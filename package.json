@@ -9,8 +9,9 @@
     "lint": "eslint .",
     "preview": "vite preview"
   },
-  "dependencies": {
+ "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "framer-motion": "^11.11.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "zustand": "^5.0.12"
