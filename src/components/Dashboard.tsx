@@ -2,7 +2,11 @@ import { useMasteryStore } from '../store/masteryStore';
 import ProgressSummary from './ProgressSummary';
 import MasteryGrid from './MasteryGrid';
 
-export default function Dashboard() {
+interface Props {
+  onStartSession: () => void;
+}
+
+export default function Dashboard({ onStartSession }: Props) {
   const studentName = useMasteryStore((s) => s.studentName);
   const curriculumLevel = useMasteryStore((s) => s.curriculumLevel);
   const lastUpdated = useMasteryStore((s) => s.lastUpdated);
@@ -28,7 +32,7 @@ export default function Dashboard() {
       </main>
 
       <footer className="dashboard__footer">
-        <button className="btn-start" disabled>
+        <button className="btn-start" onClick={onStartSession}>
           ▶&nbsp;&nbsp;START SESSION
         </button>
       </footer>

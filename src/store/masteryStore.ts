@@ -10,6 +10,7 @@ interface MasteryActions {
   updateConceptStatus: (chapterId: string, conceptId: string, status: MasteryStatus) => void;
   updateConceptNotes: (chapterId: string, conceptId: string, notes: string) => void;
   getStatusSummary: () => StatusSummary;
+  setLastUpdated: (date: string) => void;
   resetToInitial: () => void;
 }
 
@@ -83,6 +84,8 @@ export const useMasteryStore = create<MasteryStore>()(
         }
         return summary;
       },
+
+      setLastUpdated: (date) => set({ lastUpdated: date }),
 
       resetToInitial: () => set({ ...initialMasteryMap }),
     }),
