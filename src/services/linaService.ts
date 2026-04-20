@@ -1,3 +1,4 @@
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import type { VocabWord, Chapter, MasteryStatus } from '../types/mastery';
 
 export const STATUS_EMOJI: Record<MasteryStatus, string> = {
@@ -246,71 +247,29 @@ export function stripProposedChanges(content: string): string {
     .trim();
 }
 
-// ─── Streaming API call ───────────────────────────────────────────────────────
+// ─── Streaming API call (Gemini 1.5 Flash) ───────────────────────────────────
 
 export async function* streamCompletion(
   apiKey: string,
   systemPrompt: string,
   messages: Array<{ role: 'user' | 'assistant'; content: string }>,
 ): AsyncGenerator<string> {
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'content-type': 'application/json',
-      'anthropic-dangerous-direct-browser-access': 'true',
-    },
-    body: JSON.stringify({
-      model: 'claude-opus-4-7',
-      max_tokens: 4096,
-      system: systemPrompt,
-      messages,
-      stream: true,
-    }),
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({
+    model: 'gemini-1.5-flash',
+    systemInstruction: systemPrompt,
   });
 
-  if (!response.ok) {
-    const errorData = (await response.json().catch(() => ({}))) as {
-      error?: { message?: string };
-    };
-    throw new Error(
-      errorData.error?.message ?? `Anthropic API error ${response.status}`,
-    );
-  }
+  // Gemini uses 'model' instead of 'assistant' for the AI role
+  const contents = messages.map((m) => ({
+    role: m.role === 'assistant' ? 'model' : 'user',
+    parts: [{ text: m.content }],
+  }));
 
-  const reader = response.body!.getReader();
-  const decoder = new TextDecoder();
-  let buffer = '';
+  const result = await model.generateContentStream({ contents });
 
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-
-    buffer += decoder.decode(value, { stream: true });
-    const lines = buffer.split('\n');
-    buffer = lines.pop() ?? '';
-
-    for (const line of lines) {
-      if (!line.startsWith('data: ')) continue;
-      const data = line.slice(6).trim();
-      if (data === '[DONE]') return;
-
-      try {
-        const event = JSON.parse(data) as {
-          type: string;
-          delta?: { type: string; text?: string };
-        };
-        if (
-          event.type === 'content_block_delta' &&
-          event.delta?.type === 'text_delta' &&
-          event.delta.text
-        ) {
-          yield event.delta.text;
-        }
-      } catch {
-        // skip malformed SSE lines
-      }
-    }
+  for await (const chunk of result.stream) {
+    const text = chunk.text();
+    if (text) yield text;
   }
 }

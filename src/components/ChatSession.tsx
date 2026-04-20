@@ -10,7 +10,8 @@ import {
 import type { ProposedChange } from '../services/linaService';
 import type { MasteryStatus } from '../types/mastery';
 
-const API_KEY_STORAGE = 'tp-tutor-api-key';
+// API key baked in at build time via VITE_GEMINI_API_KEY GitHub Secret
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY as string;
 
 interface ChatMessage {
   id: string;
@@ -25,36 +26,35 @@ interface Props {
 }
 
 export default function ChatSession({ onEndSession }: Props) {
-  const vocabulary        = useMasteryStore((s) => s.vocabulary);
-  const chapters          = useMasteryStore((s) => s.chapters);
-  const studentName       = useMasteryStore((s) => s.studentName);
-  const updateVocabStatus = useMasteryStore((s) => s.updateVocabStatus);
+  const vocabulary          = useMasteryStore((s) => s.vocabulary);
+  const chapters            = useMasteryStore((s) => s.chapters);
+  const studentName         = useMasteryStore((s) => s.studentName);
+  const updateVocabStatus   = useMasteryStore((s) => s.updateVocabStatus);
   const updateConceptStatus = useMasteryStore((s) => s.updateConceptStatus);
-  const setLastUpdated    = useMasteryStore((s) => s.setLastUpdated);
+  const setLastUpdated      = useMasteryStore((s) => s.setLastUpdated);
 
-  const [apiKey, setApiKey]         = useState(() => localStorage.getItem(API_KEY_STORAGE) ?? '');
-  const [apiKeyInput, setApiKeyInput] = useState('');
-  const [messages, setMessages]     = useState<ChatMessage[]>([]);
-  const [input, setInput]           = useState('');
-  const [isLoading, setIsLoading]   = useState(false);
-  const [error, setError]           = useState<string | null>(null);
+  const [messages,   setMessages]  = useState<ChatMessage[]>([]);
+  const [input,      setInput]     = useState('');
+  const [isLoading,  setIsLoading] = useState(false);
+  const [error,      setError]     = useState<string | null>(null);
 
-  const messagesEndRef   = useRef<HTMLDivElement>(null);
-  const inputRef         = useRef<HTMLTextAreaElement>(null);
-  const historyRef       = useRef<Array<{ role: 'user' | 'assistant'; content: string }>>([]);
-  const greetingFired    = useRef(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef       = useRef<HTMLTextAreaElement>(null);
+  const historyRef     = useRef<Array<{ role: 'user' | 'assistant'; content: string }>>([]);
+  const greetingFired  = useRef(false);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Trigger Lina's greeting automatically on mount
   useEffect(() => {
-    if (apiKey && !greetingFired.current) {
+    if (!greetingFired.current) {
       greetingFired.current = true;
       void sendToLina('hello', true);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [apiKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function sendToLina(userText: string, hideFromUI = false) {
     if (isLoading) return;
@@ -82,7 +82,7 @@ export default function ChatSession({ onEndSession }: Props) {
       let fullContent = '';
 
       for await (const chunk of streamCompletion(
-        apiKey,
+        API_KEY,
         systemPrompt,
         historyRef.current,
       )) {
@@ -136,14 +136,6 @@ export default function ChatSession({ onEndSession }: Props) {
     }
   }
 
-  function handleSaveApiKey() {
-    const key = apiKeyInput.trim();
-    if (!key) return;
-    localStorage.setItem(API_KEY_STORAGE, key);
-    setApiKey(key);
-    setApiKeyInput('');
-  }
-
   function toggleChangeApproval(msgId: string, idx: number) {
     setMessages((prev) =>
       prev.map((m) => {
@@ -192,71 +184,16 @@ export default function ChatSession({ onEndSession }: Props) {
     );
   }
 
-  // ─── API Key Setup Screen ──────────────────────────────────────────────────
-  if (!apiKey) {
-    return (
-      <div className="chat-session">
-        <header className="chat-header">
-          <div>
-            <h1 className="chat-header__title">LINA</h1>
-            <p className="chat-header__subtitle">TOKI PONA TUTOR</p>
-          </div>
-          <button className="btn-nav" onClick={onEndSession}>
-            ← BACK
-          </button>
-        </header>
-
-        <div className="api-key-setup">
-          <h2>ANTHROPIC API KEY REQUIRED</h2>
-          <p>Lina runs on Claude Opus. Paste your API key below to begin.</p>
-          <div className="api-key-setup__form">
-            <input
-              type="password"
-              className="api-key-input"
-              placeholder="sk-ant-api03-..."
-              value={apiKeyInput}
-              onChange={(e) => setApiKeyInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSaveApiKey()}
-              autoFocus
-            />
-            <button className="btn-save-key" onClick={handleSaveApiKey}>
-              SAVE &amp; START
-            </button>
-          </div>
-          <p className="api-key-note">
-            Stored in your browser only. Sent exclusively to api.anthropic.com.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // ─── Chat Screen ───────────────────────────────────────────────────────────
   return (
     <div className="chat-session">
       <header className="chat-header">
         <div>
           <h1 className="chat-header__title">LINA</h1>
-          <p className="chat-header__subtitle">TOKI PONA TUTOR — CLAUDE OPUS</p>
+          <p className="chat-header__subtitle">TOKI PONA TUTOR — GEMINI 1.5 FLASH</p>
         </div>
-        <div className="chat-header__actions">
-          <button
-            className="btn-nav btn-nav--dim"
-            title="Change API key"
-            onClick={() => {
-              localStorage.removeItem(API_KEY_STORAGE);
-              setApiKey('');
-              setMessages([]);
-              historyRef.current = [];
-              greetingFired.current = false;
-            }}
-          >
-            KEY
-          </button>
-          <button className="btn-nav" onClick={onEndSession}>
-            ← DASHBOARD
-          </button>
-        </div>
+        <button className="btn-nav" onClick={onEndSession}>
+          ← DASHBOARD
+        </button>
       </header>
 
       <div className="chat-messages" role="log" aria-live="polite">
