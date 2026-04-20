@@ -2,14 +2,14 @@ import type { MasteryMap } from '../types/mastery';
 
 // ---------------------------------------------------------------------------
 // Seed data — mirrors the Toki Pona Mastery Map (Introduction Level)
-// Last synced: April 15, 2026 through Study Session #22 / Learning Session #14
+// Fresh-slate default — all statuses start at Not Started.
 // / Immersion Session #11
 // ---------------------------------------------------------------------------
 
 export const initialMasteryMap: MasteryMap = {
-  studentName: 'Anthony',
+  studentName: '',
   curriculumLevel: 'Introduction',
-  lastUpdated: '2026-04-15',
+  lastUpdated: '',
 
   // -------------------------------------------------------------------------
   // Chapters  (index 0 = Introduction, 1–9 = content chapters)
@@ -65,36 +65,32 @@ export const initialMasteryMap: MasteryMap = {
         {
           id: 'ch1-consonants',
           concept: 'Consonant inventory (9): p, t, k, s, m, n, l, j, w',
-          status: 'introduced',
-          sessionNotes:
-            'Identified all 9 consonants and missing letters in drills.',
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch1-vowels',
           concept: 'Vowel inventory (5): a, e, i, o, u',
-          status: 'introduced',
-          sessionNotes: 'Identified all 5 vowels.',
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch1-syllable-structure',
           concept: 'Syllable structure / phonotactics: (C)V(N) and CV(N)',
-          status: 'confident',
-          sessionNotes:
-            'Correctly identifies illegal words. Perfect recall of legal word shapes across multiple sessions. Mastery candidate.',
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch1-stress',
           concept: 'Stress rule (always on first syllable)',
-          status: 'introduced',
-          sessionNotes:
-            "Applied correctly to 'pakala' and name adaptation.",
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch1-allophony',
           concept: 'Allophony (voiced/unvoiced variation, l as tap, etc.)',
-          status: 'introduced',
-          sessionNotes:
-            "Correctly identified voicing (e.g., 'pona' → 'BO-na') as acceptable.",
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch1-nasal-assimilation',
@@ -111,16 +107,14 @@ export const initialMasteryMap: MasteryMap = {
         {
           id: 'ch1-orthography',
           concept: 'Latin alphabet orthography — lowercase default',
-          status: 'mastered',
-          sessionNotes:
-            "Any word mis-typed is a typo and shouldn't be considered an error/wrong answer.",
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch1-capitalization',
           concept: 'Capitalization rules (proper nouns / unofficial words)',
-          status: 'mastered',
-          sessionNotes:
-            'Any accidental capitalization for certain words and during the start of a sentence should be considered an automation of the keyboard and not as an error/wrong answer.',
+          status: 'not_started',
+          sessionNotes: '',
         },
       ],
     },
@@ -134,38 +128,33 @@ export const initialMasteryMap: MasteryMap = {
         {
           id: 'ch2-svo',
           concept: 'SVO word order (Subject-Verb-Object)',
-          status: 'confident',
-          sessionNotes:
-            'Consistently places subject before predicate. Strong across multiple sessions.',
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch2-li',
           concept: 'The li particle — separates subject from predicate',
-          status: 'mastered',
-          sessionNotes:
-            'Perfect recall of mi/sina exception. No errors in subject-verb separation across multiple session types. Mastered in Study Session 3.',
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch2-e',
           concept: 'The e particle — marks direct object',
-          status: 'mastered',
-          sessionNotes:
-            'Consistently applied across multiple sessions without error. Mastered in Session 4. Confirmed perfect repetition in lists throughout Study Session #14 and beyond.',
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch2-li-omission',
           concept:
             'li Omission Rule — dropped when subject is only mi or sina',
-          status: 'mastered',
-          sessionNotes:
-            "Zero errors across multiple session types. Understands 'mi en sina' still requires li. Mastered in Study Session 3.",
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch2-predicate-types',
           concept: 'Predicate types: verb, adjective, or noun after li',
-          status: 'introduced',
-          sessionNotes:
-            'Used verb, adjective, and noun predicates in practice.',
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch2-tense-free',
@@ -176,9 +165,8 @@ export const initialMasteryMap: MasteryMap = {
         {
           id: 'ch2-en',
           concept: 'The en particle — joins multiple subjects',
-          status: 'mastered',
-          sessionNotes:
-            "Study Session 16: flawless. Study Session 19: confirmed error-free across subject/object distinction drills. Mastered per Study Sessions 16 & 19 consensus. Caution: Immersion Sessions 2–4 show recurring 'en trap' in free production. Monitor in future immersion.",
+          status: 'not_started',
+          sessionNotes: '',
         },
       ],
     },
@@ -193,37 +181,33 @@ export const initialMasteryMap: MasteryMap = {
           id: 'ch3-polysemy',
           concept:
             'Polysemy — words change function based on syntactic position',
-          status: 'practicing',
-          sessionNotes:
-            "Demonstrated through using words in different positions (e.g., noka as noun vs. verb). Identified 'word-creep' as a personal barrier.",
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch3-head-initial',
           concept: 'Head-initial modifier system — first word is the head',
-          status: 'confident',
-          sessionNotes:
-            'Consistently places descriptors after the noun without prompting. Automatic across all sessions. Correctly intuited that names feel more essential and come before general descriptors.',
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch3-single-modifier',
           concept: 'Single-modifier phrases (e.g., jan lili = child)',
-          status: 'confident',
-          sessionNotes: 'Correctly uses phrases like jan lili, jan pona.',
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch3-multiple-modifiers',
           concept:
             'Multiple modifiers — each applies independently to the head (not nested)',
-          status: 'confident',
-          sessionNotes:
-            'Correctly stacks modifiers. Intuited that names come before general descriptors. Confirmed stable across many sessions.',
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch3-context',
           concept: 'Context as primary meaning-carrier',
-          status: 'introduced',
-          sessionNotes:
-            "Beginning to understand context-driven meaning; identified 'word-creep' as a barrier. Used words as different parts of speech (e.g., oko as a verb).",
+          status: 'not_started',
+          sessionNotes: '',
         },
       ],
     },
@@ -238,30 +222,27 @@ export const initialMasteryMap: MasteryMap = {
           id: 'ch4-pi-function',
           concept:
             'pi function — regroups following words into a single modifier phrase',
-          status: 'practicing',
-          sessionNotes:
-            "Introduced in Learning Session 10. Demonstrated 100% accuracy in Study Sessions 15 & 19. Anthony demonstrated 'teacher-level' awareness by correcting the tutor in Study Session 19. MIDTERM REGRESSION (Study Session 22): Failed to identify the core 2-word minimum rule in an error-check drill. Reverted from \u2705 Mastered to \uD83D\udfe1 Practicing pending re-demonstration.",
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch4-pi-minimum',
           concept: 'pi requires at least 2 content words after it',
-          status: 'introduced',
-          sessionNotes: 'Introduced in Learning Session 10.',
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch4-pi-vs-direct',
           concept:
             'pi vs. direct modification (simple possession: tomo mi, not tomo pi mi)',
-          status: 'introduced',
-          sessionNotes:
-            'Introduced in Learning Session 10. Watch for tendency to place adjectives after pi when they describe the main headword.',
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch4-pi-possession',
           concept: 'pi for multi-word possession (e.g., tomo pi jan Alu)',
-          status: 'introduced',
-          sessionNotes:
-            'Introduced in Learning Session 10. Successfully chained multiple ownership layers.',
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch4-pi-multiple',
@@ -283,47 +264,41 @@ export const initialMasteryMap: MasteryMap = {
           id: 'ch5-ala-negation',
           concept:
             'ala — universal negation (placed after the word it negates)',
-          status: 'confident',
-          sessionNotes:
-            'Flawless application in translation and storytelling. Zero hesitation across multiple contexts. Used correctly after verbs and adjectives. Study Session 14: 100% accuracy. Learning Session 14: confirmed mastery of all negation functions. Midterm (Study Session 22): flawless logic in reading comprehension and X ala X.',
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch5-ala-modifier',
           concept: 'ala as subject modifier (jan ala = nobody)',
-          status: 'confident',
-          sessionNotes:
-            'Used correctly as noun, number, and adjective (zero/nothing).',
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch5-a-not-a',
           concept: 'A-not-A structure — yes/no questions (verb ala verb)',
-          status: 'confident',
-          sessionNotes:
-            'Perfect execution of X ala X pattern across multiple sessions. Midterm: confirmed.',
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch5-a-not-a-answers',
           concept:
             'Answering A-not-A questions (repeat verb = yes; verb + ala = no)',
-          status: 'confident',
-          sessionNotes:
-            'Correctly answers using verb repetition or verb + ala.',
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch5-anu-seme',
           concept:
             'anu seme tag — turns any statement into a yes/no question',
-          status: 'confident',
-          sessionNotes:
-            'Introduced in Learning Session 11. Rapidly demonstrated confident use across noun, verb, and sentence-level choices. Confirmed consistent in Study Session 15.',
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch5-seme',
           concept:
             'seme pronoun — wh- questions (replaces the unknown element)',
-          status: 'practicing',
-          sessionNotes:
-            'Study Session 7: placed seme correctly in SVO. Midterm (Study Session 22): reverted to English word order (seme jan instead of jan seme). Regressed from \uD83D\udfe2 Confident to \uD83D\udfe1 Practicing. Needs re-drilling.',
+          status: 'not_started',
+          sessionNotes: '',
         },
       ],
     },
@@ -338,23 +313,20 @@ export const initialMasteryMap: MasteryMap = {
           id: 'ch6-preverb-position',
           concept:
             'Preverb position — after subject/li, before the main verb',
-          status: 'practicing',
-          sessionNotes:
-            'Understands helper verbs stack before main verb. Learning Session 14: practiced stacking and negation. Midterm: occasionally inserted e before following verb. Needs more variety.',
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch6-wile',
           concept: 'wile — to want to / need to',
-          status: 'mastered',
-          sessionNotes:
-            'Confirmed \u2705 Mastered in Study Sessions 9, 12, and 19. Flawless use as both preverb and transitive verb across varied exercises. Midterm: flawless.',
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch6-ken',
           concept: 'ken — to be able to / can',
-          status: 'practicing',
-          sessionNotes:
-            'Gap-fill introduced in Study Session 19. Learning Session 14 & Study Session 21: correct structural placement. Midterm: misspelled (kan) and e insertion error, but X ala X logic was correct.',
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch6-kama',
@@ -365,9 +337,8 @@ export const initialMasteryMap: MasteryMap = {
         {
           id: 'ch6-awen',
           concept: 'awen — to continue to / keep',
-          status: 'practicing',
-          sessionNotes:
-            'Introduced as a preverb concept in Session 4. Learning Session 14: initial application successful. Midterm (Study Session 22): failed recall.',
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch6-alasa',
@@ -384,29 +355,26 @@ export const initialMasteryMap: MasteryMap = {
         {
           id: 'ch6-lon',
           concept: 'lon — location / existence (at, in, on)',
-          status: 'confident',
-          sessionNotes:
-            'Correctly navigates stillness/location logic across complex sentences. Corrected habit of adding e before prepositional heads.',
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch6-tawa',
           concept: 'tawa — movement / perspective (to, for, toward)',
-          status: 'practicing',
-          sessionNotes:
-            'Mastered Study Session 9; confirmed Study Sessions 13 & 19. MIDTERM REGRESSION (Study Session 22): failed error-check — did not catch incorrect e insertion with tawa as destination preposition. Reverted from \u2705 Mastered to \uD83D\udfe1 Practicing pending re-demonstration.',
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch6-tan',
           concept: 'tan — source / cause (from, because of)',
-          status: 'confident',
-          sessionNotes:
-            'Integrated into complex la structures to express cause. High accuracy in Study Sessions 8, 13, & 19.',
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch6-kepeken',
           concept: 'kepeken — instrumentality (using, with)',
-          status: 'confident',
-          sessionNotes: "Quickly mastered the 'no e' rule for tools.",
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch6-sama',
@@ -426,9 +394,8 @@ export const initialMasteryMap: MasteryMap = {
         {
           id: 'ch7-five-colors',
           concept: 'Five-color schema: pimeja, walo, loje, jelo, laso',
-          status: 'introduced',
-          sessionNotes:
-            'jelo introduced and practiced in descriptor stacking drills. pimeja encountered in Study Session 8 and Immersion Session 3.',
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch7-laso-grue',
@@ -453,24 +420,21 @@ export const initialMasteryMap: MasteryMap = {
         {
           id: 'ch7-basic-numbers',
           concept: 'Basic number system: wan (1), tu (2), mute (3+), ala (0)',
-          status: 'confident',
-          sessionNotes:
-            "Immediate mastery of placement and meaning. Understood post-noun placement and 'very' vs 'many' distinction.",
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch7-extended-numbers',
           concept: 'Extended number system: luka (5), mute (20), ale (100)',
-          status: 'confident',
-          sessionNotes:
-            'Learning Session 13: covered the additive building-block system. Successfully built 7, 13, and 26. luka confirmed \uD83D\udfe2 Confident.',
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch7-additive-construction',
           concept:
             'Additive number construction (e.g., tu wan = 3, tu tu = 4)',
-          status: 'confident',
-          sessionNotes:
-            'Learning Session 13: successfully constructed multi-part sums (luka tu, luka luka tu wan, mute luka wan).',
+          status: 'not_started',
+          sessionNotes: '',
         },
         {
           id: 'ch7-number-philosophy',
@@ -606,10 +570,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'ala',
       partOfSpeech: 'Adj / Negator / Number',
       meanings: 'not, no, nothing, zero',
-      status: 'confident',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Study Session 14: 100% accuracy in placement. Study Session 16: confirmed confident. Midterm: flawless.',
+      sessionNotes: '',
     },
     // ── alasa ────────────────────────────────────────────────────────────────
     {
@@ -617,10 +580,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'alasa',
       partOfSpeech: 'Verb / Pre-verb',
       meanings: 'to hunt, gather, search; to try to...',
-      status: 'practicing',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        "Learning Session 13: used in 'jan alasa' (hunter) context. Learning Session 14: spelling error (asala) but semantic placement is automatic.",
+      sessionNotes: '',
     },
     // ── ale / ali ────────────────────────────────────────────────────────────
     {
@@ -628,9 +590,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'ale / ali',
       partOfSpeech: 'Adj / Noun / Number',
       meanings: 'all, every, abundance; (number) 100',
-      status: 'confident',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes: 'Learning Session 13: used in additive number system.',
+      sessionNotes: '',
     },
     // ── ante ─────────────────────────────────────────────────────────────────
     {
@@ -648,10 +610,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'anu',
       partOfSpeech: 'Particle',
       meanings: 'or',
-      status: 'mastered',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Introduced Learning Session 11; confirmed \u2705 Mastered Study Session 15. Flawless use in choice-questions, object-marking, and anu seme structures across multiple sessions.',
+      sessionNotes: '',
     },
     // ── awen ─────────────────────────────────────────────────────────────────
     {
@@ -659,10 +620,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'awen',
       partOfSpeech: 'Verb / Adj / Pre-verb',
       meanings: 'to stay, keep, protect; safe; to continue to...',
-      status: 'practicing',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Learning Session 14: initial application successful. Midterm (Study Session 22): failed recall.',
+      sessionNotes: '',
     },
     // ── e ────────────────────────────────────────────────────────────────────
     {
@@ -670,10 +630,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'e',
       partOfSpeech: 'Particle',
       meanings: '(marks a direct object)',
-      status: 'mastered',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Confirmed perfect repetition in lists. Study Session #14: mastery candidate confirmed. Midterm: perfect application.',
+      sessionNotes: '',
     },
     // ── en ───────────────────────────────────────────────────────────────────
     {
@@ -681,10 +640,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'en',
       partOfSpeech: 'Particle',
       meanings: 'and (joins subjects)',
-      status: 'mastered',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        "Study Session 19: confirmed \u2705 Mastered. Error-free across subject/object distinction drills. Caution: 'en trap' in free production (immersion). Monitor in future immersion.",
+      sessionNotes: '',
     },
     // ── esun ─────────────────────────────────────────────────────────────────
     {
@@ -712,7 +670,7 @@ export const initialMasteryMap: MasteryMap = {
       word: 'ike',
       partOfSpeech: 'Adj / Noun',
       meanings: 'bad, evil, negative, complex, wrong',
-      status: 'introduced',
+      status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
     },
@@ -722,7 +680,7 @@ export const initialMasteryMap: MasteryMap = {
       word: 'ilo',
       partOfSpeech: 'Noun',
       meanings: 'tool, device, machine',
-      status: 'introduced',
+      status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
     },
@@ -732,10 +690,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'insa',
       partOfSpeech: 'Noun / Adj',
       meanings: 'inside, center, interior, stomach; central',
-      status: 'confident',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Used correctly in multiple locative structures. Study Session 13 confirmed \uD83D\udfe2. Study Session 15 confirmed.',
+      sessionNotes: '',
     },
     // ── jaki ─────────────────────────────────────────────────────────────────
     {
@@ -753,9 +710,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'jan',
       partOfSpeech: 'Noun',
       meanings: 'person, human, people, somebody',
-      status: 'confident',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes: 'Immersion Session 4: automatic usage as noun and modifier.',
+      sessionNotes: '',
     },
     // ── jelo ─────────────────────────────────────────────────────────────────
     {
@@ -763,7 +720,7 @@ export const initialMasteryMap: MasteryMap = {
       word: 'jelo',
       partOfSpeech: 'Adj / Noun',
       meanings: 'yellow',
-      status: 'practicing',
+      status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
     },
@@ -773,10 +730,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'jo',
       partOfSpeech: 'Verb',
       meanings: 'to have, possess, own, contain, hold',
-      status: 'practicing',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Introduced Study Session 14. Immersion Session 4: used correctly for possession/state across varied contexts. Immersion Session 10: used correctly.',
+      sessionNotes: '',
     },
     // ── kala ─────────────────────────────────────────────────────────────────
     {
@@ -784,10 +740,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'kala',
       partOfSpeech: 'Noun',
       meanings: 'fish, sea creature',
-      status: 'introduced',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Introduced as a content word in Learning Session 12 exercises.',
+      sessionNotes: '',
     },
     // ── kalama ───────────────────────────────────────────────────────────────
     {
@@ -825,10 +780,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'ken',
       partOfSpeech: 'Verb / Pre-verb',
       meanings: 'to be able to, can, may; to be possible',
-      status: 'practicing',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Gap-fill introduced Study Session 19. Learning Session 14 & Study Session 21: correct structural placement. Midterm: misspelled (kan), e insertion error, but X ala X logic correct.',
+      sessionNotes: '',
     },
     // ── kepeken ──────────────────────────────────────────────────────────────
     {
@@ -836,7 +790,7 @@ export const initialMasteryMap: MasteryMap = {
       word: 'kepeken',
       partOfSpeech: 'Preposition / Verb',
       meanings: 'using, with, by means of; to use',
-      status: 'confident',
+      status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
     },
@@ -846,7 +800,7 @@ export const initialMasteryMap: MasteryMap = {
       word: 'kili',
       partOfSpeech: 'Noun',
       meanings: 'fruit, vegetable',
-      status: 'introduced',
+      status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
     },
@@ -896,10 +850,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'kon',
       partOfSpeech: 'Noun',
       meanings: 'air, gas, spirit, soul, meaning, unseen agent',
-      status: 'introduced',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Gap-fill introduced Study Session 19. Used correctly in translation.',
+      sessionNotes: '',
     },
     // ── kule ─────────────────────────────────────────────────────────────────
     {
@@ -927,10 +880,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'kute',
       partOfSpeech: 'Noun / Verb',
       meanings: 'ear; to hear, listen, obey',
-      status: 'introduced',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Midterm (Study Session 22): complete recall failure. Needs active drilling.',
+      sessionNotes: '',
     },
     // ── la ───────────────────────────────────────────────────────────────────
     {
@@ -938,7 +890,7 @@ export const initialMasteryMap: MasteryMap = {
       word: 'la',
       partOfSpeech: 'Particle',
       meanings: '(separates context from the main sentence)',
-      status: 'mastered',
+      status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
     },
@@ -948,10 +900,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'lape',
       partOfSpeech: 'Noun / Verb / Adj',
       meanings: 'sleep, rest; to sleep, to rest; sleeping',
-      status: 'introduced',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Study Session 21: recalled after hesitation. Midterm (Study Session 22): failed recall. Needs active drilling.',
+      sessionNotes: '',
     },
     // ── laso ─────────────────────────────────────────────────────────────────
     {
@@ -969,7 +920,7 @@ export const initialMasteryMap: MasteryMap = {
       word: 'lawa',
       partOfSpeech: 'Noun / Verb',
       meanings: 'head, mind; to lead, control, rule, plan',
-      status: 'practicing',
+      status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
     },
@@ -979,7 +930,7 @@ export const initialMasteryMap: MasteryMap = {
       word: 'len',
       partOfSpeech: 'Noun',
       meanings: 'cloth, clothing, fabric, layer',
-      status: 'introduced',
+      status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
     },
@@ -989,10 +940,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'lete',
       partOfSpeech: 'Adj',
       meanings: 'cold, cool, raw',
-      status: 'confident',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Introduced Learning Session 12. Fluent use in physical and mechanical contexts.',
+      sessionNotes: '',
     },
     // ── li ───────────────────────────────────────────────────────────────────
     {
@@ -1000,7 +950,7 @@ export const initialMasteryMap: MasteryMap = {
       word: 'li',
       partOfSpeech: 'Particle',
       meanings: '(separates subject from predicate)',
-      status: 'mastered',
+      status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
     },
@@ -1010,7 +960,7 @@ export const initialMasteryMap: MasteryMap = {
       word: 'lili',
       partOfSpeech: 'Adj',
       meanings: 'little, small, short, few, young',
-      status: 'confident',
+      status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
     },
@@ -1030,7 +980,7 @@ export const initialMasteryMap: MasteryMap = {
       word: 'lipu',
       partOfSpeech: 'Noun',
       meanings: 'flat object, book, paper, document, website',
-      status: 'introduced',
+      status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
     },
@@ -1050,7 +1000,7 @@ export const initialMasteryMap: MasteryMap = {
       word: 'lon',
       partOfSpeech: 'Prep / Verb / Adj',
       meanings: 'in, at, on; to be present, to exist; true, real',
-      status: 'confident',
+      status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
     },
@@ -1060,10 +1010,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'luka',
       partOfSpeech: 'Noun / Number',
       meanings: 'hand, arm; five',
-      status: 'confident',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Learning Session 13: confirmed \uD83D\udfe2 Confident as number 5 in various sums.',
+      sessionNotes: '',
     },
     // ── lukin ────────────────────────────────────────────────────────────────
     {
@@ -1071,10 +1020,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'lukin',
       partOfSpeech: 'Noun / Verb / Pre-verb',
       meanings: 'eye; to see, look, watch; to try to...',
-      status: 'introduced',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Used confidently in Immersion Session 2. Not yet formally drilled.',
+      sessionNotes: '',
     },
     // ── lupa ─────────────────────────────────────────────────────────────────
     {
@@ -1102,7 +1050,7 @@ export const initialMasteryMap: MasteryMap = {
       word: 'mama',
       partOfSpeech: 'Noun',
       meanings: 'parent, ancestor, creator, caretaker',
-      status: 'introduced',
+      status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
     },
@@ -1122,10 +1070,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'meli',
       partOfSpeech: 'Noun / Adj',
       meanings: 'woman, female; feminine',
-      status: 'practicing',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Study Session #14: introduced and used as modifier (jan meli). Minor spelling errors (mile).',
+      sessionNotes: '',
     },
     // ── mi ───────────────────────────────────────────────────────────────────
     {
@@ -1133,7 +1080,7 @@ export const initialMasteryMap: MasteryMap = {
       word: 'mi',
       partOfSpeech: 'Pronoun',
       meanings: 'I, me, we, us',
-      status: 'confident',
+      status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
     },
@@ -1143,10 +1090,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'mije',
       partOfSpeech: 'Noun / Adj',
       meanings: 'man, male; masculine',
-      status: 'practicing',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Study Session #14: introduced and used as modifier (jan mije). Minor spelling errors.',
+      sessionNotes: '',
     },
     // ── moku ─────────────────────────────────────────────────────────────────
     {
@@ -1154,10 +1100,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'moku',
       partOfSpeech: 'Noun / Verb / Adj',
       meanings: 'food, drink; to eat, drink, consume; edible',
-      status: 'confident',
-      isMasteryCandidate: true,
-      sessionNotes:
-        '\u26a0\ufe0f Mastery Candidate: Flawless usage as both noun and verb across all contexts. Awaiting mutual \u2705 agreement.',
+      status: 'not_started',
+      isMasteryCandidate: false,
+      sessionNotes: '',
     },
     // ── moli ─────────────────────────────────────────────────────────────────
     {
@@ -1175,10 +1120,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'monsi',
       partOfSpeech: 'Noun',
       meanings: 'back, rear, behind',
-      status: 'practicing',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Introduced Learning Session 9. Study Session 15: initially confused with poka; corrected. Study Session #14: confirmed \uD83D\udfe2 Confident in spatial phrases. Requires more drilling.',
+      sessionNotes: '',
     },
     // ── mu ───────────────────────────────────────────────────────────────────
     {
@@ -1206,7 +1150,7 @@ export const initialMasteryMap: MasteryMap = {
       word: 'musi',
       partOfSpeech: 'Noun / Adj / Verb',
       meanings: 'game, art, fun; entertaining, amusing; to play',
-      status: 'practicing',
+      status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
     },
@@ -1216,7 +1160,7 @@ export const initialMasteryMap: MasteryMap = {
       word: 'mute',
       partOfSpeech: 'Adj / Noun / Number',
       meanings: 'many, a lot; (number) 3+ or 20 in complex system',
-      status: 'confident',
+      status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
     },
@@ -1266,7 +1210,7 @@ export const initialMasteryMap: MasteryMap = {
       word: 'ni',
       partOfSpeech: 'Adj / Pronoun',
       meanings: 'this, that, these, those',
-      status: 'introduced',
+      status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
     },
@@ -1286,10 +1230,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'noka',
       partOfSpeech: 'Noun',
       meanings: 'leg, foot, bottom part',
-      status: 'confident',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        "Used as anatomy word and spatial landmark. Immersion Session 1: correctly applied in lon noka supa. Immersion Session 11: natural, unprompted use for 'down/bottom.'",
+      sessionNotes: '',
     },
     // ── o ────────────────────────────────────────────────────────────────────
     {
@@ -1307,7 +1250,7 @@ export const initialMasteryMap: MasteryMap = {
       word: 'oko',
       partOfSpeech: 'Noun',
       meanings: 'eye',
-      status: 'practicing',
+      status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
     },
@@ -1327,7 +1270,7 @@ export const initialMasteryMap: MasteryMap = {
       word: 'ona',
       partOfSpeech: 'Pronoun',
       meanings: 'he, she, it, they',
-      status: 'practicing',
+      status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
     },
@@ -1377,7 +1320,7 @@ export const initialMasteryMap: MasteryMap = {
       word: 'pan',
       partOfSpeech: 'Noun',
       meanings: 'grain, bread, pasta, rice, starchy staple',
-      status: 'introduced',
+      status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
     },
@@ -1387,10 +1330,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'pi',
       partOfSpeech: 'Particle',
       meanings: 'of (regroups modifiers)',
-      status: 'practicing',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        "Introduced Learning Session 10. Study Session 19: Anthony demonstrated 'teacher-level' awareness by correcting the tutor. MIDTERM (Study Session 22): Failed to identify the core 2-word minimum rule in the error-check. Reverted from \u2705 to \uD83D\udfe1 Practicing.",
+      sessionNotes: '',
     },
     // ── pilin ────────────────────────────────────────────────────────────────
     {
@@ -1398,7 +1340,7 @@ export const initialMasteryMap: MasteryMap = {
       word: 'pilin',
       partOfSpeech: 'Noun / Verb',
       meanings: 'feeling, emotion, heart; to feel, think',
-      status: 'confident',
+      status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
     },
@@ -1408,10 +1350,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'pimeja',
       partOfSpeech: 'Adj / Noun',
       meanings: 'black, dark',
-      status: 'introduced',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Encountered in Study Session 8. Used confidently in Immersion Session 3. Not formally introduced via drill.',
+      sessionNotes: '',
     },
     // ── pini ─────────────────────────────────────────────────────────────────
     {
@@ -1429,10 +1370,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'pipi',
       partOfSpeech: 'Noun',
       meanings: 'bug, insect, spider',
-      status: 'introduced',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Introduced in Immersion Session 2. Midterm (Study Session 22): complete recall failure. Needs active drilling.',
+      sessionNotes: '',
     },
     // ── poka ─────────────────────────────────────────────────────────────────
     {
@@ -1440,10 +1380,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'poka',
       partOfSpeech: 'Noun',
       meanings: 'side, hip, nearby area',
-      status: 'confident',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Introduced Learning Session 9. Immersion Session 1: successfully applied in poka supa suli. Study Session #14: confirmed \uD83D\udfe2 in spatial phrases.',
+      sessionNotes: '',
     },
     // ── poki ─────────────────────────────────────────────────────────────────
     {
@@ -1451,10 +1390,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'poki',
       partOfSpeech: 'Noun',
       meanings: 'container, box, bag, bowl',
-      status: 'introduced',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Study Session 20: gap-fill, adopted immediately. Midterm (Study Session 22): complete recall failure. Needs active drilling.',
+      sessionNotes: '',
     },
     // ── pona ─────────────────────────────────────────────────────────────────
     {
@@ -1462,10 +1400,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'pona',
       partOfSpeech: 'Noun / Adj / Verb',
       meanings: "good, simplicity, positive; to fix, to make good",
-      status: 'confident',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        "Midterm: failed recall as verb for 'fixing.' Monitor verb usage.",
+      sessionNotes: '',
     },
     // ── pu ───────────────────────────────────────────────────────────────────
     {
@@ -1493,10 +1430,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'seli',
       partOfSpeech: 'Noun / Adj / Verb',
       meanings: 'heat, warmth; hot, warm; to heat, to cook',
-      status: 'confident',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Learning Session 12: used correctly as noun, adj, and verb in first session.',
+      sessionNotes: '',
     },
     // ── selo ─────────────────────────────────────────────────────────────────
     {
@@ -1514,10 +1450,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'seme',
       partOfSpeech: 'Particle',
       meanings: 'what? which? (interrogative pronoun)',
-      status: 'practicing',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Midterm (Study Session 22): reverted to English word order (seme jan instead of jan seme). Regressed from \uD83D\udfe2 to \uD83D\udfe1.',
+      sessionNotes: '',
     },
     // ── sewi ─────────────────────────────────────────────────────────────────
     {
@@ -1525,10 +1460,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'sewi',
       partOfSpeech: 'Noun / Adj',
       meanings: 'top, sky, area above; high, divine, sacred',
-      status: 'confident',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        "Introduced Learning Session 9. Study Session 15: confirmed strong. Immersion Session 11: natural, unprompted use for 'up.'",
+      sessionNotes: '',
     },
     // ── sijelo ───────────────────────────────────────────────────────────────
     {
@@ -1536,7 +1470,7 @@ export const initialMasteryMap: MasteryMap = {
       word: 'sijelo',
       partOfSpeech: 'Noun',
       meanings: 'body, physical state, torso',
-      status: 'practicing',
+      status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
     },
@@ -1566,7 +1500,7 @@ export const initialMasteryMap: MasteryMap = {
       word: 'sina',
       partOfSpeech: 'Pronoun',
       meanings: 'you',
-      status: 'confident',
+      status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
     },
@@ -1576,10 +1510,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'sinpin',
       partOfSpeech: 'Noun',
       meanings: 'front, face, wall',
-      status: 'confident',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Study Session 15: successful production. Study Session #14: confirmed \uD83D\udfe2 in spatial phrases.',
+      sessionNotes: '',
     },
     // ── sitelen ──────────────────────────────────────────────────────────────
     {
@@ -1597,10 +1530,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'sona',
       partOfSpeech: 'Noun / Verb / Pre-verb',
       meanings: 'knowledge, information; to know; to know how to...',
-      status: 'mastered',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        "Study Session 19: confirmed \u2705 Mastered. Consistent performance in both transitive ('sona e') and preverb ('sona [verb]') contexts across multiple sessions.",
+      sessionNotes: '',
     },
     // ── soweli ───────────────────────────────────────────────────────────────
     {
@@ -1608,10 +1540,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'soweli',
       partOfSpeech: 'Noun',
       meanings: 'land mammal, animal',
-      status: 'confident',
-      isMasteryCandidate: true,
-      sessionNotes:
-        '\u26a0\ufe0f Mastery Candidate: Consistent flawless use across Immersion Sessions 1\u20134 and multiple study sessions. Midterm: used correctly. Awaiting mutual \u2705 agreement.',
+      status: 'not_started',
+      isMasteryCandidate: false,
+      sessionNotes: '',
     },
     // ── suli ─────────────────────────────────────────────────────────────────
     {
@@ -1619,7 +1550,7 @@ export const initialMasteryMap: MasteryMap = {
       word: 'suli',
       partOfSpeech: 'Adj / Noun',
       meanings: 'big, large, tall, long, important, adult; size',
-      status: 'confident',
+      status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
     },
@@ -1639,10 +1570,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'supa',
       partOfSpeech: 'Noun',
       meanings: 'horizontal surface (table, bed, floor)',
-      status: 'confident',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Immersion Session 3: used correctly across multiple contexts. Confirmed \uD83D\udfe2.',
+      sessionNotes: '',
     },
     // ── suwi ─────────────────────────────────────────────────────────────────
     {
@@ -1660,9 +1590,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'tan',
       partOfSpeech: 'Preposition / Noun',
       meanings: 'from, because of; cause, reason, origin',
-      status: 'confident',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes: 'Study Session 19: high accuracy.',
+      sessionNotes: '',
     },
     // ── taso ─────────────────────────────────────────────────────────────────
     {
@@ -1680,10 +1610,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'tawa',
       partOfSpeech: 'Prep / Verb / Adj',
       meanings: 'to, for, toward; to go, to move; moving',
-      status: 'practicing',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Mastered Study Session 9; confirmed Study Sessions 13 & 19. MIDTERM REGRESSION (Study Session 22): failed error-check for e insertion with destination preposition. Reverted from \u2705 to \uD83D\udfe1 Practicing.',
+      sessionNotes: '',
     },
     // ── telo ─────────────────────────────────────────────────────────────────
     {
@@ -1691,10 +1620,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'telo',
       partOfSpeech: 'Noun / Adj',
       meanings: 'water, liquid; wet',
-      status: 'confident',
-      isMasteryCandidate: true,
-      sessionNotes:
-        '\u26a0\ufe0f Mastery Candidate: Consistently correct. Awaiting mutual \u2705 agreement.',
+      status: 'not_started',
+      isMasteryCandidate: false,
+      sessionNotes: '',
     },
     // ── tenpo ────────────────────────────────────────────────────────────────
     {
@@ -1702,7 +1630,7 @@ export const initialMasteryMap: MasteryMap = {
       word: 'tenpo',
       partOfSpeech: 'Noun',
       meanings: 'time, duration, occasion, situation',
-      status: 'confident',
+      status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
     },
@@ -1712,7 +1640,7 @@ export const initialMasteryMap: MasteryMap = {
       word: 'toki',
       partOfSpeech: 'Noun / Verb / Interjection',
       meanings: 'language, speech; to talk, speak, say; hello!',
-      status: 'confident',
+      status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
     },
@@ -1722,7 +1650,7 @@ export const initialMasteryMap: MasteryMap = {
       word: 'tomo',
       partOfSpeech: 'Noun',
       meanings: 'indoor space, building, house, room',
-      status: 'confident',
+      status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
     },
@@ -1742,10 +1670,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'tu',
       partOfSpeech: 'Number / Verb',
       meanings: 'two; to divide',
-      status: 'mastered',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        "Learning Session 13: confirmed \u2705 Mastered. Flawless use in counting, ranking, and as 'half/divide.'",
+      sessionNotes: '',
     },
     // ── unpa ─────────────────────────────────────────────────────────────────
     {
@@ -1763,10 +1690,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'uta',
       partOfSpeech: 'Noun',
       meanings: 'mouth, lips, jaw',
-      status: 'confident',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Study Session #4: one typo (uto) corrected; used correctly in final drills.',
+      sessionNotes: '',
     },
     // ── utala ────────────────────────────────────────────────────────────────
     {
@@ -1794,10 +1720,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'wan',
       partOfSpeech: 'Number / Adj',
       meanings: 'one; unique, united',
-      status: 'mastered',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Learning Session 13: confirmed \u2705 Mastered. Flawless use in counting, ranking, and math.',
+      sessionNotes: '',
     },
     // ── waso ─────────────────────────────────────────────────────────────────
     {
@@ -1805,10 +1730,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'waso',
       partOfSpeech: 'Noun',
       meanings: 'bird, flying creature',
-      status: 'confident',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Study Sessions 20 & 21: error-free usage. Immersion Session 11: flawless. Spelling issue fully resolved.',
+      sessionNotes: '',
     },
     // ── wawa ─────────────────────────────────────────────────────────────────
     {
@@ -1816,10 +1740,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'wawa',
       partOfSpeech: 'Adj',
       meanings: 'strong, powerful, energetic, intense',
-      status: 'confident',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Study Session 20 & Immersion Session 11: natural, correct usage as modifier.',
+      sessionNotes: '',
     },
     // ── weka ─────────────────────────────────────────────────────────────────
     {
@@ -1837,10 +1760,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'wile',
       partOfSpeech: 'Verb / Pre-verb',
       meanings: 'to want, need, wish, should',
-      status: 'mastered',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Confirmed \u2705 Mastered Study Sessions 9, 12, & 19. Midterm: flawless.',
+      sessionNotes: '',
     },
     // ── nanpa ────────────────────────────────────────────────────────────────
     {
@@ -1848,10 +1770,9 @@ export const initialMasteryMap: MasteryMap = {
       word: 'nanpa',
       partOfSpeech: 'Particle / Noun',
       meanings: 'number; ordinal marker',
-      status: 'confident',
+      status: 'not_started',
       isMasteryCandidate: false,
-      sessionNotes:
-        'Learning Session 13: immediate grasp of ranking logic vs. quantity. Confirmed \uD83D\udfe2.',
+      sessionNotes: '',
     },
   ],
 };
