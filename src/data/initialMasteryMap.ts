@@ -577,7 +577,689 @@ export const initialMasteryMap: MasteryMap = {
   ],
 
   // -------------------------------------------------------------------------
-  // Vocabulary — to be populated in the next step
+  // Vocabulary  (124 words — appended in batches)
   // -------------------------------------------------------------------------
-  vocabulary: [],
+  vocabulary: [
+    // ── a ──────────────────────────────────────────────────────────────────
+    {
+      id: 'a',
+      word: 'a',
+      partOfSpeech: 'Interjection',
+      meanings: 'ah, oh, ha, um, wow',
+      status: 'not_started',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── akesi ───────────────────────────────────────────────────────────────
+    {
+      id: 'akesi',
+      word: 'akesi',
+      partOfSpeech: 'Noun',
+      meanings: 'reptile, amphibian, non-cute animal',
+      status: 'not_started',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── ala ─────────────────────────────────────────────────────────────────
+    {
+      id: 'ala',
+      word: 'ala',
+      partOfSpeech: 'Adj / Negator / Number',
+      meanings: 'not, no, nothing, zero',
+      status: 'confident',
+      isMasteryCandidate: false,
+      sessionNotes:
+        'Study Session 14: 100% accuracy in placement. Study Session 16: confirmed confident. Midterm: flawless.',
+    },
+    // ── alasa ────────────────────────────────────────────────────────────────
+    {
+      id: 'alasa',
+      word: 'alasa',
+      partOfSpeech: 'Verb / Pre-verb',
+      meanings: 'to hunt, gather, search; to try to...',
+      status: 'practicing',
+      isMasteryCandidate: false,
+      sessionNotes:
+        "Learning Session 13: used in 'jan alasa' (hunter) context. Learning Session 14: spelling error (asala) but semantic placement is automatic.",
+    },
+    // ── ale / ali ────────────────────────────────────────────────────────────
+    {
+      id: 'ale-ali',
+      word: 'ale / ali',
+      partOfSpeech: 'Adj / Noun / Number',
+      meanings: 'all, every, abundance; (number) 100',
+      status: 'confident',
+      isMasteryCandidate: false,
+      sessionNotes: 'Learning Session 13: used in additive number system.',
+    },
+    // ── ante ─────────────────────────────────────────────────────────────────
+    {
+      id: 'ante',
+      word: 'ante',
+      partOfSpeech: 'Adj / Noun / Verb',
+      meanings: 'different, other; difference; to change',
+      status: 'not_started',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── anu ──────────────────────────────────────────────────────────────────
+    {
+      id: 'anu',
+      word: 'anu',
+      partOfSpeech: 'Particle',
+      meanings: 'or',
+      status: 'mastered',
+      isMasteryCandidate: false,
+      sessionNotes:
+        'Introduced Learning Session 11; confirmed \u2705 Mastered Study Session 15. Flawless use in choice-questions, object-marking, and anu seme structures across multiple sessions.',
+    },
+    // ── awen ─────────────────────────────────────────────────────────────────
+    {
+      id: 'awen',
+      word: 'awen',
+      partOfSpeech: 'Verb / Adj / Pre-verb',
+      meanings: 'to stay, keep, protect; safe; to continue to...',
+      status: 'practicing',
+      isMasteryCandidate: false,
+      sessionNotes:
+        'Learning Session 14: initial application successful. Midterm (Study Session 22): failed recall.',
+    },
+    // ── e ────────────────────────────────────────────────────────────────────
+    {
+      id: 'e',
+      word: 'e',
+      partOfSpeech: 'Particle',
+      meanings: '(marks a direct object)',
+      status: 'mastered',
+      isMasteryCandidate: false,
+      sessionNotes:
+        'Confirmed perfect repetition in lists. Study Session #14: mastery candidate confirmed. Midterm: perfect application.',
+    },
+    // ── en ───────────────────────────────────────────────────────────────────
+    {
+      id: 'en',
+      word: 'en',
+      partOfSpeech: 'Particle',
+      meanings: 'and (joins subjects)',
+      status: 'mastered',
+      isMasteryCandidate: false,
+      sessionNotes:
+        "Study Session 19: confirmed \u2705 Mastered. Error-free across subject/object distinction drills. Caution: 'en trap' in free production (immersion). Monitor in future immersion.",
+    },
+    // ── esun ─────────────────────────────────────────────────────────────────
+    {
+      id: 'esun',
+      word: 'esun',
+      partOfSpeech: 'Noun / Verb',
+      meanings: 'market, shop, trade; to buy, sell, trade',
+      status: 'not_started',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── ijo ──────────────────────────────────────────────────────────────────
+    {
+      id: 'ijo',
+      word: 'ijo',
+      partOfSpeech: 'Noun / Adj',
+      meanings: 'thing, object, matter; material, physical',
+      status: 'not_started',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── ike ──────────────────────────────────────────────────────────────────
+    {
+      id: 'ike',
+      word: 'ike',
+      partOfSpeech: 'Adj / Noun',
+      meanings: 'bad, evil, negative, complex, wrong',
+      status: 'introduced',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── ilo ──────────────────────────────────────────────────────────────────
+    {
+      id: 'ilo',
+      word: 'ilo',
+      partOfSpeech: 'Noun',
+      meanings: 'tool, device, machine',
+      status: 'introduced',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── insa ─────────────────────────────────────────────────────────────────
+    {
+      id: 'insa',
+      word: 'insa',
+      partOfSpeech: 'Noun / Adj',
+      meanings: 'inside, center, interior, stomach; central',
+      status: 'confident',
+      isMasteryCandidate: false,
+      sessionNotes:
+        'Used correctly in multiple locative structures. Study Session 13 confirmed \uD83D\udfe2. Study Session 15 confirmed.',
+    },
+    // ── jaki ─────────────────────────────────────────────────────────────────
+    {
+      id: 'jaki',
+      word: 'jaki',
+      partOfSpeech: 'Adj / Noun',
+      meanings: 'dirty, gross, unclean; dirt, waste',
+      status: 'not_started',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── jan ──────────────────────────────────────────────────────────────────
+    {
+      id: 'jan',
+      word: 'jan',
+      partOfSpeech: 'Noun',
+      meanings: 'person, human, people, somebody',
+      status: 'confident',
+      isMasteryCandidate: false,
+      sessionNotes: 'Immersion Session 4: automatic usage as noun and modifier.',
+    },
+    // ── jelo ─────────────────────────────────────────────────────────────────
+    {
+      id: 'jelo',
+      word: 'jelo',
+      partOfSpeech: 'Adj / Noun',
+      meanings: 'yellow',
+      status: 'practicing',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── jo ───────────────────────────────────────────────────────────────────
+    {
+      id: 'jo',
+      word: 'jo',
+      partOfSpeech: 'Verb',
+      meanings: 'to have, possess, own, contain, hold',
+      status: 'practicing',
+      isMasteryCandidate: false,
+      sessionNotes:
+        'Introduced Study Session 14. Immersion Session 4: used correctly for possession/state across varied contexts. Immersion Session 10: used correctly.',
+    },
+    // ── kala ─────────────────────────────────────────────────────────────────
+    {
+      id: 'kala',
+      word: 'kala',
+      partOfSpeech: 'Noun',
+      meanings: 'fish, sea creature',
+      status: 'introduced',
+      isMasteryCandidate: false,
+      sessionNotes:
+        'Introduced as a content word in Learning Session 12 exercises.',
+    },
+    // ── kalama ───────────────────────────────────────────────────────────────
+    {
+      id: 'kalama',
+      word: 'kalama',
+      partOfSpeech: 'Noun / Verb',
+      meanings: 'sound, noise; to make sound',
+      status: 'not_started',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── kama ─────────────────────────────────────────────────────────────────
+    {
+      id: 'kama',
+      word: 'kama',
+      partOfSpeech: 'Verb / Pre-verb',
+      meanings: 'to come, arrive, become, happen; to begin to...',
+      status: 'not_started',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── kasi ─────────────────────────────────────────────────────────────────
+    {
+      id: 'kasi',
+      word: 'kasi',
+      partOfSpeech: 'Noun',
+      meanings: 'plant, tree, leaf, wood',
+      status: 'not_started',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── ken ──────────────────────────────────────────────────────────────────
+    {
+      id: 'ken',
+      word: 'ken',
+      partOfSpeech: 'Verb / Pre-verb',
+      meanings: 'to be able to, can, may; to be possible',
+      status: 'practicing',
+      isMasteryCandidate: false,
+      sessionNotes:
+        'Gap-fill introduced Study Session 19. Learning Session 14 & Study Session 21: correct structural placement. Midterm: misspelled (kan), e insertion error, but X ala X logic correct.',
+    },
+    // ── kepeken ──────────────────────────────────────────────────────────────
+    {
+      id: 'kepeken',
+      word: 'kepeken',
+      partOfSpeech: 'Preposition / Verb',
+      meanings: 'using, with, by means of; to use',
+      status: 'confident',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── kili ─────────────────────────────────────────────────────────────────
+    {
+      id: 'kili',
+      word: 'kili',
+      partOfSpeech: 'Noun',
+      meanings: 'fruit, vegetable',
+      status: 'introduced',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── kin ──────────────────────────────────────────────────────────────────
+    {
+      id: 'kin',
+      word: 'kin',
+      partOfSpeech: 'Particle / Adj',
+      meanings: 'also, too',
+      status: 'not_started',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── kipisi ───────────────────────────────────────────────────────────────
+    {
+      id: 'kipisi',
+      word: 'kipisi',
+      partOfSpeech: 'Verb / Noun',
+      meanings: 'to cut, divide, split; a slice, section',
+      status: 'not_started',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── kiwen ────────────────────────────────────────────────────────────────
+    {
+      id: 'kiwen',
+      word: 'kiwen',
+      partOfSpeech: 'Noun / Adj',
+      meanings: 'rock, stone, metal; hard, solid',
+      status: 'not_started',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── ko ───────────────────────────────────────────────────────────────────
+    {
+      id: 'ko',
+      word: 'ko',
+      partOfSpeech: 'Noun',
+      meanings: 'powder, paste, clay, semisolid substance',
+      status: 'not_started',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── kon ──────────────────────────────────────────────────────────────────
+    {
+      id: 'kon',
+      word: 'kon',
+      partOfSpeech: 'Noun',
+      meanings: 'air, gas, spirit, soul, meaning, unseen agent',
+      status: 'introduced',
+      isMasteryCandidate: false,
+      sessionNotes:
+        'Gap-fill introduced Study Session 19. Used correctly in translation.',
+    },
+    // ── kule ─────────────────────────────────────────────────────────────────
+    {
+      id: 'kule',
+      word: 'kule',
+      partOfSpeech: 'Noun',
+      meanings: 'color, aspect of a sense (timbre, flavor, etc.)',
+      status: 'not_started',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── kulupu ───────────────────────────────────────────────────────────────
+    {
+      id: 'kulupu',
+      word: 'kulupu',
+      partOfSpeech: 'Noun',
+      meanings: 'group, community, society',
+      status: 'not_started',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── kute ─────────────────────────────────────────────────────────────────
+    {
+      id: 'kute',
+      word: 'kute',
+      partOfSpeech: 'Noun / Verb',
+      meanings: 'ear; to hear, listen, obey',
+      status: 'introduced',
+      isMasteryCandidate: false,
+      sessionNotes:
+        'Midterm (Study Session 22): complete recall failure. Needs active drilling.',
+    },
+    // ── la ───────────────────────────────────────────────────────────────────
+    {
+      id: 'la',
+      word: 'la',
+      partOfSpeech: 'Particle',
+      meanings: '(separates context from the main sentence)',
+      status: 'mastered',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── lape ─────────────────────────────────────────────────────────────────
+    {
+      id: 'lape',
+      word: 'lape',
+      partOfSpeech: 'Noun / Verb / Adj',
+      meanings: 'sleep, rest; to sleep, to rest; sleeping',
+      status: 'introduced',
+      isMasteryCandidate: false,
+      sessionNotes:
+        'Study Session 21: recalled after hesitation. Midterm (Study Session 22): failed recall. Needs active drilling.',
+    },
+    // ── laso ─────────────────────────────────────────────────────────────────
+    {
+      id: 'laso',
+      word: 'laso',
+      partOfSpeech: 'Adj / Noun',
+      meanings: 'blue, green',
+      status: 'not_started',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── lawa ─────────────────────────────────────────────────────────────────
+    {
+      id: 'lawa',
+      word: 'lawa',
+      partOfSpeech: 'Noun / Verb',
+      meanings: 'head, mind; to lead, control, rule, plan',
+      status: 'practicing',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── len ──────────────────────────────────────────────────────────────────
+    {
+      id: 'len',
+      word: 'len',
+      partOfSpeech: 'Noun',
+      meanings: 'cloth, clothing, fabric, layer',
+      status: 'introduced',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── lete ─────────────────────────────────────────────────────────────────
+    {
+      id: 'lete',
+      word: 'lete',
+      partOfSpeech: 'Adj',
+      meanings: 'cold, cool, raw',
+      status: 'confident',
+      isMasteryCandidate: false,
+      sessionNotes:
+        'Introduced Learning Session 12. Fluent use in physical and mechanical contexts.',
+    },
+    // ── li ───────────────────────────────────────────────────────────────────
+    {
+      id: 'li',
+      word: 'li',
+      partOfSpeech: 'Particle',
+      meanings: '(separates subject from predicate)',
+      status: 'mastered',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── lili ─────────────────────────────────────────────────────────────────
+    {
+      id: 'lili',
+      word: 'lili',
+      partOfSpeech: 'Adj',
+      meanings: 'little, small, short, few, young',
+      status: 'confident',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── linja ────────────────────────────────────────────────────────────────
+    {
+      id: 'linja',
+      word: 'linja',
+      partOfSpeech: 'Noun',
+      meanings: 'line, rope, string, hair, long flexible thing',
+      status: 'not_started',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── lipu ─────────────────────────────────────────────────────────────────
+    {
+      id: 'lipu',
+      word: 'lipu',
+      partOfSpeech: 'Noun',
+      meanings: 'flat object, book, paper, document, website',
+      status: 'introduced',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── loje ─────────────────────────────────────────────────────────────────
+    {
+      id: 'loje',
+      word: 'loje',
+      partOfSpeech: 'Adj / Noun',
+      meanings: 'red, reddish',
+      status: 'not_started',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── lon ──────────────────────────────────────────────────────────────────
+    {
+      id: 'lon',
+      word: 'lon',
+      partOfSpeech: 'Prep / Verb / Adj',
+      meanings: 'in, at, on; to be present, to exist; true, real',
+      status: 'confident',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── luka ─────────────────────────────────────────────────────────────────
+    {
+      id: 'luka',
+      word: 'luka',
+      partOfSpeech: 'Noun / Number',
+      meanings: 'hand, arm; five',
+      status: 'confident',
+      isMasteryCandidate: false,
+      sessionNotes:
+        'Learning Session 13: confirmed \uD83D\udfe2 Confident as number 5 in various sums.',
+    },
+    // ── lukin ────────────────────────────────────────────────────────────────
+    {
+      id: 'lukin',
+      word: 'lukin',
+      partOfSpeech: 'Noun / Verb / Pre-verb',
+      meanings: 'eye; to see, look, watch; to try to...',
+      status: 'introduced',
+      isMasteryCandidate: false,
+      sessionNotes:
+        'Used confidently in Immersion Session 2. Not yet formally drilled.',
+    },
+    // ── lupa ─────────────────────────────────────────────────────────────────
+    {
+      id: 'lupa',
+      word: 'lupa',
+      partOfSpeech: 'Noun',
+      meanings: 'hole, opening, window, door',
+      status: 'not_started',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── ma ───────────────────────────────────────────────────────────────────
+    {
+      id: 'ma',
+      word: 'ma',
+      partOfSpeech: 'Noun',
+      meanings: 'land, place, location, country, ground',
+      status: 'not_started',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── mama ─────────────────────────────────────────────────────────────────
+    {
+      id: 'mama',
+      word: 'mama',
+      partOfSpeech: 'Noun',
+      meanings: 'parent, ancestor, creator, caretaker',
+      status: 'introduced',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── mani ─────────────────────────────────────────────────────────────────
+    {
+      id: 'mani',
+      word: 'mani',
+      partOfSpeech: 'Noun',
+      meanings: 'money, currency, livestock (as value measure)',
+      status: 'not_started',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── meli ─────────────────────────────────────────────────────────────────
+    {
+      id: 'meli',
+      word: 'meli',
+      partOfSpeech: 'Noun / Adj',
+      meanings: 'woman, female; feminine',
+      status: 'practicing',
+      isMasteryCandidate: false,
+      sessionNotes:
+        'Study Session #14: introduced and used as modifier (jan meli). Minor spelling errors (mile).',
+    },
+    // ── mi ───────────────────────────────────────────────────────────────────
+    {
+      id: 'mi',
+      word: 'mi',
+      partOfSpeech: 'Pronoun',
+      meanings: 'I, me, we, us',
+      status: 'confident',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── mije ─────────────────────────────────────────────────────────────────
+    {
+      id: 'mije',
+      word: 'mije',
+      partOfSpeech: 'Noun / Adj',
+      meanings: 'man, male; masculine',
+      status: 'practicing',
+      isMasteryCandidate: false,
+      sessionNotes:
+        'Study Session #14: introduced and used as modifier (jan mije). Minor spelling errors.',
+    },
+    // ── moku ─────────────────────────────────────────────────────────────────
+    {
+      id: 'moku',
+      word: 'moku',
+      partOfSpeech: 'Noun / Verb / Adj',
+      meanings: 'food, drink; to eat, drink, consume; edible',
+      status: 'confident',
+      isMasteryCandidate: true,
+      sessionNotes:
+        '\u26a0\ufe0f Mastery Candidate: Flawless usage as both noun and verb across all contexts. Awaiting mutual \u2705 agreement.',
+    },
+    // ── moli ─────────────────────────────────────────────────────────────────
+    {
+      id: 'moli',
+      word: 'moli',
+      partOfSpeech: 'Noun / Verb / Adj',
+      meanings: 'death; to die, to kill; dead',
+      status: 'not_started',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── monsi ────────────────────────────────────────────────────────────────
+    {
+      id: 'monsi',
+      word: 'monsi',
+      partOfSpeech: 'Noun',
+      meanings: 'back, rear, behind',
+      status: 'practicing',
+      isMasteryCandidate: false,
+      sessionNotes:
+        'Introduced Learning Session 9. Study Session 15: initially confused with poka; corrected. Study Session #14: confirmed \uD83D\udfe2 Confident in spatial phrases. Requires more drilling.',
+    },
+    // ── mu ───────────────────────────────────────────────────────────────────
+    {
+      id: 'mu',
+      word: 'mu',
+      partOfSpeech: 'Interjection / Noun',
+      meanings: '(any animal sound)',
+      status: 'not_started',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── mun ──────────────────────────────────────────────────────────────────
+    {
+      id: 'mun',
+      word: 'mun',
+      partOfSpeech: 'Noun',
+      meanings: 'moon, star, night sky object',
+      status: 'not_started',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── musi ─────────────────────────────────────────────────────────────────
+    {
+      id: 'musi',
+      word: 'musi',
+      partOfSpeech: 'Noun / Adj / Verb',
+      meanings: 'game, art, fun; entertaining, amusing; to play',
+      status: 'practicing',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── mute ─────────────────────────────────────────────────────────────────
+    {
+      id: 'mute',
+      word: 'mute',
+      partOfSpeech: 'Adj / Noun / Number',
+      meanings: 'many, a lot; (number) 3+ or 20 in complex system',
+      status: 'confident',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── namako ───────────────────────────────────────────────────────────────
+    {
+      id: 'namako',
+      word: 'namako',
+      partOfSpeech: 'Adj / Noun',
+      meanings: 'additional, extra; spice',
+      status: 'not_started',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── nasa ─────────────────────────────────────────────────────────────────
+    {
+      id: 'nasa',
+      word: 'nasa',
+      partOfSpeech: 'Adj',
+      meanings: 'strange, weird, silly, unusual',
+      status: 'not_started',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── nasin ────────────────────────────────────────────────────────────────
+    {
+      id: 'nasin',
+      word: 'nasin',
+      partOfSpeech: 'Noun',
+      meanings: 'way, path, method, road, doctrine',
+      status: 'not_started',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── nena ─────────────────────────────────────────────────────────────────
+    {
+      id: 'nena',
+      word: 'nena',
+      partOfSpeech: 'Noun',
+      meanings: 'bump, hill, mountain, nose',
+      status: 'not_started',
+      isMasteryCandidate: false,
+      sessionNotes: '',
+    },
+    // ── (batch 2: ni → wile + nanpa + luka-number) ───────────────────────────
+  ],
 };
