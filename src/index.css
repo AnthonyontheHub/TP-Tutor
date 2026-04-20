@@ -1,111 +1,317 @@
+/* ─── Reset ──────────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ─── Design tokens ──────────────────────────────────────────────────────── */
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  /* Base */
+  --bg:          #000000;
+  --surface:     #0f0f0f;
+  --surface-2:   #1a1a1a;
+  --text:        #ffffff;
+  --text-muted:  #555555;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  /* Status accent colors (match the emoji hues) */
+  --col-not-started: #3a3a3a;
+  --col-introduced:  #2563eb;
+  --col-practicing:  #d97706;
+  --col-confident:   #16a34a;
+  --col-mastered:    #22c55e;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
+  /* Status background tints (very dark) */
+  --bg-not-started: #111111;
+  --bg-introduced:  #050f24;
+  --bg-practicing:  #110900;
+  --bg-confident:   #020d05;
+  --bg-mastered:    #041208;
+
+  /* Typography */
+  --font: 'Courier New', Consolas, 'Lucida Console', monospace;
+
+  /* Borders */
+  --border-w: 2px;
+  --border-w-thick: 3px;
+}
+
+/* ─── Base ───────────────────────────────────────────────────────────────── */
+html, body, #root {
+  min-height: 100vh;
   background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
+  color: var(--text);
+  font-family: var(--font);
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
-}
-
-#root {
-  width: 1126px;
-  max-width: 100%;
+/* ─── Dashboard shell ────────────────────────────────────────────────────── */
+.dashboard {
+  max-width: 900px;
   margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
+  padding: 0 16px;
+}
+
+/* ─── Header ─────────────────────────────────────────────────────────────── */
+.dashboard__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 24px 0 20px;
+  border-bottom: var(--border-w-thick) solid var(--text);
+  margin-bottom: 32px;
+}
+
+.dashboard__title {
+  font-size: clamp(1.6rem, 6vw, 2.6rem);
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.dashboard__subtitle {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  letter-spacing: 0.15em;
+  margin-top: 8px;
+  text-transform: uppercase;
+}
+
+.dashboard__header-right {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.dashboard__student {
+  display: block;
+  font-size: 1rem;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+}
+
+.dashboard__date {
+  display: block;
+  font-size: 0.58rem;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  margin-top: 6px;
+  text-transform: uppercase;
+}
+
+/* ─── Main content ───────────────────────────────────────────────────────── */
+.dashboard__main {
+  /* bottom padding so last cards aren't hidden behind the fixed footer */
+  padding-bottom: 96px;
+}
+
+/* ─── Section titles ─────────────────────────────────────────────────────── */
+.section-title {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  padding-left: 10px;
+  border-left: var(--border-w-thick) solid var(--text);
+}
+
+.section-title__count {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+/* ─── Progress Summary ───────────────────────────────────────────────────── */
+.progress-summary {
+  margin-bottom: 40px;
+}
+
+.progress-summary__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: var(--border-w) solid var(--text);
+}
+
+@media (min-width: 480px) {
+  .progress-summary__grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+.progress-card {
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 18px 6px;
+  background: var(--surface);
+  border-right: var(--border-w) solid var(--text);
+  border-bottom: var(--border-w) solid var(--text);
+  /* Status accent as top bar */
+  border-top: 4px solid transparent;
 }
 
-body {
-  margin: 0;
+/* Remove right border on last of each row (mobile 3-col) */
+.progress-card:nth-child(3n) {
+  border-right: none;
+}
+/* Remove bottom border on last two rows on mobile */
+.progress-card:nth-child(n+4) {
+  border-bottom: none;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
+@media (min-width: 480px) {
+  /* On 6-col layout, only last card loses right border */
+  .progress-card:nth-child(3n) {
+    border-right: var(--border-w) solid var(--text);
+  }
+  .progress-card:nth-child(n+4) {
+    border-bottom: var(--border-w) solid var(--text);
+  }
+  .progress-card:last-child {
+    border-right: none;
+  }
+  .progress-card:nth-child(n+4) {
+    border-bottom: none;
   }
 }
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
+
+.progress-card--mastered    { border-top-color: var(--col-mastered); }
+.progress-card--confident   { border-top-color: var(--col-confident); }
+.progress-card--practicing  { border-top-color: var(--col-practicing); }
+.progress-card--introduced  { border-top-color: var(--col-introduced); }
+.progress-card--not_started { border-top-color: var(--col-not-started); }
+.progress-card--total       { border-top-color: var(--text); }
+
+.progress-card__emoji {
+  font-size: 1.4rem;
+  line-height: 1;
 }
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+.progress-card__count {
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1;
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+.progress-card__label {
+  font-size: 0.5rem;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* ─── Mastery Grid ───────────────────────────────────────────────────────── */
+.mastery-grid {
+  margin-bottom: 40px;
+}
+
+.mastery-grid__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  gap: 4px;
+}
+
+/* ─── Vocab Cards ────────────────────────────────────────────────────────── */
+.vocab-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 8px 7px 6px;
+  min-height: 54px;
+  border: var(--border-w) solid transparent;
+  cursor: default;
+  transition: filter 0.1s;
+}
+
+.vocab-card:hover {
+  filter: brightness(1.25);
+}
+
+.vocab-card--not_started {
+  background: var(--bg-not-started);
+  border-color: var(--col-not-started);
+}
+.vocab-card--introduced {
+  background: var(--bg-introduced);
+  border-color: var(--col-introduced);
+}
+.vocab-card--practicing {
+  background: var(--bg-practicing);
+  border-color: var(--col-practicing);
+}
+.vocab-card--confident {
+  background: var(--bg-confident);
+  border-color: var(--col-confident);
+}
+.vocab-card--mastered {
+  background: var(--bg-mastered);
+  border-color: var(--col-mastered);
+}
+
+.vocab-card__candidate {
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  font-size: 0.6rem;
+  opacity: 0.8;
+}
+
+.vocab-card__word {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--text);
+  word-break: break-word;
+}
+
+.vocab-card__pos {
+  display: block;
+  font-size: 0.52rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+}
+
+/* ─── Footer / Start Session ─────────────────────────────────────────────── */
+.dashboard__footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 16px;
+  background: var(--bg);
+  border-top: var(--border-w-thick) solid var(--text);
+  display: flex;
+  justify-content: center;
+}
+
+.btn-start {
+  width: 100%;
+  max-width: 900px;
+  padding: 14px 32px;
+  background: var(--text);
+  color: var(--bg);
+  font-family: var(--font);
+  font-size: 0.9rem;
+  font-weight: 900;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  border: var(--border-w-thick) solid var(--text);
+  border-radius: 0;
+  cursor: not-allowed;
+  opacity: 0.85;
+  transition: background 0.1s, color 0.1s;
+}
+
+.btn-start:not(:disabled):hover {
+  background: var(--bg);
+  color: var(--text);
 }
