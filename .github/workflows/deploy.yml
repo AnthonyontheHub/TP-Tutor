@@ -1,8 +1,8 @@
-name: Build and Deploy
 on:
   push:
     branches:
       - main
+  workflow_dispatch: # This adds the "Run workflow" button
 permissions:
   contents: write # This is the missing piece of 'power'
 jobs:
