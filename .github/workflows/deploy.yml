@@ -1,41 +1,27 @@
-name: Deploy to GitHub Pages
-
+name: Build and Deploy
 on:
   push:
-    branches: "main"
-
-# Added permissions to allow the action to write to the gh-pages branch
+    branches:
+      - main
 permissions:
-  contents: write
-
+  contents: write # This is the missing piece of 'power'
 jobs:
   build-and-deploy:
+    concurrency: ci-${{ github.ref }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
+      - name: Checkout 🛎️
         uses: actions/checkout@v4
 
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm install
-
-      # Added specific step to ensure the Generative AI SDK is present
-      - name: Ensure Google Generative AI SDK is installed
-        run: npm install @google/generative-ai
-
-      # Injected VITE_GEMINI_API_KEY into the build environment
-      - name: Build Project
-        run: npm run build
+      - name: Install and Build 🔧
+        run: |
+          npm install
+          npm run build
         env:
           VITE_GEMINI_API_KEY: ${{ secrets.VITE_GEMINI_API_KEY }}
 
-      - name: Deploy to GitHub Pages
+      - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: dist
+          folder: dist # Or 'build' if that's what your app uses
           branch: gh-pages
