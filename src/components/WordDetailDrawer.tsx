@@ -25,6 +25,10 @@ const MOCK_DICTIONARY: Record<string, string> = {
   "mute": "sina sona mute. (You know much.)"
 };
 
+const STATUS_ORDER: MasteryStatus[] = [
+  'not_started', 'introduced', 'practicing', 'confident', 'mastered',
+];
+
 const getGlowColor = (status: MasteryStatus) => {
   switch (status) {
     case 'introduced': return '0 -8px 30px rgba(59, 130, 246, 0.25)';
@@ -40,9 +44,6 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
   const [examples, setExamples] = useState<Record<string, string>>({});
   const [isGenerating, setIsGenerating] = useState(true);
   const updateVocabStatus = useMasteryStore((s) => s.updateVocabStatus);
-  const [stagedStatus, setStagedStatus] = useState<MasteryStatus>(word.status);
-
-  useEffect(() => { setStagedStatus(word.status); }, [word.id, word.status]);
 
   useEffect(() => {
     const loadOfflineData = () => {
@@ -65,6 +66,17 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
       .catch(() => loadOfflineData());
   }, [word.word, isSandboxMode]);
 
+  // NEW: Automatic cycling and saving
+  const handleAutoCycle = () => {
+    if (!isSandboxMode) return;
+    const currentIndex = STATUS_ORDER.indexOf(word.status);
+    const nextIndex = (currentIndex + 1) % STATUS_ORDER.length;
+    const newStatus = STATUS_ORDER[nextIndex];
+    
+    // Updates the store immediately
+    updateVocabStatus(word.id, newStatus);
+  };
+
   return (
     <AnimatePresence>
       <motion.div className="drawer-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} />
@@ -76,7 +88,7 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
         onDragEnd={(_, info) => { if (info.offset.y > 100 || info.velocity.y > 500) onClose(); }}
         style={{ 
           position: 'fixed', bottom: 0, left: 0, right: 0, height: '66vh', zIndex: 1000, 
-          display: 'flex', flexDirection: 'column', boxShadow: getGlowColor(stagedStatus),
+          display: 'flex', flexDirection: 'column', boxShadow: getGlowColor(word.status),
           borderTopLeftRadius: '20px', borderTopRightRadius: '20px', background: 'var(--surface, #111)'
         }}
       >
@@ -87,13 +99,31 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
         <div style={{ padding: '0 20px', overflowY: 'auto', flex: 1 }}>
           <div className="word-drawer__meta">
             <span className="word-drawer__word">{word.word}</span>
-            <div style={{ marginTop: '4px', color: 'gray', fontSize: '0.9rem' }}>
-              Status: {STATUS_META[stagedStatus].emoji} {STATUS_META[stagedStatus].label.toUpperCase()}
+            
+            {/* Clickable status that saves automatically */}
+            <div 
+               style={{ 
+                 marginTop: '4px', 
+                 padding: isSandboxMode ? '6px 10px' : '0', 
+                 borderRadius: '6px', 
+                 background: isSandboxMode ? 'rgba(255,255,255,0.08)' : 'transparent', 
+                 display: 'inline-block',
+                 cursor: isSandboxMode ? 'pointer' : 'default', 
+                 userSelect: 'none',
+                 border: isSandboxMode ? '1px solid rgba(255,255,255,0.1)' : 'none'
+               }}
+               onClick={handleAutoCycle}
+            >
+              <span className="word-drawer__status" style={{ fontSize: '0.9rem', color: 'gray' }}>
+                Status: {STATUS_META[word.status].emoji} {STATUS_META[word.status].label.toUpperCase()}
+                {isSandboxMode && <span style={{ color: '#666', fontSize: '0.7rem', marginLeft: '8px' }}> (TAP TO CHANGE)</span>}
+              </span>
             </div>
-            <span className="word-drawer__meanings" style={{ display: 'block', marginTop: '8px' }}>{word.meanings}</span>
+
+            <span className="word-drawer__meanings" style={{ display: 'block', marginTop: '12px' }}>{word.meanings}</span>
           </div>
 
-          <div className="word-drawer__section-label" style={{ marginTop: '16px' }}>EXAMPLES</div>
+          <div className="word-drawer__section-label" style={{ marginTop: '20px' }}>EXAMPLES</div>
           <div className="word-drawer__examples-list">
             {partsOfSpeech.map((pos) => (
               <div key={pos} style={{ background: '#1a1a1a', padding: '12px', borderRadius: '4px', marginBottom: '12px', border: '1px solid #333' }}>
