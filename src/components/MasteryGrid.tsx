@@ -18,7 +18,7 @@ interface Props {
 const STATUS_ORDER: MasteryStatus[] = ['not_started', 'introduced', 'practicing', 'confident', 'mastered'];
 
 const FREQUENCY_ORDER = [
-  "mi", "li", "e", "toki", "pona", "ni", "a", "la", "ala", "sina", "lon", "jan", "tawa", "pi", "sona", "tenpo", "ona", "wile", "mute", "taso", "o", "kama", "ken", "pilin", "nimi", "ike", "lili", "tan", "tomo", "pali", "ma", "sitelen", "kepeken", "musi", "jo", "moku", "lukin", "sama", "telo", "lape", "seme", "kin", "ilo", "ale / ali", "pini", "ante", "suli", "ijo", "anu", "nasa", "kulupu", "suno", "pana", "kalama", "lipu", "tu", "nasin", "sin", "pakala", "en", "wawa", "olin", "lawa", "awen", "sewi", "seli", "kon", "soweli", "weka", "mu", "wan", "lete", "sike", "nanpa", "kasi", "moli", "kute", "suwi", "utala", "pimeja", "mama", "sijelo", "pan", "luka", "uta", "open", "ko", "jaki", "kala", "pu", "insa", "esun", "kili", "poka", "mani", "len", "linja", "meli", "kiwen", "poki", "supa", "kule", "mije", "waso", "walo", "pipi", "palisa", "anpa", "noka", "akesi", "loje", "mun", "nena", "unpa", "sinpin", "selo", "monsi", "jelo", "laso", "oko", "alasa", "kipisi", "tonsi", "namako"
+  "mi", "li", "e", "toki", "pona", "ni", "a", "la", "ala", "sina", "lon", "jan", "tawa", "pi", "sona", "tenpo", "ona", "wile", "mute", "taso", "o", "kama", "ken", "pilin", "nimi", "ike", "lili", "tan", "tomo", "pali", "ma", "sitelen", "kepeken", "musi", "jo", "moku", "lukin", "sama", "telo", "lape", "seme", "kin", "ilo", "ale / ali", "pini", "ante", "suli", "ijo", "anu", "nasa", "kulupu", "suno", "pana", "kalama", "lipu", "tu", "nasin", "sin", "pakala", "en", "wawa", "olin", "lawa", "awen", "sewi", "seli", "kon", "soweli", "weka", "mu", "wan", "lete", "sike", "nanpa", "kasi", "moli", "kute", "suwi", "utala", "pimeja", "mama", "sijelo", "pan", "luka", "uta", "open", "ko", "jaki", "kala", "pu", "insa", "esun", "kili", "poka", "mani", "len", "user_is_anthony", "linja", "meli", "kiwen", "poki", "supa", "kule", "mije", "waso", "walo", "pipi", "palisa", "anpa", "noka", "akesi", "loje", "mun", "nena", "unpa", "sinpin", "selo", "monsi", "jelo", "laso", "oko", "alasa", "kipisi", "tonsi", "namako"
 ];
 
 function getPermutations(array: string[]): string[] {
@@ -89,16 +89,14 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
     });
 
   const handlePointerDown = (word: VocabWord) => {
-    // Start long press timer (500ms)
     longPressTimer.current = setTimeout(() => {
-      soundService.playBlip(523.25, 'sine', 0.05); // C5 - selection tone
+      soundService.playBlip(523.25, 'sine', 0.05); 
       setSelectedWords(prev => [...prev, word.word]);
       longPressTimer.current = null;
     }, 500);
   };
 
-  const handlePointerUp = (word: VocabWord, e: React.MouseEvent | React.TouchEvent) => {
-    // If long press triggered, don't do anything else
+  const handlePointerUp = (word: VocabWord) => {
     if (!longPressTimer.current) return;
 
     clearTimeout(longPressTimer.current);
@@ -112,14 +110,11 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
       updateVocabStatus(word.id, STATUS_ORDER[(STATUS_ORDER.indexOf(word.status) + 1) % STATUS_ORDER.length]);
       lastClickRef.current = null;
     } else {
-      // Standard Tap: Open the Card/Drawer
       lastClickRef.current = { id: word.id, time: now };
       if (selectedWords.includes(word.word)) {
-        // If already selected, tap to deselect
         soundService.playBlip(329.63, 'sine', 0.05);
         setSelectedWords(prev => prev.filter(w => w !== word.word));
       } else {
-        // Focus word / Open Drawer
         setDrawerId(word.id);
       }
     }
@@ -135,10 +130,11 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
             <div 
               key={word.id} 
               onMouseDown={() => handlePointerDown(word)}
-              onMouseUp={(e) => handlePointerUp(word, e)}
+              onMouseUp={() => handlePointerUp(word)}
               onTouchStart={() => handlePointerDown(word)}
-              onTouchEnd={(e) => handlePointerUp(word, e)}
-              style={{ transform: isSelected ? 'scale(1.1)' : (selectedWords.length > 0 && !isSelected ? 'scale(0.85)' : 'scale(1)'), opacity: selectedWords.length > 0 && !isSelected ? 0.2 : 1, transition: 'all 0.3s ease', zIndex: isSelected ? 10 : 1, cursor: 'pointer', position: 'relative' }}
+              onTouchEnd={() => handlePointerUp(word)}
+              onContextMenu={(e) => e.preventDefault()}
+              style={{ transform: isSelected ? 'scale(1.1)' : (selectedWords.length > 0 && !isSelected ? 'scale(0.85)' : 'scale(1)'), opacity: selectedWords.length > 0 && !isSelected ? 0.2 : 1, transition: 'all 0.3s ease', zIndex: isSelected ? 10 : 1, cursor: 'pointer', position: 'relative', userSelect: 'none' }}
             >
               <VocabCard word={word} onClick={() => {}} />
             </div>
@@ -188,5 +184,5 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
       )}
     </section>
   );
-    }
-      
+  }
+                      
