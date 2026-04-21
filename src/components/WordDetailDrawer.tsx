@@ -1,31 +1,29 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useMasteryStore } from '../store/masteryStore';
 import { STATUS_META } from '../types/mastery';
-import type { VocabWord, MasteryStatus } from '../types/mastery';
-
-const STATUS_ORDER: MasteryStatus[] = [
-  'not_started',
-  'introduced',
-  'practicing',
-  'confident',
-  'mastered',
-];
+import type { VocabWord } from '../types/mastery';
 
 interface Props {
   word: VocabWord;
   onClose: () => void;
+  // NEW: A function to send a prompt to Lina
+  onAskLina: (prompt: string) => void; 
 }
 
-export default function WordDetailDrawer({ word, onClose }: Props) {
-  const updateVocabStatus = useMasteryStore((s) => s.updateVocabStatus);
+export default function WordDetailDrawer({ word, onClose, onAskLina }: Props) {
+  // Split the "noun / verb" string into an array so we can list them out
+  const partsOfSpeech = word.partOfSpeech.split('/').map(p => p.trim());
 
-  function handleStatus(status: MasteryStatus) {
-    updateVocabStatus(word.id, status);
+  function handleAskLina(pos?: string) {
+    const prompt = pos 
+      ? `toki Lina, can we practice using "${word.word}" as a ${pos}?`
+      : `toki Lina, I want to discuss the word "${word.word}".`;
+    
+    onAskLina(prompt);
+    onClose(); // Close the drawer automatically
   }
 
   return (
     <AnimatePresence>
-      {/* Backdrop */}
       <motion.div
         className="drawer-backdrop"
         initial={{ opacity: 0 }}
@@ -35,80 +33,66 @@ export default function WordDetailDrawer({ word, onClose }: Props) {
         aria-hidden="true"
       />
 
-      {/* Bottom Sheet */}
       <motion.div
         className="word-drawer"
         role="dialog"
         aria-modal="true"
-        aria-label={`Details for ${word.word}`}
-        // Drag configuration
         drag="y"
         dragConstraints={{ top: 0 }}
         dragElastic={0.2}
-        // Snap Logic: 0 is full screen (top), 50% is half, 100% is closed
         initial={{ y: '100%' }}
-        animate={{ y: '50%' }} // Opens to half-screen by default
+        animate={{ y: '50%' }}
         exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
         onDragEnd={(_, info) => {
-          if (info.offset.y > 150) {
-            onClose(); // Close if dragged down significantly
-          }
+          if (info.offset.y > 150) onClose();
         }}
-        // Snap points for Half/Full Screen
         dragSnapToOrigin={false}
-        whileDrag={{ cursor: 'grabbing' }}
-        style={{ 
-          height: '100vh', 
-          top: 0,
-          position: 'fixed',
-          zIndex: 1000
-        }}
+        style={{ height: '100vh', top: 0, position: 'fixed', zIndex: 1000 }}
       >
-        {/* Gray Draggable Handle */}
         <div className="word-drawer__drag-zone" style={{ width: '100%', padding: '12px 0', cursor: 'grab' }}>
-          <div 
-            className="word-drawer__handle" 
-            style={{ 
-              width: '40px', 
-              height: '5px', 
-              backgroundColor: '#888', 
-              borderRadius: '10px', 
-              margin: '0 auto' 
-            }} 
-            aria-hidden="true" 
-          />
+          <div className="word-drawer__handle" style={{ width: '40px', height: '5px', backgroundColor: '#888', borderRadius: '10px', margin: '0 auto' }} />
         </div>
 
         <div className="word-drawer__content" style={{ padding: '0 20px 40px' }}>
           <div className="word-drawer__meta">
             <span className="word-drawer__word">{word.word}</span>
-            <span className="word-drawer__pos">{word.partOfSpeech}</span>
+            <span className="word-drawer__status" style={{ display: 'block', marginTop: '4px', fontSize: '0.9rem', color: '#666' }}>
+              Status: {STATUS_META[word.status].emoji} {STATUS_META[word.status].label.toUpperCase()}
+            </span>
             <span className="word-drawer__meanings">{word.meanings}</span>
           </div>
 
-          <div className="word-drawer__section-label">SET STATUS</div>
+          <div className="word-drawer__section-label">PARTS OF SPEECH & EXAMPLES</div>
 
-          <div className="word-drawer__status-buttons">
-            {STATUS_ORDER.map((status) => {
-              const meta = STATUS_META[status];
-              const isActive = word.status === status;
-              return (
-                <button
-                  key={status}
-                  className={`status-btn status-btn--${status}${isActive ? ' status-btn--active' : ''}`}
-                  onClick={() => handleStatus(status)}
-                  aria-pressed={isActive}
-                >
-                  <span className="status-btn__emoji">{meta.emoji}</span>
-                  <span className="status-btn__label">{meta.label.toUpperCase()}</span>
-                  {isActive && <span className="status-btn__tick">◀</span>}
-                </button>
-              );
-            })}
+          <div className="word-drawer__examples-list">
+            {partsOfSpeech.map((pos) => (
+              <div key={pos} style={{ background: '#f5f5f5', padding: '12px', borderRadius: '8px', marginBottom: '12px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <span style={{ fontWeight: 'bold', textTransform: 'uppercase', fontSize: '0.85rem' }}>{pos}</span>
+                  <button 
+                    onClick={() => handleAskLina(pos)}
+                    style={{ fontSize: '0.75rem', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer', border: '1px solid #ccc' }}
+                  >
+                    💬 Ask Lina
+                  </button>
+                </div>
+                <p style={{ margin: 0, fontStyle: 'italic', fontSize: '0.9rem', color: '#555' }}>
+                  {/* Note: We will need to add actual example sentences to your data file later! */}
+                  (Example sentences coming soon...)
+                </p>
+              </div>
+            ))}
           </div>
 
-          <button className="word-drawer__close" onClick={onClose}>
+          <button 
+             style={{ width: '100%', padding: '12px', marginTop: '10px', cursor: 'pointer', borderRadius: '8px', background: '#333', color: 'white', border: 'none' }}
+             onClick={() => handleAskLina()}
+          >
+            DISCUSS "{word.word.toUpperCase()}" WITH LINA
+          </button>
+
+          <button className="word-drawer__close" onClick={onClose} style={{ marginTop: '16px' }}>
             ✕&nbsp;&nbsp;CLOSE
           </button>
         </div>
