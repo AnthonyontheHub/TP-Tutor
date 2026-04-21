@@ -19,7 +19,7 @@ interface Props {
   selectedWords: string[];
   setSelectedWords: (words: string[]) => void;
   sortMode: SortMode;
-  sortDirection: SortDirection; // NEW PROP
+  sortDirection: SortDirection;
 }
 
 export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, selectedWords, setSelectedWords, sortMode, sortDirection }: Props) {
@@ -27,32 +27,22 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, se
   const updateVocabStatus = useMasteryStore((s) => s.updateVocabStatus);
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [visibleCount, setVisibleCount] = useState(40);
+  
   const comboRef = useRef<{ timer: ReturnType<typeof setTimeout>, wordId: string } | null>(null);
   const longPressRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const sortedAndFilteredVocab = useMemo(() => {
+  const sortedVocab = useMemo(() => {
     const list = [...vocabulary].filter(w => !activeFilter || w.status === activeFilter);
-    
     list.sort((a, b) => {
-      let comparison = 0;
-      if (sortMode === 'usage') {
-        comparison = (WORD_FREQ[b.word] || 0) - (WORD_FREQ[a.word] || 0);
-      } else if (sortMode === 'status') {
-        comparison = STATUS_ORDER.indexOf(b.status) - STATUS_ORDER.indexOf(a.status);
-      } else if (sortMode === 'unlocked') {
-        comparison = (a.status === 'not_started' ? 1 : 0) - (b.status === 'not_started' ? 1 : 0);
-      } else {
-        comparison = a.word.localeCompare(b.word);
-      }
-      
-      // Apply direction flip
-      return sortDirection === 'asc' ? comparison : -comparison;
+      let res = 0;
+      if (sortMode === 'usage') res = (WORD_FREQ[b.word] || 0) - (WORD_FREQ[a.word] || 0);
+      else if (sortMode === 'status') res = STATUS_ORDER.indexOf(b.status) - STATUS_ORDER.indexOf(a.status);
+      else if (sortMode === 'unlocked') res = (a.status === 'not_started' ? 1 : 0) - (b.status === 'not_started' ? 1 : 0);
+      else res = a.word.localeCompare(b.word);
+      return sortDirection === 'asc' ? res : -res;
     });
-
     return list;
   }, [vocabulary, activeFilter, sortMode, sortDirection]);
-
-  const displayedVocab = sortedAndFilteredVocab.slice(0, visibleCount);
 
   const handleCardClick = (word: VocabWord) => {
     if (selectedWords.length > 0) {
@@ -60,59 +50,41 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, se
       else setSelectedWords([...selectedWords, word.word]);
       return;
     }
-
     if (isSandboxMode && comboRef.current?.wordId === word.id) {
       clearTimeout(comboRef.current.timer);
       updateVocabStatus(word.id, STATUS_ORDER[(STATUS_ORDER.indexOf(word.status) + 1) % STATUS_ORDER.length]);
       comboRef.current = { timer: setTimeout(() => comboRef.current = null, 350), wordId: word.id };
       return;
     } 
-
     if (comboRef.current) clearTimeout(comboRef.current.timer);
-    comboRef.current = { timer: setTimeout(() => {
-      setDrawerId(word.id);
-      comboRef.current = null;
-    }, 250), wordId: word.id };
+    comboRef.current = { timer: setTimeout(() => { setDrawerId(word.id); comboRef.current = null; }, 250), wordId: word.id };
   };
 
   return (
-    <section className="mastery-grid" style={{ padding: '0 16px' }} onClick={() => setSelectedWords([])}>
+    <section className="mastery-grid" style={{ padding: '0 20px' }}>
       <motion.div layout className="mastery-grid__cards">
         <AnimatePresence mode="popLayout">
-          {displayedVocab.map((word) => {
-            const selectIndex = selectedWords.indexOf(word.word);
-            const isSelected = selectIndex !== -1;
+          {sortedVocab.slice(0, visibleCount).map((word) => {
+            const idx = selectedWords.indexOf(word.word);
             return (
               <motion.div 
-                key={word.id}
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: (selectedWords.length > 0 && !isSelected) ? 0.4 : 1, scale: isSelected ? 1.05 : 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
+                key={word.id} layout initial={{ opacity: 0 }} animate={{ opacity: (selectedWords.length > 0 && idx === -1) ? 0.4 : 1 }} exit={{ opacity: 0 }}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 onClick={(e) => { e.stopPropagation(); handleCardClick(word); }}
-                style={{ zIndex: isSelected ? 10 : 1, cursor: 'pointer', position: 'relative' }}
+                onMouseDown={() => { longPressRef.current = setTimeout(() => setSelectedWords([word.word]), 500); }}
+                onMouseUp={() => { if (longPressRef.current) clearTimeout(longPressRef.current); }}
+                style={{ cursor: 'pointer', position: 'relative' }}
               >
                 <VocabCard word={word} onClick={() => {}} />
-                {isSelected && (
-                  <div style={{ position: 'absolute', top: '-8px', right: '-8px', background: '#3b82f6', color: 'white', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 'bold', border: '2px solid #fff' }}>
-                    {selectIndex + 1}
-                  </div>
-                )}
+                {idx !== -1 && <div className="badge">{idx + 1}</div>}
               </motion.div>
             );
           })}
         </AnimatePresence>
       </motion.div>
-
-      {visibleCount < sortedAndFilteredVocab.length && (
-        <div style={{ textAlign: 'center', padding: '40px 0' }}>
-          <button onClick={(e) => { e.stopPropagation(); setVisibleCount(prev => prev + 40); }} style={{ background: '#222', color: '#fff', border: '1px solid #444', padding: '12px 24px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
-            LOAD MORE ({sortedAndFilteredVocab.length - visibleCount} LEFT)
-          </button>
-        </div>
+      {visibleCount < sortedVocab.length && (
+        <button onClick={() => setVisibleCount(v => v + 40)} className="btn-load-more">LOAD MORE</button>
       )}
-
       {drawerId && <WordDetailDrawer word={vocabulary.find(v => v.id === drawerId)!} onClose={() => setDrawerId(null)} onAskLina={onAskLina} isSandboxMode={isSandboxMode} />}
     </section>
   );
