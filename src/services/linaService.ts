@@ -20,7 +20,7 @@ export interface ProposedChange {
 /**
  * Builds the personality and knowledge base for Lina
  */
-export function buildSystemPrompt(vocabulary: VocabWord[], chapters: any[], studentName: string) {
+export function buildSystemPrompt(vocabulary: VocabWord[], studentName: string) {
   const knownVocab = vocabulary
     .filter(v => v.status !== 'not_started')
     .map(v => `${v.word} (${v.status})`)
