@@ -22,7 +22,6 @@ export default function App() {
         onStartSession={() => setIsChatOpen(true)} 
         onAskLina={handleAskLina} 
       />
-
       <ChatSession 
         isActive={isChatOpen} 
         onEndSession={() => setIsChatOpen(false)} 
