@@ -3,6 +3,7 @@ import { useMasteryStore } from '../store/masteryStore';
 import ProgressSummary from './ProgressSummary';
 import MasteryGrid from './MasteryGrid';
 import PhraseGrid from './PhraseGrid'; 
+import SettingsDrawer from './SettingsDrawer'; // IMPORTING THE NEW COMPONENT
 
 interface Props {
   onStartSession: () => void;
@@ -14,19 +15,8 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
   const curriculumLevel = useMasteryStore((s) => s.curriculumLevel);
   const lastUpdated = useMasteryStore((s) => s.lastUpdated);
   
-  // To power our "Cheat Code" button
-  const vocabulary = useMasteryStore((s) => s.vocabulary);
-  const updateVocabStatus = useMasteryStore((s) => s.updateVocabStatus);
-
   const [isSandboxMode, setIsSandboxMode] = useState(false);
-
-  function handleMasterAll() {
-    if (confirm("Are you sure you want to instantly master all words for testing?")) {
-      vocabulary.forEach(word => {
-        updateVocabStatus(word.id, 'mastered');
-      });
-    }
-  }
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false); // SETTINGS STATE
 
   return (
     <div className="dashboard">
@@ -39,28 +29,15 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
         </div>
         <div className="dashboard__header-right" style={{ textAlign: 'right' }}>
           
-          {/* CHEAT BUTTON & SANDBOX TOGGLE */}
-          <div style={{ marginBottom: '12px', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
-             
-             {/* TEMPORARY TESTING BUTTON */}
+          {/* THE CLEAN GEAR ICON */}
+          <div style={{ marginBottom: '12px', display: 'flex', justifyContent: 'flex-end' }}>
              <button 
-               onClick={handleMasterAll}
-               style={{ background: '#FFD700', color: '#000', border: 'none', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 'bold', cursor: 'pointer' }}
+               onClick={() => setIsSettingsOpen(true)}
+               style={{ background: 'transparent', border: 'none', fontSize: '1.5rem', cursor: 'pointer', padding: '0', color: isSandboxMode ? '#aaa' : 'var(--text)' }}
+               title="Settings"
              >
-               ⚡ MASTER ALL (TESTING)
+               ⚙️
              </button>
-
-             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-               <span style={{ fontSize: '0.7rem', color: isSandboxMode ? 'var(--text)' : 'var(--text-muted)' }}>
-                 {isSandboxMode ? 'SANDBOX ON (OFFLINE)' : 'SANDBOX OFF'}
-               </span>
-               <input 
-                 type="checkbox" 
-                 checked={isSandboxMode} 
-                 onChange={(e) => setIsSandboxMode(e.target.checked)}
-                 style={{ cursor: 'pointer' }}
-               />
-             </div>
           </div>
 
           <span className="dashboard__student" style={{ display: 'block' }}>{studentName.toUpperCase()}</span>
@@ -79,6 +56,15 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
           ▶&nbsp;&nbsp;START SESSION
         </button>
       </footer>
+
+      {/* THE NEW SETTINGS OVERLAY */}
+      {isSettingsOpen && (
+        <SettingsDrawer 
+          onClose={() => setIsSettingsOpen(false)} 
+          isSandboxMode={isSandboxMode}
+          setIsSandboxMode={setIsSandboxMode}
+        />
+      )}
     </div>
   );
 }
