@@ -3,6 +3,7 @@ import { useMasteryStore } from '../store/masteryStore';
 import VocabCard from './VocabCard';
 import WordDetailDrawer from './WordDetailDrawer';
 import { fetchSentenceSuggestions } from '../services/linaService';
+import { soundService } from '../services/soundService'; // NEW IMPORT
 import type { MasteryStatus, VocabWord } from '../types/mastery'; 
 
 interface Props {
@@ -20,15 +21,12 @@ const FREQUENCY_ORDER = [
   "mi", "li", "e", "toki", "pona", "ni", "a", "la", "ala", "sina", "lon", "jan", "tawa", "pi", "sona", "tenpo", "ona", "wile", "mute", "taso", "o", "kama", "ken", "pilin", "nimi", "ike", "lili", "tan", "tomo", "pali", "ma", "sitelen", "kepeken", "musi", "jo", "moku", "lukin", "sama", "telo", "lape", "seme", "kin", "ilo", "ale / ali", "pini", "ante", "suli", "ijo", "anu", "nasa", "kulupu", "suno", "pana", "kalama", "lipu", "tu", "nasin", "sin", "pakala", "en", "wawa", "olin", "lawa", "awen", "sewi", "seli", "kon", "soweli", "weka", "mu", "wan", "lete", "sike", "nanpa", "kasi", "moli", "kute", "suwi", "utala", "pimeja", "mama", "sijelo", "pan", "luka", "uta", "open", "ko", "jaki", "kala", "pu", "insa", "esun", "kili", "poka", "mani", "len", "linja", "meli", "kiwen", "poki", "supa", "kule", "mije", "waso", "walo", "pipi", "palisa", "anpa", "noka", "akesi", "loje", "mun", "nena", "unpa", "sinpin", "selo", "monsi", "jelo", "laso", "oko", "alasa", "kipisi", "tonsi", "namako"
 ];
 
-// Helper to generate mathematical permutations of selected words
 function getPermutations(array: string[]): string[] {
-  if (array.length > 4) return []; // Prevent browser crash on too many combos
+  if (array.length > 4) return []; 
   const result: string[][] = [];
-
   const permute = (arr: string[], m: string[] = []) => {
-    if (arr.length === 0) {
-      result.push(m);
-    } else {
+    if (arr.length === 0) result.push(m);
+    else {
       for (let i = 0; i < arr.length; i++) {
         const curr = arr.slice();
         const next = curr.splice(i, 1);
@@ -36,7 +34,6 @@ function getPermutations(array: string[]): string[] {
       }
     }
   };
-
   permute(array);
   return result.map(p => p.join(' '));
 }
@@ -52,13 +49,11 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
   const [isSuggesting, setIsSuggesting] = useState(false);
   const comboRef = useRef<{ timer: ReturnType<typeof setTimeout>, wordId: string } | null>(null);
 
-  // 1. Generate local shuffles instantly
   const localShuffles = useMemo(() => {
     if (selectedWords.length < 2) return [];
     return getPermutations(selectedWords);
   }, [selectedWords]);
 
-  // 2. AI Suggestion Logic (Lina)
   useEffect(() => {
     const apiKey = localStorage.getItem('TP_GEMINI_KEY');
     if (selectedWords.length > 1 && apiKey) {
@@ -92,23 +87,37 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
     });
 
   const handleCardClick = (word: VocabWord) => {
+    // DESELECTION
     if (selectedWords.includes(word.word)) {
+      soundService.playBlip(329.63, 'sine', 0.05); // E4 - lower "undo" tone
       if (selectedWords.length === 1) setDrawerId(word.id);
       setSelectedWords(prev => prev.filter(w => w !== word.word));
       return;
     }
+
+    // SANDBOX STATUS UPGRADE
     if (isSandboxMode && comboRef.current?.wordId === word.id) {
       clearTimeout(comboRef.current.timer);
+      soundService.playBlip(880, 'sine', 0.1); // A5 - rising success tone
       updateVocabStatus(word.id, STATUS_ORDER[(STATUS_ORDER.indexOf(word.status) + 1) % STATUS_ORDER.length]);
       comboRef.current = { timer: setTimeout(() => comboRef.current = null, 350), wordId: word.id };
       return;
     }
+
+    // SELECTION
     if (comboRef.current) clearTimeout(comboRef.current.timer);
-    comboRef.current = { timer: setTimeout(() => { setSelectedWords(prev => [...prev, word.word]); comboRef.current = null; }, 350), wordId: word.id };
+    comboRef.current = { 
+      timer: setTimeout(() => { 
+        soundService.playBlip(523.25, 'sine', 0.05); // C5 - clean select tone
+        setSelectedWords(prev => [...prev, word.word]); 
+        comboRef.current = null; 
+      }, 350), 
+      wordId: word.id 
+    };
   };
 
   return (
-    <section className="mastery-grid" onClick={() => setSelectedWords([])} style={{ paddingBottom: selectedWords.length > 1 ? '240px' : '20px' }}>
+    <section className="mastery-grid" onClick={() => { if(selectedWords.length > 0) soundService.playBlip(220, 'sine', 0.05); setSelectedWords([]); }} style={{ paddingBottom: selectedWords.length > 1 ? '240px' : '20px' }}>
       <div className="mastery-grid__cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: '10px', padding: '0 24px' }}>
         {displayedVocab.map((word) => {
           const isSelected = selectedWords.includes(word.word);
@@ -127,12 +136,11 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
       {selectedWords.length > 1 && (
         <div style={{ position: 'fixed', bottom: '24px', left: '16px', right: '16px', background: '#111', border: '1px solid #3b82f6', borderRadius: '16px', padding: '16px', zIndex: 1000, boxShadow: '0 -10px 25px rgba(0,0,0,0.8)' }}>
           
-          {/* SECTION A: LOCAL WORD SHUFFLES (FLOAT ABOVE LINA) */}
           <div style={{ marginBottom: '14px' }}>
             <div style={{ fontSize: '0.6rem', color: '#666', fontWeight: 'bold', marginBottom: '6px', letterSpacing: '0.05em' }}>LOCAL SHUFFLES:</div>
             <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '6px', scrollbarWidth: 'none' }}>
               {localShuffles.map((s, i) => (
-                <button key={i} onClick={(e) => { e.stopPropagation(); setSelectedWords(s.split(' ')); }}
+                <button key={i} onClick={(e) => { e.stopPropagation(); soundService.playBlip(659.25, 'sine', 0.03); setSelectedWords(s.split(' ')); }}
                   style={{ whiteSpace: 'nowrap', background: '#222', border: '1px solid #444', color: '#aaa', padding: '5px 10px', borderRadius: '6px', fontSize: '0.7rem', cursor: 'pointer' }}
                 >
                   {s}
@@ -141,14 +149,13 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
             </div>
           </div>
 
-          {/* SECTION B: LINA'S GRAMMAR SUGGESTIONS */}
           <div style={{ marginBottom: '14px', borderTop: '1px solid #222', paddingTop: '10px' }}>
             <div style={{ fontSize: '0.6rem', color: '#3b82f6', fontWeight: 'bold', marginBottom: '6px', letterSpacing: '0.05em' }}>LINA'S SUGGESTIONS:</div>
             <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '6px', scrollbarWidth: 'none' }}>
               {isSuggesting ? (
                 <div style={{ fontSize: '0.7rem', color: '#444', fontStyle: 'italic' }}>thinking...</div>
               ) : linaSuggestions.map((s, i) => (
-                <button key={i} onClick={(e) => { e.stopPropagation(); onAskLina(`Is "${s}" correct?`); setSelectedWords([]); }}
+                <button key={i} onClick={(e) => { e.stopPropagation(); soundService.playBlip(783.99, 'sine', 0.05); onAskLina(`Is "${s}" correct?`); setSelectedWords([]); }}
                   style={{ whiteSpace: 'nowrap', background: '#1a1a1a', border: '1px solid #3b82f6', color: '#fff', padding: '6px 12px', borderRadius: '20px', fontSize: '0.75rem', cursor: 'pointer' }}
                 >
                   {s}
@@ -157,15 +164,14 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
             </div>
           </div>
 
-          {/* SECTION C: CURRENT SELECTION & ACTIONS */}
           <div style={{ fontSize: '1.2rem', color: '#fff', marginBottom: '12px', borderTop: '1px solid #222', paddingTop: '10px', fontWeight: 'bold' }}>{selectedWords.join(' ')}</div>
           
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '8px' }}>
-            <button onClick={() => { onAskLina(`toki Lina! Is "${selectedWords.join(' ')}" a good sentence?`); setSelectedWords([]); }} 
+            <button onClick={() => { soundService.playBlip(880, 'sine', 0.1); onAskLina(`toki Lina! Is "${selectedWords.join(' ')}" a good sentence?`); setSelectedWords([]); }} 
               style={{ padding: '12px', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
               ASK LINA
             </button>
-            <button onClick={() => { savePhrase(selectedWords.join(' ')); setSelectedWords([]); }} 
+            <button onClick={() => { soundService.playBlip(1046.50, 'sine', 0.1); savePhrase(selectedWords.join(' ')); setSelectedWords([]); }} 
               style={{ padding: '12px', background: '#222', color: 'white', border: '1px solid #444', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.8rem' }}>
               SAVE 📌
             </button>
@@ -178,5 +184,5 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
       )}
     </section>
   );
-                  }
+      }
           
