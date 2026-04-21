@@ -24,11 +24,12 @@ export default function App() {
       />
 
       <ChatSession 
-        isActive={isChatOpen} 
-        onEndSession={() => setIsChatOpen(false)} 
-        pendingPrompt={pendingPrompt}
-        clearPrompt={() => setPendingPrompt(null)}
-      />
+  isActive={isChatOpen} 
+  onEndSession={() => setIsChatOpen(false)} 
+  pendingPrompt={pendingPrompt}
+  clearPrompt={() => setPendingPrompt(null)}
+  isSandboxMode={true} // For now, or link this to your dashboard state
+/>
     </>
   );
 }
