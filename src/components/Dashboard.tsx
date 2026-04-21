@@ -1,3 +1,4 @@
+import { useState } from 'react'; // Added useState
 import { useMasteryStore } from '../store/masteryStore';
 import ProgressSummary from './ProgressSummary';
 import MasteryGrid from './MasteryGrid';
@@ -12,6 +13,9 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
   const curriculumLevel = useMasteryStore((s) => s.curriculumLevel);
   const lastUpdated = useMasteryStore((s) => s.lastUpdated);
 
+  // NEW: Toggle for Sandbox Mode
+  const [isSandboxMode, setIsSandboxMode] = useState(false);
+
   return (
     <div className="dashboard">
       <header className="dashboard__header">
@@ -21,15 +25,27 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
             MASTERY MAP — {curriculumLevel.toUpperCase()}
           </p>
         </div>
-        <div className="dashboard__header-right">
-          <span className="dashboard__student">{studentName.toUpperCase()}</span>
+        <div className="dashboard__header-right" style={{ textAlign: 'right' }}>
+          <div style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-end' }}>
+             <span style={{ fontSize: '0.7rem', color: isSandboxMode ? 'var(--text)' : 'var(--text-muted)' }}>
+               {isSandboxMode ? 'SANDBOX ON (MOCK AI)' : 'SANDBOX OFF'}
+             </span>
+             <input 
+               type="checkbox" 
+               checked={isSandboxMode} 
+               onChange={(e) => setIsSandboxMode(e.target.checked)}
+               style={{ cursor: 'pointer' }}
+             />
+          </div>
+          <span className="dashboard__student" style={{ display: 'block' }}>{studentName.toUpperCase()}</span>
           <span className="dashboard__date">SYNCED {lastUpdated}</span>
         </div>
       </header>
 
       <main className="dashboard__main">
         <ProgressSummary />
-        <MasteryGrid onAskLina={onAskLina} />
+        {/* Pass the sandbox state down */}
+        <MasteryGrid onAskLina={onAskLina} isSandboxMode={isSandboxMode} />
       </main>
 
       <footer className="dashboard__footer">
