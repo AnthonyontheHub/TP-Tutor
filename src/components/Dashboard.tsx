@@ -3,7 +3,8 @@ import { useMasteryStore } from '../store/masteryStore';
 import ProgressSummary from './ProgressSummary';
 import MasteryGrid from './MasteryGrid';
 import SettingsDrawer from './SettingsDrawer'; 
-import UserProfileDrawer from './UserProfileDrawer'; // <-- NEW IMPORT
+import UserProfileDrawer from './UserProfileDrawer'; 
+import SetupScreen from './SetupScreen'; // <-- NEW IMPORT
 import type { MasteryStatus } from '../types/mastery';
 
 interface Props {
@@ -28,7 +29,7 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
   const { studentName, currentStreak, savedPhrases, vocabulary } = useMasteryStore();
   const [isSandboxMode, setIsSandboxMode] = useState(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false); 
-  const [isProfileOpen, setIsProfileOpen] = useState(false); // <-- NEW STATE
+  const [isProfileOpen, setIsProfileOpen] = useState(false); 
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
   
   const [viewMode, setViewMode] = useState<'grid' | 'phrasebook'>('grid');
@@ -36,6 +37,11 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
   
   const [sortMode, setSortMode] = useState<'alphabetical' | 'status' | 'frequency' | 'length' | 'type'>('alphabetical');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
+  // INTERCEPT: Show Setup Screen if user has not set a name yet
+  if (!studentName || studentName === 'Student') {
+    return <SetupScreen />;
+  }
 
   const handleSortClick = (mode: 'alphabetical' | 'status' | 'frequency' | 'length' | 'type') => {
     if (sortMode === mode) {
@@ -65,7 +71,6 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
       <header className="dashboard__header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px', borderBottom: '1px solid #333' }}>
         <div>
           <h1 style={{ margin: 0, fontSize: '1.2rem' }}>TOKI PONA</h1>
-          {/* Made the name a clickable button with a user icon */}
           <button 
             onClick={() => setIsProfileOpen(true)} 
             style={{ background: 'none', border: 'none', padding: 0, margin: '4px 0 0 0', fontSize: '0.75rem', color: '#3b82f6', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px' }}
@@ -145,4 +150,4 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
       {isProfileOpen && <UserProfileDrawer onClose={() => setIsProfileOpen(false)} />}
     </div>
   );
-                    }
+            }
