@@ -14,10 +14,11 @@ interface Props {
 
 const STATUS_ORDER: MasteryStatus[] = ['not_started', 'introduced', 'practicing', 'confident', 'mastered'];
 
-// Extracted exactly from your provided corpus data
+// Added "tonsi" to the end of the list!
 const FREQUENCY_ORDER = [
-  "mi", "li", "e", "toki", "pona", "ni", "a", "la", "ala", "sina", "lon", "jan", "tawa", "pi", "sona", "tenpo", "ona", "wile", "mute", "taso", "o", "kama", "ken", "pilin", "nimi", "ike", "lili", "tan", "tomo", "pali", "ma", "sitelen", "kepeken", "musi", "jo", "moku", "lukin", "sama", "telo", "lape", "seme", "kin", "ilo", "ale / ali", "pini", "ante", "suli", "ijo", "anu", "nasa", "kulupu", "suno", "pana", "kalama", "lipu", "tu", "nasin", "sin", "pakala", "en", "wawa", "olin", "lawa", "awen", "sewi", "seli", "kon", "soweli", "weka", "mu", "wan", "lete", "sike", "nanpa", "kasi", "moli", "kute", "suwi", "utala", "pimeja", "mama", "sijelo", "pan", "luka", "uta", "open", "ko", "jaki", "kala", "pu", "insa", "esun", "kili", "poka", "mani", "len", "linja", "meli", "kiwen", "poki", "supa", "kule", "mije", "waso", "walo", "pipi", "palisa", "anpa", "noka", "akesi", "loje", "mun", "nena", "unpa", "sinpin", "selo", "monsi", "jelo", "laso", "oko", "alasa", "kipisi", "namako"
+  "mi", "li", "e", "toki", "pona", "ni", "a", "la", "ala", "sina", "lon", "jan", "tawa", "pi", "sona", "tenpo", "ona", "wile", "mute", "taso", "o", "kama", "ken", "pilin", "nimi", "ike", "lili", "tan", "tomo", "pali", "ma", "sitelen", "kepeken", "musi", "jo", "moku", "lukin", "sama", "telo", "lape", "seme", "kin", "ilo", "ale / ali", "pini", "ante", "suli", "ijo", "anu", "nasa", "kulupu", "suno", "pana", "kalama", "lipu", "tu", "nasin", "sin", "pakala", "en", "wawa", "olin", "lawa", "awen", "sewi", "seli", "kon", "soweli", "weka", "mu", "wan", "lete", "sike", "nanpa", "kasi", "moli", "kute", "suwi", "utala", "pimeja", "mama", "sijelo", "pan", "luka", "uta", "open", "ko", "jaki", "kala", "pu", "insa", "esun", "kili", "poka", "mani", "len", "linja", "meli", "kiwen", "poki", "supa", "kule", "mije", "waso", "walo", "pipi", "palisa", "anpa", "noka", "akesi", "loje", "mun", "nena", "unpa", "sinpin", "selo", "monsi", "jelo", "laso", "oko", "alasa", "kipisi", "tonsi", "namako"
 ];
+
 
 export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, sortMode, sortDirection }: Props) {
   const vocabulary = useMasteryStore((s) => s.vocabulary);
