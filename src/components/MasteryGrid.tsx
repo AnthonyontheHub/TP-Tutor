@@ -10,31 +10,40 @@ interface Props {
   onAskLina: (p: string) => void; 
   isSandboxMode: boolean; 
   activeFilter: MasteryStatus | null; 
-  sortMode: any; 
-  sortDirection: any; 
-  posFilter: string; 
+  sortMode: 'word' | 'status' | 'partOfSpeech'; 
+  sortDirection: 'asc' | 'desc'; 
+  posFilter: string;
+  setSortMode: (mode: any) => void;
+  setSortDirection: (dir: any) => void;
+  setPosFilter: (pos: string) => void;
 }
 
-export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, sortMode, sortDirection, posFilter }: Props) {
+export default function MasteryGrid({ 
+  onAskLina, 
+  isSandboxMode, 
+  activeFilter, 
+  sortMode, 
+  sortDirection, 
+  posFilter,
+  setSortMode,
+  setSortDirection,
+  setPosFilter 
+}: Props) {
   const { vocabulary, savePhrase } = useMasteryStore();
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [magneticSuggestions, setMagneticSuggestions] = useState<string[]>([]);
   
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const touchStartPos = useRef({ x: 0, y: 0 });
+  const isLongPressing = useRef(false);
 
-  // Handle Magnetic Sentence suggestions
+  // Magnetic Suggestions Logic
   useEffect(() => {
     const apiKey = localStorage.getItem('TP_GEMINI_KEY');
     if (selectedWords.length > 1 && apiKey) {
       const timer = setTimeout(async () => {
-        try {
-          const results = await fetchSentenceSuggestions(apiKey, selectedWords);
-          setMagneticSuggestions(results);
-        } catch (err) {
-          console.error("Magnetic Builder Error:", err);
-        }
+        const results = await fetchSentenceSuggestions(apiKey, selectedWords);
+        setMagneticSuggestions(results);
       }, 600);
       return () => clearTimeout(timer);
     } else {
@@ -42,84 +51,85 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
     }
   }, [selectedWords]);
 
-  const handlePointerDown = (e: React.PointerEvent, word: string) => {
-    touchStartPos.current = { x: e.clientX, y: e.clientY };
-    
-    // If selection mode is already active, we don't need a long press for more words
-    if (selectedWords.length > 0) return;
+  const handlePointerDown = (word: string) => {
+    if (selectedWords.length > 0) return; // Skip timer if we're already selecting
 
+    isLongPressing.current = false;
     longPressTimer.current = setTimeout(() => {
+      isLongPressing.current = true;
       soundService.playBlip(523.25, 'sine', 0.05);
       setSelectedWords([word]);
-      longPressTimer.current = null;
-    }, 450);
+    }, 500);
   };
 
-  const handlePointerUp = (e: React.PointerEvent, word: string) => {
-    const distX = Math.abs(e.clientX - touchStartPos.current.x);
-    const distY = Math.abs(e.clientY - touchStartPos.current.y);
-
-    // If the movement is more than 10px, it's likely a scroll, not a selection
-    if (distX > 10 || distY > 10) {
-      if (longPressTimer.current) {
-        clearTimeout(longPressTimer.current);
-        longPressTimer.current = null;
-      }
-      return;
-    }
-
+  const handlePointerUp = (word: string) => {
     if (longPressTimer.current) {
-      // Short tap (Timer hasn't finished)
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
+    }
 
-      if (selectedWords.length > 0) {
-        toggleWordSelection(word);
-      } else {
-        const target = vocabulary.find(v => v.word === word);
-        if (target) setDrawerId(target.id);
-      }
-    } else if (selectedWords.length > 0) {
-      // Long press already finished, or selection mode is active
-      toggleWordSelection(word);
+    if (isLongPressing.current) {
+      isLongPressing.current = false;
+      return; // Already handled by the timer
+    }
+
+    if (selectedWords.length > 0) {
+      // Toggle selection in "Sticky Mode"
+      setSelectedWords(prev => 
+        prev.includes(word) ? prev.filter(w => w !== word) : [...prev, word]
+      );
+      soundService.playBlip(600, 'sine', 0.02);
+    } else {
+      // Regular tap opens the drawer
+      const target = vocabulary.find(v => v.word === word);
+      if (target) setDrawerId(target.id);
     }
   };
 
-  const toggleWordSelection = (word: string) => {
-    setSelectedWords(prev => {
-      const isSelected = prev.includes(word);
-      if (isSelected) {
-        return prev.filter(w => w !== word);
-      } else {
-        soundService.playBlip(523.25, 'sine', 0.05);
-        return [...prev, word];
-      }
-    });
-  };
-
+  // The Actual Sorting/Filtering Logic
   const displayed = vocabulary
     .filter(w => !activeFilter || w.status === activeFilter)
     .filter(w => posFilter === 'All' || w.partOfSpeech.includes(posFilter))
-    .sort((a: any, b: any) => {
-      const field = sortMode === 'alphabetical' ? 'word' : sortMode;
-      const valA = String(a[field] || '');
-      const valB = String(b[field] || '');
+    .sort((a, b) => {
+      const valA = String(a[sortMode] || '').toLowerCase();
+      const valB = String(b[sortMode] || '').toLowerCase();
       return sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
     });
 
   return (
-    <section>
-      <div className="mastery-grid__cards">
+    <section className="mastery-grid">
+      {/* SORTATION UI SECTION */}
+      <div className="grid-controls" style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexWrap: 'wrap' }}>
+        <select value={sortMode} onChange={(e) => setSortMode(e.target.value as any)} className="sort-select">
+          <option value="word">Sort: A-Z</option>
+          <option value="status">Sort: Mastery</option>
+          <option value="partOfSpeech">Sort: Type</option>
+        </select>
+        
+        <button onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')} className="btn-icon">
+          {sortDirection === 'asc' ? '↑' : '↓'}
+        </button>
+
+        <select value={posFilter} onChange={(e) => setPosFilter(e.target.value)} className="sort-select">
+          <option value="All">All Types</option>
+          <option value="noun">Nouns</option>
+          <option value="verb">Verbs</option>
+          <option value="adj">Adjectives</option>
+        </select>
+      </div>
+
+      <div className="mastery-grid__cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '12px' }}>
         {displayed.map((word) => (
           <div 
             key={word.id} 
-            onPointerDown={(e) => handlePointerDown(e, word.word)} 
-            onPointerUp={(e) => handlePointerUp(e, word.word)}
+            onPointerDown={() => handlePointerDown(word.word)} 
+            onPointerUp={() => handlePointerUp(word.word)}
             style={{ 
-              opacity: selectedWords.length > 0 && !selectedWords.includes(word.word) ? 0.35 : 1,
-              transform: selectedWords.includes(word.word) ? 'scale(1.04)' : 'scale(1)',
-              transition: 'all 0.15s ease-out',
-              touchAction: 'none' 
+              opacity: selectedWords.length > 0 && !selectedWords.includes(word.word) ? 0.3 : 1,
+              transform: selectedWords.includes(word.word) ? 'scale(1.08)' : 'scale(1)',
+              transition: 'all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+              cursor: 'pointer',
+              touchAction: 'none'
             }}
           >
             <VocabCard word={word} onClick={() => {}} />
@@ -127,62 +137,33 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
         ))}
       </div>
 
+      {/* MAGNETIC BUILDER PANEL */}
       {selectedWords.length > 0 && (
-        <div className="builder-panel">
+        <div className="builder-panel" style={{ position: 'fixed', bottom: '20px', left: '50%', transform: 'translateX(-50%)', width: '90%', maxWidth: '500px', background: '#1a1a1a', padding: '20px', borderRadius: '15px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)', zIndex: 1000 }}>
           <div className="builder-content">
             {magneticSuggestions.length > 0 && (
-              <div style={{ marginBottom: '18px' }}>
-                <div style={{ fontSize: '0.65rem', color: '#3b82f6', fontWeight: 900, marginBottom: '10px', letterSpacing: '0.05em' }}>MAGNETIC GROUPINGS:</div>
-                <div className="magnetic-scroll-container" style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '5px' }}>
+              <div style={{ marginBottom: '15px' }}>
+                <span style={{ fontSize: '0.7rem', color: '#3b82f6', fontWeight: 800 }}>MAGNETIC GROUPINGS:</span>
+                <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', marginTop: '8px' }}>
                   {magneticSuggestions.map((s, i) => (
-                    <button 
-                      key={i} 
-                      className="suggestion-pill"
-                      onClick={() => { onAskLina(`Is "${s}" correct?`); setSelectedWords([]); }}
-                    >
+                    <button key={i} className="suggestion-pill" onClick={() => { onAskLina(`Is "${s}" correct?`); setSelectedWords([]); }}>
                       {s}
                     </button>
                   ))}
                 </div>
               </div>
             )}
-
-            <div style={{ fontSize: '1.6rem', color: '#fff', marginBottom: '20px', fontWeight: 900, wordBreak: 'break-word' }}>
-              {selectedWords.join(' ')}
+            <div style={{ fontSize: '1.4rem', color: '#fff', marginBottom: '15px', fontWeight: 700 }}>{selectedWords.join(' ')}</div>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button onClick={() => { onAskLina(`Is "${selectedWords.join(' ')}" correct?`); setSelectedWords([]); }} className="btn-review" style={{ flex: 2 }}>ASK LINA</button>
+              <button onClick={() => { savePhrase(selectedWords.join(' ')); setSelectedWords([]); }} className="btn-toggle active" style={{ flex: 1 }}>SAVE</button>
             </div>
-            
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '12px' }}>
-              <button 
-                onClick={() => { onAskLina(`toki Lina! Is "${selectedWords.join(' ')}" correct?`); setSelectedWords([]); }} 
-                className="btn-review" style={{ margin: 0 }}
-              >
-                ASK LINA
-              </button>
-              <button 
-                onClick={() => { savePhrase(selectedWords.join(' ')); setSelectedWords([]); }} 
-                className="btn-toggle active"
-              >
-                SAVE 📌
-              </button>
-            </div>
-            <button 
-              onClick={() => setSelectedWords([])} 
-              style={{ width: '100%', marginTop: '12px', background: 'none', border: 'none', color: '#555', fontSize: '0.7rem', fontWeight: 700, cursor: 'pointer' }}
-            >
-              CANCEL SELECTION ✕
-            </button>
+            <button onClick={() => setSelectedWords([])} style={{ width: '100%', marginTop: '10px', background: 'none', border: 'none', color: '#666', fontSize: '0.8rem' }}>Clear selection ✕</button>
           </div>
         </div>
       )}
 
-      {drawerId && (
-        <WordDetailDrawer 
-          word={vocabulary.find(v => v.id === drawerId)!} 
-          onClose={() => setDrawerId(null)} 
-          onAskLina={onAskLina} 
-          isSandboxMode={isSandboxMode} 
-        />
-      )}
+      {drawerId && <WordDetailDrawer word={vocabulary.find(v => v.id === drawerId)!} onClose={() => setDrawerId(null)} onAskLina={onAskLina} isSandboxMode={isSandboxMode} />}
     </section>
   );
 }
