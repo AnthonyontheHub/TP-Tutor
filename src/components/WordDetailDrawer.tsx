@@ -8,14 +8,27 @@ interface Props {
   word: VocabWord;
   onClose: () => void;
   onAskLina: (prompt: string) => void;
+  isSandboxMode: boolean; // Add this
 }
 
-export default function WordDetailDrawer({ word, onClose, onAskLina }: Props) {
+export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMode }: Props) {
   const partsOfSpeech = word.partOfSpeech.split('/').map(p => p.trim());
   const [examples, setExamples] = useState<Record<string, string>>({});
   const [isGenerating, setIsGenerating] = useState(true);
 
   useEffect(() => {
+    // IF SANDBOX MODE IS ON: Use filler text
+    if (isSandboxMode) {
+      const mockData: Record<string, string> = {};
+      partsOfSpeech.forEach(pos => {
+        mockData[pos] = `(Sandbox Mode) ${word.word} li pona. (The ${word.word} is good as a ${pos}.)`;
+      });
+      setExamples(mockData);
+      setIsGenerating(false);
+      return;
+    }
+
+    // ELSE: Do the real AI fetch
     const apiKey = localStorage.getItem('TP_GEMINI_KEY');
     if (!apiKey) {
       setExamples({ error: "No API Key found. Add key in chat to generate examples." });
@@ -33,7 +46,7 @@ export default function WordDetailDrawer({ word, onClose, onAskLina }: Props) {
         setExamples({ error: "Lina encountered an error." });
         setIsGenerating(false);
       });
-  }, [word.word]);
+  }, [word.word, isSandboxMode]); // Added isSandboxMode to dependencies
 
   function handleAskLina(pos?: string) {
     const prompt = pos 
@@ -68,22 +81,18 @@ export default function WordDetailDrawer({ word, onClose, onAskLina }: Props) {
             <span className="word-drawer__meanings">{word.meanings}</span>
           </div>
 
-          <div className="word-drawer__section-label">PARTS OF SPEECH & EXAMPLES</div>
+          <div className="word-drawer__section-label">
+            {isSandboxMode ? 'SANDBOX EXAMPLES (MOCK)' : 'PARTS OF SPEECH & EXAMPLES'}
+          </div>
 
           <div className="word-drawer__examples-list">
             {partsOfSpeech.map((pos) => (
-              <div key={pos} className="example-box" style={{ 
-                background: '#1a1a1a', 
-                padding: '12px', 
-                borderRadius: '4px', 
-                marginBottom: '12px', 
-                border: '1px solid #333' 
-              }}>
+              <div key={pos} style={{ background: '#1a1a1a', padding: '12px', borderRadius: '4px', marginBottom: '12px', border: '1px solid #333' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                   <span style={{ fontWeight: 'bold', textTransform: 'uppercase', fontSize: '0.7rem', color: '#888' }}>{pos}</span>
                   <button className="btn-nav" onClick={() => handleAskLina(pos)} style={{ fontSize: '0.6rem', padding: '4px 8px' }}>💬 Ask Lina</button>
                 </div>
-                <p style={{ margin: 0, fontStyle: 'italic', fontSize: '0.85rem', color: '#eee' }}>
+                <p style={{ margin: 0, fontStyle: 'italic', fontSize: '0.85rem', color: isSandboxMode ? '#aaa' : '#eee' }}>
                   {isGenerating ? <span className="typing-dots">Lina is thinking...</span> : (examples[pos] || examples.error || "No example available.")}
                 </p>
               </div>
