@@ -1,7 +1,8 @@
-import { useState } from 'react'; // Added useState
+import { useState } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import ProgressSummary from './ProgressSummary';
 import MasteryGrid from './MasteryGrid';
+import PhraseGrid from './PhraseGrid'; // NEW IMPORT
 
 interface Props {
   onStartSession: () => void;
@@ -13,7 +14,6 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
   const curriculumLevel = useMasteryStore((s) => s.curriculumLevel);
   const lastUpdated = useMasteryStore((s) => s.lastUpdated);
 
-  // NEW: Toggle for Sandbox Mode
   const [isSandboxMode, setIsSandboxMode] = useState(false);
 
   return (
@@ -28,7 +28,7 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
         <div className="dashboard__header-right" style={{ textAlign: 'right' }}>
           <div style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-end' }}>
              <span style={{ fontSize: '0.7rem', color: isSandboxMode ? 'var(--text)' : 'var(--text-muted)' }}>
-               {isSandboxMode ? 'SANDBOX ON (MOCK AI)' : 'SANDBOX OFF'}
+               {isSandboxMode ? 'SANDBOX ON (OFFLINE)' : 'SANDBOX OFF'}
              </span>
              <input 
                type="checkbox" 
@@ -44,8 +44,10 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
 
       <main className="dashboard__main">
         <ProgressSummary />
-        {/* Pass the sandbox state down */}
         <MasteryGrid onAskLina={onAskLina} isSandboxMode={isSandboxMode} />
+        
+        {/* NEW: The Phrases section placed right below the vocab grid */}
+        <PhraseGrid onAskLina={onAskLina} />
       </main>
 
       <footer className="dashboard__footer">
