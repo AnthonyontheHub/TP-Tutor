@@ -3,6 +3,7 @@ import { useMasteryStore } from '../store/masteryStore';
 import ProgressSummary from './ProgressSummary';
 import MasteryGrid from './MasteryGrid';
 import SettingsDrawer from './SettingsDrawer'; 
+import UserProfileDrawer from './UserProfileDrawer'; // <-- NEW IMPORT
 import type { MasteryStatus } from '../types/mastery';
 
 interface Props {
@@ -27,12 +28,12 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
   const { studentName, currentStreak, savedPhrases, vocabulary } = useMasteryStore();
   const [isSandboxMode, setIsSandboxMode] = useState(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false); 
+  const [isProfileOpen, setIsProfileOpen] = useState(false); // <-- NEW STATE
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
   
   const [viewMode, setViewMode] = useState<'grid' | 'phrasebook'>('grid');
   const [posFilter, setPosFilter] = useState('All');
   
-  // Replaced 'unlocked' with 'length' and 'type'
   const [sortMode, setSortMode] = useState<'alphabetical' | 'status' | 'frequency' | 'length' | 'type'>('alphabetical');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
@@ -64,7 +65,13 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
       <header className="dashboard__header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px', borderBottom: '1px solid #333' }}>
         <div>
           <h1 style={{ margin: 0, fontSize: '1.2rem' }}>TOKI PONA</h1>
-          <p style={{ margin: 0, fontSize: '0.7rem', opacity: 0.6 }}>{studentName.toUpperCase()}</p>
+          {/* Made the name a clickable button with a user icon */}
+          <button 
+            onClick={() => setIsProfileOpen(true)} 
+            style={{ background: 'none', border: 'none', padding: 0, margin: '4px 0 0 0', fontSize: '0.75rem', color: '#3b82f6', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px' }}
+          >
+            👤 {studentName.toUpperCase()}
+          </button>
         </div>
         <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
           {currentStreak > 0 && (
@@ -105,7 +112,6 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
               <span style={{ color: '#8b5cf6', fontStyle: 'italic', display: 'inline-block', marginTop: '4px' }}>Toki Pona: {POS_DESCRIPTIONS[posFilter].tp}</span>
             </div>
 
-            {/* Changed justifyContent to 'center' and updated the button array */}
             <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '8px', margin: '10px 0 15px 0' }}>
               {['alphabetical', 'frequency', 'status', 'length', 'type'].map(m => (
                 <button key={m} onClick={() => handleSortClick(m as any)} style={{ fontSize: '0.6rem', background: sortMode === m ? '#3b82f6' : 'none', color: 'white', border: '1px solid #444', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer', fontWeight: sortMode === m ? 'bold' : 'normal' }}>
@@ -136,7 +142,7 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
       </main>
 
       {isSettingsOpen && <SettingsDrawer onClose={() => setIsSettingsOpen(false)} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} />}
+      {isProfileOpen && <UserProfileDrawer onClose={() => setIsProfileOpen(false)} />}
     </div>
   );
-              }
-              
+                    }
