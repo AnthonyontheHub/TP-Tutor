@@ -55,7 +55,13 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, se
           const isOnlySelection = selectedWords.length === 1 && isSelected;
           return (
             <div key={word.id} onClick={(e) => { e.stopPropagation(); handleCardClick(word); }}
-              style={{ transform: isOnlySelection ? 'scale(1.8) translateY(-10px)' : (isSelected ? 'scale(1.1)' : (selectedWords.length > 0 ? 'scale(0.85)' : 'scale(1)')), opacity: selectedWords.length > 0 && !isSelected ? 0.2 : 1, transition: 'all 0.4s ease', zIndex: isOnlySelection ? 100 : (isSelected ? 10 : 1), cursor: 'pointer', position: 'relative' }}
+              style={{ 
+                transform: isOnlySelection ? 'scale(1.8) translateY(-10px)' : (isSelected ? 'scale(1.1)' : (selectedWords.length > 0 ? 'scale(0.85)' : 'scale(1)')), 
+                opacity: selectedWords.length > 0 && !isSelected ? 0.2 : 1, 
+                transition: 'all 0.4s ease', 
+                zIndex: isOnlySelection ? 100 : (isSelected ? 10 : 1), 
+                cursor: 'pointer', position: 'relative' 
+              }}
             >
               <VocabCard word={word} onClick={() => {}} />
               {isOnlySelection && <div style={{ position: 'absolute', bottom: '-35px', left: 0, right: 0, background: '#3b82f6', color: 'white', padding: '4px', borderRadius: '4px', fontSize: '0.45rem', textAlign: 'center' }}>{word.meanings}</div>}
@@ -64,36 +70,6 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, se
         })}
       </div>
       {drawerId && <WordDetailDrawer word={vocabulary.find(v => v.id === drawerId)!} onClose={() => { setDrawerId(null); setSelectedWords([]); }} onAskLina={onAskLina} isSandboxMode={isSandboxMode} />}
-    </section>
-  );
-}
-              {isOnlySelection && (
-                <div style={{ 
-                  position: 'absolute', bottom: '-35px', left: '0', right: '0',
-                  background: '#3b82f6', color: 'white', padding: '4px 8px',
-                  borderRadius: '4px', fontSize: '0.45rem', textAlign: 'center',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.5)', pointerEvents: 'none'
-                }}>
-                  {word.meanings}
-                </div>
-              )}
-              {isSelected && !isOnlySelection && (
-                <div style={{ position: 'absolute', top: '-10px', right: '-10px', background: '#3b82f6', color: 'white', borderRadius: '50%', width: '22px', height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: 'bold', border: '2px solid #000' }}>
-                  {selectIndex + 1}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-      {drawerId && (
-        <WordDetailDrawer 
-          word={vocabulary.find(v => v.id === drawerId)!} 
-          onClose={() => { setDrawerId(null); setSelectedWords([]); }} 
-          onAskLina={onAskLina} 
-          isSandboxMode={isSandboxMode} 
-        />
-      )}
     </section>
   );
 }
