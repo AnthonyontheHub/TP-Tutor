@@ -21,6 +21,8 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
   const [isSandboxMode, setIsSandboxMode] = useState(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false); 
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
+  
+  // NEW STATE: Multi-select and Sorting
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
   const [sortMode, setSortMode] = useState<SortMode>('alphabetical');
 
@@ -42,11 +44,17 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
       </header>
 
       <main className="dashboard__main">
-        <ProgressSummary activeFilter={activeFilter} onFilterClick={(status) => { setActiveFilter(status); setSelectedWords([]); }} />
+        <ProgressSummary 
+          activeFilter={activeFilter} 
+          onFilterClick={(status) => { 
+            setActiveFilter(status); 
+            setSelectedWords([]); // Clear selection when changing status filter
+          }} 
+        />
         
-        {/* NEW: Sort Options UI */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginBottom: '10px' }}>
-          <span style={{ fontSize: '0.7rem', color: '#666', alignSelf: 'center' }}>SORT BY:</span>
+        {/* SORTING UI: Placed top right below progress icons */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginBottom: '12px', marginTop: '-10px' }}>
+          <span style={{ fontSize: '0.65rem', color: '#555', alignSelf: 'center', fontWeight: 'bold' }}>SORT:</span>
           {(['alphabetical', 'status', 'unlocked'] as SortMode[]).map(mode => (
             <button 
               key={mode}
@@ -54,7 +62,7 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
               style={{ 
                 background: sortMode === mode ? '#333' : 'transparent',
                 color: sortMode === mode ? 'white' : '#666',
-                border: '1px solid #333', padding: '4px 8px', borderRadius: '4px', fontSize: '0.65rem', cursor: 'pointer'
+                border: '1px solid #333', padding: '4px 8px', borderRadius: '4px', fontSize: '0.6rem', cursor: 'pointer', transition: 'all 0.2s'
               }}
             >
               {mode.toUpperCase()}
@@ -71,7 +79,11 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
           sortMode={sortMode}
         />
         
-        <PhraseGrid onAskLina={onAskLina} activeFilter={activeFilter} selectedWords={selectedWords} />
+        <PhraseGrid 
+          onAskLina={onAskLina} 
+          activeFilter={activeFilter} 
+          selectedWords={selectedWords} 
+        />
       </main>
 
       {isSettingsOpen && (
