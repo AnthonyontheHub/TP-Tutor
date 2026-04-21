@@ -1,3 +1,4 @@
+/* src/components/WordDetailDrawer.tsx */
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
@@ -53,7 +54,6 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
       setIsGenerating(false);
     };
 
-    // HARD LOCK: If sandbox is on, do NOT even look at the API key.
     if (isSandboxMode) {
       loadOfflineData();
       return;
@@ -81,20 +81,25 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
 
   return (
     <AnimatePresence>
-      <motion.div className="drawer-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} />
+      <motion.div 
+        className="drawer-backdrop" 
+        initial={{ opacity: 0 }} 
+        animate={{ opacity: 1 }} 
+        exit={{ opacity: 0 }} 
+        onClick={onClose} 
+      />
       <motion.div
-        drag="y" dragConstraints={{ top: 0 }} initial={{ y: '100%' }} animate={{ y: '0%' }} exit={{ y: '100%' }}
-        onDragEnd={(_, info) => { if (info.offset.y > 100) onClose(); }}
-        style={{ 
-          position: 'fixed', bottom: 0, left: 0, right: 0, height: '66vh', zIndex: 1000, 
-          display: 'flex', flexDirection: 'column', boxShadow: getGlowColor(word.status),
-          borderTopLeftRadius: '20px', borderTopRightRadius: '20px', background: '#111'
-        }}
+        className="word-drawer"
+        initial={{ y: '100%' }} 
+        animate={{ y: '0%' }} 
+        exit={{ y: '100%' }}
+        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+        style={{ boxShadow: getGlowColor(word.status) }}
       >
         <div style={{ width: '100%', padding: '16px 0', cursor: 'grab', flexShrink: 0 }}>
           <div style={{ width: '48px', height: '6px', backgroundColor: '#444', borderRadius: '10px', margin: '0 auto' }} />
         </div>
-        <div style={{ padding: '0 20px', overflowY: 'auto', flex: 1 }}>
+        <div className="word-drawer__scroll-area">
           <h2 style={{ fontSize: '2rem', margin: '0 0 8px' }}>{word.word}</h2>
           <div 
              onClick={() => isSandboxMode && updateVocabStatus(word.id, STATUS_ORDER[(STATUS_ORDER.indexOf(word.status) + 1) % STATUS_ORDER.length])}
