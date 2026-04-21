@@ -83,7 +83,13 @@ export interface MasteryMap {
   lastUpdated: string;
   chapters: Chapter[];   // index 0 = Introduction
   vocabulary: VocabWord[];
+  
+  // NEW FEATURES
+  savedPhrases: string[]; 
+  currentStreak: number;
+  lastActiveDate: string;
 }
+
 
 // ─── Status summary helper type ───────────────────────────────────────────────
 
