@@ -6,7 +6,7 @@ import PhraseGrid from './PhraseGrid';
 import SettingsDrawer from './SettingsDrawer'; 
 import type { MasteryStatus } from '../types/mastery';
 
-export type SortMode = 'alphabetical' | 'status' | 'unlocked';
+export type SortMode = 'alphabetical' | 'status' | 'unlocked' | 'usage';
 
 interface Props {
   onStartSession: () => void;
@@ -50,50 +50,44 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
       <main className="dashboard__main">
         <ProgressSummary activeFilter={activeFilter} onFilterClick={(status) => { setActiveFilter(status); setSelectedWords([]); }} />
         
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginBottom: '12px', marginTop: '-10px' }}>
-          <span style={{ fontSize: '0.65rem', color: '#555', alignSelf: 'center', fontWeight: 'bold' }}>SORT:</span>
-          {(['alphabetical', 'status', 'unlocked'] as SortMode[]).map(mode => (
-            <button key={mode} onClick={() => setSortMode(mode)} style={{ background: sortMode === mode ? '#333' : 'transparent', color: sortMode === mode ? 'white' : '#666', border: '1px solid #333', padding: '4px 8px', borderRadius: '4px', fontSize: '0.6rem', cursor: 'pointer' }}>{mode.toUpperCase()}</button>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginBottom: '12px', marginTop: '-10px', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: '0.6rem', color: '#555', alignSelf: 'center', fontWeight: 'bold', marginRight: '4px' }}>SORT:</span>
+          {(['alphabetical', 'status', 'unlocked', 'usage'] as SortMode[]).map(mode => (
+            <button 
+              key={mode} 
+              onClick={() => setSortMode(mode)} 
+              style={{ 
+                background: sortMode === mode ? '#3b82f6' : 'transparent', 
+                color: sortMode === mode ? 'white' : '#666', 
+                border: sortMode === mode ? '1px solid #3b82f6' : '1px solid #333', 
+                padding: '4px 8px', borderRadius: '4px', fontSize: '0.55rem', cursor: 'pointer', fontWeight: 'bold'
+              }}
+            >
+              {mode.toUpperCase()}
+            </button>
           ))}
         </div>
 
-        <MasteryGrid onAskLina={onAskLina} isSandboxMode={isSandboxMode} activeFilter={activeFilter} selectedWords={selectedWords} setSelectedWords={setSelectedWords} sortMode={sortMode} />
+        <MasteryGrid 
+          onAskLina={onAskLina} 
+          isSandboxMode={isSandboxMode} 
+          activeFilter={activeFilter} 
+          selectedWords={selectedWords} 
+          setSelectedWords={setSelectedWords} 
+          sortMode={sortMode} 
+        />
         
         <PhraseGrid onAskLina={onAskLina} activeFilter={activeFilter} selectedWords={selectedWords} />
       </main>
 
-      {/* FIXED SENTENCE BUILDER MENU */}
       {selectedWords.length > 0 && (
-        <div style={{ 
-          position: 'fixed', 
-          bottom: '24px', left: '16px', right: '16px', 
-          background: '#161616', 
-          border: '1px solid #3b82f6', 
-          borderRadius: '16px', 
-          padding: '20px', 
-          boxShadow: '0 12px 48px rgba(0,0,0,0.9)', 
-          zIndex: 2000, // Ensuring it is above everything
-          display: 'flex', flexDirection: 'column', gap: '12px',
-          animation: 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
-        }}>
+        <div style={{ position: 'fixed', bottom: '24px', left: '16px', right: '16px', background: '#161616', border: '1px solid #3b82f6', borderRadius: '16px', padding: '20px', boxShadow: '0 12px 48px rgba(0,0,0,0.9)', zIndex: 2000, display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.7rem', color: '#3b82f6', fontWeight: 'bold', letterSpacing: '1px' }}>SENTENCE BUILDER</span>
-            <button onClick={() => setSelectedWords([])} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', fontSize: '0.7rem', padding: '4px 10px', borderRadius: '20px', cursor: 'pointer' }}>CLEAR ALL</button>
+            <span style={{ fontSize: '0.7rem', color: '#3b82f6', fontWeight: 'bold' }}>SENTENCE BUILDER</span>
+            <button onClick={() => setSelectedWords([])} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', fontSize: '0.7rem', padding: '4px 10px', borderRadius: '20px' }}>CLEAR</button>
           </div>
-          
-          <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#fff', wordWrap: 'break-word', lineHeight: '1.2' }}>
-            {selectedWords.join(' ')}
-            <span style={{ color: '#3b82f6', marginLeft: '4px', animation: 'blink 1s infinite' }}>|</span>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '4px' }}>
-            <button onClick={handleBuildSentence} style={{ background: '#3b82f6', color: 'white', border: 'none', borderRadius: '8px', padding: '12px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.85rem' }}>
-              ASK LINA
-            </button>
-            <button onClick={() => onAskLina(`toki Lina, what does this specific word combination mean: "${selectedWords.join(' ')}"?`)} style={{ background: '#222', color: 'white', border: '1px solid #444', borderRadius: '8px', padding: '12px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.85rem' }}>
-              DEFINE COMBO
-            </button>
-          </div>
+          <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#fff' }}>{selectedWords.join(' ')}</div>
+          <button onClick={handleBuildSentence} style={{ background: '#3b82f6', color: 'white', border: 'none', borderRadius: '8px', padding: '12px', fontWeight: 'bold' }}>ASK LINA</button>
         </div>
       )}
 
