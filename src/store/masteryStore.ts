@@ -10,6 +10,8 @@ interface MasteryActions {
   updateConceptStatus: (chapterId: string, conceptId: string, status: MasteryStatus) => void;
   setLastUpdated: (date: string) => void;
   syncFromCloud: () => void;
+  syncToCloud: () => Promise<void>; // Added this to fix the 'does not exist' error
+  getStatusSummary: () => StatusSummary;
 }
 
 type MasteryStore = MasteryMap & MasteryActions;
@@ -18,6 +20,8 @@ export const useMasteryStore = create<MasteryStore>()(
   persist(
     (set, get) => ({
       ...initialMasteryMap,
+      // Ensure studentName exists even if initialMasteryMap doesn't have it
+      studentName: initialMasteryMap.studentName || 'Student',
 
       updateVocabStatus: (wordId, status) => {
         set((state) => ({
@@ -25,7 +29,7 @@ export const useMasteryStore = create<MasteryStore>()(
             w.id === wordId ? { ...w, status } : w
           ),
         }));
-        get().syncToCloud(); // Save change to Firebase
+        void get().syncToCloud(); 
       },
 
       updateConceptStatus: (chapterId, conceptId, status) => {
@@ -41,24 +45,40 @@ export const useMasteryStore = create<MasteryStore>()(
               : ch
           ),
         }));
-        get().syncToCloud(); // Save change to Firebase
+        void get().syncToCloud();
       },
 
       setLastUpdated: (date) => set({ lastUpdated: date }),
 
-      // INTERNAL HELPER: Push current state to Firebase
-      syncToCloud: async () => {
-        const { vocabulary, chapters, lastUpdated, studentName } = get();
-        // For a personal app, we save everything to one 'anthony' document
-        await setDoc(doc(db, 'users', 'anthony'), {
-          vocabulary,
-          chapters,
-          lastUpdated,
-          studentName
-        });
+      getStatusSummary: () => {
+        const { vocabulary } = get();
+        const summary: StatusSummary = {
+          not_started: 0,
+          introduced: 0,
+          practicing: 0,
+          confident: 0,
+          mastered: 0,
+        };
+        for (const word of vocabulary) {
+          summary[word.status]++;
+        }
+        return summary;
       },
 
-      // INITIALIZER: Listen for changes from other devices
+      syncToCloud: async () => {
+        const { vocabulary, chapters, lastUpdated, studentName } = get();
+        try {
+          await setDoc(doc(db, 'users', 'anthony'), {
+            vocabulary,
+            chapters,
+            lastUpdated,
+            studentName
+          });
+        } catch (err) {
+          console.error("Firebase Sync Error:", err);
+        }
+      },
+
       syncFromCloud: () => {
         onSnapshot(doc(db, 'users', 'anthony'), (snapshot) => {
           if (snapshot.exists()) {
