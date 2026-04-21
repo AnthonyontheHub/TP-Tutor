@@ -82,6 +82,14 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
     </div>
   );
 }
+      )}
+
+      {isSettingsOpen && (
+        <SettingsDrawer onClose={() => setIsSettingsOpen(false)} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} />
+      )}
+    </div>
+  );
+}
              <button onClick={() => setIsSettingsOpen(true)} style={{ background: 'transparent', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>⚙️</button>
           </div>
           <span className="dashboard__student" style={{ display: 'block' }}>{studentName.toUpperCase()}</span>
