@@ -50,15 +50,18 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, se
     <section className="mastery-grid" onClick={() => setSelectedWords([])}>
       <div className="mastery-grid__cards">
         {displayedVocab.map((word) => {
-          const selectIndex = selectedWords.indexOf(word.word);
-          const isSelected = selectIndex !== -1;
-          const isOnlySelection = selectedWords.length === 1 && isSelected;
+          const isOnlySelection = selectedWords.length === 1 && selectedWords[0] === word.word;
+          const isSelected = selectedWords.includes(word.word);
           return (
             <div key={word.id} onClick={(e) => { e.stopPropagation(); handleCardClick(word); }}
-              style={{ transform: isOnlySelection ? 'scale(1.8) translateY(-10px)' : (isSelected ? 'scale(1.1)' : (selectedWords.length > 0 ? 'scale(0.85)' : 'scale(1)')), opacity: selectedWords.length > 0 && !isSelected ? 0.2 : 1, transition: 'all 0.4s ease', zIndex: isOnlySelection ? 100 : (isSelected ? 10 : 1), cursor: 'pointer', position: 'relative' }}
+              style={{ 
+                transform: isOnlySelection ? 'scale(1.8) translateY(-10px)' : (isSelected ? 'scale(1.1)' : (selectedWords.length > 0 ? 'scale(0.85)' : 'scale(1)')), 
+                opacity: selectedWords.length > 0 && !isSelected ? 0.2 : 1, 
+                transition: 'all 0.4s ease', zIndex: isOnlySelection ? 100 : (isSelected ? 10 : 1), cursor: 'pointer', position: 'relative' 
+              }}
             >
               <VocabCard word={word} onClick={() => {}} />
-              {isOnlySelection && <div style={{ position: 'absolute', bottom: '-35px', left: 0, right: 0, background: '#3b82f6', color: 'white', padding: '4px', borderRadius: '4px', fontSize: '0.45rem', textAlign: 'center' }}>{word.meanings}</div>}
+              {isOnlySelection && <div style={{ position: 'absolute', bottom: '-30px', left: 0, right: 0, background: '#3b82f6', color: 'white', padding: '4px', borderRadius: '4px', fontSize: '0.45rem', textAlign: 'center' }}>{word.meanings}</div>}
             </div>
           );
         })}
@@ -67,14 +70,6 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, se
     </section>
   );
 }
-      return;
-    }
-    if (isSandboxMode && comboRef.current?.wordId === word.id) {
-      clearTimeout(comboRef.current.timer);
-      updateVocabStatus(word.id, STATUS_ORDER[(STATUS_ORDER.indexOf(word.status) + 1) % STATUS_ORDER.length]);
-      comboRef.current = { timer: setTimeout(() => comboRef.current = null, 350), wordId: word.id };
-      return;
-    } 
     if (comboRef.current) clearTimeout(comboRef.current.timer);
     comboRef.current = { timer: setTimeout(() => { setSelectedWords([...selectedWords, word.word]); comboRef.current = null; }, 350), wordId: word.id };
   };
