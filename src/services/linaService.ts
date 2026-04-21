@@ -75,6 +75,32 @@ export async function* streamCompletion(
 }
 
 /**
+ * Generates quick sentence suggestions based on selected words
+ */
+export async function fetchSentenceSuggestions(apiKey: string, words: string[]) {
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+  const prompt = `
+    Act as a Toki Pona tutor. Given these specific words: [${words.join(', ')}], 
+    generate 3 short, grammatically correct Toki Pona sentences using most or all of them. 
+    You MAY add necessary particles like "li", "e", "en", "la", or "pi".
+    Return ONLY a JSON array of strings: ["sentence 1", "sentence 2", "sentence 3"]
+  `;
+
+  try {
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+    // Clean up potential markdown formatting before parsing
+    const jsonString = text.replace(/```json|```/g, '').trim();
+    return JSON.parse(jsonString) as string[];
+  } catch (e) {
+    console.error("Lina Suggestion Error:", e);
+    return [];
+  }
+}
+
+/**
  * UI Utilities
  */
 export function stripProposedChanges(text: string) {
