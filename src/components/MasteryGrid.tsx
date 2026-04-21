@@ -1,14 +1,14 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import VocabCard from './VocabCard';
 import WordDetailDrawer from './WordDetailDrawer';
+import { fetchSentenceSuggestions } from '../services/linaService';
 import type { MasteryStatus, VocabWord } from '../types/mastery'; 
 
 interface Props {
   onAskLina: (prompt: string) => void;
   isSandboxMode: boolean;
   activeFilter: MasteryStatus | null;
-  // Updated the prop types
   sortMode: 'alphabetical' | 'status' | 'frequency' | 'length' | 'type';
   sortDirection: 'asc' | 'desc';
   posFilter: string; 
@@ -27,7 +27,25 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
   
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
   const [drawerId, setDrawerId] = useState<string | null>(null);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [isSuggesting, setIsSuggesting] = useState(false);
   const comboRef = useRef<{ timer: ReturnType<typeof setTimeout>, wordId: string } | null>(null);
+
+  // AI Suggestion Logic
+  useEffect(() => {
+    const apiKey = localStorage.getItem('TP_GEMINI_KEY');
+    if (selectedWords.length > 1 && apiKey) {
+      setIsSuggesting(true);
+      const timer = setTimeout(async () => {
+        const results = await fetchSentenceSuggestions(apiKey, selectedWords);
+        setSuggestions(results);
+        setIsSuggesting(false);
+      }, 800);
+      return () => clearTimeout(timer);
+    } else {
+      setSuggestions([]);
+    }
+  }, [selectedWords]);
 
   const displayedVocab = [...vocabulary]
     .filter(w => !activeFilter || w.status === activeFilter)
@@ -41,10 +59,8 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
         const rankB = FREQUENCY_ORDER.indexOf(b.word) === -1 ? 999 : FREQUENCY_ORDER.indexOf(b.word);
         comparison = rankA - rankB;
       } else if (sortMode === 'length') {
-        // Sorts by character count
         comparison = a.word.length - b.word.length;
       } else if (sortMode === 'type') {
-        // Sorts alphabetically by Part of Speech
         comparison = a.partOfSpeech.localeCompare(b.partOfSpeech);
       } else {
         comparison = a.word.localeCompare(b.word);
@@ -77,7 +93,7 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
   };
 
   return (
-    <section className="mastery-grid" onClick={() => setSelectedWords([])} style={{ paddingBottom: selectedWords.length > 1 ? '160px' : '20px' }}>
+    <section className="mastery-grid" onClick={() => setSelectedWords([])} style={{ paddingBottom: selectedWords.length > 1 ? '180px' : '20px' }}>
       <div className="mastery-grid__cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: '10px', padding: '0 24px' }}>
         {displayedVocab.map((word) => {
           const isSelected = selectedWords.includes(word.word);
@@ -95,8 +111,28 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
       </div>
 
       {selectedWords.length > 1 && (
-        <div style={{ position: 'fixed', bottom: '24px', left: '16px', right: '16px', background: '#111', border: '1px solid #3b82f6', borderRadius: '16px', padding: '16px', zIndex: 1000 }}>
-          <div style={{ fontSize: '1.2rem', color: '#fff', marginBottom: '12px' }}>{selectedWords.join(' ')}</div>
+        <div style={{ position: 'fixed', bottom: '24px', left: '16px', right: '16px', background: '#111', border: '1px solid #3b82f6', borderRadius: '16px', padding: '16px', zIndex: 1000, boxShadow: '0 -10px 25px rgba(0,0,0,0.5)' }}>
+          
+          {/* Suggestion Area */}
+          <div style={{ marginBottom: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ fontSize: '0.65rem', color: '#888', fontWeight: 'bold' }}>LINA'S SUGGESTIONS:</div>
+            <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '4px', scrollbarWidth: 'none' }}>
+              {isSuggesting ? (
+                <div style={{ fontSize: '0.7rem', color: '#3b82f6', fontStyle: 'italic' }}>Lina is thinking...</div>
+              ) : suggestions.map((s, i) => (
+                <button 
+                  key={i} 
+                  onClick={(e) => { e.stopPropagation(); onAskLina(`Is "${s}" correct?`); setSelectedWords([]); }}
+                  style={{ whiteSpace: 'nowrap', background: '#1a1a1a', border: '1px solid #333', color: '#fff', padding: '6px 12px', borderRadius: '20px', fontSize: '0.75rem', cursor: 'pointer' }}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ fontSize: '1.2rem', color: '#fff', marginBottom: '12px', borderTop: '1px solid #222', paddingTop: '10px' }}>{selectedWords.join(' ')}</div>
+          
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '8px' }}>
             <button 
               onClick={() => { onAskLina(`toki Lina! Is "${selectedWords.join(' ')}" a good sentence?`); setSelectedWords([]); }} 
@@ -119,4 +155,4 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
       )}
     </section>
   );
-}
+                          }
