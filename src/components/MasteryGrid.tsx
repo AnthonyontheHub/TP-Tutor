@@ -9,8 +9,9 @@ interface Props {
   isSandboxMode: boolean;
   activeFilter: MasteryStatus | null;
   sortMode: 'alphabetical' | 'status' | 'unlocked';
-  sortDirection: 'asc' | 'desc';
+  sortDirection: 'asc' | 'desc'; /* <-- This is the piece TypeScript is missing! */
 }
+
 
 const STATUS_ORDER: MasteryStatus[] = ['not_started', 'introduced', 'practicing', 'confident', 'mastered'];
 
