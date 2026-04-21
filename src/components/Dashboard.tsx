@@ -51,18 +51,37 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
         </div>
 
         {viewMode === 'grid' ? (
-          <MasteryGrid 
-            onAskLina={onAskLina} 
-            isSandboxMode={isSandboxMode} 
-            activeFilter={activeFilter} 
-            sortMode={sortMode} 
-            sortDirection={sortDirection} 
-            posFilter={posFilter}
-            // Passing the missing setters so the Grid UI works
-            setSortMode={setSortMode}
-            setSortDirection={setSortDirection}
-            setPosFilter={setPosFilter} 
-          />
+          <>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px', padding: '0 5px' }}>
+              <label htmlFor="pos-filter" style={{ fontWeight: 'bold' }}>Filter POS:</label>
+              <select 
+                id="pos-filter"
+                value={posFilter} 
+                onChange={(e) => setPosFilter(e.target.value)}
+                style={{ padding: '8px', borderRadius: '6px', background: '#222', color: '#fff', border: '1px solid #444', outline: 'none' }}
+              >
+                <option value="All">All Parts of Speech</option>
+                <option value="noun">Noun</option>
+                <option value="verb">Verb</option>
+                <option value="adjective">Adjective</option>
+                <option value="adverb">Adverb</option>
+                <option value="phrase">Phrase</option>
+              </select>
+            </div>
+            
+            <MasteryGrid 
+              onAskLina={onAskLina} 
+              isSandboxMode={isSandboxMode} 
+              activeFilter={activeFilter} 
+              sortMode={sortMode} 
+              sortDirection={sortDirection} 
+              posFilter={posFilter}
+              // Passing the missing setters so the Grid UI works
+              setSortMode={setSortMode}
+              setSortDirection={setSortDirection}
+              setPosFilter={setPosFilter} 
+            />
+          </>
         ) : (
           <div style={{ padding: '20px 0' }}>
             {savedPhrases.length === 0 ? <p>No phrases saved yet.</p> : savedPhrases.map((p, i) => (
