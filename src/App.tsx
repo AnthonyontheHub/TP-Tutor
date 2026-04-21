@@ -7,7 +7,6 @@ type View = 'dashboard' | 'chat';
 
 export default function App() {
   const [view, setView] = useState<View>('dashboard');
-  const [hasOpenedChat, setHasOpenedChat] = useState(false);
   const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
 
   useEffect(() => {
@@ -15,7 +14,6 @@ export default function App() {
   }, []);
 
   const handleStartSession = () => {
-    setHasOpenedChat(true);
     setView('chat');
   };
 
@@ -26,20 +24,16 @@ export default function App() {
 
   return (
     <>
-      <div style={{ display: view === 'dashboard' ? 'contents' : 'none' }}>
-        <Dashboard onStartSession={handleStartSession} onAskLina={handleAskLina} />
-      </div>
+      {/* Dashboard is now always rendered in the background */}
+      <Dashboard onStartSession={handleStartSession} onAskLina={handleAskLina} />
 
-      {hasOpenedChat && (
-        <div style={{ display: view === 'chat' ? 'contents' : 'none' }}>
-          <ChatSession 
-            isActive={view === 'chat'} 
-            onEndSession={() => setView('dashboard')} 
-            pendingPrompt={pendingPrompt}
-            clearPrompt={() => setPendingPrompt(null)}
-          />
-        </div>
-      )}
+      {/* ChatSession handles its own slide-in animation using isActive */}
+      <ChatSession 
+        isActive={view === 'chat'} 
+        onEndSession={() => setView('dashboard')} 
+        pendingPrompt={pendingPrompt}
+        clearPrompt={() => setPendingPrompt(null)}
+      />
     </>
   );
 }
