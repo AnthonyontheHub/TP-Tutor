@@ -19,9 +19,8 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter }: 
   const updateVocabStatus = useMasteryStore((s) => s.updateVocabStatus);
   
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [focusedId, setFocusedId] = useState<string | null>(null); // NEW: Tracks the "grown" card
+  const [focusedId, setFocusedId] = useState<string | null>(null); 
 
-  // We use timestamps now instead of a timeout, it is much more reliable for mobile taps
   const clickData = useRef<{ lastTime: number, wordId: string } | null>(null);
 
   const displayedVocab = activeFilter 
@@ -42,7 +41,6 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter }: 
     const isSameWord = clickData.current?.wordId === word.id;
     const timeSinceLastClick = isSameWord ? (now - clickData.current!.lastTime) : Infinity;
 
-    // Update the tracker for the next tap
     clickData.current = { lastTime: now, wordId: word.id };
 
     if (isSameWord && timeSinceLastClick < 350) {
@@ -51,20 +49,19 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter }: 
       const nextIndex = (currentIndex + 1) % STATUS_ORDER.length;
       updateVocabStatus(word.id, STATUS_ORDER[nextIndex]);
       
-      setFocusedId(word.id); // Keep it grown so you see the color change
-      clickData.current = null; // Reset to prevent a 3rd rapid tap from opening the drawer
+      setFocusedId(word.id); 
+      clickData.current = null; 
     } 
     else if (focusedId === word.id) {
-      // 🐢 SLOW SECOND TAP (Card was already focused)
-      setSelectedId(word.id); // Open the drawer
+      // 🐢 SLOW SECOND TAP 
+      setSelectedId(word.id); 
     } 
     else {
-      // 👆 FIRST TAP (Or tapping a completely different card)
+      // 👆 FIRST TAP 
       setFocusedId(word.id);
     }
   };
 
-  // Allows you to tap the background to clear the focus
   const clearFocus = () => {
     if (focusedId) setFocusedId(null);
   };
@@ -92,20 +89,22 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter }: 
               <div 
                 key={word.id}
                 onClick={(e) => {
-                  e.stopPropagation(); // Prevents the background click from immediately clearing it
+                  e.stopPropagation(); 
                   handleCardClick(word);
                 }}
                 style={{
-                  // THE MAGIC SPRING ANIMATION
                   transform: isFocused ? 'scale(1.1)' : (isDimmed ? 'scale(0.92)' : 'scale(1)'),
                   opacity: isDimmed ? 0.35 : 1,
-                  transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)', // Apple-like spring bounce
+                  transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)', 
                   zIndex: isFocused ? 10 : 1,
                   position: 'relative',
                   cursor: 'pointer'
                 }}
               >
-                <VocabCard word={word} />
+                <VocabCard 
+                  word={word} 
+                  onClick={() => {}} /* FIX: Satisfies TypeScript requirement */
+                />
               </div>
             );
           })}
@@ -117,7 +116,7 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter }: 
           word={selectedWord} 
           onClose={() => {
             setSelectedId(null);
-            setFocusedId(null); // Clear focus when closing drawer
+            setFocusedId(null); 
           }} 
           onAskLina={onAskLina} 
           isSandboxMode={isSandboxMode}
