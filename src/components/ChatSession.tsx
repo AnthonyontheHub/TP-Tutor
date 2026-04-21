@@ -20,9 +20,10 @@ interface ChatMessage {
 
 interface Props {
   onEndSession: () => void;
+  isActive: boolean;
 }
 
-export default function ChatSession({ onEndSession }: Props) {
+export default function ChatSession({ onEndSession, isActive }: Props) {
   const vocabulary          = useMasteryStore((s) => s.vocabulary);
   const chapters            = useMasteryStore((s) => s.chapters);
   const studentName         = useMasteryStore((s) => s.studentName);
@@ -44,9 +45,13 @@ export default function ChatSession({ onEndSession }: Props) {
   const historyRef     = useRef<Array<{ role: 'user' | 'assistant'; content: string }>>([]);
   const greetingFired  = useRef(false);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+useEffect(() => {
+    if (isActive) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      // Optional bonus: auto-focus the input box when returning to chat
+      if (!isLoading) inputRef.current?.focus(); 
+    }
+  }, [messages, isActive, isLoading]);
 
   // Trigger Lina's greeting automatically on mount, but only if we have a key
   useEffect(() => {
