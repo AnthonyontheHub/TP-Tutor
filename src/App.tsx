@@ -6,7 +6,6 @@ import { useMasteryStore } from './store/masteryStore';
 export default function App() {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
-  const [isSandboxMode, setIsSandboxMode] = useState(true);
 
   useEffect(() => {
     useMasteryStore.getState().syncFromCloud();
@@ -22,8 +21,6 @@ export default function App() {
       <Dashboard 
         onStartSession={() => setIsChatOpen(true)} 
         onAskLina={handleAskLina} 
-        isSandboxMode={isSandboxMode}
-        setIsSandboxMode={setIsSandboxMode}
       />
 
       <ChatSession 
@@ -31,7 +28,6 @@ export default function App() {
         onEndSession={() => setIsChatOpen(false)} 
         pendingPrompt={pendingPrompt}
         clearPrompt={() => setPendingPrompt(null)}
-        isSandboxMode={isSandboxMode} 
       />
     </>
   );
