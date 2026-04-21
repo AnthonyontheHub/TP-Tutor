@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
-import { buildSystemPrompt, streamCompletion, parseProposedChanges, stripProposedChanges, STATUS_EMOJI } from '../services/linaService';
-import type { MasteryStatus } from '../types/mastery';
+import { buildSystemPrompt, streamCompletion, stripProposedChanges } from '../services/linaService';
 
 interface Props { onEndSession: () => void; isActive: boolean; pendingPrompt?: string | null; clearPrompt?: () => void; }
 
@@ -10,7 +9,6 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
   const [messages, setMessages] = useState<any[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const apiKey = localStorage.getItem('TP_GEMINI_KEY') || '';
   const store = useMasteryStore();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const historyRef = useRef<any[]>([]);
@@ -18,14 +16,15 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
   useEffect(() => { if (isActive) messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, isActive]);
   
   useEffect(() => { 
-    if (isActive && pendingPrompt && apiKey && !isLoading) { 
-       sendToLina(pendingPrompt); 
+    const key = localStorage.getItem('TP_GEMINI_KEY');
+    if (isActive && pendingPrompt && key && !isLoading) { 
+       sendToLina(pendingPrompt, key); 
        if (clearPrompt) clearPrompt(); 
     } 
   }, [isActive, pendingPrompt]);
 
-  async function sendToLina(txt: string) {
-    if (isLoading || !apiKey) return;
+  async function sendToLina(txt: string, key: string) {
+    if (isLoading || !key) return;
     setIsLoading(true);
     setMessages(p => [...p, { role: 'user', content: txt }]);
     historyRef.current.push({ role: 'user', content: txt });
@@ -34,6 +33,36 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
     try {
       const sys = buildSystemPrompt(store.vocabulary, store.chapters, store.studentName);
       let full = '';
+      for await (const chunk of streamCompletion(key, sys, historyRef.current)) {
+        full += chunk;
+        setMessages(p => p.map(m => m.id === assistantId ? { ...m, content: stripProposedChanges(full) } : m));
+      }
+      historyRef.current.push({ role: 'assistant', content: full });
+    } catch (e) { console.error(e); } finally { setIsLoading(false); }
+  }
+
+  return (
+    <AnimatePresence>
+      {isActive && (
+        <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} style={{ position: 'fixed', bottom: 0, left: 0, right: 0, height: '90vh', background: '#111', zIndex: 2000, display: 'flex', flexDirection: 'column' }}>
+          <div onClick={onEndSession} style={{ padding: '15px', textAlign: 'center', color: '#666' }}>CLOSE</div>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
+            {messages.map((m, i) => (
+              <div key={i} style={{ marginBottom: '15px', textAlign: m.role === 'user' ? 'right' : 'left' }}>
+                <div style={{ background: m.role === 'user' ? '#333' : '#222', padding: '10px', borderRadius: '8px', display: 'inline-block', color: 'white' }}>{m.content}</div>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+          <div style={{ padding: '15px', display: 'flex', gap: '10px' }}>
+            <input value={input} onChange={e => setInput(e.target.value)} style={{ flex: 1, background: '#222', color: 'white', border: 'none', padding: '10px' }} />
+            <button onClick={() => { const k = localStorage.getItem('TP_GEMINI_KEY'); if(k) sendToLina(input, k); setInput(''); }} style={{ background: '#3b82f6', color: 'white', border: 'none', padding: '0 20px' }}>SEND</button>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
       for await (const chunk of streamCompletion(apiKey, sys, historyRef.current)) {
         full += chunk;
         setMessages(p => p.map(m => m.id === assistantId ? { ...m, content: stripProposedChanges(full) } : m));
