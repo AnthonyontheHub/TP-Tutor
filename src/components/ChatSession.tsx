@@ -21,9 +21,12 @@ interface ChatMessage {
 interface Props {
   onEndSession: () => void;
   isActive: boolean;
+  pendingPrompt?: string | null;
+  clearPrompt?: () => void;
 }
 
-export default function ChatSession({ onEndSession, isActive }: Props) {
+export default function ChatSession({ onEndSession, isActive, pendingPrompt, clearPrompt }: Props) {
+
   const vocabulary          = useMasteryStore((s) => s.vocabulary);
   const chapters            = useMasteryStore((s) => s.chapters);
   const studentName         = useMasteryStore((s) => s.studentName);
@@ -52,6 +55,14 @@ useEffect(() => {
       if (!isLoading) inputRef.current?.focus(); 
     }
   }, [messages, isActive, isLoading]);
+
+  // NEW: Listen for prompts passed in from the Dashboard (Ask Lina feature)
+  useEffect(() => {
+    if (isActive && pendingPrompt && apiKey && !isLoading) {
+      void sendToLina(pendingPrompt);
+      if (clearPrompt) clearPrompt();
+    }
+  }, [isActive, pendingPrompt, apiKey, isLoading, clearPrompt]);
 
   // Trigger Lina's greeting automatically on mount, but only if we have a key
   useEffect(() => {
