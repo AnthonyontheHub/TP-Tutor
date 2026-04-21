@@ -1,5 +1,5 @@
 /* src/components/MasteryGrid.tsx */
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import VocabCard from './VocabCard';
 import WordDetailDrawer from './WordDetailDrawer';
@@ -20,7 +20,6 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isDragging = useRef(false);
 
-  // Re-enable suggestions
   useEffect(() => {
     const apiKey = localStorage.getItem('TP_GEMINI_KEY');
     if (selectedWords.length > 1 && apiKey) {
@@ -38,17 +37,15 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
       if (!isDragging.current) {
         soundService.playBlip(523, 'sine', 0.05);
         setSelectedWords(prev => prev.includes(word) ? prev : [...prev, word]);
-        longPressTimer.current = null; // Mark as handled
+        longPressTimer.current = null;
       }
     }, 500);
   };
 
   const handlePointerUp = (word: string) => {
     if (longPressTimer.current) {
-      // If timer is still running, it was a normal tap
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
-      
       if (isDragging.current) return;
 
       if (selectedWords.length > 0) {
