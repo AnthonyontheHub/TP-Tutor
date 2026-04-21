@@ -25,7 +25,7 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
             {partsOfSpeech.map(pos => (
               <div key={pos} style={{ background: '#1a1a1a', padding: '16px', borderRadius: '12px', borderLeft: '4px solid #333' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontWeight: 900, color: '#555', fontSize: '0.65rem' }}>{pos.toUpperCase()}</span>
+                  <span style={{ fontWeight: 900, color: '#444', fontSize: '0.65rem' }}>{pos.toUpperCase()}</span>
                   <button onClick={() => { onAskLina(`toki Lina! Can we practice using "${word.word}" as a ${pos}?`); onClose(); }} style={{ background: 'transparent', border: 'none', color: '#3b82f6', fontWeight: 'bold', cursor: 'pointer' }}>ASK LINA</button>
                 </div>
                 <p style={{ marginTop: '8px', color: '#ccc', fontStyle: 'italic' }}>{word.meanings}</p>
