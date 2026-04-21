@@ -5,7 +5,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyBCK-D_zNi8LazyaEhP9VLUYWeeGa2QXcI", // You must paste your real API key here
   authDomain: "tp-tutor.firebaseapp.com",
   projectId: "tp-tutor",
-  storageBucket: "tp-tutor.appspot.com",
+  storageBucket: "tp-tutor.firebasestorage.app",
   messagingSenderId: "784915926349", // Pulled from your Project Number
   appId: "1:784915926349:web:86aa45878b95b170217b04" // You must paste your real App ID here
 };
