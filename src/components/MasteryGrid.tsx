@@ -1,32 +1,63 @@
-import { useState, useRef } from 'react';
+/* src/components/MasteryGrid.tsx */
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import VocabCard from './VocabCard';
 import WordDetailDrawer from './WordDetailDrawer';
 import { soundService } from '../services/soundService';
+import { fetchSentenceSuggestions } from '../services/linaService';
 import type { MasteryStatus } from '../types/mastery';
 
-interface Props { 
-  onAskLina: (p: string) => void; 
-  isSandboxMode: boolean; 
-  activeFilter: MasteryStatus | null; 
-  sortMode: 'alphabetical' | 'status' | 'frequency' | 'length' | 'type'; 
-  sortDirection: 'asc' | 'desc'; 
-  posFilter: string; 
-}
+interface Props { onAskLina: (p: string) => void; isSandboxMode: boolean; activeFilter: MasteryStatus | null; sortMode: any; sortDirection: any; posFilter: string; }
 
 export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, sortMode, sortDirection, posFilter }: Props) {
   const vocabulary = useMasteryStore((s) => s.vocabulary);
+  const savePhrase = useMasteryStore((s) => s.savePhrase);
+  
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
   const [drawerId, setDrawerId] = useState<string | null>(null);
-  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [linaSuggestions, setLinaSuggestions] = useState<string[]>([]);
+  
+  const longPressTimer = useRef<any>(null);
   const isDragging = useRef(false);
+
+  // Restore Shuffles Logic
+  const localShuffles = useMemo(() => {
+    if (selectedWords.length < 2 || selectedWords.length > 4) return [];
+    const results: string[][] = [];
+    const permute = (arr: string[], m: string[] = []) => {
+      if (arr.length === 0) results.push(m);
+      else {
+        for (let i = 0; i < arr.length; i++) {
+          const curr = arr.slice();
+          const next = curr.splice(i, 1);
+          permute(curr, m.concat(next));
+        }
+      }
+    };
+    permute(selectedWords);
+    return results.map(p => p.join(' ')).slice(0, 5);
+  }, [selectedWords]);
+
+  // Restore Lina Suggestions Logic
+  useEffect(() => {
+    const apiKey = localStorage.getItem('TP_GEMINI_KEY');
+    if (selectedWords.length > 1 && apiKey) {
+      const timer = setTimeout(async () => {
+        const results = await fetchSentenceSuggestions(apiKey, selectedWords);
+        setLinaSuggestions(results);
+      }, 800);
+      return () => clearTimeout(timer);
+    } else {
+      setLinaSuggestions([]);
+    }
+  }, [selectedWords]);
 
   const handlePointerDown = (word: string) => {
     isDragging.current = false;
     longPressTimer.current = setTimeout(() => {
       if (!isDragging.current) {
         soundService.playBlip(523, 'sine', 0.05);
-        setSelectedWords(prev => [...prev, word]);
+        setSelectedWords(prev => prev.includes(word) ? prev : [...prev, word]);
       }
     }, 500);
   };
@@ -36,12 +67,8 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
     if (isDragging.current) return;
 
     if (selectedWords.length > 0) {
-      if (selectedWords.includes(word)) {
-        setSelectedWords(prev => prev.filter(w => w !== word));
-      } else {
-        soundService.playBlip(523, 'sine', 0.05);
-        setSelectedWords(prev => [...prev, word]);
-      }
+      if (selectedWords.includes(word)) setSelectedWords(prev => prev.filter(w => w !== word));
+      else { soundService.playBlip(523, 'sine', 0.05); setSelectedWords(prev => [...prev, word]); }
     } else {
       const target = vocabulary.find(v => v.word === word);
       if (target) setDrawerId(target.id);
@@ -51,54 +78,60 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
   const displayed = vocabulary
     .filter(w => !activeFilter || w.status === activeFilter)
     .filter(w => posFilter === 'All' || w.partOfSpeech.includes(posFilter))
-    .sort((a, b) => {
+    .sort((a: any, b: any) => {
       const field = sortMode === 'alphabetical' ? 'word' : sortMode;
-      const valA = String(a[field as keyof typeof a] || '');
-      const valB = String(b[field as keyof typeof b] || '');
-      const comp = valA.localeCompare(valB);
+      const comp = String(a[field]).localeCompare(String(b[field]));
       return sortDirection === 'asc' ? comp : -comp;
     });
 
   return (
-    <section className="mastery-grid" onPointerMove={() => { isDragging.current = true; }}>
+    <section onPointerMove={() => { isDragging.current = true; }}>
       <div className="mastery-grid__cards">
-        {displayed.map((word) => {
-          const isSelected = selectedWords.includes(word.word);
-          return (
-            <div 
-              key={word.id} 
-              onPointerDown={() => handlePointerDown(word.word)} 
-              onPointerUp={() => handlePointerUp(word.word)} 
-              style={{ 
-                transform: isSelected ? 'scale(1.05)' : 'scale(1)',
-                opacity: selectedWords.length > 0 && !isSelected ? 0.4 : 1,
-                transition: 'all 0.2s ease'
-              }}
-            >
-              <VocabCard word={word} onClick={() => {}} />
-            </div>
-          );
-        })}
+        {displayed.map((word) => (
+          <div key={word.id} onPointerDown={() => handlePointerDown(word.word)} onPointerUp={() => handlePointerUp(word.word)} 
+               style={{ opacity: selectedWords.length > 0 && !selectedWords.includes(word.word) ? 0.3 : 1, transition: 'all 0.2s' }}>
+            <VocabCard word={word} onClick={() => {}} />
+          </div>
+        ))}
       </div>
 
       {selectedWords.length > 0 && (
-        <div style={{ position: 'fixed', bottom: 20, left: '50%', transform: 'translateX(-50%)', width: '90%', maxWidth: '800px', background: '#111', padding: '20px', borderRadius: '20px', border: '2px solid #3b82f6', zIndex: 3000 }}>
-          <div style={{ fontSize: '1.5rem', marginBottom: '10px', fontWeight: 'bold' }}>{selectedWords.join(' ')}</div>
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button onClick={() => { onAskLina(`toki Lina! Is "${selectedWords.join(' ')}" a good sentence?`); setSelectedWords([]); }} style={{ flex: 1, padding: '12px', background: '#3b82f6', border: 'none', borderRadius: '8px', color: '#fff', fontWeight: 'bold', cursor: 'pointer' }}>ASK LINA</button>
-            <button onClick={() => setSelectedWords([])} style={{ padding: '12px', background: '#333', border: 'none', borderRadius: '8px', color: '#fff', cursor: 'pointer' }}>CLEAR</button>
+        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, display: 'flex', justifyContent: 'center', zIndex: 3000, pointerEvents: 'none' }}>
+          <div style={{ width: '100%', maxWidth: '900px', background: '#0a0a0a', border: '2px solid #3b82f6', borderBottom: 'none', borderTopLeftRadius: '20px', borderTopRightRadius: '20px', padding: '20px', pointerEvents: 'auto', margin: '0 10px' }}>
+            
+            {selectedWords.length > 1 && (
+              <div style={{ marginBottom: '15px' }}>
+                <div style={{ fontSize: '0.6rem', color: '#666', marginBottom: '8px' }}>SHUFFLES:</div>
+                <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '5px' }}>
+                  {localShuffles.map((s, i) => (
+                    <button key={i} onClick={() => setSelectedWords(s.split(' '))} style={{ whiteSpace: 'nowrap', background: '#222', color: '#888', border: '1px solid #444', padding: '5px 10px', borderRadius: '6px', fontSize: '0.7rem' }}>{s}</button>
+                  ))}
+                </div>
+                {linaSuggestions.length > 0 && (
+                  <div style={{ marginTop: '10px' }}>
+                    <div style={{ fontSize: '0.6rem', color: '#3b82f6', marginBottom: '8px' }}>LINA'S SUGGESTIONS:</div>
+                    <div style={{ display: 'flex', gap: '8px', overflowX: 'auto' }}>
+                      {linaSuggestions.map((s, i) => (
+                        <button key={i} onClick={() => { onAskLina(`Is "${s}" correct?`); setSelectedWords([]); }} style={{ whiteSpace: 'nowrap', background: '#1a1a1a', color: '#fff', border: '1px solid #3b82f6', padding: '6px 12px', borderRadius: '20px', fontSize: '0.75rem' }}>{s}</button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div style={{ fontSize: '1.4rem', color: '#fff', marginBottom: '15px', fontWeight: 'bold' }}>{selectedWords.join(' ')}</div>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '10px' }}>
+              <button onClick={() => { onAskLina(`toki Lina! Is "${selectedWords.join(' ')}" correct?`); setSelectedWords([]); }} style={{ padding: '14px', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 'bold' }}>ASK LINA</button>
+              <button onClick={() => { savePhrase(selectedWords.join(' ')); setSelectedWords([]); }} style={{ padding: '14px', background: '#222', color: 'white', border: '1px solid #444', borderRadius: '12px' }}>SAVE 📌</button>
+            </div>
+            <button onClick={() => setSelectedWords([])} style={{ width: '100%', marginTop: '10px', background: 'none', border: 'none', color: '#444', fontSize: '0.7rem' }}>CLEAR ✕</button>
           </div>
         </div>
       )}
 
-      {drawerId && (
-        <WordDetailDrawer 
-          word={vocabulary.find(v => v.id === drawerId)!} 
-          onClose={() => setDrawerId(null)} 
-          onAskLina={onAskLina} 
-          isSandboxMode={isSandboxMode} 
-        />
-      )}
+      {drawerId && <WordDetailDrawer word={vocabulary.find(v => v.id === drawerId)!} onClose={() => setDrawerId(null)} onAskLina={onAskLina} isSandboxMode={isSandboxMode} />}
     </section>
   );
 }
