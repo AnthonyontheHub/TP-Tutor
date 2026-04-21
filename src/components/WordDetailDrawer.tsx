@@ -1,16 +1,10 @@
+/* src/components/WordDetailDrawer.tsx */
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
 import { STATUS_META } from '../types/mastery';
 import type { VocabWord } from '../types/mastery';
 
-interface Props {
-  word: VocabWord;
-  onClose: () => void;
-  onAskLina: (p: string) => void;
-  isSandboxMode: boolean;
-}
-
-export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMode }: Props) {
+export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMode }: { word: VocabWord; onClose: () => void; onAskLina: (p: string) => void; isSandboxMode: boolean }) {
   const partsOfSpeech = word.partOfSpeech.split('/').map(p => p.trim());
   const updateVocabStatus = useMasteryStore((s) => s.updateVocabStatus);
 
@@ -23,7 +17,7 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
           <h2 style={{ fontSize: '2.4rem', marginBottom: '8px' }}>{word.word}</h2>
           <div 
             onClick={() => isSandboxMode && updateVocabStatus(word.id, 'mastered')}
-            style={{ cursor: 'pointer', color: '#888', marginBottom: '24px', fontWeight: 'bold' }}
+            style={{ cursor: 'pointer', color: '#888', marginBottom: '24px', fontSize: '0.8rem', fontWeight: 'bold' }}
           >
             {STATUS_META[word.status].emoji} {STATUS_META[word.status].label.toUpperCase()}
           </div>
@@ -34,13 +28,13 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
                   <span style={{ fontWeight: 900, color: '#555', fontSize: '0.65rem' }}>{pos.toUpperCase()}</span>
                   <button onClick={() => { onAskLina(`toki Lina! Can we practice using "${word.word}" as a ${pos}?`); onClose(); }} style={{ background: 'transparent', border: 'none', color: '#3b82f6', fontWeight: 'bold', cursor: 'pointer' }}>ASK LINA</button>
                 </div>
-                <p style={{ marginTop: '8px', color: '#ccc' }}>{word.meanings}</p>
+                <p style={{ marginTop: '8px', color: '#ccc', fontStyle: 'italic' }}>{word.meanings}</p>
               </div>
             ))}
           </div>
         </div>
         <div style={{ padding: '20px', borderTop: '1px solid #222' }}>
-          <button onClick={onClose} style={{ width: '100%', padding: '12px', background: '#333', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>✕ CLOSE</button>
+          <button onClick={onClose} style={{ width: '100%', padding: '12px', background: '#333', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 'bold' }}>✕ CLOSE</button>
         </div>
       </motion.div>
     </AnimatePresence>
