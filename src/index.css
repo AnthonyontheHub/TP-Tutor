@@ -14,13 +14,15 @@
   --font: 'Courier New', Consolas, 'Lucida Console', monospace;
   --b2: 3px;
   --b3: 4px;
-  
+
+  /* Status accent colors */
   --col-not-started: #505050;
   --col-introduced:  #2563eb;
   --col-practicing:  #d97706;
   --col-confident:   #16a34a;
   --col-mastered:    #22c55e;
-  
+
+  /* Status background tints */
   --bg-not-started: #0d0d0d;
   --bg-introduced:  #040e22;
   --bg-practicing:  #100800;
@@ -41,7 +43,7 @@ body {
   padding: 0 16px;
 }
 
-/* Header & Main */
+/* Header Reorg */
 .dashboard__header {
   display: flex;
   justify-content: space-between;
@@ -49,40 +51,45 @@ body {
   padding: 20px 0;
   border-bottom: 1px solid #333;
 }
-.dashboard__main { padding: 20px 0 120px; }
+.dashboard__title { margin: 0; font-size: 1.2rem; font-weight: 900; letter-spacing: 0.14em; text-transform: uppercase; }
+.dashboard__profile-trigger { background: none; border: none; padding: 0; margin: 4px 0 0 0; font-size: 0.75rem; color: #3b82f6; cursor: pointer; font-weight: bold; font-family: var(--font); text-transform: uppercase; }
+.dashboard__streak { color: #f59e0b; font-weight: bold; font-size: 0.8rem; background: #332a11; padding: 4px 8px; border-radius: 12px; }
+.dashboard__icon-btn { background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; }
 
-/* Grid & Cards */
+/* Dashboard UI Components */
+.btn-review {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(to right, #3b82f6, #8b5cf6);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 900;
+  cursor: pointer;
+  margin: 20px 0;
+  font-family: var(--font);
+  letter-spacing: 0.05em;
+}
+
+.dashboard__view-toggle { display: flex; gap: 10px; margin-bottom: 20px; }
+.btn-toggle { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; background: #222; color: #fff; cursor: pointer; font-family: var(--font); text-transform: uppercase; }
+.btn-toggle.active { background: #3b82f6; }
+
+/* Mastery Grid & Cards */
 .mastery-grid__cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 12px;
-  margin-top: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 10px;
 }
 
-.vocab-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 10px 6px;
-  min-height: 84px;
-  border: var(--b2) solid transparent;
-  cursor: pointer;
-  transition: transform 0.2s, opacity 0.2s;
-}
-
-.vocab-card__word { font-size: 1rem; font-weight: 900; letter-spacing: 0.02em; }
-.vocab-card__pos { font-size: 0.5rem; color: var(--text-dim); text-transform: uppercase; margin-top: 5px; }
-
-/* Status Skins */
+/* Status skins used by VocabCard */
 .vocab-card--not_started { background: var(--bg-not-started); border-color: var(--col-not-started); }
 .vocab-card--introduced  { background: var(--bg-introduced);  border-color: var(--col-introduced); }
 .vocab-card--practicing  { background: var(--bg-practicing);  border-color: var(--col-practicing); }
 .vocab-card--confident   { background: var(--bg-confident);   border-color: var(--col-confident); }
 .vocab-card--mastered    { background: var(--bg-mastered);    border-color: var(--col-mastered); }
 
-/* Universal Drawer Fixes */
+/* Universal Drawer Logic */
 .drawer-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; }
 .word-drawer, .settings-drawer, .profile-drawer {
   position: fixed; z-index: 2001; background: #111; display: flex; flex-direction: column;
@@ -92,8 +99,9 @@ body {
 
 @media (min-width: 900px) {
   .word-drawer, .settings-drawer, .profile-drawer {
-    top: 0; bottom: 0; left: 0; right: 0; margin: auto;
-    width: 500px; height: 600px; border: var(--b3) solid var(--text); border-radius: 24px;
+    top: 50% !important; left: 50% !important; bottom: auto !important; right: auto !important;
+    width: 500px; height: 620px; transform: translate(-50%, -50%) !important;
+    border: var(--b3) solid var(--text); border-radius: 24px;
   }
 }
 .drawer__handle { width: 48px; height: 6px; background: #444; border-radius: 3px; margin: 16px auto; flex-shrink: 0; }
