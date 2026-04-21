@@ -140,6 +140,7 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
           type="password" className="api-key-input" placeholder="Paste AIzaSy... key here" 
           value={keyInput} onChange={(e) => setKeyInput(e.target.value)} 
           onKeyDown={(e) => e.key === 'Enter' && (() => { localStorage.setItem('TP_GEMINI_KEY', keyInput); setApiKey(keyInput); })()}
+          style={{ width: '100%', boxSizing: 'border-box' }}
         />
         <button className="btn-save-key" onClick={() => { localStorage.setItem('TP_GEMINI_KEY', keyInput); setApiKey(keyInput); }}>
           SAVE & START
@@ -147,7 +148,7 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
       </div>
     </div>
   ) : (
-    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden', width: '100%', boxSizing: 'border-box' }}>
       <header className="chat-header" style={{ padding: '16px 20px', borderBottom: '1px solid #333' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
@@ -158,7 +159,7 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
         </div>
       </header>
 
-      <div className="chat-messages" role="log" aria-live="polite" style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
+      <div className="chat-messages" role="log" aria-live="polite" style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '20px', boxSizing: 'border-box' }}>
         {messages.map((msg) => (
           <div key={msg.id} className={`message message--${msg.role}`} style={{ marginBottom: '20px' }}>
             <span className="message__label" style={{ display: 'block', fontSize: '0.7rem', color: '#888', marginBottom: '4px' }}>
@@ -169,7 +170,7 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
             </div>
 
             {msg.proposedChanges && !msg.changesApplied && (
-              <div className="proposed-changes" style={{ marginTop: '12px', background: '#222', padding: '12px', borderRadius: '8px', border: '1px solid #444' }}>
+              <div className="proposed-changes" style={{ marginTop: '12px', background: '#222', padding: '12px', borderRadius: '8px', border: '1px solid #444', boxSizing: 'border-box' }}>
                 <div style={{ fontSize: '0.8rem', color: '#aaa', marginBottom: '8px' }}>PROPOSED STATUS CHANGES</div>
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                   {msg.proposedChanges.map((change, idx) => (
@@ -178,7 +179,7 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
                     </li>
                   ))}
                 </ul>
-                <button onClick={() => handleApplyChanges(msg.id)} style={{ marginTop: '12px', background: '#4CAF50', color: 'white', border: 'none', padding: '8px 12px', borderRadius: '4px', cursor: 'pointer', width: '100%' }}>
+                <button onClick={() => handleApplyChanges(msg.id)} style={{ marginTop: '12px', background: '#4CAF50', color: 'white', border: 'none', padding: '8px 12px', borderRadius: '4px', cursor: 'pointer', width: '100%', boxSizing: 'border-box' }}>
                   APPLY APPROVED CHANGES
                 </button>
               </div>
@@ -190,8 +191,8 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="chat-input-area" style={{ padding: '16px', background: 'var(--surface, #111)', borderTop: '1px solid #333', display: 'flex', gap: '8px', flexShrink: 0 }}>
-        <textarea ref={inputRef} value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }} placeholder="toki…" rows={2} disabled={isLoading} style={{ flex: 1, background: '#222', color: 'white', border: 'none', borderRadius: '8px', padding: '12px', resize: 'none' }} />
+      <div className="chat-input-area" style={{ padding: '16px', background: 'var(--surface, #111)', borderTop: '1px solid #333', display: 'flex', gap: '8px', flexShrink: 0, width: '100%', boxSizing: 'border-box' }}>
+        <textarea ref={inputRef} value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }} placeholder="toki…" rows={2} disabled={isLoading} style={{ flex: 1, background: '#222', color: 'white', border: 'none', borderRadius: '8px', padding: '12px', resize: 'none', boxSizing: 'border-box' }} />
         <button onClick={handleSend} disabled={isLoading || !input.trim()} style={{ background: '#3b82f6', color: 'white', border: 'none', borderRadius: '8px', padding: '0 20px', cursor: 'pointer', fontWeight: 'bold' }}>
           {isLoading ? '···' : 'SEND'}
         </button>
@@ -205,7 +206,6 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
         <>
           <motion.div className="drawer-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onEndSession} style={{ zIndex: 999 }} />
           <motion.div
-            className="chat-drawer"
             drag="y"
             dragConstraints={{ top: 0 }}
             initial={{ y: '100%' }}
@@ -216,8 +216,9 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
               if (info.offset.y > 150 || info.velocity.y > 500) onEndSession();
             }}
             style={{
-              position: 'fixed', bottom: 0, left: 0, right: 0,
-              height: '95vh', // Strictly 95% of the screen
+              position: 'fixed', top: 'auto', bottom: 0, left: 0, right: 0,
+              height: '95vh', 
+              width: '100%', maxWidth: '100vw', margin: 0, boxSizing: 'border-box',
               zIndex: 1000,
               background: 'var(--surface, #111)', 
               borderTopLeftRadius: '20px', borderTopRightRadius: '20px',
@@ -225,8 +226,8 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
               display: 'flex', flexDirection: 'column'
             }}
           >
-            <div className="word-drawer__drag-zone" style={{ width: '100%', padding: '16px 0', cursor: 'grab', touchAction: 'none', flexShrink: 0 }}>
-              <div className="word-drawer__handle" style={{ width: '48px', height: '6px', backgroundColor: '#666', borderRadius: '10px', margin: '0 auto' }} />
+            <div style={{ width: '100%', padding: '16px 0', cursor: 'grab', touchAction: 'none', flexShrink: 0 }}>
+              <div style={{ width: '48px', height: '6px', backgroundColor: '#666', borderRadius: '10px', margin: '0 auto' }} />
             </div>
 
             {innerContent}
