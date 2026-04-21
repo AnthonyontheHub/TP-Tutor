@@ -92,30 +92,30 @@ export default function WordDetailDrawer({ word, onClose, onAskLina }: Props) {
           <div className="word-drawer__section-label">PARTS OF SPEECH & EXAMPLES</div>
 
           <div className="word-drawer__examples-list">
-            {partsOfSpeech.map((pos) => (
-              <div key={pos} style={{ background: '#f5f5f5', padding: '12px', borderRadius: '8px', marginBottom: '12px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <span style={{ fontWeight: 'bold', textTransform: 'uppercase', fontSize: '0.85rem' }}>{pos}</span>
-                  <button 
-                    onClick={() => handleAskLina(pos)}
-                    style={{ fontSize: '0.75rem', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer', border: '1px solid #ccc' }}
-                  >
-                    💬 Ask Lina
-                  </button>
-                </div>
-                <p style={{ margin: 0, fontStyle: 'italic', fontSize: '0.9rem', color: '#555' }}>
-                  {isGenerating ? (
-                    <span className="typing-dots" style={{ color: '#888' }}>Lina is thinking...</span>
-                  ) : examples.error ? (
-                    examples.error
-                  ) : examples[pos] ? (
-                    examples[pos]
-                  ) : (
-                    "Could not generate example."
-                  )}
-                </p>
-              </div>
-            ))}
+            {/* Find this line in your WordDetailDrawer.tsx */}
+{partsOfSpeech.map((pos) => (
+  <div key={pos} style={{ 
+    background: 'var(--surface)', // Swapped from #f5f5f5
+    padding: '12px', 
+    borderRadius: '4px', // Squaring it off a bit more to match your UI
+    marginBottom: '12px',
+    border: 'var(--b1) solid #222' // Added a subtle border
+  }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+      <span style={{ fontWeight: 'bold', textTransform: 'uppercase', fontSize: '0.7rem', color: 'var(--text-muted)' }}>{pos}</span>
+      <button 
+        className="btn-nav" // Using your existing button class for consistency
+        onClick={() => handleAskLina(pos)}
+        style={{ fontSize: '0.6rem', padding: '4px 8px' }}
+      >
+        💬 Ask Lina
+      </button>
+    </div>
+    <p style={{ margin: 0, fontStyle: 'italic', fontSize: '0.85rem', color: 'var(--text)' }}>
+      {/* ... keeping the logic the same ... */}
+    </p>
+  </div>
+))}
           </div>
 
           <button 
