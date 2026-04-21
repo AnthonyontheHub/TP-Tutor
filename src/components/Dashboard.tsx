@@ -2,11 +2,8 @@ import { useState } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import ProgressSummary from './ProgressSummary';
 import MasteryGrid from './MasteryGrid';
-import PhraseGrid from './PhraseGrid'; 
 import SettingsDrawer from './SettingsDrawer'; 
 import type { MasteryStatus } from '../types/mastery';
-
-export type SortMode = 'alphabetical' | 'status' | 'unlocked';
 
 interface Props {
   onStartSession: () => void;
@@ -16,24 +13,40 @@ interface Props {
 export default function Dashboard({ onStartSession, onAskLina }: Props) {
   const studentName = useMasteryStore((s) => s.studentName);
   const curriculumLevel = useMasteryStore((s) => s.curriculumLevel);
-  const lastUpdated = useMasteryStore((s) => s.lastUpdated);
-  
   const [isSandboxMode, setIsSandboxMode] = useState(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false); 
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
-  const [selectedWords, setSelectedWords] = useState<string[]>([]);
-  const [sortMode, setSortMode] = useState<SortMode>('alphabetical');
+  const [sortMode, setSortMode] = useState<'alphabetical' | 'status' | 'unlocked'>('alphabetical');
 
   return (
-    <div className="dashboard" style={{ paddingBottom: selectedWords.length > 1 ? '180px' : '40px' }}>
-      <header className="dashboard__header">
+    <div className="dashboard">
+      <header className="dashboard__header" style={{ display: 'flex', justifyContent: 'space-between', padding: '20px' }}>
         <div>
-          <h1 className="dashboard__title">TOKI PONA</h1>
-          <p className="dashboard__subtitle">MAP — {curriculumLevel.toUpperCase()}</p>
+          <h1 style={{ margin: 0 }}>TOKI PONA</h1>
+          <p style={{ fontSize: '0.7rem', opacity: 0.6 }}>{curriculumLevel.toUpperCase()} • {studentName.toUpperCase()}</p>
         </div>
-        <div style={{ display: 'flex', gap: '16px' }}>
-          <button onClick={onStartSession} style={{ background: 'transparent', border: 'none', fontSize: '1.5rem' }}>💬</button>
-          <button onClick={() => setIsSettingsOpen(true)} style={{ background: 'transparent', border: 'none', fontSize: '1.5rem' }}>⚙️</button>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button onClick={onStartSession} style={{ background: 'none', border: 'none', fontSize: '1.5rem' }}>💬</button>
+          <button onClick={() => setIsSettingsOpen(true)} style={{ background: 'none', border: 'none', fontSize: '1.5rem' }}>⚙️</button>
+        </div>
+      </header>
+
+      <main style={{ padding: '0 20px' }}>
+        <ProgressSummary activeFilter={activeFilter} onFilterClick={setActiveFilter} />
+        
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', margin: '10px 0' }}>
+          {['alphabetical', 'status', 'unlocked'].map(m => (
+            <button key={m} onClick={() => setSortMode(m as any)} style={{ fontSize: '0.6rem', background: sortMode === m ? '#333' : 'none', color: '#fff', border: '1px solid #333', padding: '4px 8px', borderRadius: '4px' }}>{m.toUpperCase()}</button>
+          ))}
+        </div>
+
+        <MasteryGrid onAskLina={onAskLina} isSandboxMode={isSandboxMode} activeFilter={activeFilter} sortMode={sortMode} />
+      </main>
+
+      {isSettingsOpen && <SettingsDrawer onClose={() => setIsSettingsOpen(false)} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} />}
+    </div>
+  );
+}
         </div>
       </header>
 
