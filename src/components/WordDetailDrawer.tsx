@@ -1,4 +1,3 @@
-/* src/components/WordDetailDrawer.tsx */
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
 import { STATUS_META } from '../types/mastery';
@@ -15,7 +14,10 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
         <div className="drawer__handle" />
         <div className="drawer__scroll-area">
           <h2 style={{ fontSize: '2.4rem', marginBottom: '8px' }}>{word.word}</h2>
-          <div onClick={() => isSandboxMode && updateVocabStatus(word.id, 'mastered')} style={{ cursor: 'pointer', color: '#888', marginBottom: '24px' }}>
+          <div 
+            onClick={() => isSandboxMode && updateVocabStatus(word.id, 'mastered')}
+            style={{ cursor: 'pointer', color: '#888', marginBottom: '24px' }}
+          >
             {STATUS_META[word.status].emoji} {STATUS_META[word.status].label.toUpperCase()}
           </div>
           <div style={{ display: 'grid', gap: '12px' }}>
