@@ -273,3 +273,37 @@ export async function* streamCompletion(
     if (text) yield text;
   }
 }
+
+
+
+// ─── Dynamic Example Generation ──────────────────────────────────────────────
+
+export async function fetchExamplesForWord(
+  apiKey: string, 
+  word: string, 
+  partsOfSpeech: string[]
+): Promise<Record<string, string>> {
+  const genAI = new GoogleGenerativeAI(apiKey);
+  // Using the same 2.5-flash model you already configured
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+  const prompt = `
+    You are Lina, a Toki Pona expert. 
+    Generate exactly one short, simple Toki Pona example sentence for the word "${word}" for EACH of these parts of speech: ${partsOfSpeech.join(', ')}.
+    
+    Return ONLY a valid JSON object where the keys are the exact parts of speech provided, and the values are the example sentences with their English translation in parentheses. 
+    Example format: {"noun": "pona li lon. (Goodness exists.)", "adjective": "jan pona li toki. (The good person speaks.)"}
+    Do not use markdown formatting or code blocks in your response, just the raw JSON.
+  `;
+
+  try {
+    const result = await model.generateContent(prompt);
+    let text = result.response.text().trim();
+    // Strip markdown formatting if the AI ignores the instruction
+    text = text.replace(/^```json/i, '').replace(/```$/i, '').trim();
+    return JSON.parse(text);
+  } catch (error) {
+    console.error("Failed to generate examples from Lina:", error);
+    return {};
+  }
+}
