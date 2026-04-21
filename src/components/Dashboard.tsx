@@ -7,6 +7,7 @@ import SettingsDrawer from './SettingsDrawer';
 import type { MasteryStatus } from '../types/mastery';
 
 export type SortMode = 'alphabetical' | 'status' | 'unlocked' | 'usage';
+export type SortDirection = 'asc' | 'desc';
 
 interface Props {
   onStartSession: () => void;
@@ -22,7 +23,21 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false); 
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
+  
+  // SORT STATE
   const [sortMode, setSortMode] = useState<SortMode>('alphabetical');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+
+  const handleSortClick = (mode: SortMode) => {
+    if (sortMode === mode) {
+      // Toggle direction if clicking the same mode
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Set new mode and default to ascending
+      setSortMode(mode);
+      setSortDirection('asc');
+    }
+  };
 
   const handleBuildSentence = () => {
     const sentence = selectedWords.join(' ');
@@ -55,15 +70,17 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
           {(['alphabetical', 'status', 'unlocked', 'usage'] as SortMode[]).map(mode => (
             <button 
               key={mode} 
-              onClick={() => setSortMode(mode)} 
+              onClick={() => handleSortClick(mode)} 
               style={{ 
                 background: sortMode === mode ? '#3b82f6' : 'transparent', 
                 color: sortMode === mode ? 'white' : '#666', 
                 border: sortMode === mode ? '1px solid #3b82f6' : '1px solid #333', 
-                padding: '4px 8px', borderRadius: '4px', fontSize: '0.55rem', cursor: 'pointer', fontWeight: 'bold'
+                padding: '4px 8px', borderRadius: '4px', fontSize: '0.55rem', cursor: 'pointer', fontWeight: 'bold',
+                display: 'flex', alignItems: 'center', gap: '4px'
               }}
             >
               {mode.toUpperCase()}
+              {sortMode === mode && (sortDirection === 'asc' ? '↑' : '↓')}
             </button>
           ))}
         </div>
@@ -74,7 +91,8 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
           activeFilter={activeFilter} 
           selectedWords={selectedWords} 
           setSelectedWords={setSelectedWords} 
-          sortMode={sortMode} 
+          sortMode={sortMode}
+          sortDirection={sortDirection}
         />
         
         <PhraseGrid onAskLina={onAskLina} activeFilter={activeFilter} selectedWords={selectedWords} />
