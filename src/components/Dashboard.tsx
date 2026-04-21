@@ -20,23 +20,23 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
 
   return (
     <div className="dashboard">
-      <header className="dashboard__header" style={{ display: 'flex', justifyContent: 'space-between', padding: '20px' }}>
+      <header className="dashboard__header" style={{ display: 'flex', justifyContent: 'space-between', padding: '20px', borderBottom: '1px solid #333' }}>
         <div>
-          <h1 style={{ margin: 0 }}>TOKI PONA</h1>
-          <p style={{ fontSize: '0.7rem', opacity: 0.6 }}>{curriculumLevel.toUpperCase()} • {studentName.toUpperCase()}</p>
+          <h1 style={{ margin: 0, fontSize: '1.2rem' }}>TOKI PONA</h1>
+          <p style={{ margin: 0, fontSize: '0.7rem', opacity: 0.6 }}>{curriculumLevel.toUpperCase()} • {studentName.toUpperCase()}</p>
         </div>
-        <div style={{ display: 'flex', gap: '12px' }}>
-          <button onClick={onStartSession} style={{ background: 'none', border: 'none', fontSize: '1.5rem' }}>💬</button>
-          <button onClick={() => setIsSettingsOpen(true)} style={{ background: 'none', border: 'none', fontSize: '1.5rem' }}>⚙️</button>
+        <div style={{ display: 'flex', gap: '15px' }}>
+          <button onClick={onStartSession} style={{ background: 'none', border: 'none', color: 'white', fontSize: '1.2rem', cursor: 'pointer' }}>💬</button>
+          <button onClick={() => setIsSettingsOpen(true)} style={{ background: 'none', border: 'none', color: 'white', fontSize: '1.2rem', cursor: 'pointer' }}>⚙️</button>
         </div>
       </header>
 
-      <main style={{ padding: '0 20px' }}>
+      <main style={{ padding: '20px' }}>
         <ProgressSummary activeFilter={activeFilter} onFilterClick={setActiveFilter} />
         
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', margin: '10px 0' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', margin: '15px 0' }}>
           {['alphabetical', 'status', 'unlocked'].map(m => (
-            <button key={m} onClick={() => setSortMode(m as any)} style={{ fontSize: '0.6rem', background: sortMode === m ? '#333' : 'none', color: '#fff', border: '1px solid #333', padding: '4px 8px', borderRadius: '4px' }}>{m.toUpperCase()}</button>
+            <button key={m} onClick={() => setSortMode(m as any)} style={{ fontSize: '0.6rem', background: sortMode === m ? '#333' : 'none', color: 'white', border: '1px solid #444', padding: '5px 10px', borderRadius: '4px' }}>{m.toUpperCase()}</button>
           ))}
         </div>
 
@@ -47,33 +47,6 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
     </div>
   );
 }
-        </div>
-      </header>
-
-      <main className="dashboard__main">
-        <div style={{ marginBottom: '8px', textAlign: 'right', fontSize: '0.7rem', color: '#666' }}>
-          {studentName.toUpperCase()} • SYNCED {lastUpdated}
-        </div>
-
-        <ProgressSummary activeFilter={activeFilter} onFilterClick={(s) => { setActiveFilter(s); setSelectedWords([]); }} />
-        
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginBottom: '12px' }}>
-          {(['alphabetical', 'status', 'unlocked'] as SortMode[]).map(mode => (
-            <button key={mode} onClick={() => setSortMode(mode)} style={{ background: sortMode === mode ? '#333' : 'transparent', color: sortMode === mode ? 'white' : '#666', border: '1px solid #333', padding: '4px 8px', borderRadius: '4px', fontSize: '0.6rem' }}>{mode.toUpperCase()}</button>
-          ))}
-        </div>
-
-        <MasteryGrid onAskLina={onAskLina} isSandboxMode={isSandboxMode} activeFilter={activeFilter} selectedWords={selectedWords} setSelectedWords={setSelectedWords} sortMode={sortMode} />
-        <PhraseGrid onAskLina={onAskLina} activeFilter={activeFilter} selectedWords={selectedWords} />
-      </main>
-
-      {selectedWords.length > 1 && (
-        <div style={{ position: 'fixed', bottom: '24px', left: '16px', right: '16px', background: '#161616', border: '1px solid #3b82f6', borderRadius: '16px', padding: '20px', zIndex: 2000 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <span style={{ fontSize: '0.7rem', color: '#3b82f6' }}>SENTENCE BUILDER</span>
-            <button onClick={() => setSelectedWords([])} style={{ background: 'none', border: 'none', color: '#fff', fontSize: '0.7rem' }}>CLEAR</button>
-          </div>
-          <div style={{ fontSize: '1.4rem', color: '#fff', marginBottom: '12px' }}>{selectedWords.join(' ')}</div>
           <button onClick={() => { onAskLina(`Is this correct: "${selectedWords.join(' ')}"?`); setSelectedWords([]); }} style={{ width: '100%', background: '#3b82f6', color: 'white', border: 'none', padding: '12px', borderRadius: '8px', fontWeight: 'bold' }}>ASK LINA</button>
         </div>
       )}
