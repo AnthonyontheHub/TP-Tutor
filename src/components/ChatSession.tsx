@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion'; // NEW
+import { motion, AnimatePresence } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
 import { buildSystemPrompt, streamCompletion, parseProposedChanges, stripProposedChanges, STATUS_EMOJI } from '../services/linaService';
 import type { ProposedChange } from '../services/linaService';
@@ -131,7 +131,6 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
     }));
   }
 
-  // INNER CONTENT VARIABLES (Setup vs Chat)
   const innerContent = !apiKey ? (
     <div className="api-key-setup" style={{ padding: '20px', flex: 1, overflowY: 'auto' }}>
       <h2>ENTER GEMINI API KEY</h2>
@@ -150,9 +149,12 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
   ) : (
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
       <header className="chat-header" style={{ padding: '16px 20px', borderBottom: '1px solid #333' }}>
-        <div>
-          <h1 className="chat-header__title" style={{ fontSize: '1.2rem', margin: 0 }}>LINA</h1>
-          <p className="chat-header__subtitle" style={{ fontSize: '0.8rem', color: '#888', margin: 0 }}>TOKI PONA TUTOR</p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h1 className="chat-header__title" style={{ fontSize: '1.2rem', margin: 0 }}>LINA</h1>
+            <p className="chat-header__subtitle" style={{ fontSize: '0.8rem', color: '#888', margin: 0 }}>TOKI PONA TUTOR</p>
+          </div>
+          <button onClick={onEndSession} style={{ background: 'transparent', color: '#888', border: 'none', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
         </div>
       </header>
 
@@ -188,7 +190,7 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="chat-input-area" style={{ padding: '16px', background: '#111', borderTop: '1px solid #333', display: 'flex', gap: '8px' }}>
+      <div className="chat-input-area" style={{ padding: '16px', background: 'var(--surface, #111)', borderTop: '1px solid #333', display: 'flex', gap: '8px', flexShrink: 0 }}>
         <textarea ref={inputRef} value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }} placeholder="toki…" rows={2} disabled={isLoading} style={{ flex: 1, background: '#222', color: 'white', border: 'none', borderRadius: '8px', padding: '12px', resize: 'none' }} />
         <button onClick={handleSend} disabled={isLoading || !input.trim()} style={{ background: '#3b82f6', color: 'white', border: 'none', borderRadius: '8px', padding: '0 20px', cursor: 'pointer', fontWeight: 'bold' }}>
           {isLoading ? '···' : 'SEND'}
@@ -201,35 +203,33 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
     <AnimatePresence>
       {isActive && (
         <>
-          {/* Background Dimmer */}
           <motion.div className="drawer-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onEndSession} style={{ zIndex: 999 }} />
-          
-          {/* The Chat Drawer */}
           <motion.div
             className="chat-drawer"
             drag="y"
             dragConstraints={{ top: 0 }}
             initial={{ y: '100%' }}
-            animate={{ y: '5%' }} // Snaps to 95% height
+            animate={{ y: '0%' }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             onDragEnd={(_, info) => {
               if (info.offset.y > 150 || info.velocity.y > 500) onEndSession();
             }}
             style={{
-              height: '95vh', top: '5vh', position: 'fixed', left: 0, right: 0, zIndex: 1000,
-              background: 'var(--bg, #000)', borderTopLeftRadius: '20px', borderTopRightRadius: '20px',
-              boxShadow: '0 -8px 40px rgba(59, 130, 246, 0.15)', // LINA'S BLUE GLOW
-              display: 'flex', flexDirection: 'column', touchAction: 'pan-x'
+              position: 'fixed', bottom: 0, left: 0, right: 0,
+              height: '95vh', // Strictly 95% of the screen
+              zIndex: 1000,
+              background: 'var(--surface, #111)', 
+              borderTopLeftRadius: '20px', borderTopRightRadius: '20px',
+              boxShadow: '0 -8px 40px rgba(59, 130, 246, 0.15)',
+              display: 'flex', flexDirection: 'column'
             }}
           >
-            {/* Draggable Header Handle */}
-            <div className="word-drawer__drag-zone" style={{ width: '100%', padding: '16px 0', cursor: 'grab', touchAction: 'none', background: '#111', borderTopLeftRadius: '20px', borderTopRightRadius: '20px' }}>
+            <div className="word-drawer__drag-zone" style={{ width: '100%', padding: '16px 0', cursor: 'grab', touchAction: 'none', flexShrink: 0 }}>
               <div className="word-drawer__handle" style={{ width: '48px', height: '6px', backgroundColor: '#666', borderRadius: '10px', margin: '0 auto' }} />
             </div>
 
             {innerContent}
-
           </motion.div>
         </>
       )}
