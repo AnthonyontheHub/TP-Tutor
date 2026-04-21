@@ -4,6 +4,7 @@ import ProgressSummary from './ProgressSummary';
 import MasteryGrid from './MasteryGrid';
 import PhraseGrid from './PhraseGrid'; 
 import SettingsDrawer from './SettingsDrawer'; 
+import type { MasteryStatus } from '../types/mastery'; // NEW IMPORT
 
 interface Props {
   onStartSession: () => void;
@@ -17,6 +18,9 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
   
   const [isSandboxMode, setIsSandboxMode] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false); 
+  
+  // NEW: Holds our current filter state
+  const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
 
   return (
     <div className="dashboard">
@@ -29,7 +33,6 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
         </div>
         <div className="dashboard__header-right" style={{ textAlign: 'right' }}>
           
-          {/* THE NEW ICON CLUSTER */}
           <div style={{ marginBottom: '12px', display: 'flex', justifyContent: 'flex-end', gap: '16px' }}>
              <button 
                onClick={onStartSession}
@@ -53,12 +56,21 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
       </header>
 
       <main className="dashboard__main">
-        <ProgressSummary />
-        <MasteryGrid onAskLina={onAskLina} isSandboxMode={isSandboxMode} />
+        {/* Pass the filter state and the updater function */}
+        <ProgressSummary 
+          activeFilter={activeFilter} 
+          onFilterClick={setActiveFilter} 
+        />
+        
+        {/* Pass the active filter down to the grid */}
+        <MasteryGrid 
+          onAskLina={onAskLina} 
+          isSandboxMode={isSandboxMode} 
+          activeFilter={activeFilter} 
+        />
+        
         <PhraseGrid onAskLina={onAskLina} />
       </main>
-
-      {/* Notice the footer block is completely gone! */}
 
       {isSettingsOpen && (
         <SettingsDrawer 
