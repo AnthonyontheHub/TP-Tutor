@@ -15,9 +15,9 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
   const [isProfileOpen, setIsProfileOpen] = useState(false); 
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'phrasebook'>('grid');
-  const [posFilter, setPosFilter] = useState('All');
-  const [sortMode, setSortMode] = useState<'alphabetical' | 'status' | 'frequency' | 'length' | 'type'>('alphabetical');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [posFilter] = useState('All');
+  const [sortMode] = useState<'alphabetical' | 'status' | 'frequency' | 'length' | 'type'>('alphabetical');
+  const [sortDirection] = useState<'asc' | 'desc'>('asc');
 
   if (!studentName || studentName === 'Student') return <SetupScreen />;
 
