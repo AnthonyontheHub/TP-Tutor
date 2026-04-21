@@ -33,6 +33,17 @@ const STATUS_ORDER: MasteryStatus[] = [
   'mastered',
 ];
 
+// DYNAMIC GLOW FUNCTION
+const getGlowColor = (status: MasteryStatus) => {
+  switch (status) {
+    case 'introduced': return '0 -8px 30px rgba(59, 130, 246, 0.25)'; // Blue Glow
+    case 'practicing': return '0 -8px 30px rgba(234, 179, 8, 0.25)';  // Yellow Glow
+    case 'confident': return '0 -8px 30px rgba(34, 197, 94, 0.25)';   // Green Glow
+    case 'mastered': return '0 -8px 40px rgba(16, 185, 129, 0.35)';   // Bright Green Glow
+    default: return '0 -8px 30px rgba(150, 150, 150, 0.1)';           // Default Gray
+  }
+};
+
 export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMode }: Props) {
   const partsOfSpeech = word.partOfSpeech.split('/').map(p => p.trim());
   const [examples, setExamples] = useState<Record<string, string>>({});
@@ -41,9 +52,7 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
   const updateVocabStatus = useMasteryStore((s) => s.updateVocabStatus);
   const [stagedStatus, setStagedStatus] = useState<MasteryStatus>(word.status);
 
-  useEffect(() => {
-    setStagedStatus(word.status);
-  }, [word.id, word.status]);
+  useEffect(() => { setStagedStatus(word.status); }, [word.id, word.status]);
 
   useEffect(() => {
     const loadOfflineData = () => {
@@ -55,26 +64,16 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
       setIsGenerating(false);
     };
 
-    if (isSandboxMode) {
-      loadOfflineData();
-      return;
-    }
+    if (isSandboxMode) { loadOfflineData(); return; }
 
     const apiKey = localStorage.getItem('TP_GEMINI_KEY');
-    if (!apiKey) {
-      loadOfflineData();
-      return;
-    }
+    if (!apiKey) { loadOfflineData(); return; }
 
     setIsGenerating(true);
     fetchExamplesForWord(apiKey, word.word, partsOfSpeech)
       .then(data => {
-        if (!data || Object.keys(data).length === 0 || data.error) {
-          loadOfflineData();
-        } else {
-          setExamples(data);
-          setIsGenerating(false);
-        }
+        if (!data || Object.keys(data).length === 0 || data.error) loadOfflineData();
+        else { setExamples(data); setIsGenerating(false); }
       })
       .catch(() => loadOfflineData());
   }, [word.word, isSandboxMode]);
@@ -93,10 +92,6 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
     setStagedStatus(STATUS_ORDER[nextIndex]);
   }
 
-  function handleSaveStatus() {
-    updateVocabStatus(word.id, stagedStatus);
-  }
-
   return (
     <AnimatePresence>
       <motion.div className="drawer-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} />
@@ -105,33 +100,36 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
         drag="y"
         dragConstraints={{ top: 0 }}
         initial={{ y: '100%' }}
-        animate={{ y: '50%' }}
+        animate={{ y: '33%' }} // Snaps to 2/3 height
         exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
         onDragEnd={(_, info) => {
           if (info.offset.y > 100 || info.velocity.y > 500) onClose();
         }}
-        // The fix to force mobile to respect Framer's vertical drag
-        style={{ height: '100vh', top: 0, position: 'fixed', zIndex: 1000, touchAction: 'pan-x' }}
+        style={{ 
+          height: '100vh', 
+          top: 0, 
+          position: 'fixed', 
+          zIndex: 1000, 
+          touchAction: 'pan-x',
+          // APPLYING THE GLOW HERE
+          boxShadow: getGlowColor(stagedStatus),
+          borderTop: `1px solid ${stagedStatus === 'not_started' ? '#444' : 'transparent'}`
+        }}
       >
         <div className="word-drawer__drag-zone" style={{ width: '100%', padding: '16px 0', cursor: 'grab', touchAction: 'none' }}>
           <div className="word-drawer__handle" style={{ width: '48px', height: '6px', backgroundColor: '#666', borderRadius: '10px', margin: '0 auto' }} />
         </div>
 
-        {/* Scrollable content area */}
         <div className="word-drawer__content" style={{ padding: '0 20px 100px', overflowY: 'auto', maxHeight: 'calc(100vh - 60px)' }}>
           <div className="word-drawer__meta">
             <span className="word-drawer__word">{word.word}</span>
             
             <div 
                style={{ 
-                 marginTop: '4px', 
-                 padding: isSandboxMode ? '4px' : '0',
-                 borderRadius: '4px',
-                 background: isSandboxMode ? 'rgba(255,255,255,0.05)' : 'transparent',
-                 display: 'inline-block',
-                 cursor: isSandboxMode ? 'pointer' : 'default',
-                 userSelect: 'none'
+                 marginTop: '4px', padding: isSandboxMode ? '4px' : '0', borderRadius: '4px',
+                 background: isSandboxMode ? 'rgba(255,255,255,0.05)' : 'transparent', display: 'inline-block',
+                 cursor: isSandboxMode ? 'pointer' : 'default', userSelect: 'none'
                }}
                onClick={() => isSandboxMode && handleCycleStatus()}
             >
@@ -143,12 +141,11 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
 
             {stagedStatus !== word.status && (
               <div style={{ marginTop: '8px' }}>
-                 <button onClick={handleSaveStatus} style={{ background: '#4CAF50', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold' }}>
+                 <button onClick={() => updateVocabStatus(word.id, stagedStatus)} style={{ background: '#4CAF50', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold' }}>
                    💾 SAVE NEW STATUS
                  </button>
               </div>
             )}
-
             <span className="word-drawer__meanings" style={{ display: 'block', marginTop: '8px' }}>{word.meanings}</span>
           </div>
 
@@ -170,32 +167,10 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
             ))}
           </div>
 
-          <button 
-             style={{ width: '100%', padding: '16px', marginTop: '16px', cursor: 'pointer', borderRadius: '8px', background: '#333', color: 'white', border: '1px solid #555', fontWeight: 'bold' }}
-             onClick={() => handleAskLina()}
-          >
+          <button onClick={() => handleAskLina()} style={{ width: '100%', padding: '16px', marginTop: '16px', cursor: 'pointer', borderRadius: '8px', background: '#333', color: 'white', border: '1px solid #555', fontWeight: 'bold' }}>
             DISCUSS "{word.word.toUpperCase()}" WITH LINA
           </button>
-
-          {/* MASSIVE CLOSE BUTTON AT THE BOTTOM */}
-          <button 
-            onClick={onClose} 
-            style={{ 
-              width: '100%', 
-              padding: '20px', 
-              marginTop: '16px', 
-              background: '#ff4444', 
-              color: 'white', 
-              border: 'none', 
-              borderRadius: '8px', 
-              fontSize: '1.2rem', 
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              display: 'block',
-              textAlign: 'center',
-              boxShadow: '0 4px 6px rgba(0,0,0,0.3)'
-            }}
-          >
+          <button onClick={onClose} style={{ width: '100%', padding: '20px', marginTop: '16px', background: '#ff4444', color: 'white', border: 'none', borderRadius: '8px', fontSize: '1.2rem', fontWeight: 'bold', cursor: 'pointer', display: 'block' }}>
             ✕ CLOSE DRAWER
           </button>
         </div>
