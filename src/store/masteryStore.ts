@@ -11,6 +11,7 @@ interface MasteryActions {
   setLastUpdated: (date: string) => void;
   savePhrase: (phrase: string) => void;
   recordActivity: () => void;
+  setStudentName: (name: string) => void; 
   syncFromCloud: () => void;
   syncToCloud: () => Promise<void>; 
   getStatusSummary: () => StatusSummary;
@@ -68,6 +69,11 @@ export const useMasteryStore = create<MasteryStore>()(
             set({ currentStreak: 1, lastActiveDate: today });
           }
         }
+      },
+
+      setStudentName: (name) => {
+        set({ studentName: name });
+        void get().syncToCloud();
       },
 
       setLastUpdated: (date) => set({ lastUpdated: date }),
