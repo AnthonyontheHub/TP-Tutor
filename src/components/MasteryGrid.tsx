@@ -8,9 +8,10 @@ interface Props {
   onAskLina: (prompt: string) => void;
   isSandboxMode: boolean;
   activeFilter: MasteryStatus | null;
-  sortMode: 'alphabetical' | 'status' | 'unlocked' | 'frequency';
+  // Updated the prop types
+  sortMode: 'alphabetical' | 'status' | 'frequency' | 'length' | 'type';
   sortDirection: 'asc' | 'desc';
-  posFilter: string; // NEW PROP
+  posFilter: string; 
 }
 
 const STATUS_ORDER: MasteryStatus[] = ['not_started', 'introduced', 'practicing', 'confident', 'mastered'];
@@ -35,12 +36,16 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
       let comparison = 0;
       if (sortMode === 'status') {
         comparison = STATUS_ORDER.indexOf(b.status) - STATUS_ORDER.indexOf(a.status);
-      } else if (sortMode === 'unlocked') {
-        comparison = (b.status === 'not_started' ? 1 : 0) - (a.status === 'not_started' ? 1 : 0);
       } else if (sortMode === 'frequency') {
         const rankA = FREQUENCY_ORDER.indexOf(a.word) === -1 ? 999 : FREQUENCY_ORDER.indexOf(a.word);
         const rankB = FREQUENCY_ORDER.indexOf(b.word) === -1 ? 999 : FREQUENCY_ORDER.indexOf(b.word);
         comparison = rankA - rankB;
+      } else if (sortMode === 'length') {
+        // Sorts by character count
+        comparison = a.word.length - b.word.length;
+      } else if (sortMode === 'type') {
+        // Sorts alphabetically by Part of Speech
+        comparison = a.partOfSpeech.localeCompare(b.partOfSpeech);
       } else {
         comparison = a.word.localeCompare(b.word);
       }
