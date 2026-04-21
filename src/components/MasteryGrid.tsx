@@ -50,6 +50,8 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
   const [isSuggesting, setIsSuggesting] = useState(false);
   
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const touchStartPos = useRef<{ x: number, y: number } | null>(null);
+  const isDragging = useRef(false);
   const lastClickRef = useRef<{ id: string, time: number } | null>(null);
 
   const localShuffles = useMemo(() => {
@@ -89,27 +91,53 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
       return sortDirection === 'asc' ? comparison : -comparison;
     });
 
-  const handlePointerDown = (word: VocabWord) => {
+  const handlePointerDown = (e: React.MouseEvent | React.TouchEvent, word: VocabWord) => {
+    const pos = 'touches' in e ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY };
+    touchStartPos.current = pos;
+    isDragging.current = false;
+
     if (longPressTimer.current) clearTimeout(longPressTimer.current);
     longPressTimer.current = setTimeout(() => {
-      soundService.playBlip(523.25, 'sine', 0.05); 
-      setSelectedWords(prev => [...prev, word.word]);
-      longPressTimer.current = null;
+      if (!isDragging.current) {
+        soundService.playBlip(523.25, 'sine', 0.05); 
+        setSelectedWords(prev => [...prev, word.word]);
+        longPressTimer.current = null;
+      }
     }, 500);
+  };
+
+  const handlePointerMove = (e: React.MouseEvent | React.TouchEvent) => {
+    if (!touchStartPos.current) return;
+    const pos = 'touches' in e ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY };
+    const dist = Math.sqrt(Math.pow(pos.x - touchStartPos.current.x, 2) + Math.pow(pos.y - touchStartPos.current.y, 2));
+    if (dist > 10) {
+      isDragging.current = true;
+      if (longPressTimer.current) {
+        clearTimeout(longPressTimer.current);
+        longPressTimer.current = null;
+      }
+    }
   };
 
   const handlePointerUp = (word: VocabWord, e: React.MouseEvent | React.TouchEvent) => {
     e.stopPropagation(); 
+    if (isDragging.current) {
+      touchStartPos.current = null;
+      return;
+    }
+
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
       const now = Date.now();
       const isDoubleTap = lastClickRef.current?.id === word.id && (now - lastClickRef.current.time) < 300;
+      
       if (isSandboxMode && isDoubleTap) {
         soundService.playBlip(880, 'sine', 0.1); 
         updateVocabStatus(word.id, STATUS_ORDER[(STATUS_ORDER.indexOf(word.status) + 1) % STATUS_ORDER.length]);
         lastClickRef.current = null;
       } else if (selectedWords.length > 0) {
+        // Selection is active: Simple tap adds/removes
         if (selectedWords.includes(word.word)) {
           soundService.playBlip(329.63, 'sine', 0.05);
           setSelectedWords(prev => prev.filter(w => w !== word.word));
@@ -118,10 +146,12 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
           setSelectedWords(prev => [...prev, word.word]);
         }
       } else {
+        // Normal mode: Open drawer
         lastClickRef.current = { id: word.id, time: now };
         setDrawerId(word.id);
       }
     }
+    touchStartPos.current = null;
   };
 
   const clearSelection = (e: React.MouseEvent) => {
@@ -139,9 +169,11 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
           return (
             <div 
               key={word.id} 
-              onMouseDown={() => handlePointerDown(word)}
+              onMouseDown={(e) => handlePointerDown(e, word)}
+              onMouseMove={handlePointerMove}
               onMouseUp={(e) => handlePointerUp(word, e)}
-              onTouchStart={() => handlePointerDown(word)}
+              onTouchStart={(e) => handlePointerDown(e, word)}
+              onTouchMove={handlePointerMove}
               onTouchEnd={(e) => handlePointerUp(word, e)}
               onContextMenu={(e) => e.preventDefault()}
               style={{ transform: isSelected ? 'scale(1.05)' : (selectedWords.length > 0 ? 'scale(0.92)' : 'scale(1)'), opacity: selectedWords.length > 0 && !isSelected ? 0.4 : 1, transition: 'all 0.2s ease', zIndex: isSelected ? 10 : 1, cursor: 'pointer', position: 'relative', userSelect: 'none' }}
