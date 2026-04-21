@@ -31,15 +31,13 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, se
     });
 
   const handleCardClick = (word: VocabWord) => {
-    // 1. DESELECT LOGIC (High Priority)
-    // If the word is already selected, tapping it ALWAYS removes it. 
-    // This stops the drawer from popping up accidentally.
+    // DESELECT: Tapping an already selected word always removes it instantly
     if (selectedWords.includes(word.word)) {
       setSelectedWords(selectedWords.filter(w => w !== word.word));
       return;
     }
 
-    // 2. RAPID-FIRE COMBO (Sandbox Only)
+    // RAPID-FIRE COMBO (Sandbox Only)
     if (isSandboxMode && comboRef.current?.wordId === word.id) {
       clearTimeout(comboRef.current.timer);
       const nextStatus = STATUS_ORDER[(STATUS_ORDER.indexOf(word.status) + 1) % STATUS_ORDER.length];
@@ -48,12 +46,9 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, se
       return;
     } 
 
-    // 3. SELECTION / DRAWER DELAY
     if (comboRef.current) clearTimeout(comboRef.current.timer);
     comboRef.current = { timer: setTimeout(() => {
-      // If we aren't rapidly tapping for status, we select the word.
-      // To open the drawer now, we can hold or we can add a specific icon.
-      // For now, let's make it: Tap 1 = Select. To open drawer, use the "Ask Lina" flow or long-press.
+      // Add word to the build sequence
       setSelectedWords([...selectedWords, word.word]);
       comboRef.current = null;
     }, 350), wordId: word.id };
@@ -63,14 +58,15 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, se
     <section className="mastery-grid">
       <div className="mastery-grid__cards">
         {displayedVocab.map((word) => {
-          const isSelected = selectedWords.includes(word.word);
+          const selectIndex = selectedWords.indexOf(word.word);
+          const isSelected = selectIndex !== -1;
           const isDimmed = selectedWords.length > 0 && !isSelected;
 
           return (
             <div 
               key={word.id}
               onClick={(e) => { e.stopPropagation(); handleCardClick(word); }}
-              onContextMenu={(e) => { e.preventDefault(); setDrawerId(word.id); }} // Right-click or Long-press for Drawer
+              onContextMenu={(e) => { e.preventDefault(); setDrawerId(word.id); }}
               style={{
                 transform: isSelected ? 'scale(1.1)' : (isDimmed ? 'scale(0.92)' : 'scale(1)'),
                 opacity: isDimmed ? 0.35 : 1,
@@ -80,9 +76,19 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, se
               }}
             >
               <VocabCard word={word} onClick={() => {}} />
+              
+              {/* SEQUENCE NUMBER BADGE */}
               {isSelected && (
-                <div style={{ position: 'absolute', top: '-8px', right: '-8px', background: '#3b82f6', color: 'white', borderRadius: '50%', width: '22px', height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: 'bold', boxShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
-                  {selectedWords.indexOf(word.word) + 1}
+                <div style={{ 
+                  position: 'absolute', top: '-10px', right: '-10px', 
+                  background: '#3b82f6', color: 'white', 
+                  borderRadius: '50%', width: '24px', height: '24px', 
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                  fontSize: '12px', fontWeight: 'bold', 
+                  boxShadow: '0 4px 8px rgba(0,0,0,0.5)',
+                  border: '2px solid #000'
+                }}>
+                  {selectIndex + 1}
                 </div>
               )}
             </div>
