@@ -11,7 +11,12 @@ const STATUS_ORDER: MasteryStatus[] = [
   'not_started',
 ];
 
-export default function ProgressSummary() {
+interface Props {
+  activeFilter: MasteryStatus | null;
+  onFilterClick: (status: MasteryStatus | null) => void;
+}
+
+export default function ProgressSummary({ activeFilter, onFilterClick }: Props) {
   const vocabulary = useMasteryStore((s) => s.vocabulary);
 
   const summary = useMemo<StatusSummary>(() => {
@@ -32,18 +37,42 @@ export default function ProgressSummary() {
       <div className="progress-summary__grid">
         {STATUS_ORDER.map((status) => {
           const meta = STATUS_META[status];
+          const isActive = activeFilter === status;
+          const isDimmed = activeFilter !== null && activeFilter !== status;
+
           return (
-            <div key={status} className={`progress-card progress-card--${status}`}>
+            <div 
+              key={status} 
+              className={`progress-card progress-card--${status}`}
+              onClick={() => onFilterClick(isActive ? null : status)}
+              style={{ 
+                cursor: 'pointer',
+                opacity: isDimmed ? 0.4 : 1,
+                transform: isActive ? 'scale(1.05)' : 'scale(1)',
+                border: isActive ? '2px solid white' : '2px solid transparent',
+                transition: 'all 0.2s ease'
+              }}
+              title={`Filter by ${meta.label}`}
+            >
               <span className="progress-card__emoji">{meta.emoji}</span>
               <span className="progress-card__count">{summary[status]}</span>
               <span className="progress-card__label">{meta.label.toUpperCase()}</span>
             </div>
           );
         })}
-        <div className="progress-card progress-card--total">
+        <div 
+          className="progress-card progress-card--total"
+          onClick={() => onFilterClick(null)}
+          style={{ 
+            cursor: 'pointer',
+            opacity: activeFilter === null ? 1 : 0.4,
+            transition: 'all 0.2s ease'
+          }}
+          title="Show All Words"
+        >
           <span className="progress-card__emoji">∑</span>
           <span className="progress-card__count">{vocabulary.length}</span>
-          <span className="progress-card__label">TOTAL</span>
+          <span className="progress-card__label">TOTAL (CLEAR)</span>
         </div>
       </div>
     </section>
