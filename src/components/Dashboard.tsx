@@ -12,6 +12,18 @@ interface Props {
 
 const POS_CATEGORIES = ['All', 'Noun', 'Verb', 'Adj', 'Particle', 'Pre-verb', 'Preposition', 'Number'];
 
+// Grammar cheat sheet mapping
+const POS_DESCRIPTIONS: Record<string, { en: string, tp: string }> = {
+  'All': { en: 'The complete dictionary.', tp: 'nimi ale' },
+  'Noun': { en: 'Person, place, thing, or concept.', tp: 'nimi ijo (Acts as the head of a phrase)' },
+  'Verb': { en: 'Action or state of being.', tp: 'nimi pali (Usually follows the particle "li" or "o")' },
+  'Adj': { en: 'Describes or modifies another word.', tp: 'nimi ante (Always comes strictly AFTER the word it modifies)' },
+  'Particle': { en: 'Grammatical marker that structures the sentence.', tp: 'li, e, la, pi, o (These have no direct English translation)' },
+  'Pre-verb': { en: 'Auxiliary verb (e.g., want to, can, start to).', tp: 'wile, ken, kama, awen... (Placed directly before the main verb)' },
+  'Preposition': { en: 'Shows location, direction, or relation (in, to, from).', tp: 'lon, tawa, tan, kepeken, sama' },
+  'Number': { en: 'Quantifier or numeral.', tp: 'nimi nanpa (wan, tu, mute, ale...)' }
+};
+
 export default function Dashboard({ onStartSession, onAskLina }: Props) {
   const { studentName, currentStreak, savedPhrases, vocabulary } = useMasteryStore();
   const [isSandboxMode, setIsSandboxMode] = useState(true);
@@ -87,6 +99,12 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
                   {pos}
                 </button>
               ))}
+            </div>
+
+            {/* Dynamic Grammar Cheat Sheet Box */}
+            <div style={{ background: '#1a1a1a', padding: '12px', borderRadius: '8px', fontSize: '0.75rem', color: '#ccc', marginBottom: '15px', borderLeft: '4px solid #3b82f6' }}>
+              <strong style={{ color: '#fff', fontSize: '0.85rem' }}>{posFilter}:</strong> {POS_DESCRIPTIONS[posFilter].en} <br/>
+              <span style={{ color: '#8b5cf6', fontStyle: 'italic', display: 'inline-block', marginTop: '4px' }}>Toki Pona: {POS_DESCRIPTIONS[posFilter].tp}</span>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', flexWrap: 'wrap', gap: '8px', margin: '10px 0 15px 0' }}>
