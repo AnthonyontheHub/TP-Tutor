@@ -1,10 +1,11 @@
+/* src/components/Dashboard.tsx */
 import { useState } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import ProgressSummary from './ProgressSummary';
 import MasteryGrid from './MasteryGrid';
 import SettingsDrawer from './SettingsDrawer'; 
 import UserProfileDrawer from './UserProfileDrawer'; 
-import SetupScreen from './SetupScreen'; // <-- NEW IMPORT
+import SetupScreen from './SetupScreen';
 import type { MasteryStatus } from '../types/mastery';
 
 interface Props {
@@ -38,7 +39,6 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
   const [sortMode, setSortMode] = useState<'alphabetical' | 'status' | 'frequency' | 'length' | 'type'>('alphabetical');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
-  // INTERCEPT: Show Setup Screen if user has not set a name yet
   if (!studentName || studentName === 'Student') {
     return <SetupScreen />;
   }
@@ -68,58 +68,70 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
 
   return (
     <div className="dashboard">
-      <header className="dashboard__header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px', borderBottom: '1px solid #333' }}>
-        <div>
-          <h1 style={{ margin: 0, fontSize: '1.2rem' }}>TOKI PONA</h1>
-          <button 
-            onClick={() => setIsProfileOpen(true)} 
-            style={{ background: 'none', border: 'none', padding: 0, margin: '4px 0 0 0', fontSize: '0.75rem', color: '#3b82f6', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px' }}
-          >
+      <header className="dashboard__header">
+        <div className="dashboard__header-left">
+          <h1 className="dashboard__title">TOKI PONA</h1>
+          <button onClick={() => setIsProfileOpen(true)} className="dashboard__profile-trigger">
             👤 {studentName.toUpperCase()}
           </button>
         </div>
-        <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+        <div className="dashboard__header-right">
           {currentStreak > 0 && (
-            <div style={{ color: '#f59e0b', fontWeight: 'bold', fontSize: '0.8rem', background: '#332a11', padding: '4px 8px', borderRadius: '12px' }}>
-              🔥 {currentStreak} Day{currentStreak > 1 ? 's' : ''}
-            </div>
+            <div className="dashboard__streak">🔥 {currentStreak} Day{currentStreak > 1 ? 's' : ''}</div>
           )}
-          <button onClick={onStartSession} style={{ background: 'none', border: 'none', color: 'white', fontSize: '1.2rem', cursor: 'pointer' }}>💬</button>
-          <button onClick={() => setIsSettingsOpen(true)} style={{ background: 'none', border: 'none', color: 'white', fontSize: '1.2rem', cursor: 'pointer' }}>⚙️</button>
+          <button onClick={onStartSession} className="dashboard__icon-btn">💬</button>
+          <button onClick={() => setIsSettingsOpen(true)} className="dashboard__icon-btn">⚙️</button>
         </div>
       </header>
 
-      <main className="dashboard__main" style={{ padding: '20px' }}>
-        
-        <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-          <button onClick={() => setViewMode('grid')} style={{ flex: 1, padding: '10px', borderRadius: '8px', border: 'none', fontWeight: 'bold', background: viewMode === 'grid' ? '#3b82f6' : '#222', color: 'white' }}>VOCAB GRID</button>
-          <button onClick={() => setViewMode('phrasebook')} style={{ flex: 1, padding: '10px', borderRadius: '8px', border: 'none', fontWeight: 'bold', background: viewMode === 'phrasebook' ? '#10b981' : '#222', color: 'white' }}>PHRASEBOOK ({savedPhrases.length})</button>
+      <main className="dashboard__main">
+        <div className="dashboard__view-toggle">
+          <button 
+            onClick={() => setViewMode('grid')} 
+            className={`btn-toggle btn-toggle--grid ${viewMode === 'grid' ? 'active' : ''}`}
+          >
+            VOCAB GRID
+          </button>
+          <button 
+            onClick={() => setViewMode('phrasebook')} 
+            className={`btn-toggle btn-toggle--phrase ${viewMode === 'phrasebook' ? 'active' : ''}`}
+          >
+            PHRASEBOOK ({savedPhrases.length})
+          </button>
         </div>
 
         {viewMode === 'grid' ? (
           <>
-            <button onClick={handleDailyReview} style={{ width: '100%', padding: '12px', marginBottom: '20px', background: 'linear-gradient(to right, #3b82f6, #8b5cf6)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer', boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)' }}>
+            <button onClick={handleDailyReview} className="btn-review">
               ⚡ START DAILY REVIEW
             </button>
             
             <ProgressSummary activeFilter={activeFilter} onFilterClick={setActiveFilter} />
             
-            <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '10px', marginTop: '15px', scrollbarWidth: 'none' }}>
+            <div className="pos-filter-bar">
               {POS_CATEGORIES.map(pos => (
-                <button key={pos} onClick={() => setPosFilter(pos)} style={{ whiteSpace: 'nowrap', fontSize: '0.7rem', padding: '6px 12px', borderRadius: '20px', border: '1px solid #444', background: posFilter === pos ? '#fff' : '#222', color: posFilter === pos ? '#000' : '#aaa', cursor: 'pointer', fontWeight: posFilter === pos ? 'bold' : 'normal' }}>
+                <button 
+                  key={pos} 
+                  onClick={() => setPosFilter(pos)} 
+                  className={`btn-pos ${posFilter === pos ? 'active' : ''}`}
+                >
                   {pos}
                 </button>
               ))}
             </div>
 
-            <div style={{ background: '#1a1a1a', padding: '12px', borderRadius: '8px', fontSize: '0.75rem', color: '#ccc', marginBottom: '15px', borderLeft: '4px solid #3b82f6' }}>
+            <div className="pos-info-box">
               <strong style={{ color: '#fff', fontSize: '0.85rem' }}>{posFilter}:</strong> {POS_DESCRIPTIONS[posFilter].en} <br/>
               <span style={{ color: '#8b5cf6', fontStyle: 'italic', display: 'inline-block', marginTop: '4px' }}>Toki Pona: {POS_DESCRIPTIONS[posFilter].tp}</span>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '8px', margin: '10px 0 15px 0' }}>
+            <div className="sort-bar">
               {['alphabetical', 'frequency', 'status', 'length', 'type'].map(m => (
-                <button key={m} onClick={() => handleSortClick(m as any)} style={{ fontSize: '0.6rem', background: sortMode === m ? '#3b82f6' : 'none', color: 'white', border: '1px solid #444', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer', fontWeight: sortMode === m ? 'bold' : 'normal' }}>
+                <button 
+                  key={m} 
+                  onClick={() => handleSortClick(m as any)} 
+                  className={`btn-sort ${sortMode === m ? 'active' : ''}`}
+                >
                   {m.toUpperCase()} {sortMode === m ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
                 </button>
               ))}
@@ -150,4 +162,4 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
       {isProfileOpen && <UserProfileDrawer onClose={() => setIsProfileOpen(false)} />}
     </div>
   );
-            }
+}
