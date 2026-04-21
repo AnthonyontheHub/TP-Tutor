@@ -40,7 +40,10 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
 
   useEffect(() => {
     if (isActive && pendingPrompt && apiKey && !isLoading) {
-      sendToLina(pendingPrompt).then(() => { if (clearPrompt) clearPrompt(); });
+      void (async () => {
+        await sendToLina(pendingPrompt);
+        if (clearPrompt) clearPrompt();
+      })();
     }
   }, [isActive, pendingPrompt, apiKey, isLoading, clearPrompt]);
 
@@ -74,6 +77,36 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
         <>
           <motion.div className="drawer-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onEndSession} />
           <motion.div className="chat-drawer" drag="y" dragConstraints={{ top: 0 }} initial={{ y: '100%' }} animate={{ y: '0%' }} exit={{ y: '100%' }} onDragEnd={(_, info) => { if (info.offset.y > 150) onEndSession(); }} style={{ position: 'fixed', bottom: 0, left: 0, right: 0, height: '95vh', zIndex: 1000, background: '#111', borderTopLeftRadius: '20px', borderTopRightRadius: '20px', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ width: '100%', padding: '16px 0', cursor: 'grab', flexShrink: 0 }}><div style={{ width: '48px', height: '6px', backgroundColor: '#666', borderRadius: '10px', margin: '0 auto' }} /></div>
+            <div style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
+               {messages.map((msg) => (
+                 <div key={msg.id} style={{ marginBottom: '20px' }}>
+                   <div style={{ color: '#888', fontSize: '0.7rem', marginBottom: '4px' }}>{msg.role === 'assistant' ? 'LINA' : 'YOU'}</div>
+                   <div style={{ background: msg.role === 'assistant' ? '#1a1a1a' : '#2d3748', padding: '12px', borderRadius: '8px', color: 'white' }}>{msg.displayContent}</div>
+                   {msg.proposedChanges && !msg.changesApplied && (
+                     <div style={{ marginTop: '10px', background: '#222', padding: '10px', borderRadius: '8px' }}>
+                        {msg.proposedChanges.map((c, i) => <div key={i} style={{ color: '#aaa' }}>✅ {c.wordId} → {STATUS_EMOJI[c.newStatus as keyof typeof STATUS_EMOJI]}</div>)}
+                        <button onClick={() => {
+                          msg.proposedChanges?.forEach((change) => { if (change.approved) updateVocabStatus(change.wordId, change.newStatus as MasteryStatus); });
+                          setLastUpdated(new Date().toLocaleDateString());
+                          setMessages((prev) => prev.map((m) => m.id === msg.id ? { ...m, changesApplied: true } : m));
+                        }} style={{ width: '100%', marginTop: '10px', background: '#4CAF50', color: 'white', border: 'none', padding: '8px', borderRadius: '4px' }}>APPLY CHANGES</button>
+                     </div>
+                   )}
+                 </div>
+               ))}
+               <div ref={messagesEndRef} />
+            </div>
+            <div style={{ padding: '16px', background: '#111', borderTop: '1px solid #333', display: 'flex', gap: '8px' }}>
+              <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && sendToLina(input)} style={{ flex: 1, background: '#222', border: 'none', borderRadius: '8px', padding: '12px', color: 'white' }} />
+              <button onClick={() => { sendToLina(input); setInput(''); }} style={{ background: '#3b82f6', border: 'none', borderRadius: '8px', padding: '0 20px', color: 'white' }}>SEND</button>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+}
             <div style={{ width: '100%', padding: '16px 0', cursor: 'grab', flexShrink: 0 }}><div style={{ width: '48px', height: '6px', backgroundColor: '#666', borderRadius: '10px', margin: '0 auto' }} /></div>
             <div style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
                {messages.map((msg) => (
