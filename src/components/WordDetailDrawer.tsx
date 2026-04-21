@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useMasteryStore } from '../store/masteryStore'; // NEW: To save your manual tests
 import { STATUS_META } from '../types/mastery';
-import type { VocabWord } from '../types/mastery';
+import type { VocabWord, MasteryStatus } from '../types/mastery';
 import { fetchExamplesForWord } from '../services/linaService';
 
 interface Props {
@@ -11,7 +12,7 @@ interface Props {
   isSandboxMode: boolean;
 }
 
-// Hand-picked phrases from your document
+// Hand-picked phrases from "Everyday Toki Pona"
 const MOCK_DICTIONARY: Record<string, string> = {
   "pona": "ale li pona. (Everything is good.)",
   "lili": "ni li lili. (That is small.)",
@@ -25,13 +26,30 @@ const MOCK_DICTIONARY: Record<string, string> = {
   "mute": "sina sona mute. (You know much.)"
 };
 
+const STATUS_ORDER: MasteryStatus[] = [
+  'not_started',
+  'introduced',
+  'practicing',
+  'confident',
+  'mastered',
+];
+
 export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMode }: Props) {
   const partsOfSpeech = word.partOfSpeech.split('/').map(p => p.trim());
   const [examples, setExamples] = useState<Record<string, string>>({});
   const [isGenerating, setIsGenerating] = useState(true);
 
+  // Hidden Tester State
+  const updateVocabStatus = useMasteryStore((s) => s.updateVocabStatus);
+  const [stagedStatus, setStagedStatus] = useState<MasteryStatus>(word.status);
+
+  // Reset staged status if the word changes
   useEffect(() => {
-    // Helper function to instantly load our offline phrases
+    setStagedStatus(word.status);
+  }, [word.id, word.status]);
+
+  // The Auto-Fallback Logic
+  useEffect(() => {
     const loadOfflineData = () => {
       const mockData: Record<string, string> = {};
       partsOfSpeech.forEach(pos => {
@@ -41,24 +59,20 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
       setIsGenerating(false);
     };
 
-    // 1. If Sandbox toggle is manually ON, use offline data instantly.
     if (isSandboxMode) {
       loadOfflineData();
       return;
     }
 
-    // 2. If Sandbox is OFF, but there is NO API key, auto-fallback to offline data.
     const apiKey = localStorage.getItem('TP_GEMINI_KEY');
     if (!apiKey) {
       loadOfflineData();
       return;
     }
 
-    // 3. If we have a key, try the AI.
     setIsGenerating(true);
     fetchExamplesForWord(apiKey, word.word, partsOfSpeech)
       .then(data => {
-        // If AI returns nothing or an error string, auto-fallback to offline data.
         if (!data || Object.keys(data).length === 0 || data.error) {
           loadOfflineData();
         } else {
@@ -66,10 +80,7 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
           setIsGenerating(false);
         }
       })
-      .catch(() => {
-        // 4. If AI throws a quota/rate-limit error, auto-fallback to offline data.
-        loadOfflineData();
-      });
+      .catch(() => loadOfflineData());
   }, [word.word, isSandboxMode]);
 
   function handleAskLina(pos?: string) {
@@ -78,6 +89,17 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
       : `toki Lina, I want to discuss the word "${word.word}".`;
     onAskLina(prompt);
     onClose(); 
+  }
+
+  // Handle Cycling Status (Sandbox Only)
+  function handleCycleStatus() {
+    const currentIndex = STATUS_ORDER.indexOf(stagedStatus);
+    const nextIndex = (currentIndex + 1) % STATUS_ORDER.length;
+    setStagedStatus(STATUS_ORDER[nextIndex]);
+  }
+
+  function handleSaveStatus() {
+    updateVocabStatus(word.id, stagedStatus);
   }
 
   return (
@@ -99,10 +121,40 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
         <div className="word-drawer__content" style={{ padding: '0 20px 40px' }}>
           <div className="word-drawer__meta">
             <span className="word-drawer__word">{word.word}</span>
-            <span className="word-drawer__status" style={{ display: 'block', marginTop: '4px', fontSize: '0.9rem', color: 'gray' }}>
-              Status: {STATUS_META[word.status].emoji} {STATUS_META[word.status].label.toUpperCase()}
-            </span>
-            <span className="word-drawer__meanings">{word.meanings}</span>
+            
+            {/* HIDDEN STATUS CYCLER */}
+            <div 
+               style={{ 
+                 marginTop: '4px', 
+                 padding: isSandboxMode ? '4px' : '0',
+                 borderRadius: '4px',
+                 background: isSandboxMode ? 'rgba(255,255,255,0.05)' : 'transparent',
+                 display: 'inline-block',
+                 cursor: isSandboxMode ? 'pointer' : 'default',
+                 userSelect: 'none'
+               }}
+               onClick={() => isSandboxMode && handleCycleStatus()}
+            >
+              <span className="word-drawer__status" style={{ fontSize: '0.9rem', color: 'gray' }}>
+                Status: {STATUS_META[stagedStatus].emoji} {STATUS_META[stagedStatus].label.toUpperCase()}
+                {isSandboxMode && <span style={{ color: '#888', fontSize: '0.7rem', marginLeft: '8px' }}>🔄 (Click to cycle)</span>}
+              </span>
+            </div>
+
+            {/* SAVE BUTTON (Only appears when status is modified) */}
+            {stagedStatus !== word.status && (
+              <div style={{ marginTop: '8px' }}>
+                 <button 
+                   onClick={handleSaveStatus}
+                   style={{ background: '#4CAF50', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold' }}
+                 >
+                   💾 SAVE NEW STATUS
+                 </button>
+                 <span style={{ color: '#aaa', fontSize: '0.7rem', marginLeft: '8px' }}>Changes card color & unlocks phrases</span>
+              </div>
+            )}
+
+            <span className="word-drawer__meanings" style={{ display: 'block', marginTop: '8px' }}>{word.meanings}</span>
           </div>
 
           <div className="word-drawer__section-label">
