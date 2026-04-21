@@ -15,7 +15,18 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
   const [isSandboxMode, setIsSandboxMode] = useState(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false); 
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
+  
   const [sortMode, setSortMode] = useState<'alphabetical' | 'status' | 'unlocked'>('alphabetical');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
+  const handleSortClick = (mode: 'alphabetical' | 'status' | 'unlocked') => {
+    if (sortMode === mode) {
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortMode(mode);
+      setSortDirection('asc');
+    }
+  };
 
   return (
     <div className="dashboard">
@@ -34,12 +45,16 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
         <ProgressSummary activeFilter={activeFilter} onFilterClick={setActiveFilter} />
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', margin: '15px 0' }}>
           {['alphabetical', 'status', 'unlocked'].map(m => (
-            <button key={m} onClick={() => setSortMode(m as any)} style={{ fontSize: '0.6rem', background: sortMode === m ? '#333' : 'none', color: 'white', border: '1px solid #444', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}>
-              {m.toUpperCase()}
+            <button 
+              key={m} 
+              onClick={() => handleSortClick(m as any)} 
+              style={{ fontSize: '0.6rem', background: sortMode === m ? '#333' : 'none', color: 'white', border: '1px solid #444', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}
+            >
+              {m.toUpperCase()} {sortMode === m ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
             </button>
           ))}
         </div>
-        <MasteryGrid onAskLina={onAskLina} isSandboxMode={isSandboxMode} activeFilter={activeFilter} sortMode={sortMode} />
+        <MasteryGrid onAskLina={onAskLina} isSandboxMode={isSandboxMode} activeFilter={activeFilter} sortMode={sortMode} sortDirection={sortDirection} />
       </main>
 
       {isSettingsOpen && <SettingsDrawer onClose={() => setIsSettingsOpen(false)} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} />}
