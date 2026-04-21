@@ -3,11 +3,14 @@ import { useMasteryStore } from '../store/masteryStore';
 import VocabCard from './VocabCard';
 import WordDetailDrawer from './WordDetailDrawer';
 
-export default function MasteryGrid() {
+interface Props {
+  onAskLina: (prompt: string) => void;
+}
+
+export default function MasteryGrid({ onAskLina }: Props) {
   const vocabulary = useMasteryStore((s) => s.vocabulary);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  // Derive current word from store so status changes reflect instantly in the drawer
   const selectedWord = selectedId
     ? (vocabulary.find((w) => w.id === selectedId) ?? null)
     : null;
@@ -30,7 +33,11 @@ export default function MasteryGrid() {
       </div>
 
       {selectedWord && (
-        <WordDetailDrawer word={selectedWord} onClose={() => setSelectedId(null)} />
+        <WordDetailDrawer 
+          word={selectedWord} 
+          onClose={() => setSelectedId(null)} 
+          onAskLina={onAskLina} 
+        />
       )}
     </section>
   );
