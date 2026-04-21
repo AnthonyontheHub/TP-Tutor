@@ -36,44 +36,37 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, se
       else setSelectedWords(selectedWords.filter(w => w !== word.word));
       return;
     }
-
     if (isSandboxMode && comboRef.current?.wordId === word.id) {
       clearTimeout(comboRef.current.timer);
-      const next = STATUS_ORDER[(STATUS_ORDER.indexOf(word.status) + 1) % STATUS_ORDER.length];
-      updateVocabStatus(word.id, next);
+      updateVocabStatus(word.id, STATUS_ORDER[(STATUS_ORDER.indexOf(word.status) + 1) % STATUS_ORDER.length]);
       comboRef.current = { timer: setTimeout(() => comboRef.current = null, 350), wordId: word.id };
       return;
     } 
-
     if (comboRef.current) clearTimeout(comboRef.current.timer);
-    comboRef.current = { timer: setTimeout(() => {
-      setSelectedWords([...selectedWords, word.word]);
-      comboRef.current = null;
-    }, 350), wordId: word.id };
+    comboRef.current = { timer: setTimeout(() => { setSelectedWords([...selectedWords, word.word]); comboRef.current = null; }, 350), wordId: word.id };
   };
 
   return (
     <section className="mastery-grid" onClick={() => setSelectedWords([])}>
-      <div className="mastery-grid__cards" style={{ perspective: '1000px' }}>
+      <div className="mastery-grid__cards">
         {displayedVocab.map((word) => {
           const selectIndex = selectedWords.indexOf(word.word);
           const isSelected = selectIndex !== -1;
           const isOnlySelection = selectedWords.length === 1 && isSelected;
-          const isDimmed = selectedWords.length > 0 && !isSelected;
-
           return (
-            <div 
-              key={word.id}
-              onClick={(e) => { e.stopPropagation(); handleCardClick(word); }}
-              style={{
-                transform: isOnlySelection ? 'scale(1.8) translateY(-10px)' : (isSelected ? 'scale(1.1)' : (isDimmed ? 'scale(0.85)' : 'scale(1)')),
-                opacity: isDimmed ? 0.2 : 1,
-                transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)', 
-                zIndex: isOnlySelection ? 100 : (isSelected ? 10 : 1), 
-                cursor: 'pointer', position: 'relative'
-              }}
+            <div key={word.id} onClick={(e) => { e.stopPropagation(); handleCardClick(word); }}
+              style={{ transform: isOnlySelection ? 'scale(1.8) translateY(-10px)' : (isSelected ? 'scale(1.1)' : (selectedWords.length > 0 ? 'scale(0.85)' : 'scale(1)')), opacity: selectedWords.length > 0 && !isSelected ? 0.2 : 1, transition: 'all 0.4s ease', zIndex: isOnlySelection ? 100 : (isSelected ? 10 : 1), cursor: 'pointer', position: 'relative' }}
             >
               <VocabCard word={word} onClick={() => {}} />
+              {isOnlySelection && <div style={{ position: 'absolute', bottom: '-35px', left: 0, right: 0, background: '#3b82f6', color: 'white', padding: '4px', borderRadius: '4px', fontSize: '0.45rem', textAlign: 'center' }}>{word.meanings}</div>}
+            </div>
+          );
+        })}
+      </div>
+      {drawerId && <WordDetailDrawer word={vocabulary.find(v => v.id === drawerId)!} onClose={() => { setDrawerId(null); setSelectedWords([]); }} onAskLina={onAskLina} isSandboxMode={isSandboxMode} />}
+    </section>
+  );
+}
               {isOnlySelection && (
                 <div style={{ 
                   position: 'absolute', bottom: '-35px', left: '0', right: '0',
