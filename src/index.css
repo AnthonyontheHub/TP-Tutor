@@ -190,7 +190,9 @@ html, body, #root {
 /* ─── Mastery Grid ───────────────────────────────────────────────────────── */
 .mastery-grid {
   margin-bottom: 40px;
+  padding: 0 40px; /* Adds safe scrolling space just on the sides of the grid */
 }
+
 
 .mastery-grid__cards {
   display: grid;
