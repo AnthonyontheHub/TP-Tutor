@@ -10,7 +10,7 @@ interface Props {
   onAskLina: (p: string) => void; 
   isSandboxMode: boolean; 
   activeFilter: MasteryStatus | null; 
-  sortMode: 'word' | 'status' | 'partOfSpeech'; 
+  sortMode: string; 
   sortDirection: 'asc' | 'desc'; 
   posFilter: string;
   setSortMode: (mode: any) => void;
@@ -19,7 +19,7 @@ interface Props {
 }
 
 export default function MasteryGrid({ 
-  onAskLina, isSandboxMode, activeFilter, sortMode, sortDirection, posFilter,
+  onAskLina, activeFilter, sortMode, sortDirection, posFilter, 
   setSortMode, setSortDirection, setPosFilter 
 }: Props) {
   const { vocabulary, savePhrase } = useMasteryStore();
@@ -28,7 +28,6 @@ export default function MasteryGrid({
   const [magneticSuggestions, setMagneticSuggestions] = useState<string[]>([]);
   
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const isLongPressing = useRef(false);
 
   useEffect(() => {
     const apiKey = localStorage.getItem('TP_GEMINI_KEY');
@@ -43,9 +42,7 @@ export default function MasteryGrid({
 
   const handlePointerDown = (word: string) => {
     if (selectedWords.length > 0) return;
-    isLongPressing.current = false;
     longPressTimer.current = setTimeout(() => {
-      isLongPressing.current = true;
       soundService.playBlip(523.25, 'sine', 0.05);
       setSelectedWords([word]);
     }, 500);
@@ -55,46 +52,39 @@ export default function MasteryGrid({
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
+      if (selectedWords.length === 0) {
+        const target = vocabulary.find(v => v.word === word);
+        if (target) setDrawerId(target.id);
+      }
     }
-
-    if (isLongPressing.current) return;
-
     if (selectedWords.length > 0) {
       setSelectedWords(prev => prev.includes(word) ? prev.filter(w => w !== word) : [...prev, word]);
-    } else {
-      const target = vocabulary.find(v => v.word === word);
-      if (target) setDrawerId(target.id);
     }
   };
 
   const displayed = vocabulary
     .filter(w => !activeFilter || w.status === activeFilter)
     .filter(w => posFilter === 'All' || w.partOfSpeech.includes(posFilter))
-    .sort((a, b) => {
-      const valA = String(a[sortMode] || '').toLowerCase();
-      const valB = String(b[sortMode] || '').toLowerCase();
+    .sort((a: any, b: any) => {
+      const field = sortMode === 'alphabetical' ? 'word' : sortMode;
+      const valA = String(a[field] || '').toLowerCase();
+      const valB = String(b[field] || '').toLowerCase();
       return sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
     });
 
   return (
-    <div className="mastery-grid-wrapper">
-      {/* PERSISTENT SORTING UI */}
-      <div className="grid-toolbar" style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
-        <select value={sortMode} onChange={(e) => setSortMode(e.target.value as any)}>
-          <option value="word">Alphabetical</option>
-          <option value="status">Mastery Level</option>
+    <div className="mastery-grid-container">
+      <div className="grid-toolbar" style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
+        <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="sort-select">
+          <option value="alphabetical">A-Z</option>
+          <option value="status">Mastery</option>
         </select>
-        <button onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')}>
-          {sortDirection === 'asc' ? 'Sort ↑' : 'Sort ↓'}
+        <button onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')} className="btn-toggle">
+          {sortDirection === 'asc' ? '↑' : '↓'}
         </button>
-        <select value={posFilter} onChange={(e) => setPosFilter(e.target.value)}>
-          <option value="All">All Parts</option>
-          <option value="noun">Nouns</option>
-          <option value="verb">Verbs</option>
-        </select>
       </div>
 
-      <div className="mastery-grid__cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))', gap: '10px' }}>
+      <div className="mastery-grid__cards">
         {displayed.map((word) => (
           <div 
             key={word.id} 
@@ -102,8 +92,6 @@ export default function MasteryGrid({
             onPointerUp={() => handlePointerUp(word.word)}
             style={{ 
               opacity: selectedWords.length > 0 && !selectedWords.includes(word.word) ? 0.3 : 1,
-              transform: selectedWords.includes(word.word) ? 'translateY(-4px)' : 'none',
-              transition: 'all 0.2s ease',
               touchAction: 'none'
             }}
           >
@@ -113,18 +101,14 @@ export default function MasteryGrid({
       </div>
 
       {selectedWords.length > 0 && (
-        <div className="magnetic-sentence-builder">
-          <div className="builder-content">
-            <div className="builder-text">{selectedWords.join(' ')}</div>
-            <div className="builder-actions">
-              <button onClick={() => { onAskLina(`Is "${selectedWords.join(' ')}" correct?`); setSelectedWords([]); }}>ASK LINA</button>
-              <button onClick={() => setSelectedWords([])} className="btn-cancel">✕</button>
-            </div>
-          </div>
+        <div className="builder-panel" style={{ position: 'fixed', bottom: '20px', left: '10px', right: '10px', background: '#222', padding: '15px', borderRadius: '12px', zIndex: 100 }}>
+          <div style={{ color: 'white', fontSize: '1.2rem', marginBottom: '10px' }}>{selectedWords.join(' ')}</div>
+          <button onClick={() => { onAskLina(`Is "${selectedWords.join(' ')}" correct?`); setSelectedWords([]); }} className="btn-review">ASK LINA</button>
+          <button onClick={() => setSelectedWords([])} style={{ background: 'none', border: 'none', color: '#666', width: '100%', marginTop: '10px' }}>Cancel</button>
         </div>
       )}
 
-      {drawerId && <WordDetailDrawer word={vocabulary.find(v => v.id === drawerId)!} onClose={() => setDrawerId(null)} onAskLina={onAskLina} isSandboxMode={isSandboxMode} />}
+      {drawerId && <WordDetailDrawer word={vocabulary.find(v => v.id === drawerId)!} onClose={() => setDrawerId(null)} onAskLina={onAskLina} isSandboxMode={true} />}
     </div>
   );
 }
