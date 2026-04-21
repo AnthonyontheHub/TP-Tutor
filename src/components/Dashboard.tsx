@@ -3,7 +3,7 @@ import { useMasteryStore } from '../store/masteryStore';
 import ProgressSummary from './ProgressSummary';
 import MasteryGrid from './MasteryGrid';
 import PhraseGrid from './PhraseGrid'; 
-import SettingsDrawer from './SettingsDrawer'; // IMPORTING THE NEW COMPONENT
+import SettingsDrawer from './SettingsDrawer'; 
 
 interface Props {
   onStartSession: () => void;
@@ -16,7 +16,7 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
   const lastUpdated = useMasteryStore((s) => s.lastUpdated);
   
   const [isSandboxMode, setIsSandboxMode] = useState(false);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false); // SETTINGS STATE
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false); 
 
   return (
     <div className="dashboard">
@@ -29,8 +29,15 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
         </div>
         <div className="dashboard__header-right" style={{ textAlign: 'right' }}>
           
-          {/* THE CLEAN GEAR ICON */}
-          <div style={{ marginBottom: '12px', display: 'flex', justifyContent: 'flex-end' }}>
+          {/* THE NEW ICON CLUSTER */}
+          <div style={{ marginBottom: '12px', display: 'flex', justifyContent: 'flex-end', gap: '16px' }}>
+             <button 
+               onClick={onStartSession}
+               style={{ background: 'transparent', border: 'none', fontSize: '1.5rem', cursor: 'pointer', padding: '0' }}
+               title="Chat with Lina"
+             >
+               💬
+             </button>
              <button 
                onClick={() => setIsSettingsOpen(true)}
                style={{ background: 'transparent', border: 'none', fontSize: '1.5rem', cursor: 'pointer', padding: '0', color: isSandboxMode ? '#aaa' : 'var(--text)' }}
@@ -51,13 +58,8 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
         <PhraseGrid onAskLina={onAskLina} />
       </main>
 
-      <footer className="dashboard__footer">
-        <button className="btn-start" onClick={onStartSession}>
-          ▶&nbsp;&nbsp;START SESSION
-        </button>
-      </footer>
+      {/* Notice the footer block is completely gone! */}
 
-      {/* THE NEW SETTINGS OVERLAY */}
       {isSettingsOpen && (
         <SettingsDrawer 
           onClose={() => setIsSettingsOpen(false)} 
