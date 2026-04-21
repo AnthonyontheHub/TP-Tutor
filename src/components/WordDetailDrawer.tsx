@@ -8,9 +8,22 @@ import { fetchExamplesForWord } from '../services/linaService';
 interface Props {
   word: VocabWord;
   onClose: () => void;
-  onAskLina: (prompt: string) => void; // Used in handleAskLina
+  onAskLina: (prompt: string) => void;
   isSandboxMode: boolean;
 }
+
+const MOCK_DICTIONARY: Record<string, string> = {
+  "pona": "ale li pona. (Everything is good.)",
+  "lili": "ni li lili. (That is small.)",
+  "musi": "ni li musi. (This is fun.)",
+  "wawa": "sina wawa. (You are strong.)",
+  "sona": "sina sona mute. (You are smart/wise.)",
+  "pali": "pali pona! (Good work!)",
+  "jan": "sina pona tawa jan. (You are good toward people.)",
+  "suli": "ni li suli. (This is important.)",
+  "ike": "mi pilin ike. (I feel bad.)",
+  "mute": "sina sona mute. (You know much.)"
+};
 
 const STATUS_ORDER: MasteryStatus[] = ['not_started', 'introduced', 'practicing', 'confident', 'mastered'];
 
@@ -31,19 +44,34 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
   const updateVocabStatus = useMasteryStore((s) => s.updateVocabStatus);
 
   useEffect(() => {
-    setIsGenerating(true);
-    if (isSandboxMode) {
-      const mock: Record<string, string> = {};
-      partsOfSpeech.forEach(pos => { mock[pos] = `${word.word} li lon.`; });
-      setExamples(mock);
+    const loadOfflineData = () => {
+      const mockData: Record<string, string> = {};
+      partsOfSpeech.forEach(pos => { 
+        mockData[pos] = MOCK_DICTIONARY[word.word] || `${word.word} li lon.`; 
+      });
+      setExamples(mockData);
       setIsGenerating(false);
+    };
+
+    // HARD LOCK: If sandbox is on, do NOT even look at the API key.
+    if (isSandboxMode) {
+      loadOfflineData();
       return;
     }
-    const key = localStorage.getItem('TP_GEMINI_KEY');
-    if (!key) { setIsGenerating(false); return; }
-    fetchExamplesForWord(key, word.word, partsOfSpeech)
-      .then(d => { setExamples(d || {}); setIsGenerating(false); })
-      .catch(() => setIsGenerating(false));
+
+    const apiKey = localStorage.getItem('TP_GEMINI_KEY');
+    if (!apiKey) {
+      loadOfflineData();
+      return;
+    }
+
+    setIsGenerating(true);
+    fetchExamplesForWord(apiKey, word.word, partsOfSpeech)
+      .then(data => {
+        if (!data || Object.keys(data).length === 0 || data.error) loadOfflineData();
+        else { setExamples(data); setIsGenerating(false); }
+      })
+      .catch(() => loadOfflineData());
   }, [word.word, isSandboxMode]);
 
   function handleAskLina(pos: string) {
