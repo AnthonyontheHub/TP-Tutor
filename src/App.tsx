@@ -8,8 +8,6 @@ type View = 'dashboard' | 'chat';
 export default function App() {
   const [view, setView] = useState<View>('dashboard');
   const [hasOpenedChat, setHasOpenedChat] = useState(false);
-  
-  // NEW: State to hold a prompt coming from the Dashboard
   const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
 
   useEffect(() => {
@@ -21,7 +19,6 @@ export default function App() {
     setView('chat');
   };
 
-  // NEW: Function to handle the "Ask Lina" button click
   const handleAskLina = (prompt: string) => {
     setPendingPrompt(prompt);
     handleStartSession(); 
