@@ -27,11 +27,11 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
   const handleBuildSentence = () => {
     const sentence = selectedWords.join(' ');
     onAskLina(`toki Lina! I'm trying to build a sentence with these words: "${sentence}". Is this correct? Can you give me variations?`);
-    setSelectedWords([]); // Clear after sending
+    setSelectedWords([]); 
   };
 
   return (
-    <div className="dashboard" style={{ paddingBottom: selectedWords.length > 0 ? '100px' : '20px' }}>
+    <div className="dashboard" style={{ paddingBottom: selectedWords.length > 0 ? '160px' : '40px' }}>
       <header className="dashboard__header">
         <div>
           <h1 className="dashboard__title">TOKI PONA</h1>
@@ -62,20 +62,38 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
         <PhraseGrid onAskLina={onAskLina} activeFilter={activeFilter} selectedWords={selectedWords} />
       </main>
 
-      {/* FLOATING ACTION BAR FOR SENTENCE BUILDING */}
+      {/* FIXED SENTENCE BUILDER MENU */}
       {selectedWords.length > 0 && (
-        <div style={{ position: 'fixed', bottom: '20px', left: '20px', right: '20px', background: '#111', border: '1px solid #3b82f6', borderRadius: '12px', padding: '16px', boxShadow: '0 8px 32px rgba(0,0,0,0.8)', zIndex: 100, display: 'flex', flexDirection: 'column', gap: '12px', animate: 'slideUp' }}>
+        <div style={{ 
+          position: 'fixed', 
+          bottom: '24px', left: '16px', right: '16px', 
+          background: '#161616', 
+          border: '1px solid #3b82f6', 
+          borderRadius: '16px', 
+          padding: '20px', 
+          boxShadow: '0 12px 48px rgba(0,0,0,0.9)', 
+          zIndex: 2000, // Ensuring it is above everything
+          display: 'flex', flexDirection: 'column', gap: '12px',
+          animation: 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
+        }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.7rem', color: '#3b82f6', fontWeight: 'bold' }}>SENTENCE BUILDER</span>
-            <button onClick={() => setSelectedWords([])} style={{ background: 'transparent', border: 'none', color: '#666', fontSize: '0.8rem', cursor: 'pointer' }}>CLEAR</button>
+            <span style={{ fontSize: '0.7rem', color: '#3b82f6', fontWeight: 'bold', letterSpacing: '1px' }}>SENTENCE BUILDER</span>
+            <button onClick={() => setSelectedWords([])} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', fontSize: '0.7rem', padding: '4px 10px', borderRadius: '20px', cursor: 'pointer' }}>CLEAR ALL</button>
           </div>
-          <div style={{ fontSize: '1.2rem', fontWeight: 'bold', letterSpacing: '0.5px', color: '#fff' }}>
+          
+          <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#fff', wordWrap: 'break-word', lineHeight: '1.2' }}>
             {selectedWords.join(' ')}
-            <span style={{ animate: 'blink', borderRight: '2px solid #3b82f6', marginLeft: '4px' }}></span>
+            <span style={{ color: '#3b82f6', marginLeft: '4px', animation: 'blink 1s infinite' }}>|</span>
           </div>
-          <button onClick={handleBuildSentence} style={{ background: '#3b82f6', color: 'white', border: 'none', borderRadius: '6px', padding: '10px', fontWeight: 'bold', cursor: 'pointer' }}>
-            ASK LINA TO FINISH SENTENCE
-          </button>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '4px' }}>
+            <button onClick={handleBuildSentence} style={{ background: '#3b82f6', color: 'white', border: 'none', borderRadius: '8px', padding: '12px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.85rem' }}>
+              ASK LINA
+            </button>
+            <button onClick={() => onAskLina(`toki Lina, what does this specific word combination mean: "${selectedWords.join(' ')}"?`)} style={{ background: '#222', color: 'white', border: '1px solid #444', borderRadius: '8px', padding: '12px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.85rem' }}>
+              DEFINE COMBO
+            </button>
+          </div>
         </div>
       )}
 
