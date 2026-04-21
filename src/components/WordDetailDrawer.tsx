@@ -8,8 +8,22 @@ interface Props {
   word: VocabWord;
   onClose: () => void;
   onAskLina: (prompt: string) => void;
-  isSandboxMode: boolean; // Add this
+  isSandboxMode: boolean;
 }
+
+// Hand-picked phrases from "Everyday Toki Pona"
+const MOCK_DICTIONARY: Record<string, string> = {
+  "pona": "ale li pona. (Everything is good.)",
+  "lili": "ni li lili. (That is small.)",
+  "musi": "ni li musi. (This is fun.)",
+  "wawa": "sina wawa. (You are strong.)",
+  "sona": "sina sona mute. (You are smart/wise.)",
+  "pali": "pali pona! (Good work!)",
+  "jan": "sina pona tawa jan. (You are good toward people.)",
+  "suli": "ni li suli. (This is important.)",
+  "ike": "mi pilin ike. (I feel bad.)",
+  "mute": "sina sona mute. (You know much.)"
+};
 
 export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMode }: Props) {
   const partsOfSpeech = word.partOfSpeech.split('/').map(p => p.trim());
@@ -17,18 +31,17 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
   const [isGenerating, setIsGenerating] = useState(true);
 
   useEffect(() => {
-    // IF SANDBOX MODE IS ON: Use filler text
     if (isSandboxMode) {
       const mockData: Record<string, string> = {};
       partsOfSpeech.forEach(pos => {
-        mockData[pos] = `(Sandbox Mode) ${word.word} li pona. (The ${word.word} is good as a ${pos}.)`;
+        // Use the document phrase if available, otherwise generic fallback
+        mockData[pos] = MOCK_DICTIONARY[word.word] || `(Sandbox) ${word.word} li lon. (The ${word.word} exists.)`;
       });
       setExamples(mockData);
       setIsGenerating(false);
       return;
     }
 
-    // ELSE: Do the real AI fetch
     const apiKey = localStorage.getItem('TP_GEMINI_KEY');
     if (!apiKey) {
       setExamples({ error: "No API Key found. Add key in chat to generate examples." });
@@ -46,7 +59,7 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
         setExamples({ error: "Lina encountered an error." });
         setIsGenerating(false);
       });
-  }, [word.word, isSandboxMode]); // Added isSandboxMode to dependencies
+  }, [word.word, isSandboxMode]);
 
   function handleAskLina(pos?: string) {
     const prompt = pos 
@@ -82,7 +95,7 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
           </div>
 
           <div className="word-drawer__section-label">
-            {isSandboxMode ? 'SANDBOX EXAMPLES (MOCK)' : 'PARTS OF SPEECH & EXAMPLES'}
+            {isSandboxMode ? 'SANDBOX EXAMPLES (OFFLINE)' : 'PARTS OF SPEECH & EXAMPLES'}
           </div>
 
           <div className="word-drawer__examples-list">
