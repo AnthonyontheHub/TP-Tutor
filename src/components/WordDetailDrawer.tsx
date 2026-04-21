@@ -26,21 +26,16 @@ const MOCK_DICTIONARY: Record<string, string> = {
 };
 
 const STATUS_ORDER: MasteryStatus[] = [
-  'not_started',
-  'introduced',
-  'practicing',
-  'confident',
-  'mastered',
+  'not_started', 'introduced', 'practicing', 'confident', 'mastered',
 ];
 
-// DYNAMIC GLOW FUNCTION
 const getGlowColor = (status: MasteryStatus) => {
   switch (status) {
-    case 'introduced': return '0 -8px 30px rgba(59, 130, 246, 0.25)'; // Blue Glow
-    case 'practicing': return '0 -8px 30px rgba(234, 179, 8, 0.25)';  // Yellow Glow
-    case 'confident': return '0 -8px 30px rgba(34, 197, 94, 0.25)';   // Green Glow
-    case 'mastered': return '0 -8px 40px rgba(16, 185, 129, 0.35)';   // Bright Green Glow
-    default: return '0 -8px 30px rgba(150, 150, 150, 0.1)';           // Default Gray
+    case 'introduced': return '0 -8px 30px rgba(59, 130, 246, 0.25)';
+    case 'practicing': return '0 -8px 30px rgba(234, 179, 8, 0.25)'; 
+    case 'confident': return '0 -8px 30px rgba(34, 197, 94, 0.25)';  
+    case 'mastered': return '0 -8px 40px rgba(16, 185, 129, 0.35)';  
+    default: return '0 -8px 30px rgba(150, 150, 150, 0.1)';          
   }
 };
 
@@ -57,9 +52,7 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
   useEffect(() => {
     const loadOfflineData = () => {
       const mockData: Record<string, string> = {};
-      partsOfSpeech.forEach(pos => {
-        mockData[pos] = MOCK_DICTIONARY[word.word] || `(Offline) ${word.word} li lon. (The ${word.word} exists.)`;
-      });
+      partsOfSpeech.forEach(pos => { mockData[pos] = MOCK_DICTIONARY[word.word] || `(Offline) ${word.word} li lon.`; });
       setExamples(mockData);
       setIsGenerating(false);
     };
@@ -79,17 +72,9 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
   }, [word.word, isSandboxMode]);
 
   function handleAskLina(pos?: string) {
-    const prompt = pos 
-      ? `toki Lina, can we practice using "${word.word}" as a ${pos}?`
-      : `toki Lina, I want to discuss the word "${word.word}".`;
+    const prompt = pos ? `toki Lina, can we practice using "${word.word}" as a ${pos}?` : `toki Lina, I want to discuss the word "${word.word}".`;
     onAskLina(prompt);
     onClose(); 
-  }
-
-  function handleCycleStatus() {
-    const currentIndex = STATUS_ORDER.indexOf(stagedStatus);
-    const nextIndex = (currentIndex + 1) % STATUS_ORDER.length;
-    setStagedStatus(STATUS_ORDER[nextIndex]);
   }
 
   return (
@@ -100,59 +85,50 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
         drag="y"
         dragConstraints={{ top: 0 }}
         initial={{ y: '100%' }}
-        animate={{ y: '33%' }} // Snaps to 2/3 height
+        animate={{ y: '0%' }}
         exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
         onDragEnd={(_, info) => {
           if (info.offset.y > 100 || info.velocity.y > 500) onClose();
         }}
         style={{ 
-          height: '100vh', 
-          top: 0, 
           position: 'fixed', 
+          bottom: 0, left: 0, right: 0,
+          height: '66vh', 
           zIndex: 1000, 
-          touchAction: 'pan-x',
-          // APPLYING THE GLOW HERE
+          display: 'flex', flexDirection: 'column',
           boxShadow: getGlowColor(stagedStatus),
-          borderTop: `1px solid ${stagedStatus === 'not_started' ? '#444' : 'transparent'}`
+          borderTop: `1px solid ${stagedStatus === 'not_started' ? '#444' : 'transparent'}`,
+          borderTopLeftRadius: '20px',
+          borderTopRightRadius: '20px',
+          background: 'var(--surface, #111)'
         }}
       >
-        <div className="word-drawer__drag-zone" style={{ width: '100%', padding: '16px 0', cursor: 'grab', touchAction: 'none' }}>
-          <div className="word-drawer__handle" style={{ width: '48px', height: '6px', backgroundColor: '#666', borderRadius: '10px', margin: '0 auto' }} />
+        <div style={{ width: '100%', padding: '16px 0', cursor: 'grab', touchAction: 'none', flexShrink: 0 }}>
+          <div style={{ width: '48px', height: '6px', backgroundColor: '#666', borderRadius: '10px', margin: '0 auto' }} />
         </div>
 
-        <div className="word-drawer__content" style={{ padding: '0 20px 100px', overflowY: 'auto', maxHeight: 'calc(100vh - 60px)' }}>
+        <div style={{ padding: '0 20px', overflowY: 'auto', flex: 1 }}>
           <div className="word-drawer__meta">
             <span className="word-drawer__word">{word.word}</span>
-            
             <div 
-               style={{ 
-                 marginTop: '4px', padding: isSandboxMode ? '4px' : '0', borderRadius: '4px',
-                 background: isSandboxMode ? 'rgba(255,255,255,0.05)' : 'transparent', display: 'inline-block',
-                 cursor: isSandboxMode ? 'pointer' : 'default', userSelect: 'none'
-               }}
-               onClick={() => isSandboxMode && handleCycleStatus()}
+               style={{ marginTop: '4px', padding: isSandboxMode ? '4px' : '0', borderRadius: '4px', background: isSandboxMode ? 'rgba(255,255,255,0.05)' : 'transparent', display: 'inline-block', cursor: isSandboxMode ? 'pointer' : 'default', userSelect: 'none' }}
+               onClick={() => isSandboxMode && setStagedStatus(STATUS_ORDER[(STATUS_ORDER.indexOf(stagedStatus) + 1) % STATUS_ORDER.length])}
             >
               <span className="word-drawer__status" style={{ fontSize: '0.9rem', color: 'gray' }}>
                 Status: {STATUS_META[stagedStatus].emoji} {STATUS_META[stagedStatus].label.toUpperCase()}
-                {isSandboxMode && <span style={{ color: '#888', fontSize: '0.7rem', marginLeft: '8px' }}>🔄 (Click to cycle)</span>}
+                {isSandboxMode && <span style={{ color: '#888', fontSize: '0.7rem', marginLeft: '8px' }}>🔄</span>}
               </span>
             </div>
-
             {stagedStatus !== word.status && (
               <div style={{ marginTop: '8px' }}>
-                 <button onClick={() => updateVocabStatus(word.id, stagedStatus)} style={{ background: '#4CAF50', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold' }}>
-                   💾 SAVE NEW STATUS
-                 </button>
+                 <button onClick={() => updateVocabStatus(word.id, stagedStatus)} style={{ background: '#4CAF50', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold' }}>💾 SAVE</button>
               </div>
             )}
             <span className="word-drawer__meanings" style={{ display: 'block', marginTop: '8px' }}>{word.meanings}</span>
           </div>
 
-          <div className="word-drawer__section-label">
-            {isSandboxMode ? 'SANDBOX EXAMPLES (OFFLINE)' : 'PARTS OF SPEECH & EXAMPLES'}
-          </div>
-
+          <div className="word-drawer__section-label">{isSandboxMode ? 'SANDBOX EXAMPLES (OFFLINE)' : 'PARTS OF SPEECH & EXAMPLES'}</div>
           <div className="word-drawer__examples-list">
             {partsOfSpeech.map((pos) => (
               <div key={pos} style={{ background: '#1a1a1a', padding: '12px', borderRadius: '4px', marginBottom: '12px', border: '1px solid #333' }}>
@@ -167,11 +143,14 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
             ))}
           </div>
 
-          <button onClick={() => handleAskLina()} style={{ width: '100%', padding: '16px', marginTop: '16px', cursor: 'pointer', borderRadius: '8px', background: '#333', color: 'white', border: '1px solid #555', fontWeight: 'bold' }}>
+          <button onClick={() => handleAskLina()} style={{ width: '100%', padding: '16px', marginTop: '16px', cursor: 'pointer', borderRadius: '8px', background: '#333', color: 'white', border: '1px solid #555', fontWeight: 'bold', marginBottom: '20px' }}>
             DISCUSS "{word.word.toUpperCase()}" WITH LINA
           </button>
-          <button onClick={onClose} style={{ width: '100%', padding: '20px', marginTop: '16px', background: '#ff4444', color: 'white', border: 'none', borderRadius: '8px', fontSize: '1.2rem', fontWeight: 'bold', cursor: 'pointer', display: 'block' }}>
-            ✕ CLOSE DRAWER
+        </div>
+
+        <div style={{ padding: '16px 20px', borderTop: '1px solid #333', background: 'var(--surface, #111)', flexShrink: 0 }}>
+          <button onClick={onClose} style={{ width: '100%', padding: '12px', background: '#ff4444', color: 'white', border: 'none', borderRadius: '8px', fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer' }}>
+            ✕ CLOSE
           </button>
         </div>
       </motion.div>
