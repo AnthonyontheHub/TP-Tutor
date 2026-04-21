@@ -11,7 +11,9 @@
   --text: #fff;
   --text-dim: #444;
   --text-muted: #666;
+  --col-mastered: #22c55e;
   --font: 'Courier New', Consolas, 'Lucida Console', monospace;
+  --b2: 3px;
   --b3: 4px;
 }
 
@@ -28,7 +30,6 @@ body {
   padding: 0 16px;
 }
 
-/* Header */
 .dashboard__header {
   display: flex;
   justify-content: space-between;
@@ -37,7 +38,13 @@ body {
   border-bottom: 1px solid #333;
 }
 
-/* Reorganized Dashboard */
+.dashboard__header-left { display: flex; flex-direction: column; }
+.dashboard__title { margin: 0; font-size: 1.2rem; font-weight: 900; letter-spacing: 0.14em; text-transform: uppercase; }
+.dashboard__profile-trigger { background: none; border: none; padding: 0; margin: 4px 0 0 0; font-size: 0.75rem; color: #3b82f6; cursor: pointer; font-weight: bold; font-family: var(--font); text-transform: uppercase; }
+.dashboard__header-right { display: flex; gap: 15px; align-items: center; }
+.dashboard__streak { color: #f59e0b; font-weight: bold; font-size: 0.8rem; background: #332a11; padding: 4px 8px; border-radius: 12px; }
+.dashboard__icon-btn { background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; }
+
 .dashboard__main { padding: 20px 0 120px; }
 
 .btn-review {
@@ -53,26 +60,11 @@ body {
   font-family: var(--font);
 }
 
-.dashboard__view-toggle {
-  display: flex;
-  gap: 10px;
-  margin-top: 12px;
-}
-
-.btn-toggle {
-  flex: 1;
-  padding: 12px;
-  border-radius: 8px;
-  border: none;
-  font-weight: bold;
-  background: #222;
-  color: #fff;
-  cursor: pointer;
-}
-
+.dashboard__view-toggle { display: flex; gap: 10px; margin-top: 12px; }
+.btn-toggle { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; background: #222; color: #fff; cursor: pointer; font-family: var(--font); }
 .btn-toggle.active { background: #3b82f6; }
 
-/* DRAWER SYSTEM - FIXED ALIGNMENT */
+/* DRAWER SYSTEM */
 .drawer-backdrop {
   position: fixed;
   inset: 0;
@@ -87,10 +79,7 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  /* Mobile Default */
-  bottom: 0;
-  left: 0;
-  right: 0;
+  bottom: 0; left: 0; right: 0;
   height: 85vh;
   border-top: var(--b3) solid var(--text);
   border-radius: 24px 24px 0 0;
@@ -98,7 +87,6 @@ body {
 
 @media (min-width: 900px) {
   .word-drawer, .settings-drawer, .profile-drawer {
-    /* Desktop: Centered Card */
     top: 0; bottom: 0; left: 0; right: 0;
     margin: auto;
     width: 500px;
@@ -111,10 +99,13 @@ body {
 .drawer__handle { width: 48px; height: 6px; background: #444; border-radius: 3px; margin: 16px auto; flex-shrink: 0; }
 .drawer__scroll-area { flex: 1; overflow-y: auto; padding: 0 20px 20px; }
 
-/* Grid density */
 .mastery-grid__cards {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   gap: 12px;
   margin-top: 20px;
 }
+
+/* Status Colors */
+.vocab-card--mastered { background: #031008; border-color: #22c55e; }
+/* ... (Other status cards remain same) */
