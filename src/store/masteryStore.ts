@@ -1,17 +1,15 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { db } from '../services/firebase';
+import { doc, setDoc, onSnapshot } from 'firebase/firestore';
 import type { MasteryMap, MasteryStatus, StatusSummary } from '../types/mastery';
 import { initialMasteryMap } from '../data/initialMasteryMap';
 
 interface MasteryActions {
   updateVocabStatus: (wordId: string, status: MasteryStatus) => void;
-  updateVocabNotes: (wordId: string, notes: string) => void;
-  toggleMasteryCandidate: (wordId: string) => void;
   updateConceptStatus: (chapterId: string, conceptId: string, status: MasteryStatus) => void;
-  updateConceptNotes: (chapterId: string, conceptId: string, notes: string) => void;
-  getStatusSummary: () => StatusSummary;
   setLastUpdated: (date: string) => void;
-  resetToInitial: () => void;
+  syncFromCloud: () => void;
 }
 
 type MasteryStore = MasteryMap & MasteryActions;
@@ -21,28 +19,16 @@ export const useMasteryStore = create<MasteryStore>()(
     (set, get) => ({
       ...initialMasteryMap,
 
-      updateVocabStatus: (wordId, status) =>
+      updateVocabStatus: (wordId, status) => {
         set((state) => ({
           vocabulary: state.vocabulary.map((w) =>
             w.id === wordId ? { ...w, status } : w
           ),
-        })),
+        }));
+        get().syncToCloud(); // Save change to Firebase
+      },
 
-      updateVocabNotes: (wordId, notes) =>
-        set((state) => ({
-          vocabulary: state.vocabulary.map((w) =>
-            w.id === wordId ? { ...w, sessionNotes: notes } : w
-          ),
-        })),
-
-      toggleMasteryCandidate: (wordId) =>
-        set((state) => ({
-          vocabulary: state.vocabulary.map((w) =>
-            w.id === wordId ? { ...w, isMasteryCandidate: !w.isMasteryCandidate } : w
-          ),
-        })),
-
-      updateConceptStatus: (chapterId, conceptId, status) =>
+      updateConceptStatus: (chapterId, conceptId, status) => {
         set((state) => ({
           chapters: state.chapters.map((ch) =>
             ch.id === chapterId
@@ -54,40 +40,38 @@ export const useMasteryStore = create<MasteryStore>()(
                 }
               : ch
           ),
-        })),
-
-      updateConceptNotes: (chapterId, conceptId, notes) =>
-        set((state) => ({
-          chapters: state.chapters.map((ch) =>
-            ch.id === chapterId
-              ? {
-                  ...ch,
-                  concepts: ch.concepts.map((c) =>
-                    c.id === conceptId ? { ...c, sessionNotes: notes } : c
-                  ),
-                }
-              : ch
-          ),
-        })),
-
-      getStatusSummary: () => {
-        const { vocabulary } = get();
-        const summary: StatusSummary = {
-          not_started: 0,
-          introduced: 0,
-          practicing: 0,
-          confident: 0,
-          mastered: 0,
-        };
-        for (const word of vocabulary) {
-          summary[word.status]++;
-        }
-        return summary;
+        }));
+        get().syncToCloud(); // Save change to Firebase
       },
 
       setLastUpdated: (date) => set({ lastUpdated: date }),
 
-      resetToInitial: () => set({ ...initialMasteryMap }),
+      // INTERNAL HELPER: Push current state to Firebase
+      syncToCloud: async () => {
+        const { vocabulary, chapters, lastUpdated, studentName } = get();
+        // For a personal app, we save everything to one 'anthony' document
+        await setDoc(doc(db, 'users', 'anthony'), {
+          vocabulary,
+          chapters,
+          lastUpdated,
+          studentName
+        });
+      },
+
+      // INITIALIZER: Listen for changes from other devices
+      syncFromCloud: () => {
+        onSnapshot(doc(db, 'users', 'anthony'), (snapshot) => {
+          if (snapshot.exists()) {
+            const data = snapshot.data();
+            set({
+              vocabulary: data.vocabulary,
+              chapters: data.chapters,
+              lastUpdated: data.lastUpdated,
+              studentName: data.studentName
+            });
+          }
+        });
+      }
     }),
     { name: 'tp-tutor-mastery' }
   )
