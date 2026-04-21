@@ -20,7 +20,9 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, se
   const vocabulary = useMasteryStore((s) => s.vocabulary);
   const updateVocabStatus = useMasteryStore((s) => s.updateVocabStatus);
   const [drawerId, setDrawerId] = useState<string | null>(null);
+  
   const comboRef = useRef<{ timer: ReturnType<typeof setTimeout>, wordId: string } | null>(null);
+  const longPressRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const displayedVocab = [...vocabulary]
     .filter(w => !activeFilter || w.status === activeFilter)
@@ -30,14 +32,36 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, se
       return a.word.localeCompare(b.word);
     });
 
+  // START LONG PRESS (Enter Multi-select)
+  const handleTouchStart = (word: VocabWord) => {
+    if (selectedWords.length > 0) return; // Already in selection mode
+
+    longPressRef.current = setTimeout(() => {
+      if (window.navigator.vibrate) window.navigator.vibrate(50); // Haptic feedback
+      setSelectedWords([word.word]);
+      longPressRef.current = null;
+    }, 500); // 0.5 seconds to trigger multi-select
+  };
+
+  const handleTouchEnd = () => {
+    if (longPressRef.current) {
+      clearTimeout(longPressRef.current);
+      longPressRef.current = null;
+    }
+  };
+
   const handleCardClick = (word: VocabWord) => {
-    // DESELECT: Tapping an already selected word always removes it instantly
-    if (selectedWords.includes(word.word)) {
-      setSelectedWords(selectedWords.filter(w => w !== word.word));
+    // 1. If we are ALREADY in multi-select mode
+    if (selectedWords.length > 0) {
+      if (selectedWords.includes(word.word)) {
+        setSelectedWords(selectedWords.filter(w => w !== word.word));
+      } else {
+        setSelectedWords([...selectedWords, word.word]);
+      }
       return;
     }
 
-    // RAPID-FIRE COMBO (Sandbox Only)
+    // 2. RAPID-FIRE COMBO (Sandbox Only)
     if (isSandboxMode && comboRef.current?.wordId === word.id) {
       clearTimeout(comboRef.current.timer);
       const nextStatus = STATUS_ORDER[(STATUS_ORDER.indexOf(word.status) + 1) % STATUS_ORDER.length];
@@ -46,12 +70,12 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, se
       return;
     } 
 
+    // 3. NORMAL TAP: Open Drawer
     if (comboRef.current) clearTimeout(comboRef.current.timer);
     comboRef.current = { timer: setTimeout(() => {
-      // Add word to the build sequence
-      setSelectedWords([...selectedWords, word.word]);
+      setDrawerId(word.id);
       comboRef.current = null;
-    }, 350), wordId: word.id };
+    }, 250), wordId: word.id };
   };
 
   return (
@@ -66,27 +90,29 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, se
             <div 
               key={word.id}
               onClick={(e) => { e.stopPropagation(); handleCardClick(word); }}
-              onContextMenu={(e) => { e.preventDefault(); setDrawerId(word.id); }}
+              onTouchStart={() => handleTouchStart(word)}
+              onTouchEnd={handleTouchEnd}
+              onMouseDown={() => handleTouchStart(word)} // Desktop support
+              onMouseUp={handleTouchEnd}
               style={{
-                transform: isSelected ? 'scale(1.1)' : (isDimmed ? 'scale(0.92)' : 'scale(1)'),
-                opacity: isDimmed ? 0.35 : 1,
-                transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)', 
+                transform: isSelected ? 'scale(1.05)' : (isDimmed ? 'scale(0.95)' : 'scale(1)'),
+                opacity: isDimmed ? 0.4 : 1,
+                transition: 'all 0.25s ease', 
                 zIndex: isSelected ? 10 : 1, 
-                cursor: 'pointer', position: 'relative'
+                cursor: 'pointer', position: 'relative',
+                touchAction: 'none' // Critical for long-press on mobile
               }}
             >
               <VocabCard word={word} onClick={() => {}} />
               
-              {/* SEQUENCE NUMBER BADGE */}
               {isSelected && (
                 <div style={{ 
-                  position: 'absolute', top: '-10px', right: '-10px', 
+                  position: 'absolute', top: '-8px', right: '-8px', 
                   background: '#3b82f6', color: 'white', 
                   borderRadius: '50%', width: '24px', height: '24px', 
                   display: 'flex', alignItems: 'center', justifyContent: 'center', 
-                  fontSize: '12px', fontWeight: 'bold', 
-                  boxShadow: '0 4px 8px rgba(0,0,0,0.5)',
-                  border: '2px solid #000'
+                  fontSize: '11px', fontWeight: 'bold', border: '2px solid #fff',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.4)'
                 }}>
                   {selectIndex + 1}
                 </div>
