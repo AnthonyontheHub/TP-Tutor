@@ -11,9 +11,7 @@
   --text: #fff;
   --text-dim: #444;
   --text-muted: #666;
-  --col-mastered: #22c55e;
   --font: 'Courier New', Consolas, 'Lucida Console', monospace;
-  --b2: 3px;
   --b3: 4px;
 }
 
@@ -68,7 +66,7 @@ body {
 .drawer-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.85);
   z-index: 2000;
 }
 
@@ -105,7 +103,3 @@ body {
   gap: 12px;
   margin-top: 20px;
 }
-
-/* Status Colors */
-.vocab-card--mastered { background: #031008; border-color: #22c55e; }
-/* ... (Other status cards remain same) */
