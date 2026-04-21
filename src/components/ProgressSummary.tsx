@@ -7,7 +7,7 @@ interface Props {
 }
 
 export default function ProgressSummary({ activeFilter, onFilterClick }: Props) {
-  const { getStatusSummary, currentStreak, savedPhrases } = useMasteryStore();
+  const { getStatusSummary, savedPhrases } = useMasteryStore();
   const summary = getStatusSummary();
 
   const badges = [
@@ -69,7 +69,7 @@ export default function ProgressSummary({ activeFilter, onFilterClick }: Props) 
               textAlign: 'center'
             }}
           >
-            <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: activeFilter === item.status ? 'white' : '#fff' }}>
+            <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: 'white' }}>
               {summary[item.status]}
             </div>
             <div style={{ fontSize: '0.5rem', color: activeFilter === item.status ? 'white' : '#666', fontWeight: 'bold', marginTop: '2px' }}>
