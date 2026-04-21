@@ -9,14 +9,11 @@ export default function VocabCard({ word, onClick }: Props) {
   return (
     <div
       className={`vocab-card vocab-card--${word.status}`}
-      style={{ pointerEvents: 'none', userSelect: 'none' }} 
+      style={{ pointerEvents: 'none', userSelect: 'none' }}
       role="button"
-      aria-label={`${word.word} — ${word.status}`}
     >
-      <span className="vocab-card__word">{word.word}</span>
-      <span className="vocab-card__pos">
-        {word.partOfSpeech.split(' /')[0].trim()}
-      </span>
+      <span className="vocab-card__word" style={{ display: 'block', fontSize: '1.1rem', fontWeight: 700 }}>{word.word}</span>
+      <span className="vocab-card__pos" style={{ fontSize: '0.7rem', opacity: 0.7 }}>{word.partOfSpeech}</span>
     </div>
   );
 }
