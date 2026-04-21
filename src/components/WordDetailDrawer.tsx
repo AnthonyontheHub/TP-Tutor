@@ -1,17 +1,43 @@
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { STATUS_META } from '../types/mastery';
 import type { VocabWord } from '../types/mastery';
+import { fetchExamplesForWord } from '../services/linaService';
 
 interface Props {
   word: VocabWord;
   onClose: () => void;
-  // NEW: A function to send a prompt to Lina
-  onAskLina: (prompt: string) => void; 
+  onAskLina: (prompt: string) => void;
 }
 
 export default function WordDetailDrawer({ word, onClose, onAskLina }: Props) {
-  // Split the "noun / verb" string into an array so we can list them out
   const partsOfSpeech = word.partOfSpeech.split('/').map(p => p.trim());
+  
+  // NEW: State for our dynamically generated examples
+  const [examples, setExamples] = useState<Record<string, string>>({});
+  const [isGenerating, setIsGenerating] = useState(true);
+
+  // NEW: Fetch examples when the drawer opens
+  useEffect(() => {
+    const apiKey = localStorage.getItem('TP_GEMINI_KEY');
+    
+    if (!apiKey) {
+      setExamples({ error: "No API Key found. Add key in chat to generate examples." });
+      setIsGenerating(false);
+      return;
+    }
+
+    setIsGenerating(true);
+    fetchExamplesForWord(apiKey, word.word, partsOfSpeech)
+      .then(data => {
+        setExamples(data);
+        setIsGenerating(false);
+      })
+      .catch(() => {
+        setExamples({ error: "Lina encountered an error generating examples." });
+        setIsGenerating(false);
+      });
+  }, [word.word]); // Reruns if the word changes
 
   function handleAskLina(pos?: string) {
     const prompt = pos 
@@ -19,7 +45,7 @@ export default function WordDetailDrawer({ word, onClose, onAskLina }: Props) {
       : `toki Lina, I want to discuss the word "${word.word}".`;
     
     onAskLina(prompt);
-    onClose(); // Close the drawer automatically
+    onClose(); 
   }
 
   return (
@@ -78,8 +104,15 @@ export default function WordDetailDrawer({ word, onClose, onAskLina }: Props) {
                   </button>
                 </div>
                 <p style={{ margin: 0, fontStyle: 'italic', fontSize: '0.9rem', color: '#555' }}>
-                  {/* Note: We will need to add actual example sentences to your data file later! */}
-                  (Example sentences coming soon...)
+                  {isGenerating ? (
+                    <span className="typing-dots" style={{ color: '#888' }}>Lina is thinking...</span>
+                  ) : examples.error ? (
+                    examples.error
+                  ) : examples[pos] ? (
+                    examples[pos]
+                  ) : (
+                    "Could not generate example."
+                  )}
                 </p>
               </div>
             ))}
