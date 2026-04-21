@@ -9,11 +9,12 @@ interface Props {
   isSandboxMode: boolean;
   activeFilter: MasteryStatus | null;
   sortMode: 'alphabetical' | 'status' | 'unlocked';
+  sortDirection: 'asc' | 'desc';
 }
 
 const STATUS_ORDER: MasteryStatus[] = ['not_started', 'introduced', 'practicing', 'confident', 'mastered'];
 
-export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, sortMode }: Props) {
+export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, sortMode, sortDirection }: Props) {
   const vocabulary = useMasteryStore((s) => s.vocabulary);
   const updateVocabStatus = useMasteryStore((s) => s.updateVocabStatus);
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
@@ -23,9 +24,17 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
   const displayedVocab = [...vocabulary]
     .filter(w => !activeFilter || w.status === activeFilter)
     .sort((a, b) => {
-      if (sortMode === 'status') return STATUS_ORDER.indexOf(b.status) - STATUS_ORDER.indexOf(a.status);
-      if (sortMode === 'unlocked') return (a.status === 'not_started' ? 1 : 0) - (b.status === 'not_started' ? 1 : 0);
-      return a.word.localeCompare(b.word);
+      let comparison = 0;
+      
+      if (sortMode === 'status') {
+        comparison = STATUS_ORDER.indexOf(b.status) - STATUS_ORDER.indexOf(a.status);
+      } else if (sortMode === 'unlocked') {
+        comparison = (b.status === 'not_started' ? 1 : 0) - (a.status === 'not_started' ? 1 : 0);
+      } else {
+        comparison = a.word.localeCompare(b.word);
+      }
+      
+      return sortDirection === 'asc' ? comparison : -comparison;
     });
 
   const handleCardClick = (word: VocabWord) => {
