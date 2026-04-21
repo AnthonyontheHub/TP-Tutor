@@ -11,7 +11,7 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
   return (
     <AnimatePresence>
       <motion.div className="drawer-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} />
-      <motion.div className="word-drawer" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}>
+      <motion.div className="word-drawer" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ type: 'spring', damping: 25, stiffness: 300 }}>
         <div className="drawer__handle" />
         <div className="drawer__scroll-area">
           <h2 style={{ fontSize: '2.4rem', marginBottom: '8px' }}>{word.word}</h2>
@@ -34,7 +34,7 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
           </div>
         </div>
         <div style={{ padding: '20px', borderTop: '1px solid #222' }}>
-          <button onClick={onClose} style={{ width: '100%', padding: '12px', background: '#333', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 'bold' }}>✕ CLOSE</button>
+          <button onClick={onClose} style={{ width: '100%', padding: '12px', background: '#333', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>✕ CLOSE</button>
         </div>
       </motion.div>
     </AnimatePresence>
