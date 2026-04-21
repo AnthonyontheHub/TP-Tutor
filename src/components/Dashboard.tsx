@@ -4,9 +4,11 @@ import MasteryGrid from './MasteryGrid';
 
 interface Props {
   onStartSession: () => void;
+  // NEW: Accept the function to pass up to App.tsx
+  onAskLina: (prompt: string) => void; 
 }
 
-export default function Dashboard({ onStartSession }: Props) {
+export default function Dashboard({ onStartSession, onAskLina }: Props) {
   const studentName = useMasteryStore((s) => s.studentName);
   const curriculumLevel = useMasteryStore((s) => s.curriculumLevel);
   const lastUpdated = useMasteryStore((s) => s.lastUpdated);
@@ -28,7 +30,7 @@ export default function Dashboard({ onStartSession }: Props) {
 
       <main className="dashboard__main">
         <ProgressSummary />
-        <MasteryGrid />
+        <MasteryGrid onAskLina={onAskLina} />
       </main>
 
       <footer className="dashboard__footer">
