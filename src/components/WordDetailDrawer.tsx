@@ -81,7 +81,6 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
     <AnimatePresence>
       <motion.div className="drawer-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} />
       <motion.div
-        className="word-drawer"
         drag="y"
         dragConstraints={{ top: 0 }}
         initial={{ y: '100%' }}
@@ -93,8 +92,9 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
         }}
         style={{ 
           position: 'fixed', 
-          bottom: 0, left: 0, right: 0,
+          top: 'auto', bottom: 0, left: 0, right: 0, 
           height: '66vh', 
+          width: '100%', maxWidth: '100vw', margin: 0, boxSizing: 'border-box',
           zIndex: 1000, 
           display: 'flex', flexDirection: 'column',
           boxShadow: getGlowColor(stagedStatus),
@@ -108,7 +108,7 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
           <div style={{ width: '48px', height: '6px', backgroundColor: '#666', borderRadius: '10px', margin: '0 auto' }} />
         </div>
 
-        <div style={{ padding: '0 20px', overflowY: 'auto', flex: 1 }}>
+        <div style={{ padding: '0 20px', overflowY: 'auto', overflowX: 'hidden', flex: 1, width: '100%', boxSizing: 'border-box' }}>
           <div className="word-drawer__meta">
             <span className="word-drawer__word">{word.word}</span>
             <div 
@@ -128,7 +128,7 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
             <span className="word-drawer__meanings" style={{ display: 'block', marginTop: '8px' }}>{word.meanings}</span>
           </div>
 
-          <div className="word-drawer__section-label">{isSandboxMode ? 'SANDBOX EXAMPLES (OFFLINE)' : 'PARTS OF SPEECH & EXAMPLES'}</div>
+          <div className="word-drawer__section-label" style={{ marginTop: '16px' }}>{isSandboxMode ? 'SANDBOX EXAMPLES (OFFLINE)' : 'PARTS OF SPEECH & EXAMPLES'}</div>
           <div className="word-drawer__examples-list">
             {partsOfSpeech.map((pos) => (
               <div key={pos} style={{ background: '#1a1a1a', padding: '12px', borderRadius: '4px', marginBottom: '12px', border: '1px solid #333' }}>
@@ -148,7 +148,7 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
           </button>
         </div>
 
-        <div style={{ padding: '16px 20px', borderTop: '1px solid #333', background: 'var(--surface, #111)', flexShrink: 0 }}>
+        <div style={{ padding: '16px 20px', borderTop: '1px solid #333', background: 'var(--surface, #111)', flexShrink: 0, width: '100%', boxSizing: 'border-box' }}>
           <button onClick={onClose} style={{ width: '100%', padding: '12px', background: '#ff4444', color: 'white', border: 'none', borderRadius: '8px', fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer' }}>
             ✕ CLOSE
           </button>
