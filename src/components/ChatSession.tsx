@@ -5,6 +5,7 @@ import {
   streamCompletion,
   parseProposedChanges,
   stripProposedChanges,
+  STATUS_EMOJI,
 } from '../services/linaService';
 import type { ProposedChange } from '../services/linaService';
 import type { MasteryStatus } from '../types/mastery';
@@ -47,12 +48,13 @@ export default function ChatSession({ onEndSession }: Props) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Only trigger Lina's greeting once we have an API key
+  // Trigger Lina's greeting automatically on mount, but only if we have a key
   useEffect(() => {
     if (apiKey && !greetingFired.current) {
       greetingFired.current = true;
-      void sendToLina('hello', true);
+      void sendToLina('toki', true); // Send an initial prompt to wake Lina up
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiKey]);
 
   async function sendToLina(userText: string, hideFromUI = false) {
@@ -128,6 +130,62 @@ export default function ChatSession({ onEndSession }: Props) {
     void sendToLina(text);
   }
 
+  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  }
+
+  function toggleChangeApproval(msgId: string, idx: number) {
+    setMessages((prev) =>
+      prev.map((m) => {
+        if (m.id !== msgId || !m.proposedChanges) return m;
+        return {
+          ...m,
+          proposedChanges: m.proposedChanges.map((c, i) =>
+            i === idx ? { ...c, approved: !c.approved } : c,
+          ),
+        };
+      }),
+    );
+  }
+
+  function handleApplyChanges(msgId: string) {
+    setMessages((prev) =>
+      prev.map((m) => {
+        if (m.id !== msgId || !m.proposedChanges) return m;
+
+        for (const change of m.proposedChanges) {
+          if (!change.approved) continue;
+          if (change.type === 'vocab' && change.wordId) {
+            updateVocabStatus(change.wordId, change.newStatus as MasteryStatus);
+          } else if (
+            change.type === 'concept' &&
+            change.chapterId &&
+            change.conceptId
+          ) {
+            updateConceptStatus(
+              change.chapterId,
+              change.conceptId,
+              change.newStatus as MasteryStatus,
+            );
+          }
+        }
+
+        const now = new Date().toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+        });
+        setLastUpdated(now);
+
+        return { ...m, changesApplied: true };
+      }),
+    );
+  }
+
+  // Setup Screen
   if (!apiKey) {
     return (
       <div className="chat-session">
@@ -145,9 +203,13 @@ export default function ChatSession({ onEndSession }: Props) {
             <input 
               type="password" 
               className="api-key-input" 
-              placeholder="Paste key here..." 
+              placeholder="Paste AIzaSy... key here" 
               value={keyInput} 
               onChange={(e) => setKeyInput(e.target.value)} 
+              onKeyDown={(e) => e.key === 'Enter' && (() => {
+                 localStorage.setItem('TP_GEMINI_KEY', keyInput);
+                 setApiKey(keyInput);
+              })()}
             />
             <button 
               className="btn-save-key" 
@@ -164,32 +226,109 @@ export default function ChatSession({ onEndSession }: Props) {
     );
   }
 
+  // Main Chat UI
   return (
     <div className="chat-session">
       <header className="chat-header">
         <div>
           <h1 className="chat-header__title">LINA</h1>
-          <p className="chat-header__subtitle">TOKI PONA TUTOR</p>
+          <p className="chat-header__subtitle">TOKI PONA TUTOR — GEMINI 1.5 FLASH</p>
         </div>
         <div className="chat-header__actions">
            <button className="btn-nav btn-nav--dim" onClick={() => {
              localStorage.removeItem('TP_GEMINI_KEY');
              window.location.reload();
            }}>RESET KEY</button>
-           <button className="btn-nav" onClick={onEndSession}>← DASHBOARD</button>
+           <button className="btn-nav" onClick={onEndSession}>
+             ← DASHBOARD
+           </button>
         </div>
       </header>
 
-      <div className="chat-messages">
+      <div className="chat-messages" role="log" aria-live="polite">
         {messages.map((msg) => (
           <div key={msg.id} className={`message message--${msg.role}`}>
             <span className="message__label">
-              {msg.role === 'assistant' ? 'LINA' : (studentName || 'YOU').toUpperCase()}
+              {msg.role === 'assistant'
+                ? 'LINA'
+                : (studentName || 'YOU').toUpperCase()}
             </span>
-            <div className="message__content">{msg.displayContent}</div>
+
+            <div className="message__content">
+              {msg.displayContent ||
+                (isLoading &&
+                msg.role === 'assistant' &&
+                messages.at(-1)?.id === msg.id ? (
+                  <span className="typing-dots">● ● ●</span>
+                ) : null)}
+            </div>
+
+            {msg.proposedChanges && !msg.changesApplied && (
+              <div className="proposed-changes">
+                <div className="proposed-changes__header">
+                  PROPOSED STATUS CHANGES — click to toggle
+                </div>
+                <ul className="proposed-changes__list">
+                  {msg.proposedChanges.map((change, idx) => {
+                    const wordLabel =
+                      change.type === 'vocab'
+                        ? (vocabulary.find((w) => w.id === change.wordId)?.word ??
+                          change.wordId)
+                        : (chapters
+                            .flatMap((ch) => ch.concepts)
+                            .find((c) => c.id === change.conceptId)?.concept ??
+                          change.conceptId);
+
+                    const currentStatus =
+                      change.type === 'vocab'
+                        ? vocabulary.find((w) => w.id === change.wordId)?.status
+                        : chapters
+                            .flatMap((ch) => ch.concepts)
+                            .find((c) => c.id === change.conceptId)?.status;
+
+                    return (
+                      <li
+                        key={idx}
+                        className={`proposed-change ${
+                          change.approved
+                            ? 'proposed-change--approved'
+                            : 'proposed-change--rejected'
+                        }`}
+                        onClick={() => toggleChangeApproval(msg.id, idx)}
+                      >
+                        <span className="proposed-change__check">
+                          {change.approved ? '✓' : '✗'}
+                        </span>
+                        <span className="proposed-change__word">{wordLabel}</span>
+                        <span className="proposed-change__arrow">
+                          {STATUS_EMOJI[currentStatus ?? 'not_started']}
+                          {' → '}
+                          {STATUS_EMOJI[change.newStatus]}
+                        </span>
+                        <span className="proposed-change__reason">
+                          {change.reason}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+                <button
+                  className="btn-apply-changes"
+                  onClick={() => handleApplyChanges(msg.id)}
+                >
+                  APPLY APPROVED CHANGES TO MASTERY MAP
+                </button>
+              </div>
+            )}
+
+            {msg.changesApplied && (
+              <div className="changes-applied">✓ MASTERY MAP UPDATED</div>
+            )}
           </div>
         ))}
+
         {error && <div className="chat-error">ERROR: {error}</div>}
+
         <div ref={messagesEndRef} />
       </div>
 
@@ -199,12 +338,16 @@ export default function ChatSession({ onEndSession }: Props) {
           className="chat-input"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
-          placeholder="toki..."
+          onKeyDown={handleKeyDown}
+          placeholder="toki… (Enter to send, Shift+Enter for newline)"
           rows={2}
           disabled={isLoading}
         />
-        <button className="btn-send" onClick={handleSend} disabled={isLoading || !input.trim()}>
+        <button
+          className="btn-send"
+          onClick={handleSend}
+          disabled={isLoading || !input.trim()}
+        >
           {isLoading ? '···' : 'SEND'}
         </button>
       </div>
