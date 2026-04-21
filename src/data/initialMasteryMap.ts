@@ -10,6 +10,15 @@ export const initialMasteryMap: MasteryMap = {
   studentName: '',
   curriculumLevel: 'Introduction',
   lastUpdated: '',
+  
+  // NEW FEATURES INITIALIZATION
+  savedPhrases: [],
+  currentStreak: 0,
+  lastActiveDate: '',
+
+  // -------------------------------------------------------------------------
+  // Chapters  (index 0 = Introduction, 1–9 = content chapters)
+// ... rest of the file remains exactly the same
 
   // -------------------------------------------------------------------------
   // Chapters  (index 0 = Introduction, 1–9 = content chapters)
