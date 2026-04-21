@@ -11,7 +11,7 @@ interface Props {
   isSandboxMode: boolean;
 }
 
-// Hand-picked phrases from "Everyday Toki Pona"
+// Hand-picked phrases from your document
 const MOCK_DICTIONARY: Record<string, string> = {
   "pona": "ale li pona. (Everything is good.)",
   "lili": "ni li lili. (That is small.)",
@@ -31,33 +31,44 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
   const [isGenerating, setIsGenerating] = useState(true);
 
   useEffect(() => {
-    if (isSandboxMode) {
+    // Helper function to instantly load our offline phrases
+    const loadOfflineData = () => {
       const mockData: Record<string, string> = {};
       partsOfSpeech.forEach(pos => {
-        // Use the document phrase if available, otherwise generic fallback
-        mockData[pos] = MOCK_DICTIONARY[word.word] || `(Sandbox) ${word.word} li lon. (The ${word.word} exists.)`;
+        mockData[pos] = MOCK_DICTIONARY[word.word] || `(Offline) ${word.word} li lon. (The ${word.word} exists.)`;
       });
       setExamples(mockData);
       setIsGenerating(false);
+    };
+
+    // 1. If Sandbox toggle is manually ON, use offline data instantly.
+    if (isSandboxMode) {
+      loadOfflineData();
       return;
     }
 
+    // 2. If Sandbox is OFF, but there is NO API key, auto-fallback to offline data.
     const apiKey = localStorage.getItem('TP_GEMINI_KEY');
     if (!apiKey) {
-      setExamples({ error: "No API Key found. Add key in chat to generate examples." });
-      setIsGenerating(false);
+      loadOfflineData();
       return;
     }
 
+    // 3. If we have a key, try the AI.
     setIsGenerating(true);
     fetchExamplesForWord(apiKey, word.word, partsOfSpeech)
       .then(data => {
-        setExamples(data || {});
-        setIsGenerating(false);
+        // If AI returns nothing or an error string, auto-fallback to offline data.
+        if (!data || Object.keys(data).length === 0 || data.error) {
+          loadOfflineData();
+        } else {
+          setExamples(data);
+          setIsGenerating(false);
+        }
       })
       .catch(() => {
-        setExamples({ error: "Lina encountered an error." });
-        setIsGenerating(false);
+        // 4. If AI throws a quota/rate-limit error, auto-fallback to offline data.
+        loadOfflineData();
       });
   }, [word.word, isSandboxMode]);
 
