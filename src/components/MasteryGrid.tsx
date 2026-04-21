@@ -8,7 +8,7 @@ interface Props {
   onAskLina: (prompt: string) => void;
   isSandboxMode: boolean;
   activeFilter: MasteryStatus | null;
-  selectedWords: string[]; // NEW: Pass the array up to the Dashboard
+  selectedWords: string[];
   setSelectedWords: (words: string[]) => void;
 }
 
@@ -21,7 +21,9 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, se
   const updateVocabStatus = useMasteryStore((s) => s.updateVocabStatus);
   
   const [drawerId, setDrawerId] = useState<string | null>(null);
-  const clickData = useRef<{ lastTime: number, wordId: string } | null>(null);
+  
+  // Track the "combo" timer for rapid-fire tapping
+  const comboRef = useRef<{ timer: ReturnType<typeof setTimeout>, wordId: string } | null>(null);
 
   const displayedVocab = activeFilter 
     ? vocabulary.filter(w => w.status === activeFilter)
@@ -32,27 +34,43 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, se
     : null;
 
   const handleCardClick = (word: VocabWord) => {
-    const now = Date.now();
-    const isSameWord = clickData.current?.wordId === word.id;
-    const timeSinceLastClick = isSameWord ? (now - clickData.current!.lastTime) : Infinity;
-    clickData.current = { lastTime: now, wordId: word.id };
+    // 1. If not in sandbox, just open the drawer or toggle selection
+    if (!isSandboxMode) {
+      if (selectedWords.includes(word.word)) setDrawerId(word.id);
+      else setSelectedWords([...selectedWords, word.word]);
+      return;
+    }
 
-    // ⚡ DOUBLE TAP: Level Up (Sandbox only)
-    if (isSandboxMode && isSameWord && timeSinceLastClick < 350) {
+    // 2. SANDBOX RAPID-FIRE LOGIC
+    if (comboRef.current && comboRef.current.wordId === word.id) {
+      // COMBO CONTINUED: Clear the "open drawer" timer and level up again
+      clearTimeout(comboRef.current.timer);
+      
       const currentIndex = STATUS_ORDER.indexOf(word.status);
       const nextIndex = (currentIndex + 1) % STATUS_ORDER.length;
       updateVocabStatus(word.id, STATUS_ORDER[nextIndex]);
-      clickData.current = null; 
-      return;
-    } 
 
-    // 👆 SINGLE TAP: Toggle Selection
-    if (selectedWords.includes(word.word)) {
-      // If already selected, maybe we want to open the drawer on a second "slow" tap?
-      // Or just deselect it. Let's make it: Tap 1 = Select, Tap 2 = Open Drawer.
-      setDrawerId(word.id);
-    } else {
-      setSelectedWords([...selectedWords, word.word]);
+      // Start a fresh 350ms window for the NEXT tap
+      const newTimer = setTimeout(() => {
+        comboRef.current = null;
+      }, 350);
+      comboRef.current = { timer: newTimer, wordId: word.id };
+    } 
+    else {
+      // FIRST TAP: Start a window to see if this is a combo or a single action
+      if (comboRef.current) clearTimeout(comboRef.current.timer);
+
+      const timer = setTimeout(() => {
+        // TIMER EXPIRED: This wasn't a rapid-fire combo, so perform normal tap action
+        if (selectedWords.includes(word.word)) {
+          setDrawerId(word.id);
+        } else {
+          setSelectedWords([...selectedWords, word.word]);
+        }
+        comboRef.current = null;
+      }, 350);
+
+      comboRef.current = { timer, wordId: word.id };
     }
   };
 
@@ -76,7 +94,8 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, se
                 opacity: isDimmed ? 0.35 : 1,
                 transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)', 
                 zIndex: isSelected ? 10 : 1,
-                cursor: 'pointer'
+                cursor: 'pointer',
+                position: 'relative'
               }}
             >
               <VocabCard word={word} onClick={() => {}} />
@@ -94,7 +113,7 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, se
       {selectedWord && (
         <WordDetailDrawer 
           word={selectedWord} 
-          onClose={() => setDrawerId(null)} 
+          onClose={() => { setDrawerId(null); setSelectedWords([]); }} 
           onAskLina={onAskLina} 
           isSandboxMode={isSandboxMode}
         />
