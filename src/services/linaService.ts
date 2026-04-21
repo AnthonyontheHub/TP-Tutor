@@ -55,14 +55,18 @@ export async function* streamCompletion(
   history: { role: 'user' | 'assistant'; content: string }[]
 ) {
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  
+  // FIX: System instructions must be passed when initializing the model
+  const model = genAI.getGenerativeModel({ 
+    model: "gemini-1.5-flash",
+    systemInstruction: systemPrompt 
+  });
 
   const chat = model.startChat({
     history: history.slice(0, -1).map(h => ({
       role: h.role === 'user' ? 'user' : 'model',
       parts: [{ text: h.content }],
-    })),
-    systemInstruction: systemPrompt,
+    }))
   });
 
   const lastMessage = history[history.length - 1].content;
@@ -91,9 +95,12 @@ export async function fetchSentenceSuggestions(apiKey: string, words: string[]) 
   try {
     const result = await model.generateContent(prompt);
     const text = result.response.text();
-    // Clean up potential markdown formatting before parsing
-    const jsonString = text.replace(/```json|```/g, '').trim();
-    return JSON.parse(jsonString) as string[];
+    
+    // FIX: More robust JSON extraction to ignore conversational padding
+    const jsonMatch = text.match(/\[[\s\S]*\]/);
+    const cleanedText = jsonMatch ? jsonMatch[0] : text;
+    
+    return JSON.parse(cleanedText) as string[];
   } catch (e) {
     console.error("Lina Suggestion Error:", e);
     return [];
@@ -143,7 +150,12 @@ export async function fetchExamplesForWord(apiKey: string, word: string, partsOf
   try {
     const result = await model.generateContent(prompt);
     const text = result.response.text();
-    return JSON.parse(text.replace(/```json|```/g, ''));
+    
+    // Applying the same robust JSON fix here just in case
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    const cleanedText = jsonMatch ? jsonMatch[0] : text;
+    
+    return JSON.parse(cleanedText);
   } catch (e) {
     console.error("Lina Dictionary Error:", e);
     return partsOfSpeech.reduce((acc, pos) => ({ ...acc, [pos]: `${word} li lon.` }), {});
