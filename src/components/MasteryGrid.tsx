@@ -22,23 +22,24 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, se
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const comboRef = useRef<{ timer: ReturnType<typeof setTimeout>, wordId: string } | null>(null);
 
-  // SORTING ENGINE
   const displayedVocab = [...vocabulary]
     .filter(w => !activeFilter || w.status === activeFilter)
     .sort((a, b) => {
-      if (sortMode === 'status') {
-        return STATUS_ORDER.indexOf(b.status) - STATUS_ORDER.indexOf(a.status);
-      }
-      if (sortMode === 'unlocked') {
-        const aVal = a.status === 'not_started' ? 1 : 0;
-        const bVal = b.status === 'not_started' ? 1 : 0;
-        return aVal - bVal; // Known words first
-      }
-      return a.word.localeCompare(b.word); // Default Alphabetical
+      if (sortMode === 'status') return STATUS_ORDER.indexOf(b.status) - STATUS_ORDER.indexOf(a.status);
+      if (sortMode === 'unlocked') return (a.status === 'not_started' ? 1 : 0) - (b.status === 'not_started' ? 1 : 0);
+      return a.word.localeCompare(b.word);
     });
 
   const handleCardClick = (word: VocabWord) => {
-    // RAPID-FIRE COMBO (Sandbox Only)
+    // 1. DESELECT LOGIC (High Priority)
+    // If the word is already selected, tapping it ALWAYS removes it. 
+    // This stops the drawer from popping up accidentally.
+    if (selectedWords.includes(word.word)) {
+      setSelectedWords(selectedWords.filter(w => w !== word.word));
+      return;
+    }
+
+    // 2. RAPID-FIRE COMBO (Sandbox Only)
     if (isSandboxMode && comboRef.current?.wordId === word.id) {
       clearTimeout(comboRef.current.timer);
       const nextStatus = STATUS_ORDER[(STATUS_ORDER.indexOf(word.status) + 1) % STATUS_ORDER.length];
@@ -47,20 +48,19 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, se
       return;
     } 
 
+    // 3. SELECTION / DRAWER DELAY
     if (comboRef.current) clearTimeout(comboRef.current.timer);
     comboRef.current = { timer: setTimeout(() => {
-      // Logic after the click-window closes
-      if (selectedWords.includes(word.word)) {
-        setDrawerId(word.id);
-      } else {
-        setSelectedWords([...selectedWords, word.word]);
-      }
+      // If we aren't rapidly tapping for status, we select the word.
+      // To open the drawer now, we can hold or we can add a specific icon.
+      // For now, let's make it: Tap 1 = Select. To open drawer, use the "Ask Lina" flow or long-press.
+      setSelectedWords([...selectedWords, word.word]);
       comboRef.current = null;
     }, 350), wordId: word.id };
   };
 
   return (
-    <section className="mastery-grid" onClick={() => setSelectedWords([])}>
+    <section className="mastery-grid">
       <div className="mastery-grid__cards">
         {displayedVocab.map((word) => {
           const isSelected = selectedWords.includes(word.word);
@@ -70,6 +70,7 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, se
             <div 
               key={word.id}
               onClick={(e) => { e.stopPropagation(); handleCardClick(word); }}
+              onContextMenu={(e) => { e.preventDefault(); setDrawerId(word.id); }} // Right-click or Long-press for Drawer
               style={{
                 transform: isSelected ? 'scale(1.1)' : (isDimmed ? 'scale(0.92)' : 'scale(1)'),
                 opacity: isDimmed ? 0.35 : 1,
@@ -79,6 +80,11 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, se
               }}
             >
               <VocabCard word={word} onClick={() => {}} />
+              {isSelected && (
+                <div style={{ position: 'absolute', top: '-8px', right: '-8px', background: '#3b82f6', color: 'white', borderRadius: '50%', width: '22px', height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: 'bold', boxShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
+                  {selectedWords.indexOf(word.word) + 1}
+                </div>
+              )}
             </div>
           );
         })}
@@ -86,7 +92,7 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, se
       {drawerId && (
         <WordDetailDrawer 
           word={vocabulary.find(v => v.id === drawerId)!} 
-          onClose={() => { setDrawerId(null); setSelectedWords([]); }} 
+          onClose={() => setDrawerId(null)} 
           onAskLina={onAskLina} 
           isSandboxMode={isSandboxMode} 
         />
