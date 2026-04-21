@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useMasteryStore } from '../store/masteryStore'; // NEW: To save your manual tests
+import { useMasteryStore } from '../store/masteryStore';
 import { STATUS_META } from '../types/mastery';
 import type { VocabWord, MasteryStatus } from '../types/mastery';
 import { fetchExamplesForWord } from '../services/linaService';
@@ -12,7 +12,6 @@ interface Props {
   isSandboxMode: boolean;
 }
 
-// Hand-picked phrases from "Everyday Toki Pona"
 const MOCK_DICTIONARY: Record<string, string> = {
   "pona": "ale li pona. (Everything is good.)",
   "lili": "ni li lili. (That is small.)",
@@ -39,16 +38,13 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
   const [examples, setExamples] = useState<Record<string, string>>({});
   const [isGenerating, setIsGenerating] = useState(true);
 
-  // Hidden Tester State
   const updateVocabStatus = useMasteryStore((s) => s.updateVocabStatus);
   const [stagedStatus, setStagedStatus] = useState<MasteryStatus>(word.status);
 
-  // Reset staged status if the word changes
   useEffect(() => {
     setStagedStatus(word.status);
   }, [word.id, word.status]);
 
-  // The Auto-Fallback Logic
   useEffect(() => {
     const loadOfflineData = () => {
       const mockData: Record<string, string> = {};
@@ -91,7 +87,6 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
     onClose(); 
   }
 
-  // Handle Cycling Status (Sandbox Only)
   function handleCycleStatus() {
     const currentIndex = STATUS_ORDER.indexOf(stagedStatus);
     const nextIndex = (currentIndex + 1) % STATUS_ORDER.length;
@@ -112,17 +107,22 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
         initial={{ y: '100%' }}
         animate={{ y: '50%' }}
         exit={{ y: '100%' }}
-        style={{ height: '100vh', top: 0, position: 'fixed', zIndex: 1000 }}
+        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+        onDragEnd={(_, info) => {
+          if (info.offset.y > 100 || info.velocity.y > 500) onClose();
+        }}
+        // The fix to force mobile to respect Framer's vertical drag
+        style={{ height: '100vh', top: 0, position: 'fixed', zIndex: 1000, touchAction: 'pan-x' }}
       >
-        <div className="word-drawer__drag-zone" style={{ width: '100%', padding: '12px 0', cursor: 'grab' }}>
-          <div className="word-drawer__handle" style={{ width: '40px', height: '5px', backgroundColor: '#888', borderRadius: '10px', margin: '0 auto' }} />
+        <div className="word-drawer__drag-zone" style={{ width: '100%', padding: '16px 0', cursor: 'grab', touchAction: 'none' }}>
+          <div className="word-drawer__handle" style={{ width: '48px', height: '6px', backgroundColor: '#666', borderRadius: '10px', margin: '0 auto' }} />
         </div>
 
-        <div className="word-drawer__content" style={{ padding: '0 20px 40px' }}>
+        {/* Scrollable content area */}
+        <div className="word-drawer__content" style={{ padding: '0 20px 100px', overflowY: 'auto', maxHeight: 'calc(100vh - 60px)' }}>
           <div className="word-drawer__meta">
             <span className="word-drawer__word">{word.word}</span>
             
-            {/* HIDDEN STATUS CYCLER */}
             <div 
                style={{ 
                  marginTop: '4px', 
@@ -141,16 +141,11 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
               </span>
             </div>
 
-            {/* SAVE BUTTON (Only appears when status is modified) */}
             {stagedStatus !== word.status && (
               <div style={{ marginTop: '8px' }}>
-                 <button 
-                   onClick={handleSaveStatus}
-                   style={{ background: '#4CAF50', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold' }}
-                 >
+                 <button onClick={handleSaveStatus} style={{ background: '#4CAF50', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold' }}>
                    💾 SAVE NEW STATUS
                  </button>
-                 <span style={{ color: '#aaa', fontSize: '0.7rem', marginLeft: '8px' }}>Changes card color & unlocks phrases</span>
               </div>
             )}
 
@@ -176,12 +171,33 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
           </div>
 
           <button 
-             style={{ width: '100%', padding: '12px', marginTop: '10px', cursor: 'pointer', borderRadius: '8px', background: '#333', color: 'white', border: 'none' }}
+             style={{ width: '100%', padding: '16px', marginTop: '16px', cursor: 'pointer', borderRadius: '8px', background: '#333', color: 'white', border: '1px solid #555', fontWeight: 'bold' }}
              onClick={() => handleAskLina()}
           >
             DISCUSS "{word.word.toUpperCase()}" WITH LINA
           </button>
-          <button className="word-drawer__close" onClick={onClose} style={{ marginTop: '16px' }}>✕&nbsp;&nbsp;CLOSE</button>
+
+          {/* MASSIVE CLOSE BUTTON AT THE BOTTOM */}
+          <button 
+            onClick={onClose} 
+            style={{ 
+              width: '100%', 
+              padding: '20px', 
+              marginTop: '16px', 
+              background: '#ff4444', 
+              color: 'white', 
+              border: 'none', 
+              borderRadius: '8px', 
+              fontSize: '1.2rem', 
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              display: 'block',
+              textAlign: 'center',
+              boxShadow: '0 4px 6px rgba(0,0,0,0.3)'
+            }}
+          >
+            ✕ CLOSE DRAWER
+          </button>
         </div>
       </motion.div>
     </AnimatePresence>
