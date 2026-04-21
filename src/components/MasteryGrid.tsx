@@ -1,61 +1,58 @@
+/* src/components/MasteryGrid.tsx */
 import { useState, useRef } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import VocabCard from './VocabCard';
 import WordDetailDrawer from './WordDetailDrawer';
 import { soundService } from '../services/soundService';
+import type { MasteryStatus } from '../types/mastery';
 
-export default function MasteryGrid({ onAskLina, activeFilter }: any) {
+interface Props { onAskLina: (p: string) => void; isSandboxMode: boolean; activeFilter: MasteryStatus | null; sortMode: any; sortDirection: any; posFilter: string; }
+
+export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, sortMode, sortDirection, posFilter }: Props) {
   const vocabulary = useMasteryStore((s) => s.vocabulary);
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
   const [drawerId, setDrawerId] = useState<string | null>(null);
-  
   const longPressTimer = useRef<any>(null);
-  const isScrolling = useRef(false);
+  const isDragging = useRef(false);
 
   const handlePointerDown = (word: string) => {
-    isScrolling.current = false;
-    // Long press to start selection mode
+    isDragging.current = false;
     longPressTimer.current = setTimeout(() => {
-      if (!isScrolling.current) {
+      if (!isDragging.current) {
         soundService.playBlip(523, 'sine', 0.05);
         setSelectedWords(prev => [...prev, word]);
       }
     }, 500);
   };
 
-  const handlePointerUp = (word: string, e: any) => {
+  const handlePointerUp = (word: string) => {
     clearTimeout(longPressTimer.current);
-    if (isScrolling.current) return;
-
+    if (isDragging.current) return;
     if (selectedWords.length > 0) {
-      // If already in selection mode, just toggle words
-      if (selectedWords.includes(word)) {
-        setSelectedWords(prev => prev.filter(w => w !== word));
-      } else {
-        soundService.playBlip(523, 'sine', 0.05);
-        setSelectedWords(prev => [...prev, word]);
-      }
+      if (selectedWords.includes(word)) setSelectedWords(prev => prev.filter(w => w !== word));
+      else { soundService.playBlip(523, 'sine', 0.05); setSelectedWords(prev => [...prev, word]); }
     } else {
-      // Normal mode: open drawer
       setDrawerId(vocabulary.find(v => v.word === word)?.id || null);
     }
   };
 
+  const displayed = vocabulary
+    .filter(w => !activeFilter || w.status === activeFilter)
+    .filter(w => posFilter === 'All' || w.partOfSpeech.includes(posFilter))
+    .sort((a: any, b: any) => {
+      const comp = a[sortMode === 'alphabetical' ? 'word' : sortMode].localeCompare(b[sortMode === 'alphabetical' ? 'word' : sortMode]);
+      return sortDirection === 'asc' ? comp : -comp;
+    });
+
   return (
-    <section className="mastery-grid" onScroll={() => isScrolling.current = true}>
+    <section onPointerMove={() => { isDragging.current = true; }}>
       <div className="mastery-grid__cards">
-        {vocabulary.filter(w => !activeFilter || w.status === activeFilter).map((word) => (
-          <div 
-            key={word.id}
-            onPointerDown={() => handlePointerDown(word.word)}
-            onPointerUp={(e) => handlePointerUp(word.word, e)}
-            style={{ opacity: selectedWords.length > 0 && !selectedWords.includes(word.word) ? 0.4 : 1 }}
-          >
+        {displayed.map((word) => (
+          <div key={word.id} onPointerDown={() => handlePointerDown(word.word)} onPointerUp={() => handlePointerUp(word.word)} style={{ opacity: selectedWords.length > 0 && !selectedWords.includes(word.word) ? 0.4 : 1 }}>
             <VocabCard word={word} onClick={() => {}} />
           </div>
         ))}
       </div>
-
       {selectedWords.length > 0 && (
         <div style={{ position: 'fixed', bottom: 20, left: '50%', transform: 'translateX(-50%)', width: '90%', maxWidth: '800px', background: '#111', padding: '20px', borderRadius: '20px', border: '2px solid #3b82f6', zIndex: 3000 }}>
           <div style={{ fontSize: '1.5rem', marginBottom: '10px' }}>{selectedWords.join(' ')}</div>
@@ -65,8 +62,7 @@ export default function MasteryGrid({ onAskLina, activeFilter }: any) {
           </div>
         </div>
       )}
-
-      {drawerId && <WordDetailDrawer word={vocabulary.find(v => v.id === drawerId)!} onClose={() => setDrawerId(null)} onAskLina={onAskLina} isSandboxMode={true} />}
+      {drawerId && <WordDetailDrawer word={vocabulary.find(v => v.id === drawerId)!} onClose={() => setDrawerId(null)} onAskLina={onAskLina} isSandboxMode={isSandboxMode} />}
     </section>
   );
 }
