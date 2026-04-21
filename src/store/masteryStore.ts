@@ -1,7 +1,6 @@
 import { db } from '../services/firebase';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { db } from '../services/firebase';
 import { doc, setDoc, onSnapshot } from 'firebase/firestore';
 import type { MasteryMap, MasteryStatus, StatusSummary } from '../types/mastery';
 import { initialMasteryMap } from '../data/initialMasteryMap';
