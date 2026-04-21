@@ -3,7 +3,7 @@ import { useMasteryStore } from '../store/masteryStore';
 import VocabCard from './VocabCard';
 import WordDetailDrawer from './WordDetailDrawer';
 import { fetchSentenceSuggestions } from '../services/linaService';
-import { soundService } from '../services/soundService'; // NEW IMPORT
+import { soundService } from '../services/soundService';
 import type { MasteryStatus, VocabWord } from '../types/mastery'; 
 
 interface Props {
@@ -47,7 +47,9 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [linaSuggestions, setLinaSuggestions] = useState<string[]>([]);
   const [isSuggesting, setIsSuggesting] = useState(false);
-  const comboRef = useRef<{ timer: ReturnType<typeof setTimeout>, wordId: string } | null>(null);
+  
+  // Track clicks for the sandbox double-tap logic
+  const lastClickRef = useRef<{ id: string, time: number } | null>(null);
 
   const localShuffles = useMemo(() => {
     if (selectedWords.length < 2) return [];
@@ -87,33 +89,30 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
     });
 
   const handleCardClick = (word: VocabWord) => {
-    // DESELECTION
+    const now = Date.now();
+    const isDoubleTap = lastClickRef.current?.id === word.id && (now - lastClickRef.current.time) < 300;
+
+    // 1. Double Tap Logic (Sandbox Status Upgrade)
+    if (isSandboxMode && isDoubleTap) {
+      soundService.playBlip(880, 'sine', 0.1); 
+      updateVocabStatus(word.id, STATUS_ORDER[(STATUS_ORDER.indexOf(word.status) + 1) % STATUS_ORDER.length]);
+      lastClickRef.current = null; // Reset
+      return;
+    }
+
+    // 2. Single Tap Logic (Selection/Deselection)
+    lastClickRef.current = { id: word.id, time: now };
+
     if (selectedWords.includes(word.word)) {
-      soundService.playBlip(329.63, 'sine', 0.05); // E4 - lower "undo" tone
+      // DESELECT
+      soundService.playBlip(329.63, 'sine', 0.05); 
       if (selectedWords.length === 1) setDrawerId(word.id);
       setSelectedWords(prev => prev.filter(w => w !== word.word));
-      return;
+    } else {
+      // SELECT
+      soundService.playBlip(523.25, 'sine', 0.05); 
+      setSelectedWords(prev => [...prev, word.word]);
     }
-
-    // SANDBOX STATUS UPGRADE
-    if (isSandboxMode && comboRef.current?.wordId === word.id) {
-      clearTimeout(comboRef.current.timer);
-      soundService.playBlip(880, 'sine', 0.1); // A5 - rising success tone
-      updateVocabStatus(word.id, STATUS_ORDER[(STATUS_ORDER.indexOf(word.status) + 1) % STATUS_ORDER.length]);
-      comboRef.current = { timer: setTimeout(() => comboRef.current = null, 350), wordId: word.id };
-      return;
-    }
-
-    // SELECTION
-    if (comboRef.current) clearTimeout(comboRef.current.timer);
-    comboRef.current = { 
-      timer: setTimeout(() => { 
-        soundService.playBlip(523.25, 'sine', 0.05); // C5 - clean select tone
-        setSelectedWords(prev => [...prev, word.word]); 
-        comboRef.current = null; 
-      }, 350), 
-      wordId: word.id 
-    };
   };
 
   return (
@@ -184,5 +183,5 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
       )}
     </section>
   );
-      }
-          
+                         }
+              
