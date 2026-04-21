@@ -4,8 +4,7 @@ import MasteryGrid from './MasteryGrid';
 
 interface Props {
   onStartSession: () => void;
-  // NEW: Accept the function to pass up to App.tsx
-  onAskLina: (prompt: string) => void; 
+  onAskLina: (prompt: string) => void;
 }
 
 export default function Dashboard({ onStartSession, onAskLina }: Props) {
