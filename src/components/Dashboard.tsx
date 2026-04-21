@@ -17,7 +17,6 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
   const studentName = useMasteryStore((s) => s.studentName);
   const curriculumLevel = useMasteryStore((s) => s.curriculumLevel);
   const lastUpdated = useMasteryStore((s) => s.lastUpdated);
-  
   const [isSandboxMode, setIsSandboxMode] = useState(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false); 
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
@@ -43,22 +42,12 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
 
       <main className="dashboard__main">
         <ProgressSummary activeFilter={activeFilter} onFilterClick={(status) => { setActiveFilter(status); setSelectedWords([]); }} />
-        
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginBottom: '12px', marginTop: '-10px' }}>
           {(['alphabetical', 'status', 'unlocked'] as SortMode[]).map(mode => (
             <button key={mode} onClick={() => setSortMode(mode)} style={{ background: sortMode === mode ? '#333' : 'transparent', color: sortMode === mode ? 'white' : '#666', border: '1px solid #333', padding: '4px 8px', borderRadius: '4px', fontSize: '0.6rem', cursor: 'pointer' }}>{mode.toUpperCase()}</button>
           ))}
         </div>
-
-        <MasteryGrid 
-          onAskLina={onAskLina} 
-          isSandboxMode={isSandboxMode} 
-          activeFilter={activeFilter} 
-          selectedWords={selectedWords} 
-          setSelectedWords={setSelectedWords} 
-          sortMode={sortMode} 
-        />
-        
+        <MasteryGrid onAskLina={onAskLina} isSandboxMode={isSandboxMode} activeFilter={activeFilter} selectedWords={selectedWords} setSelectedWords={setSelectedWords} sortMode={sortMode} />
         <PhraseGrid onAskLina={onAskLina} activeFilter={activeFilter} selectedWords={selectedWords} />
       </main>
 
@@ -74,6 +63,12 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
             <button onClick={() => onAskLina(`toki Lina, what does "${selectedWords.join(' ')}" mean?`)} style={{ background: '#222', color: 'white', border: '1px solid #444', borderRadius: '8px', padding: '12px', fontWeight: 'bold' }}>DEFINE COMBO</button>
           </div>
         </div>
+      )}
+
+      {isSettingsOpen && <SettingsDrawer onClose={() => setIsSettingsOpen(false)} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} />}
+    </div>
+  );
+}
       )}
 
       {isSettingsOpen && (
