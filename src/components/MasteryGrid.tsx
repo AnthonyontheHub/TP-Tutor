@@ -1,4 +1,3 @@
-/* src/components/MasteryGrid.tsx */
 import { useState, useRef, useEffect } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import VocabCard from './VocabCard';
@@ -25,12 +24,11 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isDragging = useRef(false);
 
-  // MAGNETIC GROUPING LOGIC
+  // RESTORED: Fetch the blue "Magnetic" grammar bubbles
   useEffect(() => {
     const apiKey = localStorage.getItem('TP_GEMINI_KEY');
     if (selectedWords.length > 1 && apiKey) {
       const timer = setTimeout(async () => {
-        // This service pulls in the 'li', 'e', and 'pi' logic to bridge your words
         const results = await fetchSentenceSuggestions(apiKey, selectedWords);
         setMagneticSuggestions(results);
       }, 600);
@@ -44,7 +42,7 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
     isDragging.current = false;
     longPressTimer.current = setTimeout(() => {
       if (!isDragging.current) {
-        soundService.playBlip(523, 'sine', 0.05);
+        soundService.playBlip(523.25, 'sine', 0.05); // Correct method from soundService
         setSelectedWords(prev => prev.includes(word) ? prev : [...prev, word]);
         longPressTimer.current = null;
       }
@@ -61,7 +59,7 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
         if (selectedWords.includes(word)) {
           setSelectedWords(prev => prev.filter(w => w !== word));
         } else {
-          soundService.push(word); // custom sound helper
+          soundService.playBlip(523.25, 'sine', 0.05);
           setSelectedWords(prev => [...prev, word]);
         }
       } else {
@@ -74,10 +72,10 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
   const displayed = vocabulary
     .filter(w => !activeFilter || w.status === activeFilter)
     .filter(w => posFilter === 'All' || w.partOfSpeech.includes(posFilter))
-    .sort((a, b) => {
+    .sort((a: any, b: any) => {
       const field = sortMode === 'alphabetical' ? 'word' : sortMode;
-      const valA = String(a[field as keyof typeof a] || '');
-      const valB = String(b[field as keyof typeof b] || '');
+      const valA = String(a[field] || '');
+      const valB = String(b[field] || '');
       return sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
     });
 
@@ -120,13 +118,13 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
               </div>
             )}
 
-            <div style={{ fontSize: '1.6rem', color: '#fff', marginBottom: '20px', fontWeight: 900, letterSpacing: '0.02em' }}>
+            <div style={{ fontSize: '1.6rem', color: '#fff', marginBottom: '20px', fontWeight: 900 }}>
               {selectedWords.join(' ')}
             </div>
             
             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '12px' }}>
               <button 
-                onClick={() => { onAskLina(`toki Lina! Is "${selectedWords.join(' ')}" a valid sentence?`); setSelectedWords([]); }} 
+                onClick={() => { onAskLina(`toki Lina! Is "${selectedWords.join(' ')}" correct?`); setSelectedWords([]); }} 
                 className="btn-review" style={{ margin: 0 }}
               >
                 ASK LINA
