@@ -84,9 +84,10 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
       <motion.div className="drawer-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} />
       <motion.div
         className="word-drawer"
-        initial={{ opacity: 0, scale: 0.95 }} 
+        initial={{ opacity: 0, scale: 0.9 }} 
         animate={{ opacity: 1, scale: 1 }} 
-        exit={{ opacity: 0, scale: 0.95 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        transition={{ type: 'spring', damping: 20, stiffness: 300 }}
         style={{ boxShadow: getGlowColor(word.status) }}
       >
         <div style={{ width: '100%', padding: '16px 0', cursor: 'grab', flexShrink: 0 }}>
