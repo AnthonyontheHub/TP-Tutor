@@ -15,6 +15,12 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v4
 
+      - name: Set up Node 🟢
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20 # This fixes the 'incompatible' error
+          cache: 'npm'
+
       - name: Install and Build 🔧
         run: |
           npm install
@@ -28,4 +34,3 @@ jobs:
           folder: dist
           branch: gh-pages
           token: ${{ secrets.GITHUB_TOKEN }}
-          clean: true # Ensures no old broken files stick around
