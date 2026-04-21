@@ -12,7 +12,6 @@ interface Props {
 
 export default function Dashboard({ onStartSession, onAskLina }: Props) {
   const studentName = useMasteryStore((s) => s.studentName);
-  const curriculumLevel = useMasteryStore((s) => s.curriculumLevel);
   const [isSandboxMode, setIsSandboxMode] = useState(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false); 
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
@@ -23,7 +22,7 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
       <header className="dashboard__header" style={{ display: 'flex', justifyContent: 'space-between', padding: '20px', borderBottom: '1px solid #333' }}>
         <div>
           <h1 style={{ margin: 0, fontSize: '1.2rem' }}>TOKI PONA</h1>
-          <p style={{ margin: 0, fontSize: '0.7rem', opacity: 0.6 }}>{curriculumLevel.toUpperCase()} • {studentName.toUpperCase()}</p>
+          <p style={{ margin: 0, fontSize: '0.7rem', opacity: 0.6 }}>{studentName.toUpperCase()}</p>
         </div>
         <div style={{ display: 'flex', gap: '15px' }}>
           <button onClick={onStartSession} style={{ background: 'none', border: 'none', color: 'white', fontSize: '1.2rem', cursor: 'pointer' }}>💬</button>
@@ -33,7 +32,18 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
 
       <main style={{ padding: '20px' }}>
         <ProgressSummary activeFilter={activeFilter} onFilterClick={setActiveFilter} />
-        
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', margin: '15px 0' }}>
+          {['alphabetical', 'status', 'unlocked'].map(m => (
+            <button key={m} onClick={() => setSortMode(m as any)} style={{ fontSize: '0.6rem', background: sortMode === m ? '#333' : 'none', color: 'white', border: '1px solid #444', padding: '5px 10px', borderRadius: '4px' }}>{m.toUpperCase()}</button>
+          ))}
+        </div>
+        <MasteryGrid onAskLina={onAskLina} isSandboxMode={isSandboxMode} activeFilter={activeFilter} sortMode={sortMode} />
+      </main>
+
+      {isSettingsOpen && <SettingsDrawer onClose={() => setIsSettingsOpen(false)} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} />}
+    </div>
+  );
+}
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', margin: '15px 0' }}>
           {['alphabetical', 'status', 'unlocked'].map(m => (
             <button key={m} onClick={() => setSortMode(m as any)} style={{ fontSize: '0.6rem', background: sortMode === m ? '#333' : 'none', color: 'white', border: '1px solid #444', padding: '5px 10px', borderRadius: '4px' }}>{m.toUpperCase()}</button>
