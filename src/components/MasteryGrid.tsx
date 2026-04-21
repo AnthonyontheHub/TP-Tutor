@@ -5,9 +5,10 @@ import WordDetailDrawer from './WordDetailDrawer';
 
 interface Props {
   onAskLina: (prompt: string) => void;
+  isSandboxMode: boolean; // Add this
 }
 
-export default function MasteryGrid({ onAskLina }: Props) {
+export default function MasteryGrid({ onAskLina, isSandboxMode }: Props) {
   const vocabulary = useMasteryStore((s) => s.vocabulary);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -24,11 +25,7 @@ export default function MasteryGrid({ onAskLina }: Props) {
 
       <div className="mastery-grid__cards">
         {vocabulary.map((word) => (
-          <VocabCard
-            key={word.id}
-            word={word}
-            onClick={() => setSelectedId(word.id)}
-          />
+          <VocabCard key={word.id} word={word} onClick={() => setSelectedId(word.id)} />
         ))}
       </div>
 
@@ -37,6 +34,7 @@ export default function MasteryGrid({ onAskLina }: Props) {
           word={selectedWord} 
           onClose={() => setSelectedId(null)} 
           onAskLina={onAskLina} 
+          isSandboxMode={isSandboxMode} // Pass it here
         />
       )}
     </section>
