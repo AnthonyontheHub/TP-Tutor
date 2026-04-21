@@ -1,10 +1,20 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
-import { streamCompletion } from '../services/linaService';
+import {
+  buildSystemPrompt,
+  streamCompletion,
+  parseProposedChanges,
+  stripProposedChanges,
+} from '../services/linaService';
+import type { ProposedChange } from '../services/linaService';
+import type { MasteryStatus } from '../types/mastery';
 
 interface ChatMessage {
-  role: 'user' | 'lina';
-  content: string;
+  id: string;
+  role: 'user' | 'assistant';
+  displayContent: string;
+  proposedChanges?: Array<ProposedChange & { approved: boolean }>;
+  changesApplied?: boolean;
 }
 
 interface Props {
@@ -12,25 +22,32 @@ interface Props {
 }
 
 export default function ChatSession({ onEndSession }: Props) {
-  const { masteryMap, updateMastery } = useMasteryStore();
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [inputText, setInputText] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [streamedResponse, setStreamedResponse] = useState('');
-  
+  const vocabulary          = useMasteryStore((s) => s.vocabulary);
+  const chapters            = useMasteryStore((s) => s.chapters);
+  const studentName         = useMasteryStore((s) => s.studentName);
+  const updateVocabStatus   = useMasteryStore((s) => s.updateVocabStatus);
+  const updateConceptStatus = useMasteryStore((s) => s.updateConceptStatus);
+  const setLastUpdated      = useMasteryStore((s) => s.setLastUpdated);
+
   // Runtime API Key Management
   const [apiKey, setApiKey] = useState(() => localStorage.getItem('TP_GEMINI_KEY') || '');
   const [keyInput, setKeyInput] = useState('');
 
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const historyRef = useRef<ChatMessage[]>([]);
-  const greetingFired = useRef(false);
+  const [messages,   setMessages]  = useState<ChatMessage[]>([]);
+  const [input,      setInput]     = useState('');
+  const [isLoading,  setIsLoading] = useState(false);
+  const [error,      setError]     = useState<string | null>(null);
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef       = useRef<HTMLTextAreaElement>(null);
+  const historyRef     = useRef<Array<{ role: 'user' | 'assistant'; content: string }>>([]);
+  const greetingFired  = useRef(false);
 
   useEffect(() => {
-    scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight);
-  }, [messages, streamedResponse]);
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
-  // Only start the conversation once an API key is present
+  // Only trigger Lina's greeting once we have an API key
   useEffect(() => {
     if (apiKey && !greetingFired.current) {
       greetingFired.current = true;
@@ -38,89 +55,99 @@ export default function ChatSession({ onEndSession }: Props) {
     }
   }, [apiKey]);
 
-  const systemPrompt = `
-    You are Lina, a kind and encouraging Toki Pona tutor. 
-    The user's current mastery data is: ${JSON.stringify(masteryMap)}.
-    Keep responses short. Use Toki Pona primarily, but provide English translations in parentheses.
-    Always evaluate if the user used a word correctly and update their progress if they did.
-  `;
-
   async function sendToLina(userText: string, hideFromUI = false) {
     if (isLoading || !apiKey) return;
 
+    setIsLoading(true);
+    setError(null);
+
     if (!hideFromUI) {
-      const userMsg: ChatMessage = { role: 'user', content: userText };
-      setMessages((prev) => [...prev, userMsg]);
-      historyRef.current.push(userMsg);
+      setMessages((prev) => [
+        ...prev,
+        { id: crypto.randomUUID(), role: 'user', displayContent: userText },
+      ]);
     }
 
-    setIsLoading(true);
-    let fullResponse = '';
+    historyRef.current.push({ role: 'user', content: userText });
+
+    const assistantId = crypto.randomUUID();
+    setMessages((prev) => [
+      ...prev,
+      { id: assistantId, role: 'assistant', displayContent: '' },
+    ]);
 
     try {
+      const systemPrompt = buildSystemPrompt(vocabulary, chapters, studentName);
+      let fullContent = '';
+
       for await (const chunk of streamCompletion(
-        apiKey, 
+        apiKey,
         systemPrompt,
         historyRef.current,
       )) {
-        fullResponse += chunk;
-        setStreamedResponse(fullResponse);
+        fullContent += chunk;
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === assistantId
+              ? { ...m, displayContent: stripProposedChanges(fullContent) }
+              : m,
+          ),
+        );
       }
 
-      const linaMsg: ChatMessage = { role: 'lina', content: fullResponse };
-      setMessages((prev) => [...prev, linaMsg]);
-      historyRef.current.push(linaMsg);
-      
-      // Basic logic to detect word usage and update store
-      // In a real app, you'd parse Lina's JSON assessment
-      Object.keys(masteryMap).forEach(word => {
-        if (userText.toLowerCase().includes(word)) {
-          updateMastery(word, 5);
-        }
-      });
+      const changes = parseProposedChanges(fullContent);
+      if (changes) {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === assistantId
+              ? {
+                  ...m,
+                  proposedChanges: changes.map((c) => ({ ...c, approved: true })),
+                }
+              : m,
+          ),
+        );
+      }
 
-    } catch (error) {
-      console.error(error);
-      const errorMsg: ChatMessage = { role: 'lina', content: "(Session Error: Please check your API key and try again.)" };
-      setMessages((prev) => [...prev, errorMsg]);
+      historyRef.current.push({ role: 'assistant', content: fullContent });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Unknown error';
+      setError(msg);
+      setMessages((prev) => prev.filter((m) => m.id !== assistantId));
+      historyRef.current.pop();
     } finally {
       setIsLoading(false);
-      setStreamedResponse('');
+      if (!hideFromUI) inputRef.current?.focus();
     }
   }
 
-  const handleSend = () => {
-    if (!inputText.trim()) return;
-    const text = inputText;
-    setInputText('');
+  function handleSend() {
+    const text = input.trim();
+    if (!text || isLoading) return;
+    setInput('');
     void sendToLina(text);
-  };
+  }
 
-  // Setup Screen: Shown only if there is no API Key in state/localStorage
   if (!apiKey) {
     return (
       <div className="chat-session">
         <header className="chat-header">
           <div>
             <h1 className="chat-header__title">LINA</h1>
-            <p className="chat-header__subtitle">TOKI PONA TUTOR</p>
+            <p className="chat-header__subtitle">API SETUP</p>
           </div>
           <button className="btn-nav" onClick={onEndSession}>← DASHBOARD</button>
         </header>
         <div className="api-key-setup">
           <h2>ENTER GEMINI API KEY</h2>
-          <p>Your key is stored locally in your browser. It is never sent to our servers.</p>
+          <p>Key is saved in your browser's local storage and is never sent to our servers.</p>
           <div className="api-key-setup__form">
             <input 
               type="password" 
               className="api-key-input" 
-              placeholder="Paste AIzaSy... key here" 
+              placeholder="Paste key here..." 
               value={keyInput} 
               onChange={(e) => setKeyInput(e.target.value)} 
-              onKeyDown={(e) => e.key === 'Enter' && (()=>{
-                 localStorage.setItem('TP_GEMINI_KEY', keyInput);
-                 setApiKey(keyInput);
-              })()}
             />
             <button 
               className="btn-save-key" 
@@ -132,56 +159,54 @@ export default function ChatSession({ onEndSession }: Props) {
               SAVE & START
             </button>
           </div>
-          <p className="api-key-help">
-            Don't have a key? Get one for free at <a href="https://aistudio.google.com/" target="_blank" rel="noreferrer">Google AI Studio</a>.
-          </p>
         </div>
       </div>
     );
   }
 
-  // Main Chat UI
   return (
     <div className="chat-session">
       <header className="chat-header">
         <div>
           <h1 className="chat-header__title">LINA</h1>
-          <p className="chat-header__subtitle">CONVERSATION MODE</p>
+          <p className="chat-header__subtitle">TOKI PONA TUTOR</p>
         </div>
-        <div className="header-actions">
-          <button className="btn-clear-key" onClick={() => {
-            localStorage.removeItem('TP_GEMINI_KEY');
-            window.location.reload();
-          }}>Reset Key</button>
-          <button className="btn-nav" onClick={onEndSession}>EXIT SESSION</button>
+        <div className="chat-header__actions">
+           <button className="btn-nav btn-nav--dim" onClick={() => {
+             localStorage.removeItem('TP_GEMINI_KEY');
+             window.location.reload();
+           }}>RESET KEY</button>
+           <button className="btn-nav" onClick={onEndSession}>← DASHBOARD</button>
         </div>
       </header>
 
-      <div className="chat-messages" ref={scrollRef}>
-        {messages.map((m, i) => (
-          <div key={i} className={`message-bubble ${m.role}`}>
-            {m.content}
+      <div className="chat-messages">
+        {messages.map((msg) => (
+          <div key={msg.id} className={`message message--${msg.role}`}>
+            <span className="message__label">
+              {msg.role === 'assistant' ? 'LINA' : (studentName || 'YOU').toUpperCase()}
+            </span>
+            <div className="message__content">{msg.displayContent}</div>
           </div>
         ))}
-        {streamedResponse && (
-          <div className="message-bubble lina">
-            {streamedResponse}
-          </div>
-        )}
-        {isLoading && !streamedResponse && (
-          <div className="message-bubble lina loading">...</div>
-        )}
+        {error && <div className="chat-error">ERROR: {error}</div>}
+        <div ref={messagesEndRef} />
       </div>
 
       <div className="chat-input-area">
-        <input
-          type="text"
-          placeholder="Toki! (Say something...)"
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+        <textarea
+          ref={inputRef}
+          className="chat-input"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
+          placeholder="toki..."
+          rows={2}
+          disabled={isLoading}
         />
-        <button onClick={handleSend} disabled={isLoading}>SEND</button>
+        <button className="btn-send" onClick={handleSend} disabled={isLoading || !input.trim()}>
+          {isLoading ? '···' : 'SEND'}
+        </button>
       </div>
     </div>
   );
