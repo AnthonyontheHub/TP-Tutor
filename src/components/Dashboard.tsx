@@ -1,4 +1,3 @@
-/* src/components/Dashboard.tsx */
 import { useState } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import ProgressSummary from './ProgressSummary';
@@ -7,8 +6,6 @@ import SettingsDrawer from './SettingsDrawer';
 import UserProfileDrawer from './UserProfileDrawer'; 
 import SetupScreen from './SetupScreen';
 import type { MasteryStatus } from '../types/mastery';
-
-const POS_CATEGORIES = ['All', 'Noun', 'Verb', 'Adj', 'Particle', 'Pre-verb', 'Preposition', 'Number'];
 
 export default function Dashboard({ onStartSession, onAskLina }: { onStartSession: () => void; onAskLina: (p: string) => void }) {
   const { studentName, currentStreak, vocabulary, savedPhrases } = useMasteryStore();
@@ -57,14 +54,14 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
 
         {viewMode === 'grid' ? (
           <>
-            <div className="pos-filter-bar">
-              {POS_CATEGORIES.map(pos => (
-                <button key={pos} onClick={() => setPosFilter(pos)} className={`btn-pos ${posFilter === pos ? 'active' : ''}`}>{pos}</button>
+            <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', padding: '15px 0' }}>
+              {['All', 'Noun', 'Verb', 'Adj'].map(pos => (
+                <button key={pos} onClick={() => setPosFilter(pos)} className={`btn-toggle ${posFilter === pos ? 'active' : ''}`} style={{ fontSize: '0.7rem', padding: '6px 12px' }}>{pos}</button>
               ))}
             </div>
             <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', margin: '10px 0' }}>
                {['alphabetical', 'frequency', 'status'].map(m => (
-                 <button key={m} onClick={() => handleSortClick(m)} className={`btn-pos ${sortMode === m ? 'active' : ''}`} style={{ fontSize: '0.6rem' }}>
+                 <button key={m} onClick={() => handleSortClick(m)} className={`btn-toggle ${sortMode === m ? 'active' : ''}`} style={{ fontSize: '0.6rem', padding: '5px 10px' }}>
                    {m.toUpperCase()} {sortMode === m ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
                  </button>
                ))}
