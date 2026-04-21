@@ -34,7 +34,6 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font);
-  overflow-x: hidden;
 }
 
 .dashboard {
@@ -51,12 +50,10 @@ body {
   padding: 20px 0;
   border-bottom: 1px solid #333;
 }
-.dashboard__title { margin: 0; font-size: 1.2rem; font-weight: 900; letter-spacing: 0.14em; text-transform: uppercase; }
-.dashboard__profile-trigger { background: none; border: none; padding: 0; margin: 4px 0 0 0; font-size: 0.75rem; color: #3b82f6; cursor: pointer; font-weight: bold; font-family: var(--font); text-transform: uppercase; }
-.dashboard__streak { color: #f59e0b; font-weight: bold; font-size: 0.8rem; background: #332a11; padding: 4px 8px; border-radius: 12px; }
-.dashboard__icon-btn { background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; }
 
-/* Dashboard UI Components */
+.dashboard__title { margin: 0; font-size: 1.2rem; font-weight: 900; letter-spacing: 0.14em; text-transform: uppercase; }
+.dashboard__profile-trigger { background: none; border: none; padding: 0; margin: 4px 0 0 0; font-size: 0.75rem; color: #3b82f6; cursor: pointer; font-weight: bold; text-transform: uppercase; }
+
 .btn-review {
   width: 100%;
   padding: 16px;
@@ -68,28 +65,41 @@ body {
   cursor: pointer;
   margin: 20px 0;
   font-family: var(--font);
-  letter-spacing: 0.05em;
 }
 
 .dashboard__view-toggle { display: flex; gap: 10px; margin-bottom: 20px; }
-.btn-toggle { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; background: #222; color: #fff; cursor: pointer; font-family: var(--font); text-transform: uppercase; }
+.btn-toggle { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; background: #222; color: #fff; cursor: pointer; text-transform: uppercase; font-family: var(--font); }
 .btn-toggle.active { background: #3b82f6; }
 
-/* Mastery Grid & Cards */
+/* Mastery Grid */
 .mastery-grid__cards {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
   gap: 10px;
 }
 
-/* Status skins used by VocabCard */
+/* Vocab Card Skins - RESTORED */
+.vocab-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 10px 6px;
+  min-height: 84px;
+  border: var(--b2) solid transparent;
+  cursor: pointer;
+}
+.vocab-card__word { font-size: 1rem; font-weight: 900; }
+.vocab-card__pos { font-size: 0.5rem; color: var(--text-dim); text-transform: uppercase; margin-top: 5px; }
+
 .vocab-card--not_started { background: var(--bg-not-started); border-color: var(--col-not-started); }
 .vocab-card--introduced  { background: var(--bg-introduced);  border-color: var(--col-introduced); }
 .vocab-card--practicing  { background: var(--bg-practicing);  border-color: var(--col-practicing); }
 .vocab-card--confident   { background: var(--bg-confident);   border-color: var(--col-confident); }
 .vocab-card--mastered    { background: var(--bg-mastered);    border-color: var(--col-mastered); }
 
-/* Universal Drawer Logic */
+/* Universal Drawer Fixes */
 .drawer-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; }
 .word-drawer, .settings-drawer, .profile-drawer {
   position: fixed; z-index: 2001; background: #111; display: flex; flex-direction: column;
