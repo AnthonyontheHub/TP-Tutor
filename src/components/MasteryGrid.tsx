@@ -5,14 +5,10 @@ import WordDetailDrawer from './WordDetailDrawer';
 import type { MasteryStatus, VocabWord } from '../types/mastery'; 
 import type { SortMode } from './Dashboard';
 
-interface Props {
-  onAskLina: (prompt: string) => void;
-  isSandboxMode: boolean;
-  activeFilter: MasteryStatus | null;
-  selectedWords: string[];
-  setSelectedWords: (words: string[]) => void;
-  sortMode: SortMode;
-}
+// Frequency Data Map
+const WORD_FREQ: Record<string, number> = {
+  li: 4647, mi: 4143, e: 3597, toki: 2905, ni: 2811, pona: 2692, a: 2126, ala: 1996, jan: 1853, sina: 1765, la: 1729, lon: 1594, sona: 1483, mute: 1268, tawa: 1242, pi: 1169, ike: 1019, tenpo: 1006, seme: 973, wile: 914, ona: 905, o: 856, kama: 764, taso: 757, ken: 738, pali: 663, nimi: 663, tan: 660, ma: 636, pilin: 592, lili: 584, moku: 565, lukin: 445, tomo: 444, ilo: 433, kepeken: 432, sitelen: 411, musi: 408, anu: 348, jo: 325, ali: 321, sama: 318, luka: 318, kin: 311, en: 310, ante: 282, pana: 261, ijo: 258, lape: 256, telo: 253, suno: 252, wan: 229, suli: 228, pini: 228, losi: 224, nasa: 220, nasin: 220, lipu: 218, nanpa: 217, lawa: 198, tu: 196, mani: 192, kalama: 185, kulupu: 176, wawa: 172, sin: 170, weka: 161, ale: 151, moli: 148, sike: 143, pakala: 137, soweli: 130, sewi: 126, awen: 113, utala: 107, inli: 103, pan: 97, kon: 95, poka: 94, sonja: 89, ko: 89, leko: 86, sijelo: 86, linja: 85, pimeja: 84, pu: 82, seli: 80, kute: 80, kasi: 78, jaki: 75, insa: 73, suwi: 71, lete: 67, pije: 58, kili: 56, sonko: 54, uta: 54, kiwen: 50, mama: 50, p: 49, open: 48, oko: 46, esun: 45, meli: 44, lupa: 43, poki: 42, wowa: 39, mije: 39, unpa: 38, i: 37, mun: 36, onkon: 35, monsuta: 35, olin: 34, len: 32, nijon: 31, namako: 30, palisa: 30, l: 29, pipi: 29, loje: 29, anpa: 28, kule: 28, m: 28, walo: 27, noka: 27, nena: 27, selo: 26, jelo: 24, supa: 21, epanja: 21, pata: 21, n: 20, t: 19, kala: 19, powe: 19, laso: 19, epelanto: 16, sinpin: 15, mu: 14, tosi: 14, kanse: 14, u: 14, tajo: 13, akesi: 13, aaa: 12, w: 12, k: 12, po: 11, katala: 11, na: 11, kan: 11, apeja: 10, mateli: 10
+};
 
 const STATUS_ORDER: MasteryStatus[] = ['not_started', 'introduced', 'practicing', 'confident', 'mastered'];
 
@@ -27,20 +23,23 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, se
   const displayedVocab = [...vocabulary]
     .filter(w => !activeFilter || w.status === activeFilter)
     .sort((a, b) => {
+      if (sortMode === 'usage') {
+        const freqA = WORD_FREQ[a.word] || 0;
+        const freqB = WORD_FREQ[b.word] || 0;
+        return freqB - freqA; // High frequency first
+      }
       if (sortMode === 'status') return STATUS_ORDER.indexOf(b.status) - STATUS_ORDER.indexOf(a.status);
       if (sortMode === 'unlocked') return (a.status === 'not_started' ? 1 : 0) - (b.status === 'not_started' ? 1 : 0);
       return a.word.localeCompare(b.word);
     });
 
-  // START LONG PRESS (Enter Multi-select)
   const handleTouchStart = (word: VocabWord) => {
-    if (selectedWords.length > 0) return; // Already in selection mode
-
+    if (selectedWords.length > 0) return;
     longPressRef.current = setTimeout(() => {
-      if (window.navigator.vibrate) window.navigator.vibrate(50); // Haptic feedback
+      if (window.navigator.vibrate) window.navigator.vibrate(50);
       setSelectedWords([word.word]);
       longPressRef.current = null;
-    }, 500); // 0.5 seconds to trigger multi-select
+    }, 500);
   };
 
   const handleTouchEnd = () => {
@@ -51,26 +50,19 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, se
   };
 
   const handleCardClick = (word: VocabWord) => {
-    // 1. If we are ALREADY in multi-select mode
     if (selectedWords.length > 0) {
-      if (selectedWords.includes(word.word)) {
-        setSelectedWords(selectedWords.filter(w => w !== word.word));
-      } else {
-        setSelectedWords([...selectedWords, word.word]);
-      }
+      if (selectedWords.includes(word.word)) setSelectedWords(selectedWords.filter(w => w !== word.word));
+      else setSelectedWords([...selectedWords, word.word]);
       return;
     }
 
-    // 2. RAPID-FIRE COMBO (Sandbox Only)
     if (isSandboxMode && comboRef.current?.wordId === word.id) {
       clearTimeout(comboRef.current.timer);
-      const nextStatus = STATUS_ORDER[(STATUS_ORDER.indexOf(word.status) + 1) % STATUS_ORDER.length];
-      updateVocabStatus(word.id, nextStatus);
+      updateVocabStatus(word.id, STATUS_ORDER[(STATUS_ORDER.indexOf(word.status) + 1) % STATUS_ORDER.length]);
       comboRef.current = { timer: setTimeout(() => comboRef.current = null, 350), wordId: word.id };
       return;
     } 
 
-    // 3. NORMAL TAP: Open Drawer
     if (comboRef.current) clearTimeout(comboRef.current.timer);
     comboRef.current = { timer: setTimeout(() => {
       setDrawerId(word.id);
@@ -79,7 +71,7 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, se
   };
 
   return (
-    <section className="mastery-grid">
+    <section className="mastery-grid" onClick={() => setSelectedWords([])}>
       <div className="mastery-grid__cards">
         {displayedVocab.map((word) => {
           const selectIndex = selectedWords.indexOf(word.word);
@@ -92,28 +84,15 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, se
               onClick={(e) => { e.stopPropagation(); handleCardClick(word); }}
               onTouchStart={() => handleTouchStart(word)}
               onTouchEnd={handleTouchEnd}
-              onMouseDown={() => handleTouchStart(word)} // Desktop support
-              onMouseUp={handleTouchEnd}
               style={{
                 transform: isSelected ? 'scale(1.05)' : (isDimmed ? 'scale(0.95)' : 'scale(1)'),
                 opacity: isDimmed ? 0.4 : 1,
-                transition: 'all 0.25s ease', 
-                zIndex: isSelected ? 10 : 1, 
-                cursor: 'pointer', position: 'relative',
-                touchAction: 'none' // Critical for long-press on mobile
+                transition: 'all 0.25s ease', zIndex: isSelected ? 10 : 1, cursor: 'pointer', position: 'relative'
               }}
             >
               <VocabCard word={word} onClick={() => {}} />
-              
               {isSelected && (
-                <div style={{ 
-                  position: 'absolute', top: '-8px', right: '-8px', 
-                  background: '#3b82f6', color: 'white', 
-                  borderRadius: '50%', width: '24px', height: '24px', 
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', 
-                  fontSize: '11px', fontWeight: 'bold', border: '2px solid #fff',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.4)'
-                }}>
+                <div style={{ position: 'absolute', top: '-8px', right: '-8px', background: '#3b82f6', color: 'white', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 'bold', border: '2px solid #fff' }}>
                   {selectIndex + 1}
                 </div>
               )}
@@ -121,14 +100,7 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, se
           );
         })}
       </div>
-      {drawerId && (
-        <WordDetailDrawer 
-          word={vocabulary.find(v => v.id === drawerId)!} 
-          onClose={() => setDrawerId(null)} 
-          onAskLina={onAskLina} 
-          isSandboxMode={isSandboxMode} 
-        />
-      )}
+      {drawerId && <WordDetailDrawer word={vocabulary.find(v => v.id === drawerId)!} onClose={() => setDrawerId(null)} onAskLina={onAskLina} isSandboxMode={isSandboxMode} />}
     </section>
   );
 }
