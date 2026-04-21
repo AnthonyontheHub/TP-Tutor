@@ -22,6 +22,16 @@ type MasteryStore = MasteryMap & MasteryActions;
 // XP Mapping: Values for each status level
 const XP_MAP = { not_started: 0, introduced: 10, practicing: 25, confident: 50, mastered: 100 };
 
+// Helper to get or create a unique user ID for the database
+const getUserId = () => {
+  let userId = localStorage.getItem('tp_tutor_user_id');
+  if (!userId) {
+    userId = crypto.randomUUID();
+    localStorage.setItem('tp_tutor_user_id', userId);
+  }
+  return userId;
+};
+
 export const useMasteryStore = create<MasteryStore>()(
   persist(
     (set, get) => ({
@@ -103,7 +113,8 @@ export const useMasteryStore = create<MasteryStore>()(
       syncToCloud: async () => {
         const { vocabulary, chapters, lastUpdated, studentName, savedPhrases, currentStreak, lastActiveDate } = get();
         try {
-          await setDoc(doc(db, 'users', 'anthony'), {
+          const userId = getUserId();
+          await setDoc(doc(db, 'users', userId), {
             vocabulary, chapters, lastUpdated, studentName, savedPhrases, currentStreak, lastActiveDate
           });
         } catch (err) {
@@ -112,7 +123,8 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       syncFromCloud: () => {
-        onSnapshot(doc(db, 'users', 'anthony'), (snapshot) => {
+        const userId = getUserId();
+        onSnapshot(doc(db, 'users', userId), (snapshot) => {
           if (snapshot.exists()) {
             const data = snapshot.data();
             set({
