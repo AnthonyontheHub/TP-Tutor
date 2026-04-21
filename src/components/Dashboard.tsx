@@ -16,10 +16,11 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false); 
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
   
-  const [sortMode, setSortMode] = useState<'alphabetical' | 'status' | 'unlocked'>('alphabetical');
+  // Added 'frequency' to the allowed modes
+  const [sortMode, setSortMode] = useState<'alphabetical' | 'status' | 'unlocked' | 'frequency'>('alphabetical');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
-  const handleSortClick = (mode: 'alphabetical' | 'status' | 'unlocked') => {
+  const handleSortClick = (mode: 'alphabetical' | 'status' | 'unlocked' | 'frequency') => {
     if (sortMode === mode) {
       setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
     } else {
@@ -43,12 +44,14 @@ export default function Dashboard({ onStartSession, onAskLina }: Props) {
 
       <main className="dashboard__main" style={{ padding: '20px' }}>
         <ProgressSummary activeFilter={activeFilter} onFilterClick={setActiveFilter} />
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', margin: '15px 0' }}>
-          {['alphabetical', 'status', 'unlocked'].map(m => (
+        
+        {/* Added 'frequency' to the button map array */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', flexWrap: 'wrap', gap: '8px', margin: '15px 0' }}>
+          {['alphabetical', 'status', 'unlocked', 'frequency'].map(m => (
             <button 
               key={m} 
               onClick={() => handleSortClick(m as any)} 
-              style={{ fontSize: '0.6rem', background: sortMode === m ? '#333' : 'none', color: 'white', border: '1px solid #444', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}
+              style={{ fontSize: '0.6rem', background: sortMode === m ? '#3b82f6' : 'none', color: 'white', border: '1px solid #444', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer', fontWeight: sortMode === m ? 'bold' : 'normal' }}
             >
               {m.toUpperCase()} {sortMode === m ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
             </button>
