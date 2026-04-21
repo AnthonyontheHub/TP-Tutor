@@ -1,4 +1,3 @@
-/* src/components/MasteryGrid.tsx */
 import { useState, useRef } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import VocabCard from './VocabCard';
@@ -40,7 +39,8 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
     .filter(w => !activeFilter || w.status === activeFilter)
     .filter(w => posFilter === 'All' || w.partOfSpeech.includes(posFilter))
     .sort((a: any, b: any) => {
-      const comp = a[sortMode === 'alphabetical' ? 'word' : sortMode].localeCompare(b[sortMode === 'alphabetical' ? 'word' : sortMode]);
+      const field = sortMode === 'alphabetical' ? 'word' : sortMode;
+      const comp = String(a[field]).localeCompare(String(b[field]));
       return sortDirection === 'asc' ? comp : -comp;
     });
 
@@ -48,7 +48,7 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
     <section onPointerMove={() => { isDragging.current = true; }}>
       <div className="mastery-grid__cards">
         {displayed.map((word) => (
-          <div key={word.id} onPointerDown={() => handlePointerDown(word.word)} onPointerUp={() => handlePointerUp(word.word)} style={{ opacity: selectedWords.length > 0 && !selectedWords.includes(word.word) ? 0.4 : 1 }}>
+          <div key={word.id} onPointerDown={() => handlePointerDown(word.word)} onPointerUp={() => handlePointerUp(word.word)} style={{ opacity: selectedWords.length > 0 && !selectedWords.includes(word.word) ? 0.4 : 1, transition: 'opacity 0.2s' }}>
             <VocabCard word={word} onClick={() => {}} />
           </div>
         ))}
