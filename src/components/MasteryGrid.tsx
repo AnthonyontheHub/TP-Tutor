@@ -28,6 +28,7 @@ export default function MasteryGrid({
   const [magneticSuggestions, setMagneticSuggestions] = useState<string[]>([]);
   
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isLongPress = useRef(false);
 
   useEffect(() => {
     const apiKey = localStorage.getItem('TP_GEMINI_KEY');
@@ -42,22 +43,35 @@ export default function MasteryGrid({
 
   const handlePointerDown = (word: string) => {
     if (selectedWords.length > 0) return;
+    
+    isLongPress.current = false;
     longPressTimer.current = setTimeout(() => {
+      isLongPress.current = true;
       soundService.playBlip(523.25, 'sine', 0.05);
       setSelectedWords([word]);
     }, 500);
   };
 
   const handlePointerUp = (word: string) => {
+    // Clear the timeout if the user lifts their finger before 500ms
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
-      if (selectedWords.length === 0) {
-        const target = vocabulary.find(v => v.word === word);
-        if (target) setDrawerId(target.id);
-      }
     }
-    if (selectedWords.length > 0) {
+    
+    // If this release was the end of a long press, consume the event and stop
+    if (isLongPress.current) {
+      isLongPress.current = false;
+      return; 
+    }
+
+    // Normal tap logic
+    if (selectedWords.length === 0) {
+      // Not selecting anything yet, so open the drawer
+      const target = vocabulary.find(v => v.word === word);
+      if (target) setDrawerId(target.id);
+    } else {
+      // Already selecting words, so toggle this word
       setSelectedWords(prev => prev.includes(word) ? prev.filter(w => w !== word) : [...prev, word]);
     }
   };
