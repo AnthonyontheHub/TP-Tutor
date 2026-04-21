@@ -22,7 +22,7 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
   const [magneticSuggestions, setMagneticSuggestions] = useState<string[]>([]);
   
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const isDragging = useRef(false);
+  const touchStartPos = useRef({ x: 0, y: 0 });
 
   // RESTORED: Fetch the blue "Magnetic" grammar bubbles
   useEffect(() => {
@@ -38,24 +38,37 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
     }
   }, [selectedWords]);
 
-  const handlePointerDown = (word: string) => {
-    isDragging.current = false;
+  const handlePointerDown = (e: React.PointerEvent, word: string) => {
+    touchStartPos.current = { x: e.clientX, y: e.clientY };
+    
+    // If we are already in selection mode, don't need a long press
+    if (selectedWords.length > 0) return;
+
     longPressTimer.current = setTimeout(() => {
-      if (!isDragging.current) {
-        soundService.playBlip(523.25, 'sine', 0.05); // Correct method from soundService
-        setSelectedWords(prev => prev.includes(word) ? prev : [...prev, word]);
-        longPressTimer.current = null;
-      }
+      soundService.playBlip(523.25, 'sine', 0.05);
+      setSelectedWords([word]);
+      longPressTimer.current = null;
     }, 450);
   };
 
-  const handlePointerUp = (word: string) => {
+  const handlePointerUp = (e: React.PointerEvent, word: string) => {
+    const dist = Math.sqrt(
+      Math.pow(e.clientX - touchStartPos.current.x, 2) + 
+      Math.pow(e.clientY - touchStartPos.current.y, 2)
+    );
+
+    // If the pointer moved more than 10px, treat it as a drag/scroll and ignore
+    if (dist > 10) {
+      if (longPressTimer.current) clearTimeout(longPressTimer.current);
+      return;
+    }
+
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
-      if (isDragging.current) return;
 
       if (selectedWords.length > 0) {
+        // Toggle selection
         if (selectedWords.includes(word)) {
           setSelectedWords(prev => prev.filter(w => w !== word));
         } else {
@@ -63,9 +76,18 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
           setSelectedWords(prev => [...prev, word]);
         }
       } else {
+        // Single tap opens drawer
         const target = vocabulary.find(v => v.word === word);
         if (target) setDrawerId(target.id);
       }
+    } else if (selectedWords.length > 0) {
+        // This handles the case where the long press timer already fired
+        if (selectedWords.includes(word)) {
+            setSelectedWords(prev => prev.filter(w => w !== word));
+          } else {
+            soundService.playBlip(523.25, 'sine', 0.05);
+            setSelectedWords(prev => [...prev, word]);
+          }
     }
   };
 
@@ -80,17 +102,18 @@ export default function MasteryGrid({ onAskLina, isSandboxMode, activeFilter, so
     });
 
   return (
-    <section onPointerMove={() => { isDragging.current = true; }}>
+    <section>
       <div className="mastery-grid__cards">
         {displayed.map((word) => (
           <div 
             key={word.id} 
-            onPointerDown={() => handlePointerDown(word.word)} 
-            onPointerUp={() => handlePointerUp(word.word)}
+            onPointerDown={(e) => handlePointerDown(e, word.word)} 
+            onPointerUp={(e) => handlePointerUp(e, word.word)}
             style={{ 
               opacity: selectedWords.length > 0 && !selectedWords.includes(word.word) ? 0.3 : 1,
               transform: selectedWords.includes(word.word) ? 'scale(1.05)' : 'scale(1)',
-              transition: 'all 0.2s'
+              transition: 'all 0.2s',
+              touchAction: 'none' // Critical for pointer events to work reliably on mobile browsers
             }}
           >
             <VocabCard word={word} onClick={() => {}} />
