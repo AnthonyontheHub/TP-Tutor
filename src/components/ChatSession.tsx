@@ -13,10 +13,10 @@ interface Props {
 
 const STATUS_EMOJI = {
   not_started: '⬜',
-  introduced: '👀',
-  practicing: '🧠',
-  confident: '✅',
-  mastered: '🔥'
+  introduced: '🔵',
+  practicing: '🟡',
+  confident: '🟢',
+  mastered: '✅'
 };
 
 export default function ChatSession({ onEndSession, isActive, pendingPrompt, clearPrompt }: Props) {
@@ -54,7 +54,8 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
     setMessages(p => [...p, { id: assistantId, role: 'assistant', displayContent: '', raw: '' }]);
     
     try {
-      const sys = buildSystemPrompt(store.vocabulary, store.chapters, store.studentName);
+      // FIX: Now correctly passing only the 2 required arguments
+      const sys = buildSystemPrompt(store.vocabulary, store.studentName);
       let full = '';
       
       for await (const chunk of streamCompletion(key, sys, historyRef.current)) {
@@ -158,4 +159,4 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
       )}
     </AnimatePresence>
   );
-                }
+}
