@@ -28,7 +28,6 @@ const STATUS_RANK: Record<MasteryStatus, number> = {
   mastered: 4
 };
 
-// Top most common Toki Pona words by frequency. Unlisted words drop to the bottom.
 const TP_FREQ = [
   "li", "e", "mi", "sina", "pona", "jan", "ni", "toki", "ala", "tawa", 
   "wile", "ken", "moku", "suno", "lili", "mute", "awen", "kama", "lon", 
@@ -89,16 +88,15 @@ export default function MasteryGrid({
     }, 400); 
   };
 
-  const clearTimer = () => {
+  const handlePointerUp = (word: string) => {
     if (longPressTimer.current) clearTimeout(longPressTimer.current);
-  };
 
-  const handleCardClick = (word: string) => {
     if (isLongPress.current) {
-      isLongPress.current = false; 
+      isLongPress.current = false; // It was a long press, selection is handled. Reset.
       return;
     }
     
+    // It was a short tap! Handle opening the card here instead of using native onClick.
     if (selectedWords.length === 0) {
       const target = vocabulary.find(v => v.word === word);
       if (target) setDrawerId(target.id);
@@ -197,9 +195,8 @@ export default function MasteryGrid({
           <div 
             key={word.id} 
             onPointerDown={() => handlePointerDown(word.word)} 
-            onPointerUp={clearTimer}
-            onPointerLeave={clearTimer}
-            onClick={() => handleCardClick(word.word)}
+            onPointerUp={() => handlePointerUp(word.word)}
+            onPointerLeave={() => { if (longPressTimer.current) clearTimeout(longPressTimer.current); }}
             onContextMenu={(e) => {
               e.preventDefault();
               if (!selectedWords.includes(word.word)) {
