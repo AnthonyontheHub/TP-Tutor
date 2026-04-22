@@ -2,10 +2,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
 
 interface Props {
+  isOpen: boolean;
   onClose: () => void;
 }
 
-export default function UserProfileDrawer({ onClose }: Props) {
+export default function UserProfileDrawer({ isOpen, onClose }: Props) {
   const { studentName, currentStreak, savedPhrases, getStatusSummary } = useMasteryStore();
   
   const summary = getStatusSummary();
@@ -13,20 +14,26 @@ export default function UserProfileDrawer({ onClose }: Props) {
 
   return (
     <AnimatePresence>
-      <motion.div 
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} 
-        onClick={onClose} 
-        className="drawer-backdrop"
-      />
-      <motion.div 
-        className="profile-drawer"
-        initial={{ y: '100%' }} animate={{ y: '0%' }} exit={{ y: '100%' }} 
-        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        onClick={(e) => e.stopPropagation()} 
-      >
-        <div className="drawer__handle" onClick={onClose} />
-        <div className="drawer__scroll-area">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+      {isOpen && (
+        <motion.div 
+          key="backdrop"
+          className="drawer-backdrop"
+          initial={{ opacity: 0 }} 
+          animate={{ opacity: 1 }} 
+          exit={{ opacity: 0 }} 
+          onClick={onClose} 
+        />
+      )}
+      {isOpen && (
+        <motion.div 
+          key="drawer"
+          className="profile-drawer"
+          initial={{ y: '100%' }} 
+          animate={{ y: 0 }} 
+          exit={{ y: '100%' }} 
+          style={{ padding: '24px' }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
             <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#888', fontSize: '1.2rem', cursor: 'pointer', marginLeft: 'auto' }}>✕</button>
           </div>
           
@@ -54,8 +61,8 @@ export default function UserProfileDrawer({ onClose }: Props) {
               <div style={{ fontSize: '1.8rem', color: '#fff', fontWeight: 'bold' }}>{savedPhrases.length} <span style={{ fontSize: '1rem', color: '#888' }}>Phrases</span></div>
             </div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      )}
     </AnimatePresence>
   );
 }
