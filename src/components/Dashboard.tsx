@@ -9,7 +9,7 @@ import SetupScreen from './SetupScreen';
 import type { MasteryStatus } from '../types/mastery';
 
 export default function Dashboard({ onStartSession, onAskLina }: { onStartSession: () => void; onAskLina: (p: string) => void }) {
-  const { studentName, currentStreak, vocabulary, savedPhrases } = useMasteryStore();
+  const { studentName, currentStreak, vocabulary, savedPhrases, profileImage } = useMasteryStore();
   const [isSandboxMode, setIsSandboxMode] = useState(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false); 
   const [isProfileOpen, setIsProfileOpen] = useState(false); 
@@ -32,7 +32,12 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
       <header className="dashboard__header">
         <div className="dashboard__header-left">
           <h1 className="dashboard__title">TOKI PONA</h1>
-          <button onClick={() => setIsProfileOpen(true)} className="dashboard__profile-trigger">👤 {studentName.toUpperCase()}</button>
+          <button onClick={() => setIsProfileOpen(true)} className="dashboard__profile-trigger" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#3b82f6', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem' }}>
+              {profileImage ? <img src={profileImage} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👤'}
+            </div>
+            {studentName.toUpperCase()}
+          </button>
         </div>
         <div className="dashboard__header-right">
           {currentStreak > 0 && <div className="dashboard__streak">🔥 {currentStreak}</div>}
@@ -51,36 +56,17 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
         </div>
 
         {viewMode === 'grid' ? (
-          <>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px', padding: '0 5px' }}>
-              <label htmlFor="pos-filter" style={{ fontWeight: 'bold' }}>Filter POS:</label>
-              <select 
-                id="pos-filter"
-                value={posFilter} 
-                onChange={(e) => setPosFilter(e.target.value)}
-                style={{ padding: '8px', borderRadius: '6px', background: '#222', color: '#fff', border: '1px solid #444', outline: 'none' }}
-              >
-                <option value="All">All Parts of Speech</option>
-                <option value="noun">Noun</option>
-                <option value="verb">Verb</option>
-                <option value="adjective">Adjective</option>
-                <option value="adverb">Adverb</option>
-                <option value="phrase">Phrase</option>
-              </select>
-            </div>
-            
-            <MasteryGrid 
-              onAskLina={onAskLina} 
-              isSandboxMode={isSandboxMode} 
-              activeFilter={activeFilter} 
-              sortMode={sortMode} 
-              sortDirection={sortDirection} 
-              posFilter={posFilter}
-              setSortMode={setSortMode}
-              setSortDirection={setSortDirection}
-              setPosFilter={setPosFilter} 
-            />
-          </>
+          <MasteryGrid 
+            onAskLina={onAskLina} 
+            isSandboxMode={isSandboxMode} 
+            activeFilter={activeFilter} 
+            sortMode={sortMode} 
+            sortDirection={sortDirection} 
+            posFilter={posFilter}
+            setSortMode={setSortMode}
+            setSortDirection={setSortDirection}
+            setPosFilter={setPosFilter} 
+          />
         ) : (
           <div style={{ padding: '20px 0' }}>
             <PhraseGrid onAskLina={onAskLina} activeFilter={activeFilter} selectedWords={[]} />
@@ -95,17 +81,8 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
         )}
       </main>
 
-      <SettingsDrawer 
-        isOpen={isSettingsOpen} 
-        onClose={() => setIsSettingsOpen(false)} 
-        isSandboxMode={isSandboxMode} 
-        setIsSandboxMode={setIsSandboxMode} 
-      />
-      
-      <UserProfileDrawer 
-        isOpen={isProfileOpen} 
-        onClose={() => setIsProfileOpen(false)} 
-      />
+      {isSettingsOpen && <SettingsDrawer onClose={() => setIsSettingsOpen(false)} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} />}
+      <UserProfileDrawer isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
     </div>
   );
 }
