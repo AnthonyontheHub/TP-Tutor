@@ -35,7 +35,9 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
       <header className="dashboard__header">
         <div className="dashboard__header-left">
           <h1 className="dashboard__title">TOKI PONA</h1>
-          <button onClick={() => setIsProfileOpen(true)} className="dashboard__profile-trigger">👤 {studentName.toUpperCase()}</button>
+          <button onClick={() => setIsProfileOpen(true)} className="dashboard__profile-trigger">
+            👤 {studentName.toUpperCase()}
+          </button>
         </div>
         <div className="dashboard__header-right">
           {currentStreak > 0 && <div className="dashboard__streak">🔥 {currentStreak}</div>}
@@ -54,39 +56,21 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
         </div>
 
         {viewMode === 'grid' ? (
-          <>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px', padding: '0 5px' }}>
-              <label htmlFor="pos-filter" style={{ fontWeight: 'bold' }}>Filter POS:</label>
-              <select 
-                id="pos-filter"
-                value={posFilter} 
-                onChange={(e) => setPosFilter(e.target.value)}
-                style={{ padding: '8px', borderRadius: '6px', background: '#222', color: '#fff', border: '1px solid #444' }}
-              >
-                <option value="All">All Parts of Speech</option>
-                <option value="noun">Noun</option>
-                <option value="verb">Verb</option>
-                <option value="adjective">Adjective</option>
-                <option value="adverb">Adverb</option>
-              </select>
-            </div>
-            
-            <MasteryGrid 
-              onAskLina={onAskLina} 
-              isSandboxMode={isSandboxMode} 
-              activeFilter={activeFilter} 
-              sortMode={sortMode} 
-              sortDirection={sortDirection} 
-              posFilter={posFilter}
-              setSortMode={setSortMode as any}
-              setSortDirection={setSortDirection}
-              setPosFilter={setPosFilter} 
-              onNavigateToPhrases={(id) => {
-                setViewMode('phrasebook');
-                if (id) setFocusPhraseId(id);
-              }}
-            />
-          </>
+          <MasteryGrid 
+            onAskLina={onAskLina} 
+            isSandboxMode={isSandboxMode} 
+            activeFilter={activeFilter} 
+            sortMode={sortMode} 
+            sortDirection={sortDirection} 
+            posFilter={posFilter}
+            setSortMode={setSortMode as any}
+            setSortDirection={setSortDirection}
+            setPosFilter={setPosFilter} 
+            onNavigateToPhrases={(id) => {
+              setViewMode('phrasebook');
+              if (id) setFocusPhraseId(id);
+            }}
+          />
         ) : (
           <PhraseGrid 
             onAskLina={onAskLina} 
