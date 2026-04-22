@@ -60,15 +60,14 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
               <select 
                 id="pos-filter"
                 value={posFilter} 
-                onChange={(e) => setPosFilter(e.target.value)}
-                style={{ padding: '8px', borderRadius: '6px', background: '#222', color: '#fff', border: '1px solid #444', outline: 'none' }}
+                onChange={(e) => setSortMode(e.target.value as any)}
+                style={{ padding: '8px', borderRadius: '6px', background: '#222', color: '#fff', border: '1px solid #444' }}
               >
                 <option value="All">All Parts of Speech</option>
                 <option value="noun">Noun</option>
                 <option value="verb">Verb</option>
                 <option value="adjective">Adjective</option>
                 <option value="adverb">Adverb</option>
-                <option value="phrase">Phrase</option>
               </select>
             </div>
             
@@ -79,7 +78,7 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
               sortMode={sortMode} 
               sortDirection={sortDirection} 
               posFilter={posFilter}
-              setSortMode={setSortMode}
+              setSortMode={setSortMode as any}
               setSortDirection={setSortDirection}
               setPosFilter={setPosFilter} 
               onNavigateToPhrases={(id) => {
@@ -89,15 +88,13 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
             />
           </>
         ) : (
-          <div style={{ padding: '20px 0' }}>
-            <PhraseGrid 
-              onAskLina={onAskLina} 
-              activeFilter={activeFilter} 
-              selectedWords={[]} 
-              focusPhraseId={focusPhraseId}
-              clearFocusPhrase={() => setFocusPhraseId(null)}
-            />
-          </div>
+          <PhraseGrid 
+            onAskLina={onAskLina} 
+            activeFilter={activeFilter} 
+            selectedWords={[]} 
+            focusPhraseId={focusPhraseId}
+            clearFocusPhrase={() => setFocusPhraseId(null)}
+          />
         )}
       </main>
 
