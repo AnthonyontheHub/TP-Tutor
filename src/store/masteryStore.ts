@@ -13,13 +13,12 @@ interface MasteryActions {
   savePhrase: (phrase: string) => void;
   recordActivity: () => void;
   setStudentName: (name: string) => void; 
-  setProfileImage: (url: string) => void;
   syncFromCloud: () => void;
   syncToCloud: () => Promise<void>; 
   getStatusSummary: () => StatusSummary;
 }
 
-type MasteryStore = MasteryMap & { profileImage?: string } & MasteryActions;
+type MasteryStore = MasteryMap & MasteryActions;
 
 const getUserId = () => {
   let userId = localStorage.getItem('tp_tutor_user_id');
@@ -35,7 +34,6 @@ export const useMasteryStore = create<MasteryStore>()(
     (set, get) => ({
       ...initialMasteryMap,
       studentName: initialMasteryMap.studentName || 'Student',
-      profileImage: '',
       savedPhrases: initialMasteryMap.savedPhrases || [],
       currentStreak: initialMasteryMap.currentStreak || 0,
       lastActiveDate: initialMasteryMap.lastActiveDate || '',
@@ -72,9 +70,11 @@ export const useMasteryStore = create<MasteryStore>()(
       recordActivity: () => {
         const today = new Date().toDateString();
         const lastDate = get().lastActiveDate;
+        
         if (lastDate !== today) {
           const yesterday = new Date();
           yesterday.setDate(yesterday.getDate() - 1);
+          
           if (lastDate === yesterday.toDateString()) {
             set((state) => ({ currentStreak: state.currentStreak + 1, lastActiveDate: today }));
           } else {
@@ -88,28 +88,25 @@ export const useMasteryStore = create<MasteryStore>()(
         void get().syncToCloud();
       },
 
-      setProfileImage: (url) => {
-        set({ profileImage: url });
-        void get().syncToCloud();
-      },
-
       setLastUpdated: (date) => set({ lastUpdated: date }),
 
       getStatusSummary: () => {
         const { vocabulary } = get();
         const summary = { not_started: 0, introduced: 0, practicing: 0, confident: 0, mastered: 0 };
+        
         for (const word of vocabulary) { 
           summary[word.status]++; 
         }
+        
         return summary;
       },
 
       syncToCloud: async () => {
-        const { vocabulary, chapters, lastUpdated, studentName, profileImage, savedPhrases, currentStreak, lastActiveDate } = get();
+        const { vocabulary, chapters, lastUpdated, studentName, savedPhrases, currentStreak, lastActiveDate } = get();
         try {
           const userId = getUserId();
           await setDoc(doc(db, 'users', userId), {
-            vocabulary, chapters, lastUpdated, studentName, profileImage, savedPhrases, currentStreak, lastActiveDate
+            vocabulary, chapters, lastUpdated, studentName, savedPhrases, currentStreak, lastActiveDate
           });
         } catch (err) {
           console.error("Firebase Sync Error:", err);
@@ -126,7 +123,6 @@ export const useMasteryStore = create<MasteryStore>()(
               chapters: data.chapters || initialMasteryMap.chapters,
               lastUpdated: data.lastUpdated || '',
               studentName: data.studentName || 'Student',
-              profileImage: data.profileImage || '',
               savedPhrases: data.savedPhrases || [],
               currentStreak: data.currentStreak || 0,
               lastActiveDate: data.lastActiveDate || ''
