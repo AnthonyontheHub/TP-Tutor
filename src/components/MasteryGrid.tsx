@@ -98,7 +98,7 @@ export default function MasteryGrid({
 
   return (
     <div className="mastery-grid-container">
-      <div className="grid-toolbar" style={{ display: 'flex', gap: '10px', marginBottom: '15px', flexWrap: 'wrap' }}>
+      <div className="grid-toolbar" style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
         <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="sort-select">
           <option value="alphabetical">A-Z</option>
           <option value="status">Mastery</option>
@@ -174,6 +174,7 @@ export default function MasteryGrid({
 
       {drawerId && (
         <WordDetailDrawer 
+          isOpen={true}
           word={vocabulary.find(v => v.id === drawerId)!} 
           onClose={() => setDrawerId(null)} 
           onAskLina={onAskLina} 
