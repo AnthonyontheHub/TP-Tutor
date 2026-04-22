@@ -1,12 +1,9 @@
 /* src/components/VocabCard.tsx */
 import type { VocabWord } from '../types/mastery';
 
-interface VocabCardProps {
-  word: VocabWord;
-  onClick: () => void;
-}
-
-export default function VocabCard({ word }: VocabCardProps) {
+export default function VocabCard({ word }: { word: VocabWord }) {
+  // pointerEvents: 'none' is essential so the MasteryGrid parent can handle 
+  // long-press vs tap logic without the inner divs intercepting clicks.
   return (
     <div 
       className={`vocab-card vocab-card--${word.status}`} 
