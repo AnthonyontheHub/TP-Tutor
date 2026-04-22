@@ -31,9 +31,7 @@ export default function MasteryGrid({
   onAskLina, isSandboxMode, activeFilter, sortMode, sortDirection, posFilter, 
   setSortMode, setSortDirection, setPosFilter 
 }: Props) {
-  // Fixed: Replaced destructured store call with individual selector
-  const vocabulary = useMasteryStore(s => s.vocabulary);
-  
+  const { vocabulary } = useMasteryStore();
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [magneticSuggestions, setMagneticSuggestions] = useState<string[]>([]);
@@ -42,28 +40,16 @@ export default function MasteryGrid({
   const isLongPress = useRef(false);
 
   useEffect(() => {
-    // Fixed: Added mount checking to prevent state updates on unmounted components (Race condition)
-    let isMounted = true;
     const apiKey = localStorage.getItem('TP_GEMINI_KEY');
-    
     if (selectedWords.length > 1 && apiKey) {
       const timer = setTimeout(async () => {
         const results = await fetchSentenceSuggestions(apiKey, selectedWords);
-        if (isMounted) {
-          setMagneticSuggestions(results);
-        }
+        setMagneticSuggestions(results);
       }, 800);
-      return () => {
-        isMounted = false;
-        clearTimeout(timer);
-      };
+      return () => clearTimeout(timer);
     } else if (selectedWords.length <= 1) {
       setMagneticSuggestions([]);
     }
-    
-    return () => {
-      isMounted = false;
-    };
   }, [selectedWords]);
 
   const handlePointerDown = (word: string) => {
@@ -102,7 +88,8 @@ export default function MasteryGrid({
         const diff = STATUS_RANK[a.status] - STATUS_RANK[b.status];
         return sortDirection === 'asc' ? diff : -diff;
       }
-      const field = sortMode === 'alphabetical' ? 'word' : (sortMode as keyof typeof a);
+      // Fixed: Explicitly typed the field key to resolve TypeScript indexing errors
+      const field = (sortMode === 'alphabetical' ? 'word' : sortMode) as keyof typeof a;
       const valA = String(a[field] || '').toLowerCase();
       const valB = String(b[field] || '').toLowerCase();
       return sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
@@ -181,7 +168,7 @@ export default function MasteryGrid({
 
       {drawerId && (
         <WordDetailDrawer 
-          word={vocabulary.find(v => v.id === drawerId)!} 
+          word={vocabulary.find(v => v.id === drawerId) || null} 
           onClose={() => setDrawerId(null)} 
           onAskLina={onAskLina} 
           isSandboxMode={isSandboxMode} 
