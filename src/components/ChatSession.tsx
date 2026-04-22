@@ -4,6 +4,15 @@ import { useMasteryStore } from '../store/masteryStore';
 import { buildSystemPrompt, streamCompletion, stripProposedChanges, parseProposedChanges } from '../services/linaService';
 import type { MasteryStatus } from '../types/mastery';
 
+interface Message {
+  id: string;
+  role: 'user' | 'assistant';
+  displayContent: string;
+  raw?: string;
+  proposedChanges?: Array<{ type: string; wordId: string; newStatus: string }>;
+  changesApplied?: boolean;
+}
+
 interface Props { 
   onEndSession: () => void; 
   isActive: boolean; 
@@ -11,7 +20,7 @@ interface Props {
   clearPrompt?: () => void; 
 }
 
-const STATUS_EMOJI = {
+const STATUS_EMOJI: Record<string, string> = {
   not_started: '⬜',
   introduced: '🔵',
   practicing: '🟡',
@@ -20,13 +29,13 @@ const STATUS_EMOJI = {
 };
 
 export default function ChatSession({ onEndSession, isActive, pendingPrompt, clearPrompt }: Props) {
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
   const store = useMasteryStore();
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const historyRef = useRef<any[]>([]);
+  const historyRef = useRef<{role: string, content: string}[]>([]);
 
   useEffect(() => { 
     if (isActive) messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); 
@@ -45,7 +54,8 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
     if (isLoading || !key || !txt.trim()) return;
     
     setIsLoading(true);
-    setMessages(p => [...p, { id: crypto.randomUUID(), role: 'user', displayContent: txt }]);
+    const userMsg: Message = { id: crypto.randomUUID(), role: 'user', displayContent: txt };
+    setMessages(p => [...p, userMsg]);
     historyRef.current.push({ role: 'user', content: txt });
     
     const assistantId = crypto.randomUUID();
@@ -76,13 +86,11 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
   function handleApplyChanges(msgId: string) {
     setMessages((prev) => prev.map((m) => {
       if (m.id !== msgId || !m.proposedChanges) return m;
-      
-      m.proposedChanges.forEach((change: any) => {
+      m.proposedChanges.forEach((change) => {
         if (change.type === 'vocab' && change.wordId) {
           store.updateVocabStatus(change.wordId, change.newStatus as MasteryStatus);
         }
       });
-      
       store.setLastUpdated(new Date().toLocaleDateString());
       return { ...m, changesApplied: true };
     }));
@@ -93,38 +101,30 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
       <AnimatePresence>
         {isActive && (
           <m.div 
-            className="side-drawer" 
+            className="side-pane"
             initial={{ x: '100%' }} 
-            animate={{ x: '0%' }} 
-            exit={{ x: '100%' }} 
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            animate={{ x: 0 }} 
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px', borderBottom: '1px solid #333' }}>
-              <h2 style={{ margin: 0, color: 'white', fontSize: '1.2rem' }}>LINA CHAT</h2>
-              <button onClick={onEndSession} style={{ background: 'none', border: 'none', color: '#888', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '20px', borderBottom: '1px solid #333' }}>
+              <h2 style={{ fontSize: '1rem', letterSpacing: '0.1em' }}>LINA CHAT</h2>
+              <button onClick={onEndSession} style={{ background: 'none', border: 'none', color: '#666', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
             </div>
             
-            <div style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
-               {!localStorage.getItem('TP_GEMINI_KEY') && <div style={{ color: '#ff6b6b', textAlign: 'center', marginBottom: '20px' }}>Please set your API Key in Settings to chat with Lina.</div>}
-               
+            <div className="drawer__scroll-area">
                {messages.map((msg) => (
                  <div key={msg.id} style={{ marginBottom: '20px', textAlign: msg.role === 'user' ? 'right' : 'left' }}>
                    <div style={{ color: '#888', fontSize: '0.7rem', marginBottom: '4px' }}>{msg.role === 'assistant' ? 'LINA' : 'YOU'}</div>
-                   <div style={{ background: msg.role === 'assistant' ? '#1a1a1a' : '#3b82f6', padding: '12px', borderRadius: '8px', color: 'white', display: 'inline-block', textAlign: 'left', maxWidth: '85%' }}>
+                   <div style={{ background: msg.role === 'assistant' ? '#1a1a1a' : '#3b82f6', padding: '12px', borderRadius: '8px', color: 'white', display: 'inline-block', textAlign: 'left', maxWidth: '90%' }}>
                      {msg.displayContent}
                    </div>
-                   
-                   {msg.proposedChanges && !msg.changesApplied && msg.role === 'assistant' && (
-                     <div style={{ marginTop: '10px', background: '#222', padding: '12px', borderRadius: '8px', textAlign: 'left', border: '1px solid #333' }}>
-                        <div style={{ fontSize: '0.7rem', color: '#888', marginBottom: '8px', fontWeight: 'bold' }}>PROPOSED UPDATES</div>
-                        {msg.proposedChanges.map((c: any, i: number) => (
-                          <div key={i} style={{ color: '#ddd', fontSize: '0.85rem', marginBottom: '4px' }}>
-                            ✅ {c.wordId} → {STATUS_EMOJI[c.newStatus as keyof typeof STATUS_EMOJI] || c.newStatus}
-                          </div>
+                   {msg.proposedChanges && !msg.changesApplied && (
+                     <div style={{ marginTop: '10px', background: '#222', padding: '12px', borderRadius: '8px', border: '1px solid #333' }}>
+                        {msg.proposedChanges.map((c, i) => (
+                          <div key={i} style={{ color: '#ddd', fontSize: '0.85rem' }}>✅ {c.wordId} → {STATUS_EMOJI[c.newStatus] || '❓'}</div>
                         ))}
-                        <button onClick={() => handleApplyChanges(msg.id)} style={{ width: '100%', marginTop: '10px', background: '#4CAF50', color: 'white', border: 'none', padding: '10px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
-                          APPLY CHANGES
-                        </button>
+                        <button onClick={() => handleApplyChanges(msg.id)} style={{ width: '100%', marginTop: '10px', background: '#4CAF50', color: 'white', border: 'none', padding: '8px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>APPLY</button>
                      </div>
                    )}
                  </div>
@@ -140,12 +140,7 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
                 placeholder="toki!"
                 style={{ flex: 1, background: '#222', border: 'none', borderRadius: '8px', padding: '12px', color: 'white', outline: 'none' }} 
               />
-              <button 
-                onClick={() => { sendToLina(input); setInput(''); }} 
-                style={{ background: '#3b82f6', border: 'none', borderRadius: '8px', padding: '0 20px', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
-              >
-                SEND
-              </button>
+              <button onClick={() => { sendToLina(input); setInput(''); }} style={{ background: '#3b82f6', border: 'none', borderRadius: '8px', padding: '0 15px', color: 'white', fontWeight: 'bold' }}>SEND</button>
             </div>
           </m.div>
         )}
