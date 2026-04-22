@@ -119,7 +119,7 @@ export default function MasteryGrid({
               cursor: 'pointer'
             }}
           >
-            <VocabCard word={word} onClick={() => {}} />
+            <VocabCard word={word} />
           </div>
         ))}
       </div>
@@ -165,14 +165,13 @@ export default function MasteryGrid({
         </div>
       )}
 
-      {drawerId && (
-        <WordDetailDrawer 
-          word={vocabulary.find(v => v.id === drawerId)!} 
-          onClose={() => setDrawerId(null)} 
-          onAskLina={onAskLina} 
-          isSandboxMode={isSandboxMode} 
-        />
-      )}
+      <WordDetailDrawer 
+        isOpen={!!drawerId}
+        word={vocabulary.find(v => v.id === drawerId) || null} 
+        onClose={() => setDrawerId(null)} 
+        onAskLina={onAskLina} 
+        isSandboxMode={isSandboxMode} 
+      />
     </div>
   );
 }
