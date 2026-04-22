@@ -2,12 +2,12 @@
 import type { VocabWord } from '../types/mastery';
 
 export default function VocabCard({ word }: { word: VocabWord }) {
-  // pointerEvents: 'none' is essential so the MasteryGrid parent can handle 
-  // long-press vs tap logic without the inner divs intercepting clicks.
+  // Removed pointerEvents: 'none'. 
+  // The parent MasteryGrid handles the logic, but the card must be interactive 
+  // to bubble those pointer events up.
   return (
     <div 
       className={`vocab-card vocab-card--${word.status}`} 
-      style={{ pointerEvents: 'none' }}
     >
       <div className="vocab-card__word">
         {word.word}
