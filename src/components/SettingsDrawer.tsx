@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useMasteryStore } from '../store/masteryStore';
 
 interface Props {
   onClose: () => void;
@@ -9,7 +8,6 @@ interface Props {
 }
 
 export default function SettingsDrawer({ onClose, isSandboxMode, setIsSandboxMode }: Props) {
-  const { vocabulary, updateVocabStatus, resetProgress } = useMasteryStore(); // Added resetProgress
   const [apiKey, setApiKey] = useState('');
 
   useEffect(() => {
@@ -21,17 +19,8 @@ export default function SettingsDrawer({ onClose, isSandboxMode, setIsSandboxMod
     alert('API Key Saved!');
   };
 
-  const handleReset = () => {
-    if (window.confirm("Are you sure you want to reset all your progress? This cannot be undone.")) {
-        resetProgress();
-        alert("Progress reset.");
-        onClose();
-    }
-  }
-
   return (
     <AnimatePresence>
-      {/* Separate Backdrop */}
       <motion.div 
         key="backdrop"
         initial={{ opacity: 0 }} 
@@ -42,14 +31,13 @@ export default function SettingsDrawer({ onClose, isSandboxMode, setIsSandboxMod
         style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 2000 }}
       />
       
-      {/* Content Drawer */}
       <motion.div
         key="content"
         initial={{ y: '100%' }}
         animate={{ y: '0%' }}
         exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        onClick={(e) => e.stopPropagation()} // Stops click-through to backdrop
+        onClick={(e) => e.stopPropagation()} 
         className="settings-drawer"
         style={{ 
           position: 'fixed', bottom: 0, left: 0, right: 0, 
@@ -73,7 +61,7 @@ export default function SettingsDrawer({ onClose, isSandboxMode, setIsSandboxMod
           </label>
         </div>
 
-        <div className="settings-section" style={{ background: '#1a1a1a', padding: '15px', borderRadius: '12px', marginBottom: '15px' }}>
+        <div className="settings-section" style={{ background: '#1a1a1a', padding: '15px', borderRadius: '12px' }}>
           <p style={{ color: '#888', margin: '0 0 10px 0', fontSize: '0.8rem' }}>GEMINI API KEY</p>
           <input 
             type="password" 
@@ -83,16 +71,6 @@ export default function SettingsDrawer({ onClose, isSandboxMode, setIsSandboxMod
           />
           <button onClick={handleSaveKey} className="btn-review" style={{ width: '100%', margin: 0 }}>SAVE KEY</button>
         </div>
-
-        {/* Danger Zone */}
-        <div className="settings-section" style={{ background: '#2a0a0a', padding: '15px', borderRadius: '12px', border: '1px solid #ff4444' }}>
-            <h3 style={{ color: '#ff4444', margin: '0 0 10px 0', fontSize: '1rem' }}>DANGER ZONE</h3>
-            <p style={{ color: '#aaa', fontSize: '0.8rem', marginBottom: '15px' }}>This will permanently delete all your learning progress and saved phrases.</p>
-            <button onClick={handleReset} style={{ width: '100%', padding: '12px', background: '#ff4444', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
-                RESET ALL PROGRESS
-            </button>
-        </div>
-
       </motion.div>
     </AnimatePresence>
   );
