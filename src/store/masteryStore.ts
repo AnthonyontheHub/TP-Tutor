@@ -12,24 +12,15 @@ interface MasteryActions {
   savePhrase: (phrase: string) => void;
   recordActivity: () => void;
   setStudentName: (name: string) => void; 
-  syncFromCloud: () => void;
+  syncFromCloud: () => () => void; // FIX: Now returns the cleanup function
   syncToCloud: () => Promise<void>; 
   getStatusSummary: () => StatusSummary & { xp: number, level: number, rankTitle: string };
-  resetProgress: () => void; // Added resetProgress
 }
 
 type MasteryStore = MasteryMap & MasteryActions;
 
-// XP Mapping: Values for each status level - Made sure it covers all statuses
-const XP_MAP: Record<MasteryStatus, number> = { 
-  not_started: 0, 
-  introduced: 10, 
-  practicing: 25, 
-  confident: 50, 
-  mastered: 100 
-};
+const XP_MAP = { not_started: 0, introduced: 10, practicing: 25, confident: 50, mastered: 100 };
 
-// Helper to get or create a unique user ID for the database
 const getUserId = () => {
   let userId = localStorage.getItem('tp_tutor_user_id');
   if (!userId) {
@@ -103,34 +94,17 @@ export const useMasteryStore = create<MasteryStore>()(
         const summary = { not_started: 0, introduced: 0, practicing: 0, confident: 0, mastered: 0, xp: 0 };
         
         for (const word of vocabulary) { 
-          // Ensure word.status is valid, fallback to not_started if undefined
-          const status = word.status || 'not_started';
-          summary[status]++; 
-          summary.xp += (XP_MAP[status] || 0); // Guard against NaN
+          summary[word.status]++; 
+          summary.xp += XP_MAP[word.status];
         }
 
-        // Calculate level based on 500 XP per level. Ensure XP is a valid number.
-        const validXp = isNaN(summary.xp) ? 0 : summary.xp;
-        const level = Math.floor(validXp / 500) + 1;
+        const level = Math.floor(summary.xp / 500) + 1;
         
         let rankTitle = "nimi lili"; 
         if (level >= 5) rankTitle = "jan pi toki pona"; 
         if (level >= 10) rankTitle = "jan sona"; 
         
-        return { ...summary, xp: validXp, level, rankTitle };
-      },
-
-      // Added Reset Progress function
-      resetProgress: () => {
-        set({
-           vocabulary: initialMasteryMap.vocabulary,
-           chapters: initialMasteryMap.chapters,
-           savedPhrases: [],
-           currentStreak: 0,
-           lastActiveDate: '',
-           // Keep studentName
-        });
-        void get().syncToCloud();
+        return { ...summary, level, rankTitle };
       },
 
       syncToCloud: async () => {
@@ -146,21 +120,27 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       syncFromCloud: () => {
-        const userId = getUserId();
-        onSnapshot(doc(db, 'users', userId), (snapshot) => {
-          if (snapshot.exists()) {
-            const data = snapshot.data();
-            set({
-              vocabulary: data.vocabulary || initialMasteryMap.vocabulary,
-              chapters: data.chapters || initialMasteryMap.chapters,
-              lastUpdated: data.lastUpdated || '',
-              studentName: data.studentName || 'Student',
-              savedPhrases: data.savedPhrases || [],
-              currentStreak: data.currentStreak || 0,
-              lastActiveDate: data.lastActiveDate || ''
-            });
-          }
-        });
+        try {
+          const userId = getUserId();
+          const unsubscribe = onSnapshot(doc(db, 'users', userId), (snapshot) => {
+            if (snapshot.exists()) {
+              const data = snapshot.data();
+              set({
+                vocabulary: data.vocabulary || initialMasteryMap.vocabulary,
+                chapters: data.chapters || initialMasteryMap.chapters,
+                lastUpdated: data.lastUpdated || '',
+                studentName: data.studentName || 'Student',
+                savedPhrases: data.savedPhrases || [],
+                currentStreak: data.currentStreak || 0,
+                lastActiveDate: data.lastActiveDate || ''
+              });
+            }
+          });
+          return unsubscribe; 
+        } catch (err) {
+          console.error("Firebase Initialization Error:", err);
+          return () => {}; // Safe fallback if offline
+        }
       }
     }),
     { name: 'tp-tutor-mastery' }
