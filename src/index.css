@@ -1,10 +1,4 @@
 /* src/index.css */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
 :root {
   --bg: #000;
   --surface: #0d0d0d;
@@ -16,14 +10,12 @@
   --b2: 3px;
   --b3: 4px;
 
-  /* Status accent colors */
   --col-not-started: #505050;
   --col-introduced:  #2563eb;
   --col-practicing:  #d97706;
   --col-confident:   #16a34a;
   --col-mastered:    #22c55e;
 
-  /* Status background tints */
   --bg-not-started: #0d0d0d;
   --bg-introduced:  #040e22;
   --bg-practicing:  #100800;
@@ -31,20 +23,21 @@
   --bg-mastered:    #031008;
 }
 
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
 body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font);
   overflow-x: hidden;
+  min-height: 100vh;
 }
 
-/* Layout Container */
 #root {
   display: flex;
+  width: 100%;
   min-height: 100vh;
-  width: 100vw;
-  overflow-x: hidden;
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.4s ease;
 }
 
 .dashboard {
@@ -53,10 +46,13 @@ body {
   max-width: 900px;
   margin: 0 auto;
   padding: 0 16px;
-  transition: margin 0.4s ease;
+  transition: margin-right 0.4s ease;
 }
 
-/* Side Pane Styling (Sidebars) */
+.has-active-sidebar .dashboard {
+  margin-right: var(--sidebar-width);
+}
+
 .side-pane {
   position: fixed;
   top: 0;
@@ -71,50 +67,10 @@ body {
   box-shadow: -10px 0 30px rgba(0,0,0,0.5);
 }
 
-/* Shift Dashboard left when any side pane is active */
-.has-active-sidebar .dashboard {
-  margin-left: calc(50% - 450px - (var(--sidebar-width) / 2));
-}
-
-/* Header Sections */
-.dashboard__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 0;
-  border-bottom: 1px solid #333;
-}
-.dashboard__title { margin: 0; font-size: 1.2rem; font-weight: 900; letter-spacing: 0.14em; text-transform: uppercase; }
-.dashboard__profile-trigger { background: none; border: none; padding: 0; margin: 4px 0 0 0; font-size: 0.75rem; color: #3b82f6; cursor: pointer; font-weight: bold; text-transform: uppercase; }
-.dashboard__streak { color: #f59e0b; font-weight: bold; font-size: 0.8rem; background: #332a11; padding: 4px 8px; border-radius: 12px; }
-.dashboard__icon-btn { background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; }
-
-/* Main UI Components */
-.dashboard__main { padding: 20px 0 120px; }
-
-.btn-review {
-  width: 100%;
-  padding: 16px;
-  background: linear-gradient(to right, #3b82f6, #8b5cf6);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-weight: 900;
-  cursor: pointer;
-  margin: 20px 0;
-  font-family: var(--font);
-  letter-spacing: 0.05em;
-}
-
-.dashboard__view-toggle { display: flex; gap: 10px; margin-bottom: 20px; }
-.btn-toggle { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; background: #222; color: #fff; cursor: pointer; text-transform: uppercase; font-family: var(--font); }
-.btn-toggle.active { background: #3b82f6; }
-
-/* Mastery Grid & Vocab Cards */
-.mastery-grid__cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 12px;
+.drawer__scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
 }
 
 .vocab-card {
@@ -127,9 +83,10 @@ body {
   min-height: 84px;
   border: var(--b2) solid transparent;
   cursor: pointer;
+  transition: transform 0.1s ease;
 }
-.vocab-card__word { font-size: 1rem; font-weight: 900; }
-.vocab-card__pos { font-size: 0.5rem; color: var(--text-dim); text-transform: uppercase; margin-top: 5px; }
+
+.vocab-card:hover { transform: scale(1.02); }
 
 .vocab-card--not_started { background: var(--bg-not-started); border-color: var(--col-not-started); }
 .vocab-card--introduced  { background: var(--bg-introduced);  border-color: var(--col-introduced); }
@@ -137,33 +94,7 @@ body {
 .vocab-card--confident   { background: var(--bg-confident);   border-color: var(--col-confident); }
 .vocab-card--mastered    { background: var(--bg-mastered);    border-color: var(--col-mastered); }
 
-.drawer__scroll-area { flex: 1; overflow-y: auto; padding: 20px; }
-
-/* Sentence Builder Container */
-.builder-panel {
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
-  display: flex;
-  justify-content: center;
-  z-index: 3000;
-  pointer-events: none;
-}
-.builder-content {
-  width: 100%;
-  max-width: 900px;
-  background: #0a0a0a;
-  border: 2px solid #3b82f6;
-  border-bottom: none;
-  border-top-left-radius: 24px;
-  border-top-right-radius: 24px;
-  padding: 24px;
-  box-shadow: 0 -15px 40px rgba(0,0,0,0.9);
-  pointer-events: auto;
-  margin: 0 16px;
-}
-
-/* Responsive side-pane for mobile */
-@media (max-width: 600px) {
+@media (max-width: 800px) {
   :root { --sidebar-width: 100%; }
-  .has-active-sidebar .dashboard { transform: translateX(-100%); }
+  .has-active-sidebar .dashboard { display: none; }
 }
