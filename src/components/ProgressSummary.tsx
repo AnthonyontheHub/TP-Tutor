@@ -8,7 +8,7 @@ interface Props {
 
 export default function ProgressSummary({ activeFilter, onFilterClick }: Props) {
   // Fixed: Subscribe directly to vocabulary to guarantee component reactivity
-  useMasteryStore((s) => s.vocabulary); 
+  const vocabulary = useMasteryStore((s) => s.vocabulary); 
   const { getStatusSummary, savedPhrases } = useMasteryStore();
   const summary = getStatusSummary();
 
@@ -26,6 +26,8 @@ export default function ProgressSummary({ activeFilter, onFilterClick }: Props) 
     { status: 'mastered', label: 'DONE', color: '#ec4899' },
   ];
 
+  const totalWords = Math.max(1, vocabulary.length);
+
   return (
     <div style={{ background: '#111', borderRadius: '16px', padding: '20px', border: '1px solid #222', marginBottom: '20px' }}>
       
@@ -41,17 +43,18 @@ export default function ProgressSummary({ activeFilter, onFilterClick }: Props) 
         ))}
       </div>
 
-      {/* Level & XP Progress Bar */}
+      {/* Mastery Distribution Progress Bar */}
       <div style={{ marginBottom: '24px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '8px' }}>
-          <div>
-            <span style={{ fontSize: '0.7rem', color: '#3b82f6', fontWeight: 'bold', textTransform: 'uppercase' }}>{summary.rankTitle}</span>
-            <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'white' }}>Level {summary.level}</div>
-          </div>
-          <div style={{ fontSize: '0.8rem', color: '#666' }}>{summary.xp % 500} / 500 XP</div>
+          <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'white' }}>Vocabulary Progress</div>
+          <div style={{ fontSize: '0.8rem', color: '#666' }}>{vocabulary.length} Words</div>
         </div>
-        <div style={{ height: '6px', background: '#222', borderRadius: '10px', overflow: 'hidden' }}>
-          <div style={{ width: `${(summary.xp % 500) / 5}%`, height: '100%', background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)', transition: 'width 0.5s ease' }} />
+        <div style={{ height: '8px', background: '#222', borderRadius: '10px', overflow: 'hidden', display: 'flex' }}>
+          <div style={{ width: `${(summary.mastered / totalWords) * 100}%`, height: '100%', background: '#ec4899', transition: 'width 0.5s ease' }} title="Mastered" />
+          <div style={{ width: `${(summary.confident / totalWords) * 100}%`, height: '100%', background: '#10b981', transition: 'width 0.5s ease' }} title="Confident" />
+          <div style={{ width: `${(summary.practicing / totalWords) * 100}%`, height: '100%', background: '#f59e0b', transition: 'width 0.5s ease' }} title="Practicing" />
+          <div style={{ width: `${(summary.introduced / totalWords) * 100}%`, height: '100%', background: '#3b82f6', transition: 'width 0.5s ease' }} title="Introduced" />
+          <div style={{ width: `${(summary.not_started / totalWords) * 100}%`, height: '100%', background: '#1a1a1a', transition: 'width 0.5s ease' }} title="Not Started" />
         </div>
       </div>
 
