@@ -7,6 +7,8 @@ interface Props {
 }
 
 export default function ProgressSummary({ activeFilter, onFilterClick }: Props) {
+  // Fixed: Subscribe directly to vocabulary to guarantee component reactivity
+  useMasteryStore((s) => s.vocabulary); 
   const { getStatusSummary, savedPhrases } = useMasteryStore();
   const summary = getStatusSummary();
 
@@ -17,12 +19,11 @@ export default function ProgressSummary({ activeFilter, onFilterClick }: Props) 
     { icon: '📚', label: 'Writer', unlocked: savedPhrases.length >= 5 },
   ];
 
-  const statusItems: { status: MasteryStatus; label: string; color: string; icon?: string }[] = [
-    { status: 'not_started', label: 'NOT STARTED', color: '#ffffff' },
+  const statusItems: { status: MasteryStatus; label: string; color: string }[] = [
     { status: 'introduced', label: 'INTRO', color: '#3b82f6' },
     { status: 'practicing', label: 'WORK', color: '#f59e0b' },
     { status: 'confident', label: 'GOOD', color: '#10b981' },
-    { status: 'mastered', label: 'DONE', color: '#10b981', icon: '✅' },
+    { status: 'mastered', label: 'DONE', color: '#ec4899' },
   ];
 
   return (
@@ -55,7 +56,7 @@ export default function ProgressSummary({ activeFilter, onFilterClick }: Props) 
       </div>
 
       {/* Mastery Counts (Clickable Filters) */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '8px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
         {statusItems.map((item) => (
           <button
             key={item.status}
@@ -63,27 +64,17 @@ export default function ProgressSummary({ activeFilter, onFilterClick }: Props) 
             style={{
               background: activeFilter === item.status ? item.color : '#1a1a1a',
               border: 'none',
-              padding: '12px 4px',
+              padding: '12px 8px',
               borderRadius: '12px',
               cursor: 'pointer',
               transition: 'all 0.2s ease',
-              textAlign: 'center',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center'
+              textAlign: 'center'
             }}
           >
-            <div style={{ fontSize: '1rem', fontWeight: 'bold', color: activeFilter === item.status && item.color === '#ffffff' ? '#000' : 'white' }}>
-              {item.icon ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  {summary[item.status]} <span style={{ fontSize: '0.8rem' }}>{item.icon}</span>
-                </div>
-              ) : (
-                summary[item.status]
-              )}
+            <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: 'white' }}>
+              {summary[item.status]}
             </div>
-            <div style={{ fontSize: '0.45rem', color: activeFilter === item.status ? (item.color === '#ffffff' ? '#000' : 'white') : '#888', fontWeight: 'bold', marginTop: '4px' }}>
+            <div style={{ fontSize: '0.5rem', color: activeFilter === item.status ? 'white' : '#666', fontWeight: 'bold', marginTop: '2px' }}>
               {item.label}
             </div>
           </button>
