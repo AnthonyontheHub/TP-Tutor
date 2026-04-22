@@ -13,15 +13,13 @@ interface MasteryActions {
   savePhrase: (phrase: string) => void;
   recordActivity: () => void;
   setStudentName: (name: string) => void; 
-  setProfileImage: (url: string) => void; // New
+  setProfileImage: (url: string) => void;
   syncFromCloud: () => void;
   syncToCloud: () => Promise<void>; 
-  getStatusSummary: () => StatusSummary & { xp: number, level: number, rankTitle: string };
+  getStatusSummary: () => StatusSummary;
 }
 
 type MasteryStore = MasteryMap & { profileImage?: string } & MasteryActions;
-
-const XP_MAP = { not_started: 0, introduced: 10, practicing: 25, confident: 50, mastered: 100 };
 
 const getUserId = () => {
   let userId = localStorage.getItem('tp_tutor_user_id');
@@ -37,7 +35,7 @@ export const useMasteryStore = create<MasteryStore>()(
     (set, get) => ({
       ...initialMasteryMap,
       studentName: initialMasteryMap.studentName || 'Student',
-      profileImage: '', // New
+      profileImage: '',
       savedPhrases: initialMasteryMap.savedPhrases || [],
       currentStreak: initialMasteryMap.currentStreak || 0,
       lastActiveDate: initialMasteryMap.lastActiveDate || '',
@@ -74,11 +72,9 @@ export const useMasteryStore = create<MasteryStore>()(
       recordActivity: () => {
         const today = new Date().toDateString();
         const lastDate = get().lastActiveDate;
-        
         if (lastDate !== today) {
           const yesterday = new Date();
           yesterday.setDate(yesterday.getDate() - 1);
-          
           if (lastDate === yesterday.toDateString()) {
             set((state) => ({ currentStreak: state.currentStreak + 1, lastActiveDate: today }));
           } else {
@@ -101,19 +97,11 @@ export const useMasteryStore = create<MasteryStore>()(
 
       getStatusSummary: () => {
         const { vocabulary } = get();
-        const summary = { not_started: 0, introduced: 0, practicing: 0, confident: 0, mastered: 0, xp: 0 };
-        
+        const summary = { not_started: 0, introduced: 0, practicing: 0, confident: 0, mastered: 0 };
         for (const word of vocabulary) { 
           summary[word.status]++; 
-          summary.xp += XP_MAP[word.status];
         }
-
-        const level = Math.floor(summary.xp / 500) + 1;
-        let rankTitle = "nimi lili"; 
-        if (level >= 5) rankTitle = "jan pi toki pona"; 
-        if (level >= 10) rankTitle = "jan sona"; 
-        
-        return { ...summary, level, rankTitle };
+        return summary;
       },
 
       syncToCloud: async () => {
