@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useMasteryStore } from '../store/masteryStore';
 
 interface Props {
   onClose: () => void;
@@ -9,55 +8,44 @@ interface Props {
 }
 
 export default function SettingsDrawer({ onClose, isSandboxMode, setIsSandboxMode }: Props) {
-  const { vocabulary, updateVocabStatus } = useMasteryStore();
   const [apiKey, setApiKey] = useState('');
 
   useEffect(() => {
     setApiKey(localStorage.getItem('TP_GEMINI_KEY') || '');
   }, []);
 
-  const handleSaveKey = () => {
-    localStorage.setItem('TP_GEMINI_KEY', apiKey);
-    alert('API Key Saved!');
-  };
-
   return (
     <AnimatePresence>
+      <motion.div 
+        className="drawer-backdrop" 
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} 
+        onClick={onClose} 
+      />
       <motion.div
-        key="content"
-        initial={{ x: '100%' }}
-        animate={{ x: '0%' }}
-        exit={{ x: '100%' }}
+        className="settings-drawer"
+        initial={{ y: '100%', x: '-50%' }}
+        animate={{ y: 0, x: '-50%' }}
+        exit={{ y: '100%', x: '-50%' }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        className="side-drawer"
-        style={{ padding: '20px' }}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <h2 style={{ color: 'white', margin: 0 }}>SETTINGS</h2>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#888', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
-        </div>
-
-        <div className="settings-section" style={{ background: '#1a1a1a', padding: '15px', borderRadius: '12px', marginBottom: '15px' }}>
-          <label style={{ display: 'flex', justifyContent: 'space-between', color: 'white', alignItems: 'center' }}>
-            <span>Sandbox Mode (Offline)</span>
+        <div className="drawer__handle" onClick={onClose} />
+        <div className="drawer__scroll-area">
+          <h2 style={{ marginBottom: '20px' }}>SETTINGS</h2>
+          <div style={{ background: '#1a1a1a', padding: '15px', borderRadius: '12px', marginBottom: '15px' }}>
+            <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>Sandbox Mode</span>
+              <input type="checkbox" checked={isSandboxMode} onChange={(e) => setIsSandboxMode(e.target.checked)} />
+            </label>
+          </div>
+          <div style={{ background: '#1a1a1a', padding: '15px', borderRadius: '12px' }}>
+            <p style={{ color: '#888', fontSize: '0.8rem', marginBottom: '10px' }}>GEMINI API KEY</p>
             <input 
-              type="checkbox" 
-              checked={isSandboxMode} 
-              onChange={(e) => setIsSandboxMode(e.target.checked)}
-              style={{ width: '20px', height: '20px' }}
+              type="password" value={apiKey} 
+              onChange={(e) => setApiKey(e.target.value)}
+              onBlur={() => localStorage.setItem('TP_GEMINI_KEY', apiKey)}
+              style={{ width: '100%', padding: '10px', background: '#000', border: '1px solid #333', color: 'white', borderRadius: '6px' }}
             />
-          </label>
-        </div>
-
-        <div className="settings-section" style={{ background: '#1a1a1a', padding: '15px', borderRadius: '12px' }}>
-          <p style={{ color: '#888', margin: '0 0 10px 0', fontSize: '0.8rem' }}>GEMINI API KEY</p>
-          <input 
-            type="password" 
-            value={apiKey} 
-            onChange={(e) => setApiKey(e.target.value)}
-            style={{ width: '100%', padding: '10px', background: '#000', border: '1px solid #333', color: 'white', borderRadius: '6px', marginBottom: '10px' }}
-          />
-          <button onClick={handleSaveKey} className="btn-review" style={{ width: '100%', margin: 0 }}>SAVE KEY</button>
+          </div>
         </div>
       </motion.div>
     </AnimatePresence>
