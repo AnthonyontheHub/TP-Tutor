@@ -22,7 +22,7 @@ const PHRASES = [
 ];
 
 export default function PhraseGrid({ onAskLina, activeFilter, selectedWords, focusPhraseId, clearFocusPhrase }: Props) {
-  const { vocabulary, savedPhrases, updatePhraseNote } = useMasteryStore();
+  const { vocabulary, savedPhrases, updatePhraseNote, deletePhrase } = useMasteryStore();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [noteInput, setNoteInput] = useState('');
 
@@ -85,7 +85,14 @@ export default function PhraseGrid({ onAskLina, activeFilter, selectedWords, foc
             {p.isSaved && (
               <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #1e293b' }}>
                 {p.notes && <div style={{ fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '8px', padding: '6px', background: '#1e293b', borderRadius: '4px' }}>📝 {p.notes}</div>}
-                <button onClick={() => { setEditingId(p.id); setNoteInput(p.notes); }} className="btn-toggle" style={{ padding: '4px 8px', fontSize: '0.65rem', width: 'auto' }}>{p.notes ? 'EDIT NOTE' : '+ NOTE'}</button>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button onClick={() => { setEditingId(p.id); setNoteInput(p.notes); }} className="btn-toggle" style={{ padding: '4px 8px', fontSize: '0.65rem', width: 'auto' }}>
+                    {p.notes ? 'EDIT NOTE' : '+ NOTE'}
+                  </button>
+                  <button onClick={() => { if(window.confirm('Delete this saved phrase?')) deletePhrase(p.id); }} className="btn-toggle" style={{ padding: '4px 8px', fontSize: '0.65rem', width: 'auto', background: '#7f1d1d' }}>
+                    DELETE
+                  </button>
+                </div>
               </div>
             )}
           </div>
