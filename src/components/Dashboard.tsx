@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import ProgressSummary from './ProgressSummary';
 import MasteryGrid from './MasteryGrid';
+import PhraseGrid from './PhraseGrid'; 
 import SettingsDrawer from './SettingsDrawer'; 
 import UserProfileDrawer from './UserProfileDrawer'; 
 import SetupScreen from './SetupScreen';
 import type { MasteryStatus } from '../types/mastery';
 
 export default function Dashboard({ onStartSession, onAskLina }: { onStartSession: () => void; onAskLina: (p: string) => void }) {
-  const { studentName, currentStreak, vocabulary, savedPhrases } = useMasteryStore();
+  const { studentName, currentStreak, vocabulary } = useMasteryStore();
   const [isSandboxMode, setIsSandboxMode] = useState(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false); 
   const [isProfileOpen, setIsProfileOpen] = useState(false); 
@@ -33,10 +34,10 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
           <h1 className="dashboard__title">TOKI PONA</h1>
           <button onClick={() => setIsProfileOpen(true)} className="dashboard__profile-trigger">👤 {studentName.toUpperCase()}</button>
         </div>
-        <div className="dashboard__header-right" style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+        <div className="dashboard__header-right">
           {currentStreak > 0 && <div className="dashboard__streak">🔥 {currentStreak}</div>}
-          <button onClick={onStartSession} className="dashboard__icon-btn">💬 Chat</button>
-          <button onClick={() => setIsSettingsOpen(true)} className="dashboard__icon-btn">⚙️ Settings</button>
+          <button onClick={onStartSession} className="dashboard__icon-btn">💬</button>
+          <button onClick={() => setIsSettingsOpen(true)} className="dashboard__icon-btn">⚙️</button>
         </div>
       </header>
 
@@ -50,23 +51,42 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
         </div>
 
         {viewMode === 'grid' ? (
-          <MasteryGrid 
-            onAskLina={onAskLina} 
-            isSandboxMode={isSandboxMode} 
-            activeFilter={activeFilter} 
-            sortMode={sortMode} 
-            sortDirection={sortDirection} 
-            posFilter={posFilter}
-            setSortMode={setSortMode}
-            setSortDirection={setSortDirection}
-            setPosFilter={setPosFilter} 
-          />
+          <>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px', padding: '0 5px' }}>
+              <label htmlFor="pos-filter" style={{ fontWeight: 'bold' }}>Filter POS:</label>
+              <select 
+                id="pos-filter"
+                value={posFilter} 
+                onChange={(e) => setPosFilter(e.target.value)}
+                style={{ padding: '8px', borderRadius: '6px', background: '#222', color: '#fff', border: '1px solid #444', outline: 'none' }}
+              >
+                <option value="All">All Parts of Speech</option>
+                <option value="noun">Noun</option>
+                <option value="verb">Verb</option>
+                <option value="adjective">Adjective</option>
+                <option value="adverb">Adverb</option>
+                <option value="phrase">Phrase</option>
+              </select>
+            </div>
+            
+            <MasteryGrid 
+              onAskLina={onAskLina} 
+              isSandboxMode={isSandboxMode} 
+              activeFilter={activeFilter} 
+              sortMode={sortMode} 
+              sortDirection={sortDirection} 
+              posFilter={posFilter}
+              setSortMode={setSortMode}
+              setSortDirection={setSortDirection}
+              setPosFilter={setPosFilter} 
+            />
+          </>
         ) : (
-          <div style={{ padding: '20px 0' }}>
-            {savedPhrases.length === 0 ? <p>No phrases saved yet.</p> : savedPhrases.map((p, i) => (
-              <div key={i} style={{ background: '#111', borderLeft: '4px solid #10b981', padding: '15px', borderRadius: '8px', marginBottom: '10px' }}>{p}</div>
-            ))}
-          </div>
+          <PhraseGrid 
+            onAskLina={onAskLina} 
+            activeFilter={activeFilter} 
+            selectedWords={[]} 
+          />
         )}
       </main>
 
