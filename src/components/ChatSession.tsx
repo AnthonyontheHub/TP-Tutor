@@ -20,20 +20,11 @@ const STATUS_EMOJI = {
   mastered: '✅'
 };
 
-const generateId = () => {
-  try {
-    return crypto.randomUUID();
-  } catch (e) {
-    return Math.random().toString(36).substring(2, 15);
-  }
-};
-
 export default function ChatSession({ onEndSession, isActive, pendingPrompt, clearPrompt }: Props) {
   const [messages, setMessages] = useState<any[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
-  // Select only what we need from the store to prevent unnecessary re-renders
   const vocabulary = useMasteryStore(s => s.vocabulary);
   const studentName = useMasteryStore(s => s.studentName);
   const updateVocabStatus = useMasteryStore(s => s.updateVocabStatus);
@@ -59,12 +50,12 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
     if (isLoading || !key || !txt.trim()) return;
     
     setIsLoading(true);
-    setInput(''); // Clear input only after we've confirmed we can send
+    setInput(''); 
     
-    setMessages(p => [...p, { id: generateId(), role: 'user', displayContent: txt }]);
+    setMessages(p => [...p, { id: crypto.randomUUID(), role: 'user', displayContent: txt }]);
     historyRef.current.push({ role: 'user', content: txt });
     
-    const assistantId = generateId();
+    const assistantId = crypto.randomUUID();
     setMessages(p => [...p, { id: assistantId, role: 'assistant', displayContent: '', raw: '' }]);
     
     try {
@@ -119,6 +110,7 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
               className="chat-drawer" 
               drag="y" dragConstraints={{ top: 0 }} onDragEnd={(_, info) => { if (info.offset.y > 150) onEndSession(); }}
               initial={{ y: '100%' }} animate={{ y: '0%' }} exit={{ y: '100%' }} 
+              onClick={(e) => e.stopPropagation()}
               style={{ position: 'fixed', bottom: 0, left: 0, right: 0, height: '92vh', zIndex: 2000, background: '#111', borderTopLeftRadius: '20px', borderTopRightRadius: '20px', display: 'flex', flexDirection: 'column' }}
             >
               <div style={{ width: '100%', padding: '16px 0', cursor: 'grab', flexShrink: 0 }}>
