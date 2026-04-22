@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'; 
+import { useState, useEffect, useCallback } from 'react'; 
 import Dashboard from './components/Dashboard';
 import ChatSession from './components/ChatSession';
 import { useMasteryStore } from './store/masteryStore'; 
@@ -8,10 +8,10 @@ export default function App() {
   const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
 
   useEffect(() => {
-    // Fixed: Capture and directly return the strictly typed unsubscribe function
+    // Fixed: Capture and return the unsubscribe function correctly
     const unsubscribe = useMasteryStore.getState().syncFromCloud();
     return () => {
-      unsubscribe();
+      if (unsubscribe) unsubscribe();
     };
   }, []);
 
@@ -19,6 +19,11 @@ export default function App() {
     setPendingPrompt(prompt);
     setIsChatOpen(true); 
   };
+
+  // Fixed: Memoizing clearPrompt to prevent stale closures / infinite re-renders in children
+  const clearPrompt = useCallback(() => {
+    setPendingPrompt(null);
+  }, []);
 
   return (
     <>
@@ -30,7 +35,7 @@ export default function App() {
         isActive={isChatOpen} 
         onEndSession={() => setIsChatOpen(false)} 
         pendingPrompt={pendingPrompt}
-        clearPrompt={() => setPendingPrompt(null)}
+        clearPrompt={clearPrompt}
       />
     </>
   );
