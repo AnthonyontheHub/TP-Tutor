@@ -2,7 +2,7 @@
 import { db } from '../services/firebase';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { doc, setDoc, onSnapshot } from 'firebase/firestore';
+import { doc, setDoc, onSnapshot, Unsubscribe } from 'firebase/firestore';
 import type { MasteryMap, MasteryStatus, StatusSummary } from '../types/mastery';
 import { initialMasteryMap } from '../data/initialMasteryMap';
 
@@ -13,7 +13,7 @@ interface MasteryActions {
   savePhrase: (phrase: string) => void;
   recordActivity: () => void;
   setStudentName: (name: string) => void; 
-  syncFromCloud: () => () => void; // Fixed: Now correctly typed to return the unsubscribe function
+  syncFromCloud: () => Unsubscribe | void;
   syncToCloud: () => Promise<void>; 
   getStatusSummary: () => StatusSummary & { xp: number, level: number, rankTitle: string };
 }
@@ -123,7 +123,7 @@ export const useMasteryStore = create<MasteryStore>()(
 
       syncFromCloud: () => {
         const userId = getUserId();
-        // Fixed: Returning the onSnapshot function so it can be used for cleanup
+        // Fixed: Returning the unsubscribe function
         return onSnapshot(doc(db, 'users', userId), (snapshot) => {
           if (snapshot.exists()) {
             const data = snapshot.data();
