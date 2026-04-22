@@ -1,55 +1,37 @@
 import { useState, useEffect } from 'react'; 
 import Dashboard from './components/Dashboard';
 import ChatSession from './components/ChatSession';
-import SettingsDrawer from './components/SettingsDrawer';
-import UserProfileDrawer from './components/UserProfileDrawer';
 import { useMasteryStore } from './store/masteryStore'; 
 
 export default function App() {
-  const [activeView, setActiveView] = useState<'none' | 'chat' | 'settings' | 'profile'>('none');
-  const [isSandboxMode, setIsSandboxMode] = useState(true);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
 
   useEffect(() => {
-    useMasteryStore.getState().syncFromCloud();
+    // FIX: Properly bind and execute the cleanup function to prevent memory leaks
+    const unsubscribe = useMasteryStore.getState().syncFromCloud();
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
-  // Sync state to body class for CSS transforms
-  useEffect(() => {
-    if (activeView !== 'none') {
-      document.body.classList.add('has-active-drawer');
-    } else {
-      document.body.classList.remove('has-active-drawer');
-    }
-  }, [activeView]);
+  const handleAskLina = (prompt: string) => {
+    setPendingPrompt(prompt);
+    setIsChatOpen(true); 
+  };
 
   return (
     <>
       <Dashboard 
-        onStartSession={() => setActiveView('chat')} 
-        onOpenSettings={() => setActiveView('settings')}
-        onOpenProfile={() => setActiveView('profile')}
-        onAskLina={() => setActiveView('chat')} 
-        isSandboxMode={isSandboxMode}
+        onStartSession={() => setIsChatOpen(true)} 
+        onAskLina={handleAskLina} 
       />
-      
       <ChatSession 
-        isActive={activeView === 'chat'} 
-        onEndSession={() => setActiveView('none')} 
+        isActive={isChatOpen} 
+        onEndSession={() => setIsChatOpen(false)} 
+        pendingPrompt={pendingPrompt}
+        clearPrompt={() => setPendingPrompt(null)}
       />
-
-      {activeView === 'settings' && (
-        <SettingsDrawer 
-          onClose={() => setActiveView('none')} 
-          isSandboxMode={isSandboxMode} 
-          setIsSandboxMode={setIsSandboxMode} 
-        />
-      )}
-
-      {activeView === 'profile' && (
-        <UserProfileDrawer 
-          onClose={() => setActiveView('none')} 
-        />
-      )}
     </>
   );
 }
