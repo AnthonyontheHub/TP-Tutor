@@ -28,15 +28,17 @@ export default function PhraseGrid({ onAskLina, activeFilter, selectedWords, foc
 
   const clean = (w: string) => w.toLowerCase().replace(/[.!?,]/g, '');
 
+  const safeSavedPhrases = savedPhrases || [];
+
   useEffect(() => {
     if (focusPhraseId) {
       setEditingId(focusPhraseId);
-      const target = savedPhrases.find(p => typeof p !== 'string' && p.id === focusPhraseId);
+      const target = safeSavedPhrases.find(p => typeof p !== 'string' && p.id === focusPhraseId);
       setNoteInput(target && typeof target !== 'string' ? target.notes : '');
     }
-  }, [focusPhraseId, savedPhrases]);
+  }, [focusPhraseId, safeSavedPhrases]);
 
-  const normalizedSaved = savedPhrases.map(p => 
+  const normalizedSaved = safeSavedPhrases.map(p => 
     typeof p === 'string' ? { id: p, tp: p, en: 'User Saved Phrase *', notes: '' } : p
   );
 
@@ -46,7 +48,6 @@ export default function PhraseGrid({ onAskLina, activeFilter, selectedWords, foc
   ];
 
   const filtered = combined.filter(p => {
-    // BUG FIX: If it is a user saved phrase, automatically allow it to pass the strict dictionary check
     if (!p.isSaved) {
       const ws = p.tp.split(' ').map(clean);
       const isKnown = ws.every(w => {
