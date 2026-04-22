@@ -1,3 +1,4 @@
+/* src/services/linaService.ts */
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import type { VocabWord, MasteryStatus } from '../types/mastery';
 
@@ -102,6 +103,24 @@ export async function fetchSentenceSuggestions(apiKey: string, words: string[]) 
   } catch (e) {
     console.error("Lina Suggestion Error:", e);
     return [];
+  }
+}
+
+/**
+ * Provides a quick translation for the builder panel
+ */
+export async function fetchQuickTranslation(apiKey: string, text: string) {
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+  const prompt = `Translate this Toki Pona phrase to English: "${text}". Provide ONLY the direct English translation, no other text, quotes, or explanation.`;
+
+  try {
+    const result = await model.generateContent(prompt);
+    return result.response.text().trim();
+  } catch (e) {
+    console.error("Lina Translation Error:", e);
+    return null;
   }
 }
 
