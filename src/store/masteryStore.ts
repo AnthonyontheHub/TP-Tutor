@@ -13,7 +13,7 @@ interface MasteryActions {
   savePhrase: (phrase: string) => void;
   recordActivity: () => void;
   setStudentName: (name: string) => void; 
-  syncFromCloud: () => () => void; // Updated return type for unsubscribe
+  syncFromCloud: () => (() => void) | void;
   syncToCloud: () => Promise<void>; 
   getStatusSummary: () => StatusSummary & { xp: number, level: number, rankTitle: string };
 }
@@ -25,7 +25,10 @@ const XP_MAP = { not_started: 0, introduced: 10, practicing: 25, confident: 50, 
 const getUserId = () => {
   let userId = localStorage.getItem('tp_tutor_user_id');
   if (!userId) {
-    userId = crypto.randomUUID();
+    // Safe fallback for non-HTTPS contexts where crypto.randomUUID is undefined
+    userId = typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+      ? crypto.randomUUID()
+      : 'user-' + Date.now() + '-' + Math.random().toString(36).substring(2, 9);
     localStorage.setItem('tp_tutor_user_id', userId);
   }
   return userId;
@@ -123,12 +126,10 @@ export const useMasteryStore = create<MasteryStore>()(
 
       syncFromCloud: () => {
         const userId = getUserId();
-        // Fixed: Returning the unsubscribe function from onSnapshot
-        return onSnapshot(doc(db, 'users', userId), (snapshot) => {
+        // Return the unsubscribe function to satisfy App.tsx cleanup
+        const unsubscribe = onSnapshot(doc(db, 'users', userId), (snapshot) => {
           if (snapshot.exists()) {
             const data = snapshot.data();
-            
-            // Only update state if cloud data exists to prevent reset loops
             set({
               vocabulary: data.vocabulary || initialMasteryMap.vocabulary,
               chapters: data.chapters || initialMasteryMap.chapters,
@@ -140,6 +141,7 @@ export const useMasteryStore = create<MasteryStore>()(
             });
           }
         });
+        return unsubscribe;
       }
     }),
     { name: 'tp-tutor-mastery' }
