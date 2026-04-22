@@ -31,7 +31,7 @@ export default function MasteryGrid({
   onAskLina, isSandboxMode, activeFilter, sortMode, sortDirection, posFilter, 
   setSortMode, setSortDirection, setPosFilter 
 }: Props) {
-  const { vocabulary, savePhrase } = useMasteryStore();
+  const { vocabulary } = useMasteryStore();
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [magneticSuggestions, setMagneticSuggestions] = useState<string[]>([]);
@@ -97,12 +97,7 @@ export default function MasteryGrid({
   return (
     <div className="mastery-grid-container">
       <div className="grid-toolbar" style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
-        <select 
-          value={sortMode} 
-          onChange={(e) => setSortMode(e.target.value)} 
-          className="sort-select"
-          style={{ padding: '8px', borderRadius: '6px', background: '#222', color: '#fff', border: '1px solid #444', outline: 'none', flex: 1 }}
-        >
+        <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="sort-select">
           <option value="alphabetical">A-Z</option>
           <option value="status">Mastery</option>
         </select>
@@ -124,7 +119,6 @@ export default function MasteryGrid({
               cursor: 'pointer'
             }}
           >
-            {/* Fixed React warning: VocabCard shouldn't receive an unused 'onClick' prop */}
             <VocabCard word={word} />
           </div>
         ))}
@@ -158,14 +152,6 @@ export default function MasteryGrid({
                 style={{ margin: 0, flex: 2 }}
               >
                 ASK LINA
-              </button>
-              {/* Added: Direct save button to store phrases */}
-              <button 
-                onClick={() => { savePhrase(selectedWords.join(' ')); setSelectedWords([]); }} 
-                className="btn-review"
-                style={{ margin: 0, flex: 1, background: 'linear-gradient(to right, #10b981, #059669)' }}
-              >
-                SAVE
               </button>
               <button 
                 onClick={() => setSelectedWords([])} 
