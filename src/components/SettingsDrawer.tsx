@@ -24,38 +24,30 @@ export default function SettingsDrawer({ onClose, isSandboxMode, setIsSandboxMod
 
   return (
     <AnimatePresence>
-      <div style={{ position: 'relative', zIndex: 3000 }}>
-        {/* Unified Backdrop using global CSS */}
+      <div style={{ position: 'fixed', inset: 0, zIndex: 3000 }}>
         <motion.div 
-          key="backdrop"
-          initial={{ opacity: 0 }} 
-          animate={{ opacity: 1 }} 
-          exit={{ opacity: 0 }} 
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} 
           onClick={onClose}
           className="drawer-backdrop"
-          style={{ cursor: 'pointer' }}
         />
         
-        {/* Content Drawer using global CSS structure */}
         <motion.div
-          key="content"
+          drag="y"
+          dragConstraints={{ top: 0 }}
+          dragElastic={0.2}
+          onDragEnd={(_, info) => { if (info.offset.y > 100) onClose(); }}
           initial={{ y: '100%' }}
           animate={{ y: '0%' }}
           exit={{ y: '100%' }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           className="settings-drawer"
+          style={{ height: '66vh' }}
           onClick={(e) => e.stopPropagation()}
-          style={{ 
-            display: 'flex', 
-            flexDirection: 'column',
-            background: '#111',
-            borderTop: '3px solid #fff' // Matches index.css variable --text
-          }}
         >
-          <div className="drawer__handle" />
+          <div className="drawer__handle" onClick={onClose} style={{ cursor: 'pointer' }} />
           
           <div className="drawer__scroll-area">
-            <h2 style={{ color: 'white', marginTop: 0, letterSpacing: '0.1em' }}>SETTINGS</h2>
+            <h2 style={{ color: 'white', marginTop: 0, marginBottom: '20px', letterSpacing: '0.1em' }}>SETTINGS</h2>
 
             <div style={{ background: '#1a1a1a', padding: '20px', borderRadius: '12px', marginBottom: '15px', border: '1px solid #333' }}>
               <label style={{ display: 'flex', justifyContent: 'space-between', color: 'white', alignItems: 'center', cursor: 'pointer' }}>
@@ -78,15 +70,8 @@ export default function SettingsDrawer({ onClose, isSandboxMode, setIsSandboxMod
                 placeholder="Paste key here..."
                 onChange={(e) => setApiKey(e.target.value)}
                 style={{ 
-                  width: '100%', 
-                  padding: '12px', 
-                  background: '#000', 
-                  border: '1px solid #444', 
-                  color: 'white', 
-                  borderRadius: '8px', 
-                  marginBottom: '15px',
-                  outline: 'none',
-                  fontFamily: 'monospace'
+                  width: '100%', padding: '12px', background: '#000', border: '1px solid #444', 
+                  color: 'white', borderRadius: '8px', marginBottom: '15px', outline: 'none'
                 }}
               />
               <button onClick={handleSaveKey} className="btn-review" style={{ margin: 0 }}>
@@ -97,18 +82,11 @@ export default function SettingsDrawer({ onClose, isSandboxMode, setIsSandboxMod
             <button 
               onClick={onClose} 
               style={{ 
-                width: '100%', 
-                marginTop: '30px', 
-                background: 'transparent', 
-                color: '#666', 
-                border: '1px solid #333', 
-                padding: '12px', 
-                borderRadius: '8px', 
-                fontWeight: 'bold',
-                cursor: 'pointer'
+                width: '100%', marginTop: '30px', background: 'transparent', color: '#666', 
+                border: '1px solid #333', padding: '12px', borderRadius: '8px', fontWeight: 'bold'
               }}
             >
-              ✕ CLOSE SETTINGS
+              ✕ CLOSE
             </button>
           </div>
         </motion.div>
