@@ -5,7 +5,7 @@ import MasteryGrid from './MasteryGrid';
 import SetupScreen from './SetupScreen';
 import type { MasteryStatus } from '../types/mastery';
 
-interface Props {
+interface DashboardProps {
   onStartSession: () => void;
   onOpenSettings: () => void;
   onOpenProfile: () => void;
@@ -13,7 +13,7 @@ interface Props {
   isSandboxMode: boolean;
 }
 
-export default function Dashboard({ onStartSession, onOpenSettings, onOpenProfile, onAskLina, isSandboxMode }: Props) {
+export default function Dashboard({ onStartSession, onOpenSettings, onOpenProfile, onAskLina, isSandboxMode }: DashboardProps) {
   const { studentName, currentStreak, vocabulary, savedPhrases } = useMasteryStore();
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'phrasebook'>('grid');
@@ -38,9 +38,9 @@ export default function Dashboard({ onStartSession, onOpenSettings, onOpenProfil
       <main className="dashboard__main">
         <ProgressSummary activeFilter={activeFilter} onFilterClick={setActiveFilter} />
         
-        <div className="dashboard__view-toggle">
-          <button onClick={() => setViewMode('grid')} className={`btn-toggle ${viewMode === 'grid' ? 'active' : ''}`}>GRID</button>
-          <button onClick={() => setViewMode('phrasebook')} className={`btn-toggle ${viewMode === 'phrasebook' ? 'active' : ''}`}>PHRASEBOOK</button>
+        <div className="dashboard__view-toggle" style={{ display: 'flex', gap: '10px', margin: '20px 0' }}>
+          <button onClick={() => setViewMode('grid')} className={`btn-toggle ${viewMode === 'grid' ? 'active' : ''}`} style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: viewMode === 'grid' ? '#3b82f6' : '#222', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}>GRID</button>
+          <button onClick={() => setViewMode('phrasebook')} className={`btn-toggle ${viewMode === 'phrasebook' ? 'active' : ''}`} style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: viewMode === 'phrasebook' ? '#3b82f6' : '#222', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}>PHRASEBOOK</button>
         </div>
 
         {viewMode === 'grid' ? (
@@ -57,8 +57,8 @@ export default function Dashboard({ onStartSession, onOpenSettings, onOpenProfil
           />
         ) : (
           <div style={{ padding: '20px 0' }}>
-            {savedPhrases.length === 0 ? <p>No saved phrases.</p> : savedPhrases.map((p, i) => (
-              <div key={i} style={{ background: '#111', padding: '15px', borderRadius: '8px', marginBottom: '10px' }}>{p}</div>
+            {savedPhrases.length === 0 ? <p>No phrases saved yet.</p> : savedPhrases.map((p, i) => (
+              <div key={i} style={{ background: '#111', padding: '15px', borderRadius: '8px', marginBottom: '10px', borderLeft: '4px solid #10b981' }}>{p}</div>
             ))}
           </div>
         )}
