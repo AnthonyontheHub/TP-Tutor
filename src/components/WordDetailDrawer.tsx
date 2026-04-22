@@ -1,4 +1,3 @@
-/* src/components/WordDetailDrawer.tsx */
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
 import { STATUS_META } from '../types/mastery';
@@ -27,8 +26,8 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
           initial={{ opacity: 0, scale: 0.95 }} 
           animate={{ opacity: 1, scale: 1 }} 
           exit={{ opacity: 0, scale: 0.95 }} 
-          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           onClick={(e) => e.stopPropagation()}
+          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
         >
           <div className="drawer__handle" />
           <div className="drawer__scroll-area">
