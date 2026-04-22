@@ -3,22 +3,20 @@ import { db } from '../services/firebase';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { doc, setDoc, onSnapshot } from 'firebase/firestore';
-import type { MasteryMap, MasteryStatus, StatusSummary } from '../types/mastery';
+import type { MasteryMap, MasteryStatus, StatusSummary, SavedPhrase } from '../types/mastery';
 import { initialMasteryMap } from '../data/initialMasteryMap';
 
 interface MasteryActions {
   updateVocabStatus: (wordIdOrText: string, status: MasteryStatus) => void;
   updateConceptStatus: (chapterId: string, conceptId: string, status: MasteryStatus) => void;
   setLastUpdated: (date: string) => void;
-  savePhrase: (phrase: string) => void;
+  savePhrase: (phrase: string | SavedPhrase) => void;
+  updatePhraseNote: (id: string, note: string) => void;
   recordActivity: () => void;
   setStudentName: (name: string) => void; 
   syncFromCloud: () => void;
   syncToCloud: () => Promise<void>; 
   getStatusSummary: () => StatusSummary & { xp: number, level: number, rankTitle: string };
-  resetProgress: () => void;
-  randomizeProgress: () => void;
-  masterAll: () => void;
 }
 
 type MasteryStore = MasteryMap & MasteryActions;
@@ -67,8 +65,26 @@ export const useMasteryStore = create<MasteryStore>()(
         void get().syncToCloud();
       },
 
-      savePhrase: (phrase) => {
-        set((state) => ({ savedPhrases: [...new Set([...state.savedPhrases, phrase])] }));
+      savePhrase: (phraseOrString) => {
+        const newPhrase = typeof phraseOrString === 'string' 
+          ? { id: crypto.randomUUID(), tp: phraseOrString, en: 'User Saved Phrase *', notes: '' }
+          : phraseOrString;
+        
+        set((state) => {
+          const exists = state.savedPhrases.some(p => typeof p === 'string' ? p === newPhrase.tp : p.tp === newPhrase.tp);
+          if (exists) return state;
+          return { savedPhrases: [...state.savedPhrases, newPhrase] };
+        });
+        void get().syncToCloud();
+      },
+
+      updatePhraseNote: (id, notes) => {
+        set((state) => ({
+          savedPhrases: state.savedPhrases.map(p => {
+            if (typeof p === 'string') return p;
+            return p.id === id ? { ...p, notes } : p;
+          })
+        }));
         void get().syncToCloud();
       },
 
@@ -140,46 +156,6 @@ export const useMasteryStore = create<MasteryStore>()(
             });
           }
         });
-      },
-
-      resetProgress: () => {
-        set({
-          vocabulary: initialMasteryMap.vocabulary,
-          chapters: initialMasteryMap.chapters,
-          savedPhrases: [],
-          currentStreak: 0,
-          lastActiveDate: ''
-        });
-        void get().syncToCloud();
-      },
-
-      randomizeProgress: () => {
-        const statuses: MasteryStatus[] = ['not_started', 'introduced', 'practicing', 'confident', 'mastered'];
-        set((state) => ({
-          vocabulary: state.vocabulary.map((w) => ({
-            ...w,
-            status: statuses[Math.floor(Math.random() * statuses.length)]
-          })),
-          chapters: state.chapters.map((ch) => ({
-            ...ch,
-            concepts: ch.concepts.map((c) => ({
-              ...c,
-              status: statuses[Math.floor(Math.random() * statuses.length)]
-            }))
-          }))
-        }));
-        void get().syncToCloud();
-      },
-
-      masterAll: () => {
-        set((state) => ({
-          vocabulary: state.vocabulary.map((w) => ({ ...w, status: 'mastered' })),
-          chapters: state.chapters.map((ch) => ({
-            ...ch,
-            concepts: ch.concepts.map((c) => ({ ...c, status: 'mastered' }))
-          }))
-        }));
-        void get().syncToCloud();
       }
     }),
     { name: 'tp-tutor-mastery' }
