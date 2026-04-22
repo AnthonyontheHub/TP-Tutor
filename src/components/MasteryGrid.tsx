@@ -27,6 +27,8 @@ const STATUS_RANK: Record<MasteryStatus, number> = {
   mastered: 4
 };
 
+const POS_OPTIONS = ['All', 'Noun', 'Verb', 'Adjective', 'Adverb', 'Pronoun', 'Preposition', 'Conjunction', 'Interjection'];
+
 export default function MasteryGrid({ 
   onAskLina, isSandboxMode, activeFilter, sortMode, sortDirection, posFilter, 
   setSortMode, setSortDirection, setPosFilter 
@@ -96,7 +98,7 @@ export default function MasteryGrid({
 
   return (
     <div className="mastery-grid-container">
-      <div className="grid-toolbar" style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
+      <div className="grid-toolbar" style={{ display: 'flex', gap: '10px', marginBottom: '15px', flexWrap: 'wrap' }}>
         <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="sort-select">
           <option value="alphabetical">A-Z</option>
           <option value="status">Mastery</option>
@@ -104,6 +106,11 @@ export default function MasteryGrid({
         <button onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')} className="btn-toggle">
           {sortDirection === 'asc' ? '↑' : '↓'}
         </button>
+        <select value={posFilter} onChange={(e) => setPosFilter(e.target.value)} className="sort-select">
+          {POS_OPTIONS.map(pos => (
+            <option key={pos} value={pos}>{pos}</option>
+          ))}
+        </select>
       </div>
 
       <div className="mastery-grid__cards">
@@ -167,7 +174,6 @@ export default function MasteryGrid({
 
       {drawerId && (
         <WordDetailDrawer 
-          isOpen={!!drawerId}
           word={vocabulary.find(v => v.id === drawerId)!} 
           onClose={() => setDrawerId(null)} 
           onAskLina={onAskLina} 
