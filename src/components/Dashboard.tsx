@@ -1,3 +1,4 @@
+/* src/components/Dashboard.tsx */
 import { useState } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import ProgressSummary from './ProgressSummary';
@@ -9,7 +10,7 @@ import SetupScreen from './SetupScreen';
 import type { MasteryStatus } from '../types/mastery';
 
 export default function Dashboard({ onStartSession, onAskLina }: { onStartSession: () => void; onAskLina: (p: string) => void }) {
-  const { studentName, currentStreak, vocabulary, savedPhrases } = useMasteryStore();
+  const { studentName, currentStreak, vocabulary } = useMasteryStore();
   const [isSandboxMode, setIsSandboxMode] = useState(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false); 
   const [isProfileOpen, setIsProfileOpen] = useState(false); 
@@ -17,8 +18,10 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'phrasebook'>('grid');
   const [posFilter, setPosFilter] = useState('All');
-  const [sortMode, setSortMode] = useState<'alphabetical' | 'status' | 'frequency' | 'length' | 'type'>('alphabetical');
+  const [sortMode, setSortMode] = useState<'alphabetical' | 'status' | 'partOfSpeech' | 'meanings'>('alphabetical');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  
+  const [focusPhraseId, setFocusPhraseId] = useState<string | null>(null);
 
   if (!studentName || studentName === 'Student') return <SetupScreen />;
 
@@ -79,27 +82,27 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
               setSortMode={setSortMode}
               setSortDirection={setSortDirection}
               setPosFilter={setPosFilter} 
+              onNavigateToPhrases={(id) => {
+                setViewMode('phrasebook');
+                if (id) setFocusPhraseId(id);
+              }}
             />
           </>
         ) : (
           <div style={{ padding: '20px 0' }}>
-            <PhraseGrid onAskLina={onAskLina} activeFilter={activeFilter} selectedWords={[]} />
-            
-            <h3 style={{ marginTop: '30px', marginBottom: '15px', color: '#fff', fontSize: '1.2rem', fontWeight: 'bold', borderBottom: '1px solid #333', paddingBottom: '10px' }}>
-              SAVED PHRASES
-            </h3>
-            {savedPhrases.length === 0 ? <p style={{ color: '#888' }}>No phrases saved yet.</p> : savedPhrases.map((p, i) => (
-              <div key={i} style={{ background: '#111', borderLeft: '4px solid #10b981', padding: '15px', borderRadius: '8px', marginBottom: '10px', color: '#eee' }}>{p}</div>
-            ))}
+            <PhraseGrid 
+              onAskLina={onAskLina} 
+              activeFilter={activeFilter} 
+              selectedWords={[]} 
+              focusPhraseId={focusPhraseId}
+              clearFocusPhrase={() => setFocusPhraseId(null)}
+            />
           </div>
         )}
       </main>
 
-      {/* Fixed: SettingsDrawer might also need isOpen prop if it uses AnimatePresence, but preserving existing logic otherwise */}
       {isSettingsOpen && <SettingsDrawer onClose={() => setIsSettingsOpen(false)} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} />}
-      
-      {/* Fixed: Unconditional render with isOpen prop passed to allow Framer Motion AnimatePresence to work */}
-      <UserProfileDrawer isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
+      {isProfileOpen && <UserProfileDrawer onClose={() => setIsProfileOpen(false)} />}
     </div>
   );
 }
