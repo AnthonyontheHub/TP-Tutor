@@ -25,7 +25,6 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
-  // Select only what we need from the store to prevent unnecessary re-renders
   const vocabulary = useMasteryStore(s => s.vocabulary);
   const studentName = useMasteryStore(s => s.studentName);
   const updateVocabStatus = useMasteryStore(s => s.updateVocabStatus);
@@ -40,19 +39,23 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
   
   useEffect(() => { 
     const key = localStorage.getItem('TP_GEMINI_KEY');
-    if (isActive && pendingPrompt && key && !isLoading) { 
-       sendToLina(pendingPrompt, key); 
+    if (isActive && pendingPrompt && !isLoading) { 
+       if (key) {
+         sendToLina(pendingPrompt, key); 
+       } else {
+         // Fixed: Prevent stale prompts if the user hasn't supplied a key yet
+         alert("Please add your Gemini API Key in settings first!");
+       }
        if (clearPrompt) clearPrompt(); 
     } 
-    // Fixed: Included clearPrompt safely now that it is memoized in App.tsx
-  }, [isActive, pendingPrompt, clearPrompt, isLoading]);
+  }, [isActive, pendingPrompt, isLoading, clearPrompt]);
 
   async function sendToLina(txt: string, overrideKey?: string) {
     const key = overrideKey || localStorage.getItem('TP_GEMINI_KEY');
     if (isLoading || !key || !txt.trim()) return;
     
     setIsLoading(true);
-    setInput(''); // Clear input only after we've confirmed we can send
+    setInput(''); 
     
     setMessages(p => [...p, { id: crypto.randomUUID(), role: 'user', displayContent: txt }]);
     historyRef.current.push({ role: 'user', content: txt });
