@@ -37,28 +37,43 @@ export default function MasteryGrid({
   const [magneticSuggestions, setMagneticSuggestions] = useState<string[]>([]);
   
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const isLongPressActive = useRef(false);
+  const isLongPress = useRef(false);
 
   useEffect(() => {
     const apiKey = localStorage.getItem('TP_GEMINI_KEY');
-    if (selectedWords.length > 1 && apiKey) {
-      const timer = setTimeout(async () => {
-        const results = await fetchSentenceSuggestions(apiKey, selectedWords);
-        setMagneticSuggestions(results);
-      }, 800);
-      return () => clearTimeout(timer);
-    } else if (selectedWords.length <= 1) {
+    if (selectedWords.length > 1) {
+      if (apiKey) {
+        const timer = setTimeout(async () => {
+          const results = await fetchSentenceSuggestions(apiKey, selectedWords);
+          setMagneticSuggestions(results);
+        }, 800);
+        return () => clearTimeout(timer);
+      } else {
+        // Fallback: Logically combine words if no AI integration is present
+        const baseCombo = selectedWords.join(' ');
+        const combos = [baseCombo];
+        
+        // Generate basic Toki Pona sentence structures
+        if (selectedWords.length === 2 && !selectedWords.includes('li')) {
+          combos.push(`${selectedWords[0]} li ${selectedWords[1]}`);
+        } else if (selectedWords.length >= 3 && !selectedWords.includes('li')) {
+          combos.push(`${selectedWords[0]} li ${selectedWords.slice(1).join(' ')}`);
+          combos.push(`${selectedWords[0]} ${selectedWords[1]} li ${selectedWords.slice(2).join(' ')}`);
+        }
+
+        setMagneticSuggestions(Array.from(new Set(combos)));
+      }
+    } else {
       setMagneticSuggestions([]);
     }
   }, [selectedWords]);
 
   const handlePointerDown = (word: string) => {
-    isLongPressActive.current = false;
+    isLongPress.current = false;
     longPressTimer.current = setTimeout(() => {
-      isLongPressActive.current = true;
+      isLongPress.current = true;
       soundService.playBlip(523.25, 'sine', 0.05);
-      // Toggle selection immediately on long press
-      setSelectedWords(prev => prev.includes(word) ? prev.filter(w => w !== word) : [...prev, word]);
+      setSelectedWords(prev => prev.includes(word) ? prev : [...prev, word]);
     }, 500);
   };
 
@@ -68,18 +83,15 @@ export default function MasteryGrid({
       longPressTimer.current = null;
     }
     
-    // If it was a long press, we've already toggled the word in Down timer.
-    // We just return here to prevent opening the drawer.
-    if (isLongPressActive.current) {
+    if (isLongPress.current) {
+      isLongPress.current = false;
       return; 
     }
 
-    // Normal Tap logic
     if (selectedWords.length === 0) {
       const target = vocabulary.find(v => v.word === word);
       if (target) setDrawerId(target.id);
     } else {
-      // If we are already in selection mode, a tap toggles selection
       setSelectedWords(prev => prev.includes(word) ? prev.filter(w => w !== word) : [...prev, word]);
     }
   };
@@ -120,25 +132,19 @@ export default function MasteryGrid({
             style={{ 
               opacity: selectedWords.length > 0 && !selectedWords.includes(word.word) ? 0.3 : 1,
               touchAction: 'none',
-              cursor: 'pointer',
-              userSelect: 'none',
-              WebkitUserSelect: 'none'
+              cursor: 'pointer'
             }}
           >
-            <VocabCard word={word} />
+            <VocabCard word={word} onClick={() => {}} />
           </div>
         ))}
       </div>
 
-      {selectedWords.length > 0 && (
+      {selectedWords.length > 1 && (
         <div className="builder-panel">
           <div className="builder-content">
-            <div style={{ color: 'white', fontSize: '1.2rem', marginBottom: '15px', fontWeight: 'bold' }}>
-              {selectedWords.join(' ')}
-            </div>
-            
             {magneticSuggestions.length > 0 && (
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '15px' }}>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '15px', justifyContent: 'center' }}>
                 {magneticSuggestions.map((s, i) => (
                   <button 
                     key={i} 
@@ -150,6 +156,10 @@ export default function MasteryGrid({
                 ))}
               </div>
             )}
+
+            <div style={{ color: 'white', fontSize: '1.2rem', marginBottom: '15px', fontWeight: 'bold', textAlign: 'center' }}>
+              {selectedWords.join(' ')}
+            </div>
 
             <div style={{ display: 'flex', gap: '10px' }}>
               <button 
@@ -173,7 +183,6 @@ export default function MasteryGrid({
 
       {drawerId && (
         <WordDetailDrawer 
-          isOpen={!!drawerId}
           word={vocabulary.find(v => v.id === drawerId)!} 
           onClose={() => setDrawerId(null)} 
           onAskLina={onAskLina} 
