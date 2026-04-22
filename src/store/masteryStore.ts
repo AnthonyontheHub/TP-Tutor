@@ -14,10 +14,20 @@ interface MasteryActions {
   setStudentName: (name: string) => void; 
   syncFromCloud: () => void;
   syncToCloud: () => Promise<void>; 
-  getStatusSummary: () => StatusSummary;
+  getStatusSummary: () => StatusSummary & { xp: number, level: number, rankTitle: string };
+  resetProgress: () => void; // Added resetProgress
 }
 
 type MasteryStore = MasteryMap & MasteryActions;
+
+// XP Mapping: Values for each status level - Made sure it covers all statuses
+const XP_MAP: Record<MasteryStatus, number> = { 
+  not_started: 0, 
+  introduced: 10, 
+  practicing: 25, 
+  confident: 50, 
+  mastered: 100 
+};
 
 // Helper to get or create a unique user ID for the database
 const getUserId = () => {
@@ -90,13 +100,37 @@ export const useMasteryStore = create<MasteryStore>()(
 
       getStatusSummary: () => {
         const { vocabulary } = get();
-        const summary = { not_started: 0, introduced: 0, practicing: 0, confident: 0, mastered: 0 };
+        const summary = { not_started: 0, introduced: 0, practicing: 0, confident: 0, mastered: 0, xp: 0 };
         
         for (const word of vocabulary) { 
-          summary[word.status]++; 
+          // Ensure word.status is valid, fallback to not_started if undefined
+          const status = word.status || 'not_started';
+          summary[status]++; 
+          summary.xp += (XP_MAP[status] || 0); // Guard against NaN
         }
+
+        // Calculate level based on 500 XP per level. Ensure XP is a valid number.
+        const validXp = isNaN(summary.xp) ? 0 : summary.xp;
+        const level = Math.floor(validXp / 500) + 1;
         
-        return summary;
+        let rankTitle = "nimi lili"; 
+        if (level >= 5) rankTitle = "jan pi toki pona"; 
+        if (level >= 10) rankTitle = "jan sona"; 
+        
+        return { ...summary, xp: validXp, level, rankTitle };
+      },
+
+      // Added Reset Progress function
+      resetProgress: () => {
+        set({
+           vocabulary: initialMasteryMap.vocabulary,
+           chapters: initialMasteryMap.chapters,
+           savedPhrases: [],
+           currentStreak: 0,
+           lastActiveDate: '',
+           // Keep studentName
+        });
+        void get().syncToCloud();
       },
 
       syncToCloud: async () => {
