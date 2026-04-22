@@ -13,7 +13,7 @@ export default function App() {
     useMasteryStore.getState().syncFromCloud();
   }, []);
 
-  // Sync class to body for the CSS shift effect
+  // Controls the dashboard shift
   useEffect(() => {
     if (activeView !== 'none') {
       document.body.classList.add('has-active-drawer');
@@ -28,7 +28,7 @@ export default function App() {
         onStartSession={() => setActiveView('chat')} 
         onOpenSettings={() => setActiveView('settings')}
         onOpenProfile={() => setActiveView('profile')}
-        onAskLina={(p) => { setActiveView('chat'); /* handle prompt logic if needed */ }} 
+        onAskLina={() => setActiveView('chat')} 
         isSandboxMode={isSandboxMode}
       />
       
