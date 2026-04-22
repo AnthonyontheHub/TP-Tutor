@@ -72,24 +72,27 @@ export default function MasteryGrid({
     }
   }, [selectedWords, isSandboxMode]);
 
+  // Safely separated pointer events to guarantee click accuracy
   const handlePointerDown = (word: string) => {
     isLongPress.current = false;
     longPressTimer.current = setTimeout(() => {
       isLongPress.current = true;
       soundService.playBlip(523.25, 'sine', 0.05);
       setSelectedWords(prev => prev.includes(word) ? prev : [...prev, word]);
-    }, 500);
+    }, 400); 
   };
 
-  const handlePointerUp = (word: string) => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
+  const clearTimer = () => {
+    if (longPressTimer.current) clearTimeout(longPressTimer.current);
+  };
+
+  const handleCardClick = (word: string) => {
     if (isLongPress.current) {
-      isLongPress.current = false;
-      return; 
+      isLongPress.current = false; // Reset after a successful hold
+      return;
     }
+    
+    // Normal Tap Logic
     if (selectedWords.length === 0) {
       const target = vocabulary.find(v => v.word === word);
       if (target) setDrawerId(target.id);
@@ -98,21 +101,16 @@ export default function MasteryGrid({
     }
   };
 
-  // Fixed Translation Toggle
   const handleTranslateToggle = async () => {
     if (isTranslating) {
       setIsTranslating(false);
       return;
     }
-    
     setIsTranslating(true);
-    
     if (!translationText) {
       const phrase = selectedWords.join(' ');
       const apiKey = localStorage.getItem('TP_GEMINI_KEY');
-      
       setTranslationText("..."); 
-
       if (apiKey && !isSandboxMode) {
         const result = await fetchQuickTranslation(apiKey, phrase);
         if (result) {
@@ -120,12 +118,10 @@ export default function MasteryGrid({
           return;
         }
       }
-      
       const fallbackTranslation = selectedWords.map(w => {
         const match = vocabulary.find(v => v.word === w);
         return match ? match.meanings.split(',')[0].trim() : w;
       }).join(' ');
-      
       setTranslationText(fallbackTranslation);
     }
   };
@@ -146,14 +142,35 @@ export default function MasteryGrid({
 
   return (
     <div className="mastery-grid-container">
-      <div className="grid-toolbar" style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
-        <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="sort-select">
-          <option value="alphabetical">A-Z</option>
-          <option value="status">Mastery Level</option>
-          <option value="partOfSpeech">Word Type (POS)</option>
-          <option value="meanings">English Meaning</option>
+      {/* Standardized Dual Select Toolbar */}
+      <div className="grid-toolbar" style={{ display: 'flex', gap: '10px', marginBottom: '20px', alignItems: 'center' }}>
+        <select 
+          value={posFilter} 
+          onChange={(e) => setPosFilter(e.target.value)}
+          style={{ flex: 1, padding: '10px', borderRadius: '8px', background: '#222', color: '#fff', border: '1px solid #444', outline: 'none', fontWeight: 'bold' }}
+        >
+          <option value="All">All Words</option>
+          <option value="noun">Noun</option>
+          <option value="verb">Verb</option>
+          <option value="adjective">Adjective</option>
+          <option value="adverb">Adverb</option>
         </select>
-        <button onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')} className="btn-toggle">
+        
+        <select 
+          value={sortMode} 
+          onChange={(e) => setSortMode(e.target.value)} 
+          style={{ flex: 1, padding: '10px', borderRadius: '8px', background: '#222', color: '#fff', border: '1px solid #444', outline: 'none', fontWeight: 'bold' }}
+        >
+          <option value="alphabetical">A-Z</option>
+          <option value="status">Mastery</option>
+          <option value="partOfSpeech">Type (POS)</option>
+          <option value="meanings">English</option>
+        </select>
+        
+        <button 
+          onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')} 
+          style={{ padding: '10px 15px', borderRadius: '8px', background: '#3b82f6', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
+        >
           {sortDirection === 'asc' ? '↑' : '↓'}
         </button>
       </div>
@@ -163,11 +180,20 @@ export default function MasteryGrid({
           <div 
             key={word.id} 
             onPointerDown={() => handlePointerDown(word.word)} 
-            onPointerUp={() => handlePointerUp(word.word)}
+            onPointerUp={clearTimer}
+            onPointerLeave={clearTimer}
+            onClick={() => handleCardClick(word.word)}
+            onContextMenu={(e) => {
+              e.preventDefault();
+              if (!selectedWords.includes(word.word)) {
+                 soundService.playBlip(523.25, 'sine', 0.05);
+                 setSelectedWords(prev => [...prev, word.word]);
+              }
+            }}
             className="grid-item-wrapper"
             style={{ 
               opacity: selectedWords.length > 0 && !selectedWords.includes(word.word) ? 0.3 : 1,
-              touchAction: 'none',
+              touchAction: 'pan-y',
               cursor: 'pointer'
             }}
           >
@@ -179,44 +205,19 @@ export default function MasteryGrid({
       {selectedWords.length > 1 && (
         <div className="builder-panel">
           <div className="builder-content">
-            
             {magneticSuggestions.length > 0 && (
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '15px', justifyContent: 'center' }}>
                 {magneticSuggestions.map((s, i) => (
                   <div key={i} style={{ position: 'relative' }}>
-                    <button 
-                      className="suggestion-pill"
-                      onClick={() => setActivePillMenu(activePillMenu === s ? null : s)}
-                      style={{ borderColor: activePillMenu === s ? '#fff' : '#3b82f6' }}
-                    >
-                      {s}
-                    </button>
-                    
+                    <button className="suggestion-pill" onClick={() => setActivePillMenu(activePillMenu === s ? null : s)} style={{ borderColor: activePillMenu === s ? '#fff' : '#3b82f6' }}>{s}</button>
                     {activePillMenu === s && (
-                      <div style={{ 
-                        position: 'absolute', bottom: '120%', left: '50%', transform: 'translateX(-50%)', 
-                        background: '#222', padding: '6px', borderRadius: '8px', display: 'flex', gap: '6px', 
-                        border: '1px solid #444', zIndex: 10, boxShadow: '0 4px 12px rgba(0,0,0,0.5)'
-                      }}>
-                        <button 
-                          className="btn-toggle" 
-                          style={{ padding: '6px 10px', fontSize: '0.75rem', margin: 0 }}
-                          onClick={() => { onAskLina(`Let's practice this: "${s}"`); setActivePillMenu(null); }}
-                        >
-                          ASK
-                        </button>
-                        <button 
-                          className="btn-toggle" 
-                          style={{ padding: '6px 10px', fontSize: '0.75rem', margin: 0, background: '#16a34a' }}
-                          onClick={() => { 
-                            const newId = crypto.randomUUID();
-                            savePhrase({ id: newId, tp: s, en: 'User Saved Phrase *', notes: '' }); 
-                            setActivePillMenu(null);
-                            if (onNavigateToPhrases) onNavigateToPhrases(newId);
-                          }}
-                        >
-                          SAVE
-                        </button>
+                      <div style={{ position: 'absolute', bottom: '120%', left: '50%', transform: 'translateX(-50%)', background: '#222', padding: '6px', borderRadius: '8px', display: 'flex', gap: '6px', border: '1px solid #444', zIndex: 10 }}>
+                        <button className="btn-toggle" style={{ padding: '6px 10px', fontSize: '0.75rem', margin: 0 }} onClick={() => onAskLina(`Let's practice: "${s}"`)}>ASK</button>
+                        <button className="btn-toggle" style={{ padding: '6px 10px', fontSize: '0.75rem', margin: 0, background: '#16a34a' }} onClick={() => {
+                          const newId = crypto.randomUUID();
+                          savePhrase({ id: newId, tp: s, en: 'User Saved Phrase *', notes: '' });
+                          if (onNavigateToPhrases) onNavigateToPhrases(newId);
+                        }}>SAVE</button>
                       </div>
                     )}
                   </div>
@@ -225,39 +226,15 @@ export default function MasteryGrid({
             )}
 
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '15px', marginBottom: '15px' }}>
-              <div style={{ color: isTranslating ? '#a855f7' : 'white', fontSize: '1.2rem', fontWeight: 'bold', textAlign: 'center', minHeight: '1.5rem' }}>
+              <div style={{ color: isTranslating ? '#a855f7' : 'white', fontSize: '1.2rem', fontWeight: 'bold', textAlign: 'center' }}>
                 {isTranslating ? translationText : selectedWords.join(' ')}
               </div>
-              <button 
-                onClick={handleTranslateToggle}
-                style={{ 
-                  background: isTranslating ? '#333' : 'none', 
-                  border: isTranslating ? '2px solid #a855f7' : '2px solid #555', 
-                  borderRadius: '50%', width: '28px', height: '28px', 
-                  color: isTranslating ? '#a855f7' : '#999', 
-                  cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontWeight: 'bold', touchAction: 'none'
-                }}
-              >
-                ?
-              </button>
+              <button onClick={handleTranslateToggle} style={{ background: isTranslating ? '#333' : 'none', border: isTranslating ? '2px solid #a855f7' : '2px solid #555', borderRadius: '50%', width: '28px', height: '28px', color: isTranslating ? '#a855f7' : '#999', cursor: 'pointer', fontWeight: 'bold' }}>?</button>
             </div>
 
             <div style={{ display: 'flex', gap: '10px' }}>
-              <button 
-                onClick={() => { onAskLina(`Is "${selectedWords.join(' ')}" correct?`); setSelectedWords([]); }} 
-                className="btn-review" 
-                style={{ margin: 0, flex: 2 }}
-              >
-                ASK LINA
-              </button>
-              <button 
-                onClick={() => { setSelectedWords([]); setActivePillMenu(null); }} 
-                className="btn-toggle"
-                style={{ flex: 1 }}
-              >
-                CLEAR
-              </button>
+              <button onClick={() => { onAskLina(`Is "${selectedWords.join(' ')}" correct?`); setSelectedWords([]); }} className="btn-review" style={{ margin: 0, flex: 2 }}>ASK LINA</button>
+              <button onClick={() => setSelectedWords([])} className="btn-toggle" style={{ flex: 1 }}>CLEAR</button>
             </div>
           </div>
         </div>
