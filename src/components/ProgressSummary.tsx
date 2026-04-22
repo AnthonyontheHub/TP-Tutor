@@ -9,6 +9,9 @@ interface Props {
 export default function ProgressSummary({ activeFilter, onFilterClick }: Props) {
   const { getStatusSummary, savedPhrases } = useMasteryStore();
   const summary = getStatusSummary();
+  
+  // Total tokens in the application
+  const totalWords = summary.not_started + summary.introduced + summary.practicing + summary.confident + summary.mastered || 124;
 
   const badges = [
     { icon: '🌱', label: 'Newcomer', unlocked: (summary.introduced + summary.practicing) >= 5 },
@@ -21,7 +24,7 @@ export default function ProgressSummary({ activeFilter, onFilterClick }: Props) 
     { status: 'introduced', label: 'INTRO', color: '#3b82f6' },
     { status: 'practicing', label: 'WORK', color: '#f59e0b' },
     { status: 'confident', label: 'GOOD', color: '#10b981' },
-    { status: 'mastered', label: 'DONE', color: '#ec4899' },
+    { status: 'mastered', label: 'DONE', color: '#22c55e' },
   ];
 
   return (
@@ -39,17 +42,23 @@ export default function ProgressSummary({ activeFilter, onFilterClick }: Props) 
         ))}
       </div>
 
-      {/* Level & XP Progress Bar */}
+      {/* Rebuilt Stacked Progress Bar */}
       <div style={{ marginBottom: '24px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '8px' }}>
           <div>
             <span style={{ fontSize: '0.7rem', color: '#3b82f6', fontWeight: 'bold', textTransform: 'uppercase' }}>{summary.rankTitle}</span>
             <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'white' }}>Level {summary.level}</div>
           </div>
-          <div style={{ fontSize: '0.8rem', color: '#666' }}>{summary.xp % 500} / 500 XP</div>
+          <div style={{ fontSize: '0.8rem', color: '#666' }}>{totalWords - summary.not_started} / {totalWords} Words</div>
         </div>
-        <div style={{ height: '6px', background: '#222', borderRadius: '10px', overflow: 'hidden' }}>
-          <div style={{ width: `${(summary.xp % 500) / 5}%`, height: '100%', background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)', transition: 'width 0.5s ease' }} />
+        <div style={{ height: '14px', display: 'flex', borderRadius: '10px', overflow: 'hidden', background: '#222' }}>
+          <div title="Not Started" style={{ width: `${(summary.not_started / totalWords) * 100}%`, background: '#ffffff', borderRight: '1px solid #111' }} />
+          <div title="Introduced" style={{ width: `${(summary.introduced / totalWords) * 100}%`, background: '#3b82f6', borderRight: '1px solid #111' }} />
+          <div title="Practicing" style={{ width: `${(summary.practicing / totalWords) * 100}%`, background: '#f59e0b', borderRight: '1px solid #111' }} />
+          <div title="Confident" style={{ width: `${(summary.confident / totalWords) * 100}%`, background: '#10b981', borderRight: '1px solid #111' }} />
+          <div title="Mastered" style={{ width: `${(summary.mastered / totalWords) * 100}%`, background: '#22c55e', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>
+            {summary.mastered > 0 && '✅'}
+          </div>
         </div>
       </div>
 
