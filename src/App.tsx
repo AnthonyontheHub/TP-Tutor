@@ -1,4 +1,3 @@
-/* src/App.tsx */
 import { useState, useEffect } from 'react'; 
 import Dashboard from './components/Dashboard';
 import ChatSession from './components/ChatSession';
@@ -7,20 +6,20 @@ import { useMasteryStore } from './store/masteryStore';
 export default function App() {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
-    // Safety check: ensure syncFromCloud exists and is a function
-    const store = useMasteryStore.getState();
-    
-    if (typeof store.syncFromCloud === 'function') {
-      const unsubscribe = store.syncFromCloud();
-      
+    try {
+      // Fixed: Capture and return the unsubscribe function with error handling
+      const unsubscribe = useMasteryStore.getState().syncFromCloud();
       return () => {
-        // Only call unsubscribe if it is actually returned as a function
-        if (typeof unsubscribe === 'function') {
+        if (unsubscribe && typeof unsubscribe === 'function') {
           unsubscribe();
         }
       };
+    } catch (err) {
+      console.error("Critical: Failed to sync from cloud:", err);
+      setHasError(true);
     }
   }, []);
 
@@ -28,6 +27,18 @@ export default function App() {
     setPendingPrompt(prompt);
     setIsChatOpen(true); 
   };
+
+  if (hasError) {
+    return (
+      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#000', color: '#ff4444', textAlign: 'center', padding: '20px' }}>
+        <div>
+          <h1>Sync Error</h1>
+          <p>Failed to connect to the database. Please check your internet connection or Firebase configuration.</p>
+          <button onClick={() => window.location.reload()} style={{ marginTop: '20px', padding: '10px 20px', borderRadius: '8px', border: 'none', background: '#3b82f6', color: 'white' }}>RETRY</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
