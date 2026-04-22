@@ -15,10 +15,15 @@ interface MasteryActions {
   setStudentName: (name: string) => void; 
   syncFromCloud: () => void;
   syncToCloud: () => Promise<void>; 
-  getStatusSummary: () => StatusSummary;
+  getStatusSummary: () => StatusSummary & { xp: number, level: number, rankTitle: string };
+  resetProgress: () => void;
+  randomizeProgress: () => void;
+  masterAll: () => void;
 }
 
 type MasteryStore = MasteryMap & MasteryActions;
+
+const XP_MAP = { not_started: 0, introduced: 10, practicing: 25, confident: 50, mastered: 100 };
 
 const getUserId = () => {
   let userId = localStorage.getItem('tp_tutor_user_id');
@@ -92,13 +97,19 @@ export const useMasteryStore = create<MasteryStore>()(
 
       getStatusSummary: () => {
         const { vocabulary } = get();
-        const summary = { not_started: 0, introduced: 0, practicing: 0, confident: 0, mastered: 0 };
+        const summary = { not_started: 0, introduced: 0, practicing: 0, confident: 0, mastered: 0, xp: 0 };
         
         for (const word of vocabulary) { 
           summary[word.status]++; 
+          summary.xp += XP_MAP[word.status];
         }
+
+        const level = Math.floor(summary.xp / 500) + 1;
+        let rankTitle = "nimi lili"; 
+        if (level >= 5) rankTitle = "jan pi toki pona"; 
+        if (level >= 10) rankTitle = "jan sona"; 
         
-        return summary;
+        return { ...summary, level, rankTitle };
       },
 
       syncToCloud: async () => {
@@ -129,6 +140,46 @@ export const useMasteryStore = create<MasteryStore>()(
             });
           }
         });
+      },
+
+      resetProgress: () => {
+        set({
+          vocabulary: initialMasteryMap.vocabulary,
+          chapters: initialMasteryMap.chapters,
+          savedPhrases: [],
+          currentStreak: 0,
+          lastActiveDate: ''
+        });
+        void get().syncToCloud();
+      },
+
+      randomizeProgress: () => {
+        const statuses: MasteryStatus[] = ['not_started', 'introduced', 'practicing', 'confident', 'mastered'];
+        set((state) => ({
+          vocabulary: state.vocabulary.map((w) => ({
+            ...w,
+            status: statuses[Math.floor(Math.random() * statuses.length)]
+          })),
+          chapters: state.chapters.map((ch) => ({
+            ...ch,
+            concepts: ch.concepts.map((c) => ({
+              ...c,
+              status: statuses[Math.floor(Math.random() * statuses.length)]
+            }))
+          }))
+        }));
+        void get().syncToCloud();
+      },
+
+      masterAll: () => {
+        set((state) => ({
+          vocabulary: state.vocabulary.map((w) => ({ ...w, status: 'mastered' })),
+          chapters: state.chapters.map((ch) => ({
+            ...ch,
+            concepts: ch.concepts.map((c) => ({ ...c, status: 'mastered' }))
+          }))
+        }));
+        void get().syncToCloud();
       }
     }),
     { name: 'tp-tutor-mastery' }
