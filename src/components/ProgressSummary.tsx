@@ -1,3 +1,4 @@
+/* src/components/ProgressSummary.tsx */
 import { useMasteryStore } from '../store/masteryStore';
 import type { MasteryStatus } from '../types/mastery';
 
@@ -7,17 +8,9 @@ interface Props {
 }
 
 export default function ProgressSummary({ activeFilter, onFilterClick }: Props) {
-  // Subscribe directly to vocabulary to guarantee component reactivity
   useMasteryStore((s) => s.vocabulary); 
-  const { getStatusSummary, savedPhrases } = useMasteryStore();
+  const { getStatusSummary } = useMasteryStore();
   const summary = getStatusSummary();
-
-  const badges = [
-    { icon: '🌱', label: 'Newcomer', unlocked: (summary.introduced + summary.practicing) >= 5 },
-    { icon: '🗣️', label: 'Speaker', unlocked: summary.confident >= 15 },
-    { icon: '🦉', label: 'Philosopher', unlocked: summary.mastered >= 10 },
-    { icon: '📚', label: 'Writer', unlocked: savedPhrases.length >= 5 },
-  ];
 
   const statusItems: { status: MasteryStatus; label: string; color: string }[] = [
     { status: 'not_started', label: 'NOT START', color: '#ffffff' },
@@ -30,63 +23,30 @@ export default function ProgressSummary({ activeFilter, onFilterClick }: Props) 
   return (
     <div style={{ background: '#111', borderRadius: '16px', padding: '20px', border: '1px solid #222', marginBottom: '20px' }}>
       
-      {/* Achievement Badges Row */}
-      <div style={{ display: 'flex', gap: '12px', overflowX: 'auto', marginBottom: '20px', paddingBottom: '10px', scrollbarWidth: 'none' }}>
-        {badges.map((badge, i) => (
-          <div key={i} style={{ textAlign: 'center', opacity: badge.unlocked ? 1 : 0.2, filter: badge.unlocked ? 'none' : 'grayscale(1)', minWidth: '60px' }}>
-            <div style={{ fontSize: '1.5rem', background: '#222', width: '45px', height: '45px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 4px' }}>
-              {badge.icon}
-            </div>
-            <div style={{ fontSize: '0.6rem', color: '#888', textTransform: 'uppercase' }}>{badge.label}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* Level & XP Progress Bar */}
-      <div style={{ marginBottom: '24px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '8px' }}>
-          <div>
-            <span style={{ fontSize: '0.7rem', color: '#3b82f6', fontWeight: 'bold', textTransform: 'uppercase' }}>{summary.rankTitle}</span>
-            <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'white' }}>Level {summary.level}</div>
-          </div>
-          <div style={{ fontSize: '0.8rem', color: '#666' }}>{summary.xp % 500} / 500 XP</div>
-        </div>
-        <div style={{ height: '6px', background: '#222', borderRadius: '10px', overflow: 'hidden' }}>
-          <div style={{ width: `${(summary.xp % 500) / 5}%`, height: '100%', background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)', transition: 'width 0.5s ease' }} />
-        </div>
-      </div>
-
       {/* Mastery Counts (Clickable Filters) */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px' }}>
-        {statusItems.map((item) => {
-          const isActive = activeFilter === item.status;
-          const isAnyActive = activeFilter !== null;
-          
-          return (
-            <button
-              key={item.status}
-              onClick={() => onFilterClick(isActive ? null : item.status)}
-              style={{
-                background: isActive ? item.color : '#1a1a1a',
-                border: isActive ? `1px solid ${item.color}` : '1px solid #333',
-                padding: '12px 4px',
-                borderRadius: '12px',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                textAlign: 'center',
-                boxShadow: isActive ? `0 0 15px ${item.color}` : 'none',
-                opacity: isAnyActive && !isActive ? 0.3 : 1
-              }}
-            >
-              <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: isActive ? '#000' : 'white' }}>
-                {summary[item.status]}
-              </div>
-              <div style={{ fontSize: '0.45rem', color: isActive ? '#000' : '#666', fontWeight: 'bold', marginTop: '2px' }}>
-                {item.label}
-              </div>
-            </button>
-          );
-        })}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
+        {statusItems.map((item) => (
+          <button
+            key={item.status}
+            onClick={() => onFilterClick(activeFilter === item.status ? null : item.status)}
+            style={{
+              background: activeFilter === item.status ? item.color : '#1a1a1a',
+              border: 'none',
+              padding: '12px 8px',
+              borderRadius: '12px',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              textAlign: 'center'
+            }}
+          >
+            <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: 'white' }}>
+              {summary[item.status]}
+            </div>
+            <div style={{ fontSize: '0.5rem', color: activeFilter === item.status ? 'white' : '#666', fontWeight: 'bold', marginTop: '2px' }}>
+              {item.label}
+            </div>
+          </button>
+        ))}
       </div>
 
       {/* Weekly Heatmap (Simulation) */}
@@ -108,5 +68,7 @@ export default function ProgressSummary({ activeFilter, onFilterClick }: Props) 
         </div>
       </div>
     </div>
+  );
+}
   );
 }
