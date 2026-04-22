@@ -1,17 +1,15 @@
 /* src/components/SettingsDrawer.tsx */
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useMasteryStore } from '../store/masteryStore';
 
 interface Props {
-  isOpen?: boolean;
+  isOpen: boolean;
   onClose: () => void;
   isSandboxMode: boolean;
   setIsSandboxMode: (val: boolean) => void;
 }
 
-export default function SettingsDrawer({ isOpen = true, onClose, isSandboxMode, setIsSandboxMode }: Props) {
-  const { resetProgress, randomizeProgress, masterAll } = useMasteryStore();
+export default function SettingsDrawer({ isOpen, onClose, isSandboxMode, setIsSandboxMode }: Props) {
   const [apiKey, setApiKey] = useState('');
 
   useEffect(() => {
@@ -21,27 +19,6 @@ export default function SettingsDrawer({ isOpen = true, onClose, isSandboxMode, 
   const handleSaveKey = () => {
     localStorage.setItem('TP_GEMINI_KEY', apiKey);
     alert('API Key Saved!');
-  };
-
-  const handleReset = () => {
-    if (window.confirm('Are you sure you want to completely reset your progress? This cannot be undone.')) {
-      resetProgress();
-      alert('Progress has been reset.');
-    }
-  };
-
-  const handleRandomize = () => {
-    if (window.confirm('Randomize all knowledge base statuses? This is for testing only!')) {
-      randomizeProgress();
-      alert('Knowledge base randomized.');
-    }
-  };
-
-  const handleMasterAll = () => {
-    if (window.confirm('Mark all words and concepts as Mastered?')) {
-      masterAll();
-      alert('You are now a Toki Pona master!');
-    }
   };
 
   return (
@@ -83,7 +60,7 @@ export default function SettingsDrawer({ isOpen = true, onClose, isSandboxMode, 
             </label>
           </div>
 
-          <div className="settings-section" style={{ background: '#1a1a1a', padding: '15px', borderRadius: '12px', marginBottom: '20px' }}>
+          <div className="settings-section" style={{ background: '#1a1a1a', padding: '15px', borderRadius: '12px' }}>
             <p style={{ color: '#888', margin: '0 0 10px 0', fontSize: '0.8rem' }}>GEMINI API KEY</p>
             <input 
               type="password" 
@@ -93,33 +70,6 @@ export default function SettingsDrawer({ isOpen = true, onClose, isSandboxMode, 
             />
             <button onClick={handleSaveKey} className="btn-review" style={{ width: '100%', margin: 0 }}>SAVE KEY</button>
           </div>
-
-          {/* DANGERZONE */}
-          <div className="settings-section dangerzone" style={{ background: '#2a0a0a', padding: '15px', borderRadius: '12px', border: '1px solid #ff4444' }}>
-            <h3 style={{ color: '#ff4444', margin: '0 0 10px 0', fontSize: '1rem', textTransform: 'uppercase' }}>Dangerzone</h3>
-            
-            <button 
-              onClick={handleRandomize} 
-              style={{ width: '100%', padding: '10px', background: 'transparent', border: '1px solid #ffaa00', color: '#ffaa00', borderRadius: '6px', marginBottom: '10px', cursor: 'pointer' }}
-            >
-              Randomize Progress (Test)
-            </button>
-
-            <button 
-              onClick={handleMasterAll} 
-              style={{ width: '100%', padding: '10px', background: 'transparent', border: '1px solid #00cc66', color: '#00cc66', borderRadius: '6px', marginBottom: '10px', cursor: 'pointer' }}
-            >
-              Master All Data
-            </button>
-
-            <button 
-              onClick={handleReset} 
-              style={{ width: '100%', padding: '10px', background: '#ff4444', border: 'none', color: 'white', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
-            >
-              Reset All Progress
-            </button>
-          </div>
-
         </motion.div>
       )}
     </AnimatePresence>
