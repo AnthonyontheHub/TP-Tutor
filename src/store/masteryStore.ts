@@ -1,3 +1,4 @@
+/* src/store/masteryStore.ts */
 import { db } from '../services/firebase';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
@@ -11,9 +12,9 @@ interface MasteryActions {
   setLastUpdated: (date: string) => void;
   savePhrase: (phrase: string) => void;
   recordActivity: () => void;
-  setStudentName: (name: string) => void;
+  setStudentName: (name: string) => void; 
   syncFromCloud: () => void;
-  syncToCloud: () => Promise<void>;
+  syncToCloud: () => Promise<void>; 
   getStatusSummary: () => StatusSummary;
 }
 
@@ -40,20 +41,20 @@ export const useMasteryStore = create<MasteryStore>()(
       updateVocabStatus: (wordIdOrText, status) => {
         set((state) => ({
           vocabulary: state.vocabulary.map((w) =>
-            w.id === wordIdOrText || w.word.toLowerCase() === wordIdOrText.toLowerCase()
-              ? { ...w, status }
+            (w.id === wordIdOrText || w.word.toLowerCase() === wordIdOrText.toLowerCase()) 
+              ? { ...w, status } 
               : w
           ),
         }));
         get().recordActivity();
-        void get().syncToCloud();
+        void get().syncToCloud(); 
       },
 
       updateConceptStatus: (chapterId, conceptId, status) => {
         set((state) => ({
           chapters: state.chapters.map((ch) =>
             ch.id === chapterId
-              ? { ...ch, concepts: ch.concepts.map((c) => (c.id === conceptId ? { ...c, status } : c)) }
+              ? { ...ch, concepts: ch.concepts.map((c) => c.id === conceptId ? { ...c, status } : c) }
               : ch
           ),
         }));
@@ -69,9 +70,11 @@ export const useMasteryStore = create<MasteryStore>()(
       recordActivity: () => {
         const today = new Date().toDateString();
         const lastDate = get().lastActiveDate;
+        
         if (lastDate !== today) {
           const yesterday = new Date();
           yesterday.setDate(yesterday.getDate() - 1);
+          
           if (lastDate === yesterday.toDateString()) {
             set((state) => ({ currentStreak: state.currentStreak + 1, lastActiveDate: today }));
           } else {
@@ -89,34 +92,24 @@ export const useMasteryStore = create<MasteryStore>()(
 
       getStatusSummary: () => {
         const { vocabulary } = get();
-        const summary: StatusSummary = {
-          not_started: 0,
-          introduced: 0,
-          practicing: 0,
-          confident: 0,
-          mastered: 0,
-        };
-        vocabulary.forEach((w) => {
-          summary[w.status]++;
-        });
+        const summary = { not_started: 0, introduced: 0, practicing: 0, confident: 0, mastered: 0 };
+        
+        for (const word of vocabulary) { 
+          summary[word.status]++; 
+        }
+        
         return summary;
       },
 
       syncToCloud: async () => {
-        const state = get();
+        const { vocabulary, chapters, lastUpdated, studentName, savedPhrases, currentStreak, lastActiveDate } = get();
         try {
           const userId = getUserId();
           await setDoc(doc(db, 'users', userId), {
-            vocabulary: state.vocabulary,
-            chapters: state.chapters,
-            lastUpdated: state.lastUpdated,
-            studentName: state.studentName,
-            savedPhrases: state.savedPhrases,
-            currentStreak: state.currentStreak,
-            lastActiveDate: state.lastActiveDate,
+            vocabulary, chapters, lastUpdated, studentName, savedPhrases, currentStreak, lastActiveDate
           });
         } catch (err) {
-          console.error('Firebase Sync Error:', err);
+          console.error("Firebase Sync Error:", err);
         }
       },
 
@@ -132,11 +125,11 @@ export const useMasteryStore = create<MasteryStore>()(
               studentName: data.studentName || 'Student',
               savedPhrases: data.savedPhrases || [],
               currentStreak: data.currentStreak || 0,
-              lastActiveDate: data.lastActiveDate || '',
+              lastActiveDate: data.lastActiveDate || ''
             });
           }
         });
-      },
+      }
     }),
     { name: 'tp-tutor-mastery' }
   )
