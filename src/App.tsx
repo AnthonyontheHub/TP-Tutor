@@ -1,3 +1,4 @@
+/* src/App.tsx */
 import { useState, useEffect } from 'react'; 
 import Dashboard from './components/Dashboard';
 import ChatSession from './components/ChatSession';
@@ -8,7 +9,11 @@ export default function App() {
   const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
 
   useEffect(() => {
-    useMasteryStore.getState().syncFromCloud();
+    // Capture the unsubscribe function and run it on unmount
+    const unsubscribe = useMasteryStore.getState().syncFromCloud();
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
   const handleAskLina = (prompt: string) => {
