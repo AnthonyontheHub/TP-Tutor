@@ -18,11 +18,15 @@ interface Props {
   setPosFilter: (pos: string) => void;
 }
 
+const STATUS_HIERARCHY: MasteryStatus[] = [
+  'not_started', 'introduced', 'practicing', 'confident', 'mastered'
+];
+
 export default function MasteryGrid({ 
   onAskLina, isSandboxMode, activeFilter, sortMode, sortDirection, posFilter, 
   setSortMode, setSortDirection, setPosFilter 
 }: Props) {
-  const { vocabulary, savePhrase } = useMasteryStore();
+  const { vocabulary } = useMasteryStore();
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [magneticSuggestions, setMagneticSuggestions] = useState<string[]>([]);
@@ -53,36 +57,54 @@ export default function MasteryGrid({
   };
 
   const handlePointerUp = (word: string) => {
-    // Clear the timeout if the user lifts their finger before 500ms
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
     }
     
-    // If this release was the end of a long press, consume the event and stop
     if (isLongPress.current) {
       isLongPress.current = false;
       return; 
     }
 
-    // Normal tap logic
     if (selectedWords.length === 0) {
-      // Not selecting anything yet, so open the drawer
       const target = vocabulary.find(v => v.word === word);
       if (target) setDrawerId(target.id);
     } else {
-      // Already selecting words, so toggle this word
       setSelectedWords(prev => prev.includes(word) ? prev.filter(w => w !== word) : [...prev, word]);
     }
   };
 
   const displayed = vocabulary
-    .filter(w => !activeFilter || w.status === activeFilter)
-    .filter(w => posFilter === 'All' || w.partOfSpeech.includes(posFilter))
-    .sort((a: any, b: any) => {
-      const field = sortMode === 'alphabetical' ? 'word' : sortMode;
-      const valA = String(a[field] || '').toLowerCase();
-      const valB = String(b[field] || '').toLowerCase();
+    .filter(w => {
+      // 1. Filter by Parts of Speech
+      if (posFilter !== 'All' && !w.partOfSpeech.includes(posFilter)) return false;
+      
+      // 2. Cascade Filter (Show this level AND above, exclude below)
+      if (activeFilter) {
+        const filterIndex = STATUS_HIERARCHY.indexOf(activeFilter);
+        const wordIndex = STATUS_HIERARCHY.indexOf(w.status);
+        if (wordIndex < filterIndex) return false;
+      }
+      return true;
+    })
+    .sort((a, b) => {
+      // 3. Smart Sorting based on the Filter 
+      // If a filter is active, force group them by status (active at top, ascending upwards)
+      if (activeFilter || sortMode === 'status') {
+        const indexA = STATUS_HIERARCHY.indexOf(a.status);
+        const indexB = STATUS_HIERARCHY.indexOf(b.status);
+        if (indexA !== indexB) {
+          // If we have an active filter, ALWAYS sort ascending from the filter point
+          if (activeFilter) return indexA - indexB; 
+          // Otherwise obey the toggle direction
+          return sortDirection === 'asc' ? indexA - indexB : indexB - indexA;
+        }
+      }
+
+      // 4. Default / Fallback Alphabetical
+      const valA = String(a.word || '').toLowerCase();
+      const valB = String(b.word || '').toLowerCase();
       return sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
     });
 
@@ -91,7 +113,7 @@ export default function MasteryGrid({
       <div className="grid-toolbar" style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
         <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="sort-select" style={{ flex: 1, padding: '10px', borderRadius: '8px', background: '#222', color: 'white', border: '1px solid #444', outline: 'none' }}>
           <option value="alphabetical">A-Z</option>
-          <option value="status">Mastery</option>
+          <option value="status">Mastery Level</option>
         </select>
         <button onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')} className="btn-toggle" style={{ flex: 0, padding: '0 20px' }}>
           {sortDirection === 'asc' ? '↑' : '↓'}
