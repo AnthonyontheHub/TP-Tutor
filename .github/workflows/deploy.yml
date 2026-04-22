@@ -18,14 +18,13 @@ jobs:
       - name: Set up Node 🟢
         uses: actions/setup-node@v4
         with:
-          node-version: 20 # This fixes the 'incompatible' error
+          node-version: 20
           cache: 'npm'
 
       - name: Install and Build 🔧
         run: |
-          npm install
+          npm ci
           npm run build
-        # We must map your GitHub Secrets to the Environment Variables Vite expects
         env:
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
