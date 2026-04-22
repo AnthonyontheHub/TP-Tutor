@@ -3,18 +3,24 @@ import { db } from '../services/firebase';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { doc, setDoc, onSnapshot } from 'firebase/firestore';
-import type { MasteryMap, MasteryStatus, StatusSummary, SavedPhrase } from '../types/mastery';
+import type { MasteryMap, MasteryStatus, StatusSummary } from '../types/mastery';
 import { initialMasteryMap } from '../data/initialMasteryMap';
 
 interface MasteryActions {
   updateVocabStatus: (wordIdOrText: string, status: MasteryStatus) => void;
-  savePhrase: (text: string, comment?: string) => void;
-  deletePhrase: (id: string) => void;
-  updatePhraseComment: (id: string, comment: string) => void;
+  updateConceptStatus: (chapterId: string, conceptId: string, status: MasteryStatus) => void;
+  setLastUpdated: (date: string) => void;
+  savePhrase: (phrase: string) => void;
+  recordActivity: () => void;
   setStudentName: (name: string) => void; 
+  syncFromCloud: () => () => void; // Updated return type for unsubscribe
   syncToCloud: () => Promise<void>; 
-  getStatusSummary: () => StatusSummary;
+  getStatusSummary: () => StatusSummary & { xp: number, level: number, rankTitle: string };
 }
+
+type MasteryStore = MasteryMap & MasteryActions;
+
+const XP_MAP = { not_started: 0, introduced: 10, practicing: 25, confident: 50, mastered: 100 };
 
 const getUserId = () => {
   let userId = localStorage.getItem('tp_tutor_user_id');
@@ -25,44 +31,58 @@ const getUserId = () => {
   return userId;
 };
 
-export const useMasteryStore = create<MasteryMap & MasteryActions>()(
+export const useMasteryStore = create<MasteryStore>()(
   persist(
     (set, get) => ({
       ...initialMasteryMap,
-      savedPhrases: Array.isArray(initialMasteryMap.savedPhrases) ? initialMasteryMap.savedPhrases : [],
+      studentName: initialMasteryMap.studentName || 'Student',
+      savedPhrases: initialMasteryMap.savedPhrases || [],
+      currentStreak: initialMasteryMap.currentStreak || 0,
+      lastActiveDate: initialMasteryMap.lastActiveDate || '',
 
       updateVocabStatus: (wordIdOrText, status) => {
         set((state) => ({
           vocabulary: state.vocabulary.map((w) =>
-            (w.id === wordIdOrText || w.word.toLowerCase() === wordIdOrText.toLowerCase()) ? { ...w, status } : w
+            (w.id === wordIdOrText || w.word.toLowerCase() === wordIdOrText.toLowerCase()) 
+              ? { ...w, status } 
+              : w
           ),
         }));
+        get().recordActivity();
         void get().syncToCloud(); 
       },
 
-      savePhrase: (text, comment = "") => {
-        const newPhrase: SavedPhrase = { id: crypto.randomUUID(), text, comment, timestamp: Date.now() };
-        set((state) => ({ savedPhrases: [newPhrase, ...state.savedPhrases] }));
-        void get().syncToCloud();
-      },
-
-      deletePhrase: (id) => {
-        set((state) => ({ savedPhrases: state.savedPhrases.filter(p => p.id !== id) }));
-        void get().syncToCloud();
-      },
-
-      updatePhraseComment: (id, comment) => {
+      updateConceptStatus: (chapterId, conceptId, status) => {
         set((state) => ({
-          savedPhrases: state.savedPhrases.map(p => p.id === id ? { ...p, comment } : p)
+          chapters: state.chapters.map((ch) =>
+            ch.id === chapterId
+              ? { ...ch, concepts: ch.concepts.map((c) => c.id === conceptId ? { ...c, status } : c) }
+              : ch
+          ),
         }));
+        get().recordActivity();
         void get().syncToCloud();
       },
 
-      getStatusSummary: () => {
-        const { vocabulary } = get();
-        const summary = { not_started: 0, introduced: 0, practicing: 0, confident: 0, mastered: 0 };
-        vocabulary.forEach(w => { if(summary[w.status] !== undefined) summary[w.status]++; });
-        return summary;
+      savePhrase: (phrase) => {
+        set((state) => ({ savedPhrases: [...new Set([...state.savedPhrases, phrase])] }));
+        void get().syncToCloud();
+      },
+
+      recordActivity: () => {
+        const today = new Date().toDateString();
+        const lastDate = get().lastActiveDate;
+        
+        if (lastDate !== today) {
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+          
+          if (lastDate === yesterday.toDateString()) {
+            set((state) => ({ currentStreak: state.currentStreak + 1, lastActiveDate: today }));
+          } else {
+            set({ currentStreak: 1, lastActiveDate: today });
+          }
+        }
       },
 
       setStudentName: (name) => {
@@ -70,14 +90,56 @@ export const useMasteryStore = create<MasteryMap & MasteryActions>()(
         void get().syncToCloud();
       },
 
+      setLastUpdated: (date) => set({ lastUpdated: date }),
+
+      getStatusSummary: () => {
+        const { vocabulary } = get();
+        const summary = { not_started: 0, introduced: 0, practicing: 0, confident: 0, mastered: 0, xp: 0 };
+        
+        for (const word of vocabulary) { 
+          summary[word.status]++; 
+          summary.xp += XP_MAP[word.status];
+        }
+
+        const level = Math.floor(summary.xp / 500) + 1;
+        let rankTitle = "nimi lili"; 
+        if (level >= 5) rankTitle = "jan pi toki pona"; 
+        if (level >= 10) rankTitle = "jan sona"; 
+        
+        return { ...summary, level, rankTitle };
+      },
+
       syncToCloud: async () => {
-        const { vocabulary, chapters, studentName, savedPhrases, currentStreak, lastActiveDate } = get();
+        const { vocabulary, chapters, lastUpdated, studentName, savedPhrases, currentStreak, lastActiveDate } = get();
         try {
           const userId = getUserId();
           await setDoc(doc(db, 'users', userId), {
-            vocabulary, chapters, studentName, savedPhrases, currentStreak, lastActiveDate, lastUpdated: new Date().toISOString()
+            vocabulary, chapters, lastUpdated, studentName, savedPhrases, currentStreak, lastActiveDate
           });
-        } catch (err) { console.error("Sync Error:", err); }
+        } catch (err) {
+          console.error("Firebase Sync Error:", err);
+        }
+      },
+
+      syncFromCloud: () => {
+        const userId = getUserId();
+        // Fixed: Returning the unsubscribe function from onSnapshot
+        return onSnapshot(doc(db, 'users', userId), (snapshot) => {
+          if (snapshot.exists()) {
+            const data = snapshot.data();
+            
+            // Only update state if cloud data exists to prevent reset loops
+            set({
+              vocabulary: data.vocabulary || initialMasteryMap.vocabulary,
+              chapters: data.chapters || initialMasteryMap.chapters,
+              lastUpdated: data.lastUpdated || '',
+              studentName: data.studentName || 'Student',
+              savedPhrases: data.savedPhrases || [],
+              currentStreak: data.currentStreak || 0,
+              lastActiveDate: data.lastActiveDate || ''
+            });
+          }
+        });
       }
     }),
     { name: 'tp-tutor-mastery' }
