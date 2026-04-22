@@ -7,7 +7,7 @@ interface Props {
 }
 
 export default function ProgressSummary({ activeFilter, onFilterClick }: Props) {
-  const { getStatusSummary, savedPhrases } = useMasteryStore();
+  const { getStatusSummary } = useMasteryStore();
   const summary = getStatusSummary();
   const totalWords = 124;
 
