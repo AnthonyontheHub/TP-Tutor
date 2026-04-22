@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useMasteryStore } from '../store/masteryStore';
 
 interface Props {
   onClose: () => void;
@@ -9,7 +8,6 @@ interface Props {
 }
 
 export default function SettingsDrawer({ onClose, isSandboxMode, setIsSandboxMode }: Props) {
-  const { vocabulary, updateVocabStatus } = useMasteryStore();
   const [apiKey, setApiKey] = useState('');
 
   useEffect(() => {
@@ -23,57 +21,53 @@ export default function SettingsDrawer({ onClose, isSandboxMode, setIsSandboxMod
 
   return (
     <AnimatePresence>
-      {/* Separate Backdrop */}
       <motion.div 
-        key="backdrop"
+        className="drawer-backdrop" 
         initial={{ opacity: 0 }} 
         animate={{ opacity: 1 }} 
         exit={{ opacity: 0 }} 
-        onClick={onClose}
-        className="drawer-backdrop"
-        style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 2000 }}
+        onClick={onClose} 
       />
       
-      {/* Content Drawer */}
-      <motion.div
-        key="content"
-        initial={{ y: '100%' }}
-        animate={{ y: '0%' }}
-        exit={{ y: '100%' }}
-        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        onClick={(e) => e.stopPropagation()} // Stops click-through to backdrop
+      <motion.div 
         className="settings-drawer"
-        style={{ 
-          position: 'fixed', bottom: 0, left: 0, right: 0, 
-          height: '70vh', background: '#111', zIndex: 2001,
-          borderTop: '2px solid #333', borderTopLeftRadius: '20px', borderTopRightRadius: '20px',
-          padding: '20px', overflowY: 'auto', boxSizing: 'border-box'
-        }}
+        initial={{ opacity: 0, scale: 0.95 }} 
+        animate={{ opacity: 1, scale: 1 }} 
+        exit={{ opacity: 0, scale: 0.95 }} 
+        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
       >
-        <div style={{ width: '40px', height: '4px', background: '#333', borderRadius: '2px', margin: '0 auto 20px' }} />
-        <h2 style={{ color: 'white', marginTop: 0 }}>SETTINGS</h2>
+        <div className="drawer__handle" />
+        <div className="drawer__scroll-area">
+          <h2 style={{ fontSize: '2.4rem', marginBottom: '24px', color: 'white' }}>SETTINGS</h2>
 
-        <div className="settings-section" style={{ background: '#1a1a1a', padding: '15px', borderRadius: '12px', marginBottom: '15px' }}>
-          <label style={{ display: 'flex', justifyContent: 'space-between', color: 'white', alignItems: 'center' }}>
-            <span>Sandbox Mode (Offline)</span>
+          <div style={{ background: '#1a1a1a', padding: '16px', borderRadius: '12px', borderLeft: '4px solid #3b82f6', marginBottom: '16px' }}>
+            <label style={{ display: 'flex', justifyContent: 'space-between', color: 'white', alignItems: 'center', fontWeight: 'bold', cursor: 'pointer' }}>
+              <span>Sandbox Mode (Offline)</span>
+              <input 
+                type="checkbox" 
+                checked={isSandboxMode} 
+                onChange={(e) => setIsSandboxMode(e.target.checked)}
+                style={{ width: '24px', height: '24px', cursor: 'pointer' }}
+              />
+            </label>
+            <p style={{ marginTop: '8px', color: '#ccc', fontSize: '0.85rem' }}>Use local dictionary instead of AI.</p>
+          </div>
+
+          <div style={{ background: '#1a1a1a', padding: '16px', borderRadius: '12px', borderLeft: '4px solid #10b981' }}>
+            <p style={{ color: '#888', margin: '0 0 8px 0', fontSize: '0.8rem', fontWeight: 'bold' }}>GEMINI API KEY</p>
             <input 
-              type="checkbox" 
-              checked={isSandboxMode} 
-              onChange={(e) => setIsSandboxMode(e.target.checked)}
-              style={{ width: '20px', height: '20px' }}
+              type="password" 
+              value={apiKey} 
+              onChange={(e) => setApiKey(e.target.value)}
+              placeholder="Paste API Key here..."
+              style={{ width: '100%', padding: '12px', background: '#000', border: '1px solid #333', color: 'white', borderRadius: '8px', marginBottom: '12px', outline: 'none' }}
             />
-          </label>
+            <button onClick={handleSaveKey} className="btn-review" style={{ width: '100%', margin: 0, padding: '12px', borderRadius: '8px' }}>SAVE KEY</button>
+          </div>
         </div>
-
-        <div className="settings-section" style={{ background: '#1a1a1a', padding: '15px', borderRadius: '12px' }}>
-          <p style={{ color: '#888', margin: '0 0 10px 0', fontSize: '0.8rem' }}>GEMINI API KEY</p>
-          <input 
-            type="password" 
-            value={apiKey} 
-            onChange={(e) => setApiKey(e.target.value)}
-            style={{ width: '100%', padding: '10px', background: '#000', border: '1px solid #333', color: 'white', borderRadius: '6px', marginBottom: '10px' }}
-          />
-          <button onClick={handleSaveKey} className="btn-review" style={{ width: '100%', margin: 0 }}>SAVE KEY</button>
+        
+        <div style={{ padding: '20px', borderTop: '1px solid #222' }}>
+          <button onClick={onClose} style={{ width: '100%', padding: '12px', background: '#333', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>✕ CLOSE SETTINGS</button>
         </div>
       </motion.div>
     </AnimatePresence>
