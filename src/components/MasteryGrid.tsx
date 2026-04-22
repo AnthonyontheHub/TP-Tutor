@@ -28,24 +28,36 @@ const STATUS_RANK: Record<MasteryStatus, number> = {
 };
 
 export default function MasteryGrid({ 
-  onAskLina, activeFilter, sortMode, sortDirection, posFilter, 
+  onAskLina, isSandboxMode, activeFilter, sortMode, sortDirection, posFilter, 
   setSortMode, setSortDirection, setPosFilter 
 }: Props) {
   const { vocabulary } = useMasteryStore();
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
   const [drawerId, setDrawerId] = useState<string | null>(null);
+  const [magneticSuggestions, setMagneticSuggestions] = useState<string[]>([]);
   
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isLongPress = useRef(false);
 
+  useEffect(() => {
+    const apiKey = localStorage.getItem('TP_GEMINI_KEY');
+    if (selectedWords.length > 1 && apiKey) {
+      const timer = setTimeout(async () => {
+        const results = await fetchSentenceSuggestions(apiKey, selectedWords);
+        setMagneticSuggestions(results);
+      }, 800);
+      return () => clearTimeout(timer);
+    } else if (selectedWords.length <= 1) {
+      setMagneticSuggestions([]);
+    }
+  }, [selectedWords]);
+
   const handlePointerDown = (word: string) => {
-    if (selectedWords.length > 0) return;
-    
     isLongPress.current = false;
     longPressTimer.current = setTimeout(() => {
       isLongPress.current = true;
       soundService.playBlip(523.25, 'sine', 0.05);
-      setSelectedWords([word]);
+      setSelectedWords(prev => prev.includes(word) ? prev : [...prev, word]);
     }, 500);
   };
 
@@ -68,7 +80,7 @@ export default function MasteryGrid({
     }
   };
 
-  const displayed = [...vocabulary]
+  const displayed = vocabulary
     .filter(w => !activeFilter || w.status === activeFilter)
     .filter(w => posFilter === 'All' || w.partOfSpeech.includes(posFilter))
     .sort((a, b) => {
@@ -76,20 +88,16 @@ export default function MasteryGrid({
         const diff = STATUS_RANK[a.status] - STATUS_RANK[b.status];
         return sortDirection === 'asc' ? diff : -diff;
       }
-      const valA = String(a.word || '').toLowerCase();
-      const valB = String(b.word || '').toLowerCase();
+      const field = sortMode === 'alphabetical' ? 'word' : (sortMode as keyof typeof a);
+      const valA = String(a[field] || '').toLowerCase();
+      const valB = String(b[field] || '').toLowerCase();
       return sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
     });
 
   return (
     <div className="mastery-grid-container">
       <div className="grid-toolbar" style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
-        <select 
-          value={sortMode} 
-          onChange={(e) => setSortMode(e.target.value)} 
-          className="sort-select"
-          style={{ padding: '8px', borderRadius: '8px', background: '#222', color: '#fff', border: '1px solid #444' }}
-        >
+        <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="sort-select">
           <option value="alphabetical">A-Z</option>
           <option value="status">Mastery</option>
         </select>
@@ -104,21 +112,56 @@ export default function MasteryGrid({
             key={word.id} 
             onPointerDown={() => handlePointerDown(word.word)} 
             onPointerUp={() => handlePointerUp(word.word)}
+            className="grid-item-wrapper"
             style={{ 
               opacity: selectedWords.length > 0 && !selectedWords.includes(word.word) ? 0.3 : 1,
-              touchAction: 'none'
+              touchAction: 'none',
+              cursor: 'pointer'
             }}
           >
-            <VocabCard word={word} />
+            <VocabCard word={word} onClick={() => {}} />
           </div>
         ))}
       </div>
 
       {selectedWords.length > 0 && (
-        <div className="builder-panel" style={{ position: 'fixed', bottom: '20px', left: '10px', right: '10px', background: '#222', padding: '15px', borderRadius: '12px', zIndex: 100 }}>
-          <div style={{ color: 'white', fontSize: '1.2rem', marginBottom: '10px' }}>{selectedWords.join(' ')}</div>
-          <button onClick={() => { onAskLina(`Is "${selectedWords.join(' ')}" correct?`); setSelectedWords([]); }} className="btn-review">ASK LINA</button>
-          <button onClick={() => setSelectedWords([])} style={{ background: 'none', border: 'none', color: '#666', width: '100%', marginTop: '10px', cursor: 'pointer' }}>Cancel</button>
+        <div className="builder-panel">
+          <div className="builder-content">
+            <div style={{ color: 'white', fontSize: '1.2rem', marginBottom: '15px', fontWeight: 'bold' }}>
+              {selectedWords.join(' ')}
+            </div>
+            
+            {magneticSuggestions.length > 0 && (
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '15px' }}>
+                {magneticSuggestions.map((s, i) => (
+                  <button 
+                    key={i} 
+                    className="suggestion-pill"
+                    onClick={() => onAskLina(`Let's practice this: "${s}"`)}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button 
+                onClick={() => { onAskLina(`Is "${selectedWords.join(' ')}" correct?`); setSelectedWords([]); }} 
+                className="btn-review" 
+                style={{ margin: 0, flex: 2 }}
+              >
+                ASK LINA
+              </button>
+              <button 
+                onClick={() => setSelectedWords([])} 
+                className="btn-toggle"
+                style={{ flex: 1 }}
+              >
+                CLEAR
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -127,7 +170,7 @@ export default function MasteryGrid({
           word={vocabulary.find(v => v.id === drawerId)!} 
           onClose={() => setDrawerId(null)} 
           onAskLina={onAskLina} 
-          isSandboxMode={true} 
+          isSandboxMode={isSandboxMode} 
         />
       )}
     </div>
