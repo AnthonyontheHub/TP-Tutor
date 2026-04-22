@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import ProgressSummary from './ProgressSummary';
 import MasteryGrid from './MasteryGrid';
+import PhraseGrid from './PhraseGrid';
 import SettingsDrawer from './SettingsDrawer'; 
 import UserProfileDrawer from './UserProfileDrawer'; 
 import SetupScreen from './SetupScreen';
@@ -16,7 +17,7 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'phrasebook'>('grid');
   const [posFilter, setPosFilter] = useState('All');
-  const [sortMode, setSortMode] = useState<'alphabetical' | 'status'>('alphabetical');
+  const [sortMode, setSortMode] = useState<'alphabetical' | 'status' | 'frequency' | 'length' | 'type'>('alphabetical');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   if (!studentName || studentName === 'Student') return <SetupScreen />;
@@ -59,15 +60,12 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
                 onChange={(e) => setPosFilter(e.target.value)}
                 style={{ padding: '8px', borderRadius: '6px', background: '#222', color: '#fff', border: '1px solid #444', outline: 'none' }}
               >
-                <option value="All">All</option>
-                <option value="Noun">Noun</option>
-                <option value="Verb">Verb</option>
-                <option value="Adj">Adjective</option>
-                <option value="Preposition">Preposition</option>
-                <option value="Particle">Particle</option>
-                <option value="Pronoun">Pronoun</option>
-                <option value="Interjection">Interjection</option>
-                <option value="Number">Number</option>
+                <option value="All">All Parts of Speech</option>
+                <option value="noun">Noun</option>
+                <option value="verb">Verb</option>
+                <option value="adjective">Adjective</option>
+                <option value="adverb">Adverb</option>
+                <option value="phrase">Phrase</option>
               </select>
             </div>
             
@@ -85,8 +83,13 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
           </>
         ) : (
           <div style={{ padding: '20px 0' }}>
-            {savedPhrases.length === 0 ? <p>No phrases saved yet.</p> : savedPhrases.map((p, i) => (
-              <div key={i} style={{ background: '#111', borderLeft: '4px solid #10b981', padding: '15px', borderRadius: '8px', marginBottom: '10px' }}>{p}</div>
+            <PhraseGrid onAskLina={onAskLina} activeFilter={activeFilter} selectedWords={[]} />
+            
+            <h3 style={{ marginTop: '30px', marginBottom: '15px', color: '#fff', fontSize: '1.2rem', fontWeight: 'bold', borderBottom: '1px solid #333', paddingBottom: '10px' }}>
+              SAVED PHRASES
+            </h3>
+            {savedPhrases.length === 0 ? <p style={{ color: '#888' }}>No phrases saved yet.</p> : savedPhrases.map((p, i) => (
+              <div key={i} style={{ background: '#111', borderLeft: '4px solid #10b981', padding: '15px', borderRadius: '8px', marginBottom: '10px', color: '#eee' }}>{p}</div>
             ))}
           </div>
         )}
