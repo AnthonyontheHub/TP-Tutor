@@ -16,7 +16,7 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'phrasebook'>('grid');
   const [posFilter, setPosFilter] = useState('All');
-  const [sortMode, setSortMode] = useState<'alphabetical' | 'status' | 'frequency' | 'length' | 'type'>('alphabetical');
+  const [sortMode, setSortMode] = useState<'alphabetical' | 'status'>('alphabetical');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   if (!studentName || studentName === 'Student') return <SetupScreen />;
@@ -57,14 +57,17 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
                 id="pos-filter"
                 value={posFilter} 
                 onChange={(e) => setPosFilter(e.target.value)}
-                style={{ padding: '8px', borderRadius: '6px', background: '#222', color: '#fff', border: '1px solid #444', outline: 'none', flex: 1 }}
+                style={{ padding: '8px', borderRadius: '6px', background: '#222', color: '#fff', border: '1px solid #444', outline: 'none' }}
               >
-                <option value="All">All Parts of Speech</option>
-                <option value="noun">Noun</option>
-                <option value="verb">Verb</option>
-                <option value="adjective">Adjective</option>
-                <option value="adverb">Adverb</option>
-                <option value="phrase">Phrase</option>
+                <option value="All">All</option>
+                <option value="Noun">Noun</option>
+                <option value="Verb">Verb</option>
+                <option value="Adj">Adjective</option>
+                <option value="Preposition">Preposition</option>
+                <option value="Particle">Particle</option>
+                <option value="Pronoun">Pronoun</option>
+                <option value="Interjection">Interjection</option>
+                <option value="Number">Number</option>
               </select>
             </div>
             
@@ -89,8 +92,8 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
         )}
       </main>
 
-      <SettingsDrawer isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} />
-      <UserProfileDrawer isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
+      {isSettingsOpen && <SettingsDrawer onClose={() => setIsSettingsOpen(false)} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} />}
+      {isProfileOpen && <UserProfileDrawer onClose={() => setIsProfileOpen(false)} />}
     </div>
   );
 }
