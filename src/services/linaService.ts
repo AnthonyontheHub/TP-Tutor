@@ -18,9 +18,6 @@ export interface ProposedChange {
   newStatus: MasteryStatus;
 }
 
-/**
- * Builds the personality and knowledge base for Lina
- */
 export function buildSystemPrompt(vocabulary: VocabWord[], studentName: string) {
   const knownVocab = vocabulary
     .filter(v => v.status !== 'not_started')
@@ -47,20 +44,13 @@ export function buildSystemPrompt(vocabulary: VocabWord[], studentName: string) 
   `;
 }
 
-/**
- * Streams completion from Gemini
- */
 export async function* streamCompletion(
   apiKey: string,
   systemPrompt: string,
   history: { role: 'user' | 'assistant'; content: string }[]
 ) {
   const genAI = new GoogleGenerativeAI(apiKey);
-  
-  const model = genAI.getGenerativeModel({ 
-    model: "gemini-1.5-flash",
-    systemInstruction: systemPrompt 
-  });
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", systemInstruction: systemPrompt });
 
   const chat = model.startChat({
     history: history.slice(0, -1).map(h => ({
@@ -78,9 +68,6 @@ export async function* streamCompletion(
   }
 }
 
-/**
- * Generates quick sentence suggestions based on selected words
- */
 export async function fetchSentenceSuggestions(apiKey: string, words: string[]) {
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -95,10 +82,8 @@ export async function fetchSentenceSuggestions(apiKey: string, words: string[]) 
   try {
     const result = await model.generateContent(prompt);
     const text = result.response.text();
-    
     const jsonMatch = text.match(/\[[\s\S]*\]/);
     const cleanedText = jsonMatch ? jsonMatch[0] : text;
-    
     return JSON.parse(cleanedText) as string[];
   } catch (e) {
     console.error("Lina Suggestion Error:", e);
@@ -106,9 +91,6 @@ export async function fetchSentenceSuggestions(apiKey: string, words: string[]) 
   }
 }
 
-/**
- * Provides a quick translation for the builder panel
- */
 export async function fetchQuickTranslation(apiKey: string, text: string) {
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -124,9 +106,6 @@ export async function fetchQuickTranslation(apiKey: string, text: string) {
   }
 }
 
-/**
- * UI Utilities
- */
 export function stripProposedChanges(text: string) {
   return text.split('---')[0].trim();
 }
@@ -151,9 +130,6 @@ export function parseProposedChanges(text: string): ProposedChange[] | null {
   return changes.length > 0 ? changes : null;
 }
 
-/**
- * Dictionary Helper for the Drawers
- */
 export async function fetchExamplesForWord(apiKey: string, word: string, partsOfSpeech: string[]) {
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -163,10 +139,8 @@ export async function fetchExamplesForWord(apiKey: string, word: string, partsOf
   try {
     const result = await model.generateContent(prompt);
     const text = result.response.text();
-    
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     const cleanedText = jsonMatch ? jsonMatch[0] : text;
-    
     return JSON.parse(cleanedText);
   } catch (e) {
     console.error("Lina Dictionary Error:", e);
