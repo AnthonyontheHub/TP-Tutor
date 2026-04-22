@@ -1,4 +1,5 @@
-import { useState } from 'react';
+/* src/components/Dashboard.tsx */
+import { useState, useEffect } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import ProgressSummary from './ProgressSummary';
 import MasteryGrid from './MasteryGrid';
@@ -9,8 +10,18 @@ import SetupScreen from './SetupScreen';
 import type { MasteryStatus } from '../types/mastery';
 
 export default function Dashboard({ onStartSession, onAskLina }: { onStartSession: () => void; onAskLina: (p: string) => void }) {
-  const { studentName, currentStreak, vocabulary, savedPhrases, removePhrase, updatePhraseComment } = useMasteryStore();
-  const [isSandboxMode, setIsSandboxMode] = useState(true);
+  const { studentName, currentStreak, vocabulary, savedPhrases } = useMasteryStore();
+  
+  // FIXED: Sync Sandbox preference securely with localStorage
+  const [isSandboxMode, setIsSandboxMode] = useState(() => {
+    const saved = localStorage.getItem('tp_sandbox_mode');
+    return saved !== null ? saved === 'true' : true;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('tp_sandbox_mode', String(isSandboxMode));
+  }, [isSandboxMode]);
+
   const [isSettingsOpen, setIsSettingsOpen] = useState(false); 
   const [isProfileOpen, setIsProfileOpen] = useState(false); 
   
@@ -88,25 +99,9 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
             <h3 style={{ marginTop: '30px', marginBottom: '15px', color: '#fff', fontSize: '1.2rem', fontWeight: 'bold', borderBottom: '1px solid #333', paddingBottom: '10px' }}>
               SAVED PHRASES
             </h3>
-            {savedPhrases.length === 0 ? <p style={{ color: '#888' }}>No phrases saved yet.</p> : savedPhrases.map((p, i) => {
-              // Backward compatibility mapping
-              const phraseObj = typeof p === 'string' ? { id: p, text: p, comment: '' } : p;
-              
-              return (
-                <div key={phraseObj.id} style={{ background: '#111', borderLeft: '4px solid #10b981', padding: '15px', borderRadius: '8px', marginBottom: '10px', color: '#eee', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>{phraseObj.text}</span>
-                    <button onClick={() => removePhrase(phraseObj.id)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '1.2rem' }}>🗑️</button>
-                  </div>
-                  <input 
-                    value={phraseObj.comment || ''}
-                    onChange={(e) => updatePhraseComment(phraseObj.id, e.target.value)}
-                    placeholder="Add a comment or translation..."
-                    style={{ background: '#222', border: '1px solid #333', borderRadius: '6px', padding: '8px', color: 'white', width: '100%', outline: 'none' }}
-                  />
-                </div>
-              );
-            })}
+            {savedPhrases.length === 0 ? <p style={{ color: '#888' }}>No phrases saved yet.</p> : savedPhrases.map((p, i) => (
+              <div key={i} style={{ background: '#111', borderLeft: '4px solid #10b981', padding: '15px', borderRadius: '8px', marginBottom: '10px', color: '#eee' }}>{p}</div>
+            ))}
           </div>
         )}
       </main>
