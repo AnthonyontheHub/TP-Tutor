@@ -12,6 +12,7 @@
   --text-dim: #444;
   --text-muted: #666;
   --font: 'Courier New', Consolas, 'Lucida Console', monospace;
+  --sidebar-width: 400px;
   --b2: 3px;
   --b3: 4px;
 
@@ -37,22 +38,42 @@ body {
   overflow-x: hidden;
 }
 
+/* Layout Container */
+#root {
+  display: flex;
+  min-height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .dashboard {
+  flex: 1;
+  width: 100%;
   max-width: 900px;
   margin: 0 auto;
   padding: 0 16px;
-  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: margin 0.4s ease;
 }
 
-/* Shift dashboard left when any side drawer is open */
-body:has(.side-drawer) .dashboard {
-  transform: translateX(-225px);
+/* Side Pane Styling (Sidebars) */
+.side-pane {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: #111;
+  border-left: var(--b3) solid var(--text);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -10px 0 30px rgba(0,0,0,0.5);
 }
 
-@media (max-width: 1100px) {
-  body:has(.side-drawer) .dashboard {
-    transform: translateX(0); /* Ignore shift on smaller screens to allow overlap */
-  }
+/* Shift Dashboard left when any side pane is active */
+.has-active-sidebar .dashboard {
+  margin-left: calc(50% - 450px - (var(--sidebar-width) / 2));
 }
 
 /* Header Sections */
@@ -110,44 +131,11 @@ body:has(.side-drawer) .dashboard {
 .vocab-card__word { font-size: 1rem; font-weight: 900; }
 .vocab-card__pos { font-size: 0.5rem; color: var(--text-dim); text-transform: uppercase; margin-top: 5px; }
 
-/* Status Skins */
 .vocab-card--not_started { background: var(--bg-not-started); border-color: var(--col-not-started); }
 .vocab-card--introduced  { background: var(--bg-introduced);  border-color: var(--col-introduced); }
 .vocab-card--practicing  { background: var(--bg-practicing);  border-color: var(--col-practicing); }
 .vocab-card--confident   { background: var(--bg-confident);   border-color: var(--col-confident); }
 .vocab-card--mastered    { background: var(--bg-mastered);    border-color: var(--col-mastered); }
-
-/* Magnet Suggestion Pill */
-.suggestion-pill {
-  white-space: nowrap;
-  background: #1a1a1a;
-  color: #fff;
-  border: 1px solid #3b82f6;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 900;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: var(--font);
-}
-.suggestion-pill:hover { background: #3b82f6; transform: translateY(-2px); }
-
-/* Unified Side Drawer */
-.side-drawer {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 450px;
-  max-width: 100vw;
-  background: var(--surface);
-  border-left: var(--b3) solid var(--text);
-  z-index: 2000;
-  display: flex;
-  flex-direction: column;
-  box-shadow: -15px 0 40px rgba(0,0,0,0.8);
-}
 
 .drawer__scroll-area { flex: 1; overflow-y: auto; padding: 20px; }
 
@@ -172,4 +160,10 @@ body:has(.side-drawer) .dashboard {
   box-shadow: 0 -15px 40px rgba(0,0,0,0.9);
   pointer-events: auto;
   margin: 0 16px;
+}
+
+/* Responsive side-pane for mobile */
+@media (max-width: 600px) {
+  :root { --sidebar-width: 100%; }
+  .has-active-sidebar .dashboard { transform: translateX(-100%); }
 }
