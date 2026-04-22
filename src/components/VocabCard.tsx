@@ -1,6 +1,6 @@
 import type { VocabWord } from '../types/mastery';
 
-export default function VocabCard({ word, onClick }: { word: VocabWord, onClick: () => void }) {
+export default function VocabCard({ word }: { word: VocabWord }) {
   return (
     <div className={`vocab-card vocab-card--${word.status}`} style={{ pointerEvents: 'none' }}>
       <div className="vocab-card__word">{word.word}</div>
