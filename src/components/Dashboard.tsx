@@ -95,8 +95,11 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
         )}
       </main>
 
+      {/* Fixed: SettingsDrawer might also need isOpen prop if it uses AnimatePresence, but preserving existing logic otherwise */}
       {isSettingsOpen && <SettingsDrawer onClose={() => setIsSettingsOpen(false)} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} />}
-      {isProfileOpen && <UserProfileDrawer onClose={() => setIsProfileOpen(false)} />}
+      
+      {/* Fixed: Unconditional render with isOpen prop passed to allow Framer Motion AnimatePresence to work */}
+      <UserProfileDrawer isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
     </div>
   );
 }
