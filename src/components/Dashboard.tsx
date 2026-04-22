@@ -1,3 +1,4 @@
+/* src/components/Dashboard.tsx */
 import { useState } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import ProgressSummary from './ProgressSummary';
@@ -27,13 +28,19 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
     onAskLina(`toki Lina! Please quiz me on: ${reviewWords.slice(0,10).join(', ')}`);
   };
 
+  const handleBackgroundClick = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).classList.contains('dashboard__main')) {
+      setActiveFilter(null);
+    }
+  };
+
   return (
     <div className="dashboard">
       <header className="dashboard__header">
         <div className="dashboard__header-left">
           <h1 className="dashboard__title">TOKI PONA</h1>
           <button onClick={() => setIsProfileOpen(true)} className="dashboard__profile-trigger" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#3b82f6', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem' }}>
+            <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#3b82f6', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {profileImage ? <img src={profileImage} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👤'}
             </div>
             {studentName.toUpperCase()}
@@ -46,7 +53,7 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
         </div>
       </header>
 
-      <main className="dashboard__main">
+      <main className="dashboard__main" onClick={handleBackgroundClick}>
         <ProgressSummary activeFilter={activeFilter} onFilterClick={setActiveFilter} />
         <button onClick={handleDailyReview} className="btn-review">⚡ START DAILY REVIEW</button>
         
@@ -70,7 +77,6 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
         ) : (
           <div style={{ padding: '20px 0' }}>
             <PhraseGrid onAskLina={onAskLina} activeFilter={activeFilter} selectedWords={[]} />
-            
             <h3 style={{ marginTop: '30px', marginBottom: '15px', color: '#fff', fontSize: '1.2rem', fontWeight: 'bold', borderBottom: '1px solid #333', paddingBottom: '10px' }}>
               SAVED PHRASES
             </h3>
