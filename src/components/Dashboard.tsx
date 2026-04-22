@@ -10,12 +10,7 @@ import SetupScreen from './SetupScreen';
 import type { MasteryStatus } from '../types/mastery';
 
 export default function Dashboard({ onStartSession, onAskLina }: { onStartSession: () => void; onAskLina: (p: string) => void }) {
-  // Fixed: Replaced destructured store call with individual selectors to prevent over-fetching
-  const studentName = useMasteryStore((s) => s.studentName);
-  const currentStreak = useMasteryStore((s) => s.currentStreak);
-  const vocabulary = useMasteryStore((s) => s.vocabulary);
-  const savedPhrases = useMasteryStore((s) => s.savedPhrases);
-
+  const { studentName, currentStreak, vocabulary, savedPhrases } = useMasteryStore();
   const [isSandboxMode, setIsSandboxMode] = useState(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false); 
   const [isProfileOpen, setIsProfileOpen] = useState(false); 
@@ -30,7 +25,13 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
 
   const handleDailyReview = () => {
     const reviewWords = vocabulary.filter(w => w.status === 'practicing' || w.status === 'introduced').map(w => w.word);
-    onAskLina(`toki Lina! Please quiz me on: ${reviewWords.slice(0,10).join(', ')}`);
+    
+    // Fixed: Handle the case where there are no active review words
+    if (reviewWords.length > 0) {
+      onAskLina(`toki Lina! Please quiz me on: ${reviewWords.slice(0,10).join(', ')}`);
+    } else {
+      onAskLina(`toki Lina! I don't have any specific words to review right now. Can you teach me a new concept?`);
+    }
   };
 
   return (
