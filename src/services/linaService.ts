@@ -17,6 +17,9 @@ export interface ProposedChange {
   newStatus: MasteryStatus;
 }
 
+/**
+ * Builds the personality and knowledge base for Lina
+ */
 export function buildSystemPrompt(vocabulary: VocabWord[], studentName: string) {
   const knownVocab = vocabulary
     .filter(v => v.status !== 'not_started')
@@ -43,12 +46,16 @@ export function buildSystemPrompt(vocabulary: VocabWord[], studentName: string) 
   `;
 }
 
+/**
+ * Streams completion from Gemini
+ */
 export async function* streamCompletion(
   apiKey: string,
   systemPrompt: string,
   history: { role: 'user' | 'assistant'; content: string }[]
 ) {
   const genAI = new GoogleGenerativeAI(apiKey);
+  
   const model = genAI.getGenerativeModel({ 
     model: "gemini-1.5-flash",
     systemInstruction: systemPrompt 
@@ -70,6 +77,9 @@ export async function* streamCompletion(
   }
 }
 
+/**
+ * Generates quick sentence suggestions based on selected words
+ */
 export async function fetchSentenceSuggestions(apiKey: string, words: string[]) {
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -85,28 +95,26 @@ export async function fetchSentenceSuggestions(apiKey: string, words: string[]) 
     const result = await model.generateContent(prompt);
     const text = result.response.text();
     
-    // FIX: Fortified JSON extraction handling code block wrappers
     const jsonMatch = text.match(/\[[\s\S]*\]/);
-    if (!jsonMatch) throw new Error("No JSON array found in response");
+    const cleanedText = jsonMatch ? jsonMatch[0] : text;
     
-    return JSON.parse(jsonMatch[0]) as string[];
+    return JSON.parse(cleanedText) as string[];
   } catch (e) {
     console.error("Lina Suggestion Error:", e);
-    return ["mi wile e sona.", "toki pona li pona.", "sina sona e toki pona."]; // Safe offline/error fallback
+    return [];
   }
 }
 
+/**
+ * UI Utilities
+ */
 export function stripProposedChanges(text: string) {
   return text.split('---')[0].trim();
 }
 
 export function parseProposedChanges(text: string): ProposedChange[] | null {
-  if (!text.includes('---')) return null;
-  const sections = text.split('---');
-  const changeSection = sections[sections.length - 1] || sections[1];
-  
   const changes: ProposedChange[] = [];
-  const lines = changeSection.split('\n');
+  const lines = text.split('\n');
   
   lines.forEach(line => {
     if (line.includes('CHANGE: vocab')) {
@@ -124,6 +132,9 @@ export function parseProposedChanges(text: string): ProposedChange[] | null {
   return changes.length > 0 ? changes : null;
 }
 
+/**
+ * Dictionary Helper for the Drawers
+ */
 export async function fetchExamplesForWord(apiKey: string, word: string, partsOfSpeech: string[]) {
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -134,13 +145,12 @@ export async function fetchExamplesForWord(apiKey: string, word: string, partsOf
     const result = await model.generateContent(prompt);
     const text = result.response.text();
     
-    // FIX: Fortified JSON extraction handling code block wrappers
     const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error("No JSON object found in response");
+    const cleanedText = jsonMatch ? jsonMatch[0] : text;
     
-    return JSON.parse(jsonMatch[0]);
+    return JSON.parse(cleanedText);
   } catch (e) {
     console.error("Lina Dictionary Error:", e);
-    return partsOfSpeech.reduce((acc, pos) => ({ ...acc, [pos]: `${word} li lon.` }), {}); // Safe fallback
+    return partsOfSpeech.reduce((acc, pos) => ({ ...acc, [pos]: `${word} li lon.` }), {});
   }
 }
