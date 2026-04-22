@@ -20,6 +20,12 @@ const STATUS_EMOJI = {
   mastered: '✅'
 };
 
+const generateId = () => {
+  return typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+    ? crypto.randomUUID()
+    : 'msg-' + Date.now() + '-' + Math.random().toString(36).substring(2, 9);
+};
+
 export default function ChatSession({ onEndSession, isActive, pendingPrompt, clearPrompt }: Props) {
   const [messages, setMessages] = useState<any[]>([]);
   const [input, setInput] = useState('');
@@ -53,10 +59,10 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
     setIsLoading(true);
     setInput(''); // Clear input only after we've confirmed we can send
     
-    setMessages(p => [...p, { id: crypto.randomUUID(), role: 'user', displayContent: txt }]);
+    setMessages(p => [...p, { id: generateId(), role: 'user', displayContent: txt }]);
     historyRef.current.push({ role: 'user', content: txt });
     
-    const assistantId = crypto.randomUUID();
+    const assistantId = generateId();
     setMessages(p => [...p, { id: assistantId, role: 'assistant', displayContent: '', raw: '' }]);
     
     try {
