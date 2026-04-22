@@ -1,4 +1,3 @@
-/* src/store/masteryStore.ts */
 import { db } from '../services/firebase';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
@@ -92,7 +91,13 @@ export const useMasteryStore = create<MasteryStore>()(
 
       getStatusSummary: () => {
         const { vocabulary } = get();
-        const summary = { not_started: 0, introduced: 0, practicing: 0, confident: 0, mastered: 0 };
+        const summary: StatusSummary = { 
+          not_started: 0, 
+          introduced: 0, 
+          practicing: 0, 
+          confident: 0, 
+          mastered: 0 
+        };
         
         for (const word of vocabulary) { 
           summary[word.status]++; 
