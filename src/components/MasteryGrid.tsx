@@ -31,7 +31,9 @@ export default function MasteryGrid({
   onAskLina, isSandboxMode, activeFilter, sortMode, sortDirection, posFilter, 
   setSortMode, setSortDirection, setPosFilter 
 }: Props) {
-  const { vocabulary } = useMasteryStore();
+  // Fixed: Replaced destructured store call with individual selector
+  const vocabulary = useMasteryStore(s => s.vocabulary);
+  
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [magneticSuggestions, setMagneticSuggestions] = useState<string[]>([]);
@@ -39,24 +41,29 @@ export default function MasteryGrid({
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isLongPress = useRef(false);
 
-  // FIXED: Memory leak cleanup for unmounted component timers
   useEffect(() => {
-    return () => {
-      if (longPressTimer.current) clearTimeout(longPressTimer.current);
-    };
-  }, []);
-
-  useEffect(() => {
+    // Fixed: Added mount checking to prevent state updates on unmounted components (Race condition)
+    let isMounted = true;
     const apiKey = localStorage.getItem('TP_GEMINI_KEY');
+    
     if (selectedWords.length > 1 && apiKey) {
       const timer = setTimeout(async () => {
         const results = await fetchSentenceSuggestions(apiKey, selectedWords);
-        setMagneticSuggestions(results);
+        if (isMounted) {
+          setMagneticSuggestions(results);
+        }
       }, 800);
-      return () => clearTimeout(timer);
+      return () => {
+        isMounted = false;
+        clearTimeout(timer);
+      };
     } else if (selectedWords.length <= 1) {
       setMagneticSuggestions([]);
     }
+    
+    return () => {
+      isMounted = false;
+    };
   }, [selectedWords]);
 
   const handlePointerDown = (word: string) => {
