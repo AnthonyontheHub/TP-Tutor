@@ -1,3 +1,4 @@
+/* src/components/ChatSession.tsx */
 import { useState, useRef, useEffect } from 'react';
 import { m, AnimatePresence, LazyMotion, domMax } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
@@ -24,7 +25,12 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
-  const store = useMasteryStore();
+  // Select only what we need from the store to prevent unnecessary re-renders
+  const vocabulary = useMasteryStore(s => s.vocabulary);
+  const studentName = useMasteryStore(s => s.studentName);
+  const updateVocabStatus = useMasteryStore(s => s.updateVocabStatus);
+  const setLastUpdated = useMasteryStore(s => s.setLastUpdated);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const historyRef = useRef<any[]>([]);
 
@@ -45,6 +51,8 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
     if (isLoading || !key || !txt.trim()) return;
     
     setIsLoading(true);
+    setInput(''); // Clear input only after we've confirmed we can send
+    
     setMessages(p => [...p, { id: crypto.randomUUID(), role: 'user', displayContent: txt }]);
     historyRef.current.push({ role: 'user', content: txt });
     
@@ -52,7 +60,7 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
     setMessages(p => [...p, { id: assistantId, role: 'assistant', displayContent: '', raw: '' }]);
     
     try {
-      const sys = buildSystemPrompt(store.vocabulary, store.studentName);
+      const sys = buildSystemPrompt(vocabulary, studentName);
       let full = '';
       
       for await (const chunk of streamCompletion(key, sys, historyRef.current)) {
@@ -68,7 +76,6 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
       historyRef.current.push({ role: 'assistant', content: full });
     } catch (e) { 
       console.error(e); 
-      setMessages(p => [...p, { id: crypto.randomUUID(), role: 'assistant', displayContent: 'Error: Could not connect to Lina. Please ensure your API key is valid.' }]);
     } finally { 
       setIsLoading(false); 
     }
@@ -80,11 +87,11 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
       
       m.proposedChanges.forEach((change: any) => {
         if (change.type === 'vocab' && change.wordId) {
-          store.updateVocabStatus(change.wordId, change.newStatus as MasteryStatus);
+          updateVocabStatus(change.wordId, change.newStatus as MasteryStatus);
         }
       });
       
-      store.setLastUpdated(new Date().toLocaleDateString());
+      setLastUpdated(new Date().toLocaleDateString());
       return { ...m, changesApplied: true };
     }));
   }
@@ -106,29 +113,29 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
               initial={{ y: '100%' }} animate={{ y: '0%' }} exit={{ y: '100%' }} 
               style={{ position: 'fixed', bottom: 0, left: 0, right: 0, height: '92vh', zIndex: 2000, background: '#111', borderTopLeftRadius: '20px', borderTopRightRadius: '20px', display: 'flex', flexDirection: 'column' }}
             >
-              <div style={{ width: '100%', padding: '16px 0', cursor: 'grab', flexShrink: 0 }} onClick={onEndSession}>
-                <div style={{ width: '48px', height: '6px', backgroundColor: '#666', borderRadius: '10px', margin: '0 auto' }} />
+              <div style={{ width: '100%', padding: '16px 0', cursor: 'grab', flexShrink: 0 }}>
+                <div style={{ width: '48px', height: '6px', backgroundColor: '#666', borderRadius: '10px', margin: '0 auto' }} onClick={onEndSession} />
               </div>
               
-              <div style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
+              <div style={{ flex: 1, overflowY: 'auto', padding: '0 20px 20px' }}>
                  {!localStorage.getItem('TP_GEMINI_KEY') && <div style={{ color: '#ff6b6b', textAlign: 'center', marginBottom: '20px' }}>Please set your API Key in Settings to chat with Lina.</div>}
                  
                  {messages.map((msg) => (
                    <div key={msg.id} style={{ marginBottom: '20px', textAlign: msg.role === 'user' ? 'right' : 'left' }}>
-                     <div style={{ color: '#888', fontSize: '0.7rem', marginBottom: '4px' }}>{msg.role === 'assistant' ? 'LINA' : 'YOU'}</div>
-                     <div style={{ background: msg.role === 'assistant' ? '#1a1a1a' : '#3b82f6', padding: '12px', borderRadius: '8px', color: 'white', display: 'inline-block', textAlign: 'left', maxWidth: '85%', wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>
+                     <div style={{ color: '#888', fontSize: '0.7rem', marginBottom: '4px', fontWeight: 'bold' }}>{msg.role === 'assistant' ? 'LINA' : 'YOU'}</div>
+                     <div style={{ background: msg.role === 'assistant' ? '#1a1a1a' : '#3b82f6', padding: '12px', borderRadius: '12px', color: 'white', display: 'inline-block', textAlign: 'left', maxWidth: '85%', fontSize: '0.95rem', lineHeight: '1.4' }}>
                        {msg.displayContent}
                      </div>
                      
                      {msg.proposedChanges && !msg.changesApplied && msg.role === 'assistant' && (
-                       <div style={{ marginTop: '10px', background: '#222', padding: '12px', borderRadius: '8px', textAlign: 'left', border: '1px solid #333' }}>
+                       <div style={{ marginTop: '10px', background: '#222', padding: '12px', borderRadius: '12px', textAlign: 'left', border: '2px solid #333' }}>
                           <div style={{ fontSize: '0.7rem', color: '#888', marginBottom: '8px', fontWeight: 'bold' }}>PROPOSED UPDATES</div>
                           {msg.proposedChanges.map((c: any, i: number) => (
                             <div key={i} style={{ color: '#ddd', fontSize: '0.85rem', marginBottom: '4px' }}>
-                              ✅ {c.wordId} → {STATUS_EMOJI[c.newStatus as keyof typeof STATUS_EMOJI] || c.newStatus}
+                              {STATUS_EMOJI[c.newStatus as keyof typeof STATUS_EMOJI] || '✅'} {c.wordId}
                             </div>
                           ))}
-                          <button onClick={() => handleApplyChanges(msg.id)} style={{ width: '100%', marginTop: '10px', background: '#4CAF50', color: 'white', border: 'none', padding: '10px', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
+                          <button onClick={() => handleApplyChanges(msg.id)} style={{ width: '100%', marginTop: '10px', background: '#4CAF50', color: 'white', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
                             APPLY CHANGES
                           </button>
                        </div>
@@ -142,15 +149,16 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
                 <input 
                   value={input} 
                   onChange={(e) => setInput(e.target.value)} 
-                  onKeyDown={(e) => e.key === 'Enter' && (sendToLina(input), setInput(''))} 
+                  onKeyDown={(e) => e.key === 'Enter' && sendToLina(input)} 
                   placeholder="toki!"
-                  style={{ flex: 1, background: '#222', border: 'none', borderRadius: '8px', padding: '12px', color: 'white', outline: 'none' }} 
+                  style={{ flex: 1, background: '#222', border: 'none', borderRadius: '8px', padding: '12px', color: 'white', outline: 'none', fontSize: '1rem' }} 
                 />
                 <button 
-                  onClick={() => { sendToLina(input); setInput(''); }} 
-                  style={{ background: '#3b82f6', border: 'none', borderRadius: '8px', padding: '0 20px', color: 'white', fontWeight: 'bold', cursor: 'pointer' }}
+                  onClick={() => sendToLina(input)} 
+                  disabled={isLoading}
+                  style={{ background: '#3b82f6', border: 'none', borderRadius: '8px', padding: '0 20px', color: 'white', fontWeight: 'bold', cursor: isLoading ? 'not-allowed' : 'pointer', opacity: isLoading ? 0.6 : 1 }}
                 >
-                  SEND
+                  {isLoading ? '...' : 'SEND'}
                 </button>
               </div>
             </m.div>
