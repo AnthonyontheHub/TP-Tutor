@@ -71,20 +71,25 @@ export const useMasteryStore = create<MasteryStore>()(
           : phraseOrString;
         
         set((state) => {
-          const exists = state.savedPhrases.some(p => typeof p === 'string' ? p === newPhrase.tp : p.tp === newPhrase.tp);
+          // Bulletproof check for undefined arrays from old local storage configurations
+          const currentPhrases = state.savedPhrases || []; 
+          const exists = currentPhrases.some(p => typeof p === 'string' ? p === newPhrase.tp : p.tp === newPhrase.tp);
           if (exists) return state;
-          return { savedPhrases: [...state.savedPhrases, newPhrase] };
+          return { savedPhrases: [...currentPhrases, newPhrase] };
         });
         void get().syncToCloud();
       },
 
       updatePhraseNote: (id, notes) => {
-        set((state) => ({
-          savedPhrases: state.savedPhrases.map(p => {
-            if (typeof p === 'string') return p;
-            return p.id === id ? { ...p, notes } : p;
-          })
-        }));
+        set((state) => {
+          const currentPhrases = state.savedPhrases || [];
+          return {
+            savedPhrases: currentPhrases.map(p => {
+              if (typeof p === 'string') return p;
+              return p.id === id ? { ...p, notes } : p;
+            })
+          };
+        });
         void get().syncToCloud();
       },
 
