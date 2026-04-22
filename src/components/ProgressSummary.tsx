@@ -1,3 +1,4 @@
+/* src/components/ProgressSummary.tsx */
 import { useMasteryStore } from '../store/masteryStore';
 import type { MasteryStatus } from '../types/mastery';
 
@@ -7,12 +8,13 @@ interface Props {
 }
 
 export default function ProgressSummary({ activeFilter, onFilterClick }: Props) {
-  // Fixed: Atomic selector pattern to prevent global re-rendering
+  // Subscribe directly to vocabulary to guarantee component reactivity when status changes occur
+  useMasteryStore((s) => s.vocabulary); 
+  
+  // Fixed: Extracted individual selectors to prevent global over-fetching
   const getStatusSummary = useMasteryStore((s) => s.getStatusSummary);
   const savedPhrases = useMasteryStore((s) => s.savedPhrases);
-  const vocabulary = useMasteryStore((s) => s.vocabulary); 
   
-  // Recompute summary only when vocabulary changes (via atomic selection above)
   const summary = getStatusSummary();
 
   const badges = [
