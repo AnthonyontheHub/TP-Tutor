@@ -1,4 +1,3 @@
-/* src/components/ProgressSummary.tsx */
 import { useMasteryStore } from '../store/masteryStore';
 import type { MasteryStatus } from '../types/mastery';
 
@@ -8,15 +7,20 @@ interface Props {
 }
 
 export default function ProgressSummary({ activeFilter, onFilterClick }: Props) {
+  // Subscribe directly to vocabulary to guarantee component reactivity
   useMasteryStore((s) => s.vocabulary); 
   const { getStatusSummary } = useMasteryStore();
   const summary = getStatusSummary();
 
   const statusItems: { status: MasteryStatus; label: string; color: string }[] = [
-    { status: 'not_started', label: 'NOT START', color: '#ffffff' },
+     { status: 'not_started', label: 'NOT START', color: '#ffffff' },
+
     { status: 'introduced', label: 'INTRODUCED', color: '#3b82f6' },
+
     { status: 'practicing', label: 'PRACTICING', color: '#f59e0b' },
+
     { status: 'confident', label: 'CONFIDENT', color: '#10b981' },
+
     { status: 'mastered', label: 'MASTERED', color: '#ec4899' },
   ];
 
@@ -68,7 +72,5 @@ export default function ProgressSummary({ activeFilter, onFilterClick }: Props) 
         </div>
       </div>
     </div>
-  );
-}
   );
 }
