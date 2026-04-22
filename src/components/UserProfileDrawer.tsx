@@ -19,7 +19,6 @@ export default function UserProfileDrawer({ onClose }: Props) {
           onClick={onClose} 
           style={{ position: 'fixed', inset: 0, background: 'black', zIndex: 1999 }} 
         />
-        {/* Slides from Right instead of Bottom */}
         <motion.div 
           initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} 
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
