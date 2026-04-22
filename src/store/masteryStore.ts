@@ -2,7 +2,7 @@
 import { db } from '../services/firebase';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { doc, setDoc, onSnapshot, Unsubscribe } from 'firebase/firestore';
+import { doc, setDoc, onSnapshot } from 'firebase/firestore';
 import type { MasteryMap, MasteryStatus, StatusSummary } from '../types/mastery';
 import { initialMasteryMap } from '../data/initialMasteryMap';
 
@@ -13,7 +13,7 @@ interface MasteryActions {
   savePhrase: (phrase: string) => void;
   recordActivity: () => void;
   setStudentName: (name: string) => void; 
-  syncFromCloud: () => Unsubscribe;
+  syncFromCloud: () => (() => void); // FIXED: Added proper return type for the unsubscribe function
   syncToCloud: () => Promise<void>; 
   getStatusSummary: () => StatusSummary & { xp: number, level: number, rankTitle: string };
 }
@@ -123,7 +123,7 @@ export const useMasteryStore = create<MasteryStore>()(
 
       syncFromCloud: () => {
         const userId = getUserId();
-        // FIXED: Return the unsubscribe function from onSnapshot
+        // FIXED: Return the snapshot function so the App.tsx useEffect can invoke it on unmount
         return onSnapshot(doc(db, 'users', userId), (snapshot) => {
           if (snapshot.exists()) {
             const data = snapshot.data();
