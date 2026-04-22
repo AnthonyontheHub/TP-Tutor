@@ -1,38 +1,35 @@
-/* src/App.tsx */
 import { useState, useEffect } from 'react'; 
 import Dashboard from './components/Dashboard';
 import ChatSession from './components/ChatSession';
 import { useMasteryStore } from './store/masteryStore'; 
 
 export default function App() {
-  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [activePane, setActivePane] = useState<'none' | 'chat' | 'settings' | 'profile' | 'detail'>('none');
   const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
 
   useEffect(() => {
-    // Capture the unsubscribe function and run it on unmount
-    const unsubscribe = useMasteryStore.getState().syncFromCloud();
-    return () => {
-      if (unsubscribe) unsubscribe();
-    };
+    useMasteryStore.getState().syncFromCloud();
   }, []);
 
   const handleAskLina = (prompt: string) => {
     setPendingPrompt(prompt);
-    setIsChatOpen(true); 
+    setActivePane('chat'); 
   };
 
   return (
-    <>
+    <div className={activePane !== 'none' ? 'has-active-sidebar' : ''} style={{ display: 'flex', width: '100%' }}>
       <Dashboard 
-        onStartSession={() => setIsChatOpen(true)} 
+        activePane={activePane}
+        setActivePane={setActivePane}
         onAskLina={handleAskLina} 
       />
+      
       <ChatSession 
-        isActive={isChatOpen} 
-        onEndSession={() => setIsChatOpen(false)} 
+        isActive={activePane === 'chat'} 
+        onEndSession={() => setActivePane('none')} 
         pendingPrompt={pendingPrompt}
         clearPrompt={() => setPendingPrompt(null)}
       />
-    </>
+    </div>
   );
 }
