@@ -2,22 +2,17 @@ import { useState } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import ProgressSummary from './ProgressSummary';
 import MasteryGrid from './MasteryGrid';
+import PhraseGrid from './PhraseGrid';
 import SetupScreen from './SetupScreen';
 import type { MasteryStatus } from '../types/mastery';
 
-interface Props {
-  onStartSession: () => void;
-  onOpenSettings: () => void;
-  onOpenProfile: () => void;
-  onAskLina: (p: string) => void;
-  isSandboxMode: boolean;
-}
-
-export default function Dashboard({ onStartSession, onOpenSettings, onOpenProfile, onAskLina, isSandboxMode }: Props) {
-  const { studentName, currentStreak, vocabulary, savedPhrases } = useMasteryStore();
+export default function Dashboard({ onStartSession, onAskLina, isSandboxMode }: { onStartSession: () => void; onAskLina: (p: string) => void; isSandboxMode: boolean }) {
+  const { studentName, currentStreak } = useMasteryStore();
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'phrasebook'>('grid');
   const [posFilter, setPosFilter] = useState('All');
+  const [sortMode, setSortMode] = useState<'alphabetical' | 'status' | 'frequency' | 'length' | 'type'>('alphabetical');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   if (!studentName || studentName === 'Student') return <SetupScreen />;
 
@@ -26,12 +21,11 @@ export default function Dashboard({ onStartSession, onOpenSettings, onOpenProfil
       <header className="dashboard__header">
         <div>
           <h1 className="dashboard__title">TOKI PONA</h1>
-          <button onClick={onOpenProfile} className="dashboard__profile-trigger">👤 {studentName.toUpperCase()}</button>
+          <button className="dashboard__profile-trigger">👤 {studentName.toUpperCase()}</button>
         </div>
         <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
           {currentStreak > 0 && <div className="dashboard__streak">🔥 {currentStreak}</div>}
           <button onClick={onStartSession} className="dashboard__icon-btn">💬</button>
-          <button onClick={onOpenSettings} className="dashboard__icon-btn">⚙️</button>
         </div>
       </header>
 
@@ -44,23 +38,23 @@ export default function Dashboard({ onStartSession, onOpenSettings, onOpenProfil
         </div>
 
         {viewMode === 'grid' ? (
-          <MasteryGrid 
-            onAskLina={onAskLina} 
-            isSandboxMode={isSandboxMode} 
-            activeFilter={activeFilter} 
-            posFilter={posFilter}
-            setPosFilter={setPosFilter}
-            sortMode="alphabetical"
-            sortDirection="asc"
-            setSortMode={() => {}}
-            setSortDirection={() => {}}
-          />
+          <>
+            <div style={{ marginBottom: '20px' }}>
+              <select value={posFilter} onChange={(e) => setPosFilter(e.target.value)} style={{ width: '100%', padding: '12px', background: '#111', color: 'white', borderRadius: '8px', border: '1px solid #333' }}>
+                <option value="All">All Parts of Speech</option>
+                <option value="noun">Noun</option>
+                <option value="verb">Verb</option>
+                <option value="adjective">Adjective</option>
+              </select>
+            </div>
+            <MasteryGrid 
+              onAskLina={onAskLina} isSandboxMode={isSandboxMode} activeFilter={activeFilter} 
+              sortMode={sortMode} sortDirection={sortDirection} posFilter={posFilter}
+              setSortMode={setSortMode} setSortDirection={setSortDirection} setPosFilter={setPosFilter}
+            />
+          </>
         ) : (
-          <div style={{ padding: '20px 0' }}>
-            {savedPhrases.length === 0 ? <p>No phrases saved yet.</p> : savedPhrases.map((p, i) => (
-              <div key={i} style={{ background: '#111', padding: '15px', borderRadius: '8px', marginBottom: '10px', borderLeft: '4px solid #10b981' }}>{p}</div>
-            ))}
-          </div>
+          <PhraseGrid onAskLina={onAskLina} />
         )}
       </main>
     </div>
