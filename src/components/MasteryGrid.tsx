@@ -37,7 +37,7 @@ export default function MasteryGrid({
   const [magneticSuggestions, setMagneticSuggestions] = useState<string[]>([]);
   
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const isLongPress = useRef(false);
+  const isLongPressActive = useRef(false);
 
   useEffect(() => {
     const apiKey = localStorage.getItem('TP_GEMINI_KEY');
@@ -53,9 +53,9 @@ export default function MasteryGrid({
   }, [selectedWords]);
 
   const handlePointerDown = (word: string) => {
-    isLongPress.current = false;
+    isLongPressActive.current = false;
     longPressTimer.current = setTimeout(() => {
-      isLongPress.current = true;
+      isLongPressActive.current = true;
       soundService.playBlip(523.25, 'sine', 0.05);
       setSelectedWords(prev => prev.includes(word) ? prev : [...prev, word]);
     }, 500);
@@ -64,19 +64,21 @@ export default function MasteryGrid({
   const handlePointerUp = (word: string) => {
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
     }
     
-    if (isLongPress.current) {
-      isLongPress.current = false;
+    // If we just finished a long press, do nothing else
+    if (isLongPressActive.current) {
       return; 
     }
 
-    if (selectedWords.length === 0) {
+    // If we are already in selection mode (at least one word selected), 
+    // tapping simply toggles the word in the list.
+    if (selectedWords.length > 0) {
+      setSelectedWords(prev => prev.includes(word) ? prev.filter(w => w !== word) : [...prev, word]);
+    } else {
+      // Normal tap behavior: open drawer
       const target = vocabulary.find(v => v.word === word);
       if (target) setDrawerId(target.id);
-    } else {
-      setSelectedWords(prev => prev.includes(word) ? prev.filter(w => w !== word) : [...prev, word]);
     }
   };
 
@@ -116,7 +118,9 @@ export default function MasteryGrid({
             style={{ 
               opacity: selectedWords.length > 0 && !selectedWords.includes(word.word) ? 0.3 : 1,
               touchAction: 'none',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              userSelect: 'none',
+              WebkitUserSelect: 'none'
             }}
           >
             <VocabCard word={word} />
@@ -165,13 +169,15 @@ export default function MasteryGrid({
         </div>
       )}
 
-      <WordDetailDrawer 
-        isOpen={!!drawerId}
-        word={vocabulary.find(v => v.id === drawerId) || null} 
-        onClose={() => setDrawerId(null)} 
-        onAskLina={onAskLina} 
-        isSandboxMode={isSandboxMode} 
-      />
+      {drawerId && (
+        <WordDetailDrawer 
+          isOpen={!!drawerId}
+          word={vocabulary.find(v => v.id === drawerId)!} 
+          onClose={() => setDrawerId(null)} 
+          onAskLina={onAskLina} 
+          isSandboxMode={isSandboxMode} 
+        />
+      )}
     </div>
   );
 }
