@@ -28,6 +28,14 @@ const STATUS_RANK: Record<MasteryStatus, number> = {
   mastered: 4
 };
 
+// Top most common Toki Pona words by frequency. Unlisted words drop to the bottom.
+const TP_FREQ = [
+  "li", "e", "mi", "sina", "pona", "jan", "ni", "toki", "ala", "tawa", 
+  "wile", "ken", "moku", "suno", "lili", "mute", "awen", "kama", "lon", 
+  "la", "tenpo", "ijo", "pilin", "olin", "lawa", "kulupu", "seme", "anu", 
+  "en", "kin", "pi", "a", "o", "mu", "wan", "tu", "luka", "ale", "ali"
+];
+
 export default function MasteryGrid({ 
   onAskLina, isSandboxMode, activeFilter, sortMode, sortDirection, posFilter, 
   setSortMode, setSortDirection, setPosFilter, onNavigateToPhrases
@@ -72,7 +80,6 @@ export default function MasteryGrid({
     }
   }, [selectedWords, isSandboxMode]);
 
-  // Safely separated pointer events to guarantee click accuracy
   const handlePointerDown = (word: string) => {
     isLongPress.current = false;
     longPressTimer.current = setTimeout(() => {
@@ -88,11 +95,10 @@ export default function MasteryGrid({
 
   const handleCardClick = (word: string) => {
     if (isLongPress.current) {
-      isLongPress.current = false; // Reset after a successful hold
+      isLongPress.current = false; 
       return;
     }
     
-    // Normal Tap Logic
     if (selectedWords.length === 0) {
       const target = vocabulary.find(v => v.word === word);
       if (target) setDrawerId(target.id);
@@ -134,6 +140,16 @@ export default function MasteryGrid({
         const diff = STATUS_RANK[a.status] - STATUS_RANK[b.status];
         return sortDirection === 'asc' ? diff : -diff;
       }
+      
+      if (sortMode === 'frequency') {
+        const idxA = TP_FREQ.indexOf(a.word.toLowerCase());
+        const idxB = TP_FREQ.indexOf(b.word.toLowerCase());
+        const rankA = idxA === -1 ? 999 : idxA;
+        const rankB = idxB === -1 ? 999 : idxB;
+        const diff = rankA - rankB;
+        return sortDirection === 'asc' ? diff : -diff;
+      }
+
       const field = sortMode === 'alphabetical' ? 'word' : (sortMode as keyof typeof a);
       const valA = String(a[field] || '').toLowerCase();
       const valB = String(b[field] || '').toLowerCase();
@@ -142,7 +158,6 @@ export default function MasteryGrid({
 
   return (
     <div className="mastery-grid-container">
-      {/* Standardized Dual Select Toolbar */}
       <div className="grid-toolbar" style={{ display: 'flex', gap: '10px', marginBottom: '20px', alignItems: 'center' }}>
         <select 
           value={posFilter} 
@@ -154,6 +169,7 @@ export default function MasteryGrid({
           <option value="verb">Verb</option>
           <option value="adjective">Adjective</option>
           <option value="adverb">Adverb</option>
+          <option value="number">Number</option>
         </select>
         
         <select 
@@ -162,8 +178,9 @@ export default function MasteryGrid({
           style={{ flex: 1, padding: '10px', borderRadius: '8px', background: '#222', color: '#fff', border: '1px solid #444', outline: 'none', fontWeight: 'bold' }}
         >
           <option value="alphabetical">A-Z</option>
-          <option value="status">Mastery</option>
-          <option value="partOfSpeech">Type (POS)</option>
+          <option value="frequency">Frequency / Most Used</option>
+          <option value="status">Mastery Level</option>
+          <option value="partOfSpeech">Word Type (POS)</option>
           <option value="meanings">English</option>
         </select>
         
