@@ -13,7 +13,7 @@ export default function App() {
     useMasteryStore.getState().syncFromCloud();
   }, []);
 
-  // Update Body class for CSS animations
+  // Sync state to body class for CSS transforms
   useEffect(() => {
     if (activeView !== 'none') {
       document.body.classList.add('has-active-drawer');
