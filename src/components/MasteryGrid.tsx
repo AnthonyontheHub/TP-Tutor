@@ -20,65 +20,43 @@ interface Props {
 
 export default function MasteryGrid({ 
   onAskLina, activeFilter, sortMode, sortDirection, posFilter, 
-  setSortMode, setSortDirection, setPosFilter 
+  setSortMode, setSortDirection 
 }: Props) {
-  const { vocabulary, savePhrase } = useMasteryStore();
+  const { vocabulary } = useMasteryStore();
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
   const [drawerId, setDrawerId] = useState<string | null>(null);
-  const [magneticSuggestions, setMagneticSuggestions] = useState<string[]>([]);
   
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const isLongPress = useRef(false);
-
-  useEffect(() => {
-    const apiKey = localStorage.getItem('TP_GEMINI_KEY');
-    if (selectedWords.length > 1 && apiKey) {
-      const timer = setTimeout(async () => {
-        const results = await fetchSentenceSuggestions(apiKey, selectedWords);
-        setMagneticSuggestions(results);
-      }, 800);
-      return () => clearTimeout(timer);
-    }
-  }, [selectedWords]);
+  const isLongPressActive = useRef(false);
 
   const handlePointerDown = (word: string) => {
-    if (selectedWords.length > 0) return;
-    
-    isLongPress.current = false;
+    isLongPressActive.current = false;
     longPressTimer.current = setTimeout(() => {
-      isLongPress.current = true;
+      isLongPressActive.current = true;
       soundService.playBlip(523.25, 'sine', 0.05);
-      setSelectedWords([word]);
+      setSelectedWords(prev => prev.includes(word) ? prev.filter(w => w !== word) : [...prev, word]);
     }, 500);
   };
 
   const handlePointerUp = (word: string) => {
-    // Clear the timeout if the user lifts their finger before 500ms
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
     }
     
-    // If this release was the end of a long press, consume the event and stop
-    if (isLongPress.current) {
-      isLongPress.current = false;
-      return; 
+    if (!isLongPressActive.current) {
+      if (selectedWords.length > 0) {
+        setSelectedWords(prev => prev.includes(word) ? prev.filter(w => w !== word) : [...prev, word]);
+      } else {
+        const target = vocabulary.find(v => v.word === word);
+        if (target) setDrawerId(target.id);
+      }
     }
-
-    // Normal tap logic
-    if (selectedWords.length === 0) {
-      // Not selecting anything yet, so open the drawer
-      const target = vocabulary.find(v => v.word === word);
-      if (target) setDrawerId(target.id);
-    } else {
-      // Already selecting words, so toggle this word
-      setSelectedWords(prev => prev.includes(word) ? prev.filter(w => w !== word) : [...prev, word]);
-    }
+    isLongPressActive.current = false;
   };
 
   const displayed = vocabulary
     .filter(w => !activeFilter || w.status === activeFilter)
-    .filter(w => posFilter === 'All' || w.partOfSpeech.includes(posFilter))
+    .filter(w => posFilter === 'All' || w.partOfSpeech.toLowerCase().includes(posFilter.toLowerCase()))
     .sort((a: any, b: any) => {
       const field = sortMode === 'alphabetical' ? 'word' : sortMode;
       const valA = String(a[field] || '').toLowerCase();
@@ -86,14 +64,16 @@ export default function MasteryGrid({
       return sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
     });
 
+  const selectedVocab = vocabulary.find(v => v.id === drawerId);
+
   return (
     <div className="mastery-grid-container">
       <div className="grid-toolbar" style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
-        <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="sort-select">
+        <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="sort-select" style={{ background: '#222', color: 'white', border: '1px solid #444', padding: '8px', borderRadius: '6px' }}>
           <option value="alphabetical">A-Z</option>
           <option value="status">Mastery</option>
         </select>
-        <button onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')} className="btn-toggle">
+        <button onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')} className="btn-toggle" style={{ flex: 'none', width: '40px' }}>
           {sortDirection === 'asc' ? '↑' : '↓'}
         </button>
       </div>
@@ -106,7 +86,8 @@ export default function MasteryGrid({
             onPointerUp={() => handlePointerUp(word.word)}
             style={{ 
               opacity: selectedWords.length > 0 && !selectedWords.includes(word.word) ? 0.3 : 1,
-              touchAction: 'none'
+              touchAction: 'none',
+              cursor: 'pointer'
             }}
           >
             <VocabCard word={word} onClick={() => {}} />
@@ -115,14 +96,20 @@ export default function MasteryGrid({
       </div>
 
       {selectedWords.length > 0 && (
-        <div className="builder-panel" style={{ position: 'fixed', bottom: '20px', left: '10px', right: '10px', background: '#222', padding: '15px', borderRadius: '12px', zIndex: 100 }}>
-          <div style={{ color: 'white', fontSize: '1.2rem', marginBottom: '10px' }}>{selectedWords.join(' ')}</div>
-          <button onClick={() => { onAskLina(`Is "${selectedWords.join(' ')}" correct?`); setSelectedWords([]); }} className="btn-review">ASK LINA</button>
-          <button onClick={() => setSelectedWords([])} style={{ background: 'none', border: 'none', color: '#666', width: '100%', marginTop: '10px' }}>Cancel</button>
+        <div className="builder-panel">
+          <div className="builder-content">
+            <div style={{ color: 'white', fontSize: '1.2rem', marginBottom: '15px', fontWeight: 'bold' }}>{selectedWords.join(' ')}</div>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button onClick={() => { onAskLina(`Is "${selectedWords.join(' ')}" correct?`); setSelectedWords([]); }} className="btn-review" style={{ margin: 0 }}>ASK LINA</button>
+              <button onClick={() => setSelectedWords([])} className="btn-toggle" style={{ flex: '0 0 100px' }}>CANCEL</button>
+            </div>
+          </div>
         </div>
       )}
 
-      {drawerId && <WordDetailDrawer word={vocabulary.find(v => v.id === drawerId)!} onClose={() => setDrawerId(null)} onAskLina={onAskLina} isSandboxMode={true} />}
+      {drawerId && selectedVocab && (
+        <WordDetailDrawer word={selectedVocab} onClose={() => setDrawerId(null)} onAskLina={onAskLina} isSandboxMode={true} />
+      )}
     </div>
   );
 }
