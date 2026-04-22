@@ -21,6 +21,7 @@ export default function SettingsDrawer({ onClose, isSandboxMode, setIsSandboxMod
 
   return (
     <AnimatePresence>
+      {/* Separate Backdrop */}
       <motion.div 
         key="backdrop"
         initial={{ opacity: 0 }} 
@@ -31,13 +32,14 @@ export default function SettingsDrawer({ onClose, isSandboxMode, setIsSandboxMod
         style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 2000 }}
       />
       
+      {/* Content Drawer */}
       <motion.div
         key="content"
         initial={{ y: '100%' }}
         animate={{ y: '0%' }}
         exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        onClick={(e) => e.stopPropagation()} 
+        onClick={(e) => e.stopPropagation()} // Stops click-through to backdrop
         className="settings-drawer"
         style={{ 
           position: 'fixed', bottom: 0, left: 0, right: 0, 
