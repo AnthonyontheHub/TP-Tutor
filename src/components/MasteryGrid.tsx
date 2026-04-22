@@ -20,7 +20,7 @@ interface Props {
 
 export default function MasteryGrid({ 
   onAskLina, activeFilter, sortMode, sortDirection, posFilter, 
-  setSortMode, setSortDirection, setPosFilter, isSandboxMode // Fixed: Extracted isSandboxMode
+  setSortMode, setSortDirection, setPosFilter, isSandboxMode 
 }: Props) {
   const { vocabulary, savePhrase } = useMasteryStore();
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
@@ -53,25 +53,20 @@ export default function MasteryGrid({
   };
 
   const handlePointerUp = (word: string) => {
-    // Clear the timeout if the user lifts their finger before 500ms
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
     }
     
-    // If this release was the end of a long press, consume the event and stop
     if (isLongPress.current) {
       isLongPress.current = false;
       return; 
     }
 
-    // Normal tap logic
     if (selectedWords.length === 0) {
-      // Not selecting anything yet, so open the drawer
       const target = vocabulary.find(v => v.word === word);
       if (target) setDrawerId(target.id);
     } else {
-      // Already selecting words, so toggle this word
       setSelectedWords(prev => prev.includes(word) ? prev.filter(w => w !== word) : [...prev, word]);
     }
   };
@@ -89,11 +84,16 @@ export default function MasteryGrid({
   return (
     <div className="mastery-grid-container">
       <div className="grid-toolbar" style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
-        <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="sort-select">
+        <select 
+          value={sortMode} 
+          onChange={(e) => setSortMode(e.target.value)} 
+          className="sort-select" 
+          style={{ padding: '8px', borderRadius: '6px', background: '#222', color: '#fff', border: '1px solid #444', outline: 'none', flex: 1 }}
+        >
           <option value="alphabetical">A-Z</option>
           <option value="status">Mastery</option>
         </select>
-        <button onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')} className="btn-toggle">
+        <button onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')} className="btn-toggle" style={{ flex: '0 0 auto', padding: '8px 16px' }}>
           {sortDirection === 'asc' ? '↑' : '↓'}
         </button>
       </div>
@@ -115,15 +115,22 @@ export default function MasteryGrid({
       </div>
 
       {selectedWords.length > 0 && (
-        <div className="builder-panel" style={{ position: 'fixed', bottom: '20px', left: '10px', right: '10px', background: '#222', padding: '15px', borderRadius: '12px', zIndex: 100 }}>
-          <div style={{ color: 'white', fontSize: '1.2rem', marginBottom: '10px' }}>{selectedWords.join(' ')}</div>
-          <button onClick={() => { onAskLina(`Is "${selectedWords.join(' ')}" correct?`); setSelectedWords([]); }} className="btn-review">ASK LINA</button>
-          <button onClick={() => setSelectedWords([])} style={{ background: 'none', border: 'none', color: '#666', width: '100%', marginTop: '10px' }}>Cancel</button>
+        <div className="builder-panel">
+          <div className="builder-content">
+            <div style={{ color: 'white', fontSize: '1.2rem', marginBottom: '10px', textAlign: 'center', fontWeight: 'bold' }}>{selectedWords.join(' ')}</div>
+            <button onClick={() => { onAskLina(`Is "${selectedWords.join(' ')}" correct?`); setSelectedWords([]); }} className="btn-review" style={{ margin: '10px 0' }}>ASK LINA</button>
+            <button onClick={() => setSelectedWords([])} style={{ background: 'none', border: 'none', color: '#888', width: '100%', padding: '10px', cursor: 'pointer', fontWeight: 'bold' }}>Cancel</button>
+          </div>
         </div>
       )}
 
-      {/* Fixed: isSandboxMode is now properly passed instead of hardcoded to true */}
-      {drawerId && <WordDetailDrawer word={vocabulary.find(v => v.id === drawerId)!} onClose={() => setDrawerId(null)} onAskLina={onAskLina} isSandboxMode={isSandboxMode} />}
+      <WordDetailDrawer 
+        isOpen={!!drawerId} 
+        word={drawerId ? vocabulary.find(v => v.id === drawerId) : null} 
+        onClose={() => setDrawerId(null)} 
+        onAskLina={onAskLina} 
+        isSandboxMode={isSandboxMode} 
+      />
     </div>
   );
 }
