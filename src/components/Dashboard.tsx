@@ -1,4 +1,5 @@
-import { useState } from 'react';
+/* src/components/Dashboard.tsx */
+import { useState, useEffect } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import ProgressSummary from './ProgressSummary';
 import MasteryGrid from './MasteryGrid';
@@ -9,16 +10,25 @@ import type { MasteryStatus } from '../types/mastery';
 
 export default function Dashboard({ onStartSession, onAskLina }: { onStartSession: () => void; onAskLina: (p: string) => void }) {
   const { studentName, currentStreak, vocabulary, savedPhrases } = useMasteryStore();
-  const [isSandboxMode, setIsSandboxMode] = useState(true);
+  
+  // Persist Sandbox mode across reloads to avoid resetting to 'true'
+  const [isSandboxMode, setIsSandboxMode] = useState(() => {
+    const saved = localStorage.getItem('tp_sandbox_mode');
+    return saved !== null ? JSON.parse(saved) : true;
+  });
+
   const [isSettingsOpen, setIsSettingsOpen] = useState(false); 
   const [isProfileOpen, setIsProfileOpen] = useState(false); 
   
-  // RE-ADDED STATES FOR SORTING & FILTERING
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'phrasebook'>('grid');
   const [posFilter, setPosFilter] = useState('All');
   const [sortMode, setSortMode] = useState<'alphabetical' | 'status' | 'frequency' | 'length' | 'type'>('alphabetical');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
+  useEffect(() => {
+    localStorage.setItem('tp_sandbox_mode', JSON.stringify(isSandboxMode));
+  }, [isSandboxMode]);
 
   if (!studentName || studentName === 'Student') return <SetupScreen />;
 
@@ -76,7 +86,6 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
               sortMode={sortMode} 
               sortDirection={sortDirection} 
               posFilter={posFilter}
-              // Passing the missing setters so the Grid UI works
               setSortMode={setSortMode}
               setSortDirection={setSortDirection}
               setPosFilter={setPosFilter} 
