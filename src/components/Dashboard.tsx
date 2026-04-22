@@ -60,7 +60,7 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
               <select 
                 id="pos-filter"
                 value={posFilter} 
-                onChange={(e) => setSortMode(e.target.value as any)}
+                onChange={(e) => setPosFilter(e.target.value)}
                 style={{ padding: '8px', borderRadius: '6px', background: '#222', color: '#fff', border: '1px solid #444' }}
               >
                 <option value="All">All Parts of Speech</option>
