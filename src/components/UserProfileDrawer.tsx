@@ -1,4 +1,3 @@
-/* src/components/UserProfileDrawer.tsx */
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
 
