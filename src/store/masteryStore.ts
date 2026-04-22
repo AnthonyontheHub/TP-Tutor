@@ -12,6 +12,7 @@ interface MasteryActions {
   setLastUpdated: (date: string) => void;
   savePhrase: (phrase: string | SavedPhrase) => void;
   updatePhraseNote: (id: string, note: string) => void;
+  deletePhrase: (id: string) => void;
   recordActivity: () => void;
   setStudentName: (name: string) => void; 
   syncFromCloud: () => void;
@@ -71,7 +72,6 @@ export const useMasteryStore = create<MasteryStore>()(
           : phraseOrString;
         
         set((state) => {
-          // Bulletproof check for undefined arrays from old local storage configurations
           const currentPhrases = state.savedPhrases || []; 
           const exists = currentPhrases.some(p => typeof p === 'string' ? p === newPhrase.tp : p.tp === newPhrase.tp);
           if (exists) return state;
@@ -87,6 +87,19 @@ export const useMasteryStore = create<MasteryStore>()(
             savedPhrases: currentPhrases.map(p => {
               if (typeof p === 'string') return p;
               return p.id === id ? { ...p, notes } : p;
+            })
+          };
+        });
+        void get().syncToCloud();
+      },
+
+      deletePhrase: (id) => {
+        set((state) => {
+          const currentPhrases = state.savedPhrases || [];
+          return {
+            savedPhrases: currentPhrases.filter(p => {
+              if (typeof p === 'string') return p !== id; // safety catch
+              return p.id !== id;
             })
           };
         });
