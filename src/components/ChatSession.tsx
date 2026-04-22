@@ -33,16 +33,25 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
   }, [messages, isActive]);
   
   useEffect(() => { 
-    const key = localStorage.getItem('TP_GEMINI_KEY');
-    if (isActive && pendingPrompt && key && !isLoading) { 
-       sendToLina(pendingPrompt, key); 
+    if (isActive && pendingPrompt && !isLoading) { 
+       sendToLina(pendingPrompt); 
        if (clearPrompt) clearPrompt(); 
     } 
   }, [isActive, pendingPrompt]);
 
-  async function sendToLina(txt: string, overrideKey?: string) {
-    const key = overrideKey || localStorage.getItem('TP_GEMINI_KEY');
-    if (isLoading || !key || !txt.trim()) return;
+  async function sendToLina(txt: string) {
+    if (isLoading || !txt.trim()) return;
+    
+    const key = localStorage.getItem('TP_GEMINI_KEY');
+    
+    // FIX: Actively inform the user in the UI instead of silently failing
+    if (!key) {
+      setMessages(p => [...p, 
+        { id: crypto.randomUUID(), role: 'user', displayContent: txt },
+        { id: crypto.randomUUID(), role: 'assistant', displayContent: '⚠️ Please click the gear icon in the top right of the dashboard to enter your Gemini API key before chatting!', raw: '' }
+      ]);
+      return;
+    }
     
     setIsLoading(true);
     setMessages(p => [...p, { id: crypto.randomUUID(), role: 'user', displayContent: txt }]);
@@ -68,6 +77,7 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
       historyRef.current.push({ role: 'assistant', content: full });
     } catch (e) { 
       console.error(e); 
+      setMessages(p => p.map(m => m.id === assistantId ? { ...m, displayContent: '❌ Connection error. Please check your API key.' } : m));
     } finally { 
       setIsLoading(false); 
     }
@@ -95,25 +105,27 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
           <>
             <m.div 
               className="drawer-backdrop" 
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} 
+              initial={{ opacity: 0 }} animate={{ opacity: 0.6 }} exit={{ opacity: 0 }} 
               onClick={onEndSession} 
+              style={{ position: 'fixed', inset: 0, background: 'black', zIndex: 1999 }} 
             />
             <m.div 
               className="chat-drawer" 
               drag="y" dragConstraints={{ top: 0 }} onDragEnd={(_, info) => { if (info.offset.y > 150) onEndSession(); }}
               initial={{ y: '100%' }} animate={{ y: '0%' }} exit={{ y: '100%' }} 
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              onClick={(e) => e.stopPropagation()}
+              style={{ position: 'fixed', bottom: 0, left: 0, right: 0, height: '92vh', zIndex: 2000, background: '#111', borderTopLeftRadius: '20px', borderTopRightRadius: '20px', display: 'flex', flexDirection: 'column' }}
             >
-              <div className="drawer__handle" onClick={onEndSession} />
+              <div style={{ width: '100%', padding: '16px 0', cursor: 'grab', flexShrink: 0 }} onClick={onEndSession}>
+                <div style={{ width: '48px', height: '6px', backgroundColor: '#666', borderRadius: '10px', margin: '0 auto' }} />
+              </div>
               
-              <div className="drawer__scroll-area">
-                 {!localStorage.getItem('TP_GEMINI_KEY') && <div style={{ color: '#ff6b6b', textAlign: 'center', marginBottom: '20px' }}>Please set your API Key in Settings to chat with Lina.</div>}
+              <div style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
+                 {!localStorage.getItem('TP_GEMINI_KEY') && <div style={{ color: '#ff6b6b', textAlign: 'center', marginBottom: '20px' }}>You are in offline mode. Set your API Key to enable Lina.</div>}
                  
                  {messages.map((msg) => (
                    <div key={msg.id} style={{ marginBottom: '20px', textAlign: msg.role === 'user' ? 'right' : 'left' }}>
                      <div style={{ color: '#888', fontSize: '0.7rem', marginBottom: '4px' }}>{msg.role === 'assistant' ? 'LINA' : 'YOU'}</div>
-                     <div style={{ background: msg.role === 'assistant' ? '#1a1a1a' : '#3b82f6', padding: '12px', borderRadius: '8px', color: 'white', display: 'inline-block', textAlign: 'left', maxWidth: '85%' }}>
+                     <div style={{ background: msg.role === 'assistant' ? '#1a1a1a' : '#3b82f6', padding: '12px', borderRadius: '8px', color: 'white', display: 'inline-block', textAlign: 'left', maxWidth: '85%', wordWrap: 'break-word' }}>
                        {msg.displayContent}
                      </div>
                      
