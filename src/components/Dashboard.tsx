@@ -1,34 +1,26 @@
-/* src/components/Dashboard.tsx */
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import ProgressSummary from './ProgressSummary';
 import MasteryGrid from './MasteryGrid';
-import SettingsDrawer from './SettingsDrawer'; 
-import UserProfileDrawer from './UserProfileDrawer'; 
 import SetupScreen from './SetupScreen';
 import type { MasteryStatus } from '../types/mastery';
 
-export default function Dashboard({ onStartSession, onAskLina }: { onStartSession: () => void; onAskLina: (p: string) => void }) {
-  const { studentName, currentStreak, vocabulary, savedPhrases } = useMasteryStore();
-  
-  // Persist Sandbox mode across reloads to avoid resetting to 'true'
-  const [isSandboxMode, setIsSandboxMode] = useState(() => {
-    const saved = localStorage.getItem('tp_sandbox_mode');
-    return saved !== null ? JSON.parse(saved) : true;
-  });
+interface Props {
+  onStartSession: () => void;
+  onOpenSettings: () => void;
+  onOpenProfile: () => void;
+  onAskLina: (p: string) => void;
+  isSandboxMode: boolean;
+}
 
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false); 
-  const [isProfileOpen, setIsProfileOpen] = useState(false); 
+export default function Dashboard({ onStartSession, onOpenSettings, onOpenProfile, onAskLina, isSandboxMode }: Props) {
+  const { studentName, currentStreak, vocabulary, savedPhrases } = useMasteryStore();
   
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'phrasebook'>('grid');
   const [posFilter, setPosFilter] = useState('All');
-  const [sortMode, setSortMode] = useState<'alphabetical' | 'status' | 'frequency' | 'length' | 'type'>('alphabetical');
+  const [sortMode, setSortMode] = useState<'alphabetical' | 'status'>('alphabetical');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-
-  useEffect(() => {
-    localStorage.setItem('tp_sandbox_mode', JSON.stringify(isSandboxMode));
-  }, [isSandboxMode]);
 
   if (!studentName || studentName === 'Student') return <SetupScreen />;
 
@@ -42,12 +34,12 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
       <header className="dashboard__header">
         <div className="dashboard__header-left">
           <h1 className="dashboard__title">TOKI PONA</h1>
-          <button onClick={() => setIsProfileOpen(true)} className="dashboard__profile-trigger">👤 {studentName.toUpperCase()}</button>
+          <button onClick={onOpenProfile} className="dashboard__profile-trigger">👤 {studentName.toUpperCase()}</button>
         </div>
         <div className="dashboard__header-right">
           {currentStreak > 0 && <div className="dashboard__streak">🔥 {currentStreak}</div>}
           <button onClick={onStartSession} className="dashboard__icon-btn">💬</button>
-          <button onClick={() => setIsSettingsOpen(true)} className="dashboard__icon-btn">⚙️</button>
+          <button onClick={onOpenSettings} className="dashboard__icon-btn">⚙️</button>
         </div>
       </header>
 
@@ -61,36 +53,17 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
         </div>
 
         {viewMode === 'grid' ? (
-          <>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px', padding: '0 5px' }}>
-              <label htmlFor="pos-filter" style={{ fontWeight: 'bold' }}>Filter POS:</label>
-              <select 
-                id="pos-filter"
-                value={posFilter} 
-                onChange={(e) => setPosFilter(e.target.value)}
-                style={{ padding: '8px', borderRadius: '6px', background: '#222', color: '#fff', border: '1px solid #444', outline: 'none' }}
-              >
-                <option value="All">All Parts of Speech</option>
-                <option value="noun">Noun</option>
-                <option value="verb">Verb</option>
-                <option value="adjective">Adjective</option>
-                <option value="adverb">Adverb</option>
-                <option value="phrase">Phrase</option>
-              </select>
-            </div>
-            
-            <MasteryGrid 
-              onAskLina={onAskLina} 
-              isSandboxMode={isSandboxMode} 
-              activeFilter={activeFilter} 
-              sortMode={sortMode} 
-              sortDirection={sortDirection} 
-              posFilter={posFilter}
-              setSortMode={setSortMode}
-              setSortDirection={setSortDirection}
-              setPosFilter={setPosFilter} 
-            />
-          </>
+          <MasteryGrid 
+            onAskLina={onAskLina} 
+            isSandboxMode={isSandboxMode} 
+            activeFilter={activeFilter} 
+            sortMode={sortMode} 
+            sortDirection={sortDirection} 
+            posFilter={posFilter}
+            setSortMode={setSortMode}
+            setSortDirection={setSortDirection}
+            setPosFilter={setPosFilter} 
+          />
         ) : (
           <div style={{ padding: '20px 0' }}>
             {savedPhrases.length === 0 ? <p>No phrases saved yet.</p> : savedPhrases.map((p, i) => (
@@ -99,9 +72,6 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
           </div>
         )}
       </main>
-
-      {isSettingsOpen && <SettingsDrawer onClose={() => setIsSettingsOpen(false)} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} />}
-      {isProfileOpen && <UserProfileDrawer onClose={() => setIsProfileOpen(false)} />}
     </div>
   );
 }
