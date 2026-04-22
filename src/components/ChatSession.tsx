@@ -71,7 +71,7 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
       }
 
       const changes = parseProposedChanges(full);
-      if (changes && changes.length > 0) {
+      if (changes && Array.isArray(changes)) {
         setMessages(p => p.map(m => m.id === assistantId ? { ...m, proposedChanges: changes } : m));
       }
 
@@ -102,9 +102,7 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
         {isActive && (
           <m.div 
             className="side-pane"
-            initial={{ x: '100%' }} 
-            animate={{ x: 0 }} 
-            exit={{ x: '100%' }}
+            initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '20px', borderBottom: '1px solid #333' }}>
