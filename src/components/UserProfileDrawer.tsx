@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
 
@@ -7,13 +8,20 @@ interface Props {
 }
 
 export default function UserProfileDrawer({ isOpen, onClose }: Props) {
-  const studentName = useMasteryStore(s => s.studentName);
-  const currentStreak = useMasteryStore(s => s.currentStreak);
-  const savedPhrases = useMasteryStore(s => s.savedPhrases);
-  const getStatusSummary = useMasteryStore(s => s.getStatusSummary);
+  const { studentName, currentStreak, savedPhrases, getStatusSummary, profileImage, setProfileImage } = useMasteryStore();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const summary = getStatusSummary();
   const totalLearned = summary.introduced + summary.practicing + summary.confident + summary.mastered;
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setProfileImage(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -25,7 +33,7 @@ export default function UserProfileDrawer({ isOpen, onClose }: Props) {
             initial={{ opacity: 0 }} 
             animate={{ opacity: 1 }} 
             exit={{ opacity: 0 }} 
-            onClick={onClose}
+            onClick={onClose} 
             style={{ zIndex: 2000 }}
           />
           <motion.div 
@@ -39,25 +47,35 @@ export default function UserProfileDrawer({ isOpen, onClose }: Props) {
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
               <div className="drawer__handle" style={{ margin: '0 auto' }} />
-              <button 
-                onClick={onClose} 
-                style={{ 
-                  position: 'absolute', 
-                  right: '24px', 
-                  background: 'none', 
-                  border: 'none', 
-                  color: '#888', 
-                  fontSize: '1.2rem', 
-                  cursor: 'pointer' 
-                }}
-              >✕</button>
+              <button onClick={onClose} style={{ position: 'absolute', right: '24px', background: 'none', border: 'none', color: '#888', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
             </div>
             
             <div className="drawer__scroll-area">
               <div style={{ marginBottom: '32px', textAlign: 'center' }}>
-                <div style={{ width: '80px', height: '80px', background: '#3b82f6', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2.5rem', margin: '0 auto 16px auto', boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)' }}>
-                  👤
+                <div 
+                  onClick={() => fileInputRef.current?.click()}
+                  style={{ 
+                    width: '100px', 
+                    height: '100px', 
+                    background: '#3b82f6', 
+                    borderRadius: '50%', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    fontSize: '3rem', 
+                    margin: '0 auto 16px auto', 
+                    boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
+                    cursor: 'pointer',
+                    overflow: 'hidden',
+                    position: 'relative',
+                    border: '3px solid #fff'
+                  }}
+                >
+                  {profileImage ? <img src={profileImage} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👤'}
+                  <div style={{ position: 'absolute', bottom: 0, background: 'rgba(0,0,0,0.6)', width: '100%', fontSize: '0.6rem', color: 'white', padding: '2px 0' }}>CHANGE</div>
                 </div>
+                <input type="file" ref={fileInputRef} onChange={handleFileChange} style={{ display: 'none' }} accept="image/*" />
+
                 <h2 style={{ margin: 0, color: 'white', fontSize: '1.8rem' }}>{studentName}</h2>
                 <div style={{ color: '#888', fontSize: '0.9rem', marginTop: '4px' }}>Toki Pona Student</div>
               </div>
