@@ -1,3 +1,4 @@
+/* src/components/WordDetailDrawer.tsx */
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
 import { STATUS_META } from '../types/mastery';
@@ -12,12 +13,15 @@ export default function WordDetailDrawer({ word, onClose, onAskLina, isSandboxMo
       <motion.div className="drawer-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} />
       <motion.div 
         className="word-drawer" 
-        initial={{ y: '100%', x: '-50%' }} 
-        animate={{ y: 0, x: '-50%' }} 
-        exit={{ y: '100%', x: '-50%' }} 
+        initial={{ opacity: 0, scale: 0.95, y: '100%' }} 
+        animate={{ opacity: 1, scale: 1, y: 0 }} 
+        exit={{ opacity: 0, scale: 0.95, y: '100%' }} 
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+        drag="y"
+        dragConstraints={{ top: 0 }}
+        onDragEnd={(_, info) => { if (info.offset.y > 150) onClose(); }}
       >
-        <div className="drawer__handle" />
+        <div className="drawer__handle" onClick={onClose} />
         <div className="drawer__scroll-area">
           <h2 style={{ fontSize: '2.4rem', marginBottom: '8px' }}>{word.word}</h2>
           <div 
