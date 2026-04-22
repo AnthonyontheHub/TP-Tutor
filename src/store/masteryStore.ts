@@ -3,24 +3,23 @@ import { db } from '../services/firebase';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { doc, setDoc, onSnapshot } from 'firebase/firestore';
-import type { MasteryMap, MasteryStatus, StatusSummary, SavedPhrase } from '../types/mastery';
+import type { MasteryMap, MasteryStatus, StatusSummary } from '../types/mastery';
 import { initialMasteryMap } from '../data/initialMasteryMap';
 
 interface MasteryActions {
   updateVocabStatus: (wordIdOrText: string, status: MasteryStatus) => void;
   updateConceptStatus: (chapterId: string, conceptId: string, status: MasteryStatus) => void;
   setLastUpdated: (date: string) => void;
-  savePhrase: (phrase: string | SavedPhrase) => void;
-  updatePhraseNote: (id: string, note: string) => void;
-  deletePhrase: (id: string) => void;
+  savePhrase: (phrase: string) => void;
   recordActivity: () => void;
   setStudentName: (name: string) => void; 
+  setProfileImage: (url: string) => void; // New
   syncFromCloud: () => void;
   syncToCloud: () => Promise<void>; 
   getStatusSummary: () => StatusSummary & { xp: number, level: number, rankTitle: string };
 }
 
-type MasteryStore = MasteryMap & MasteryActions;
+type MasteryStore = MasteryMap & { profileImage?: string } & MasteryActions;
 
 const XP_MAP = { not_started: 0, introduced: 10, practicing: 25, confident: 50, mastered: 100 };
 
@@ -38,6 +37,7 @@ export const useMasteryStore = create<MasteryStore>()(
     (set, get) => ({
       ...initialMasteryMap,
       studentName: initialMasteryMap.studentName || 'Student',
+      profileImage: '', // New
       savedPhrases: initialMasteryMap.savedPhrases || [],
       currentStreak: initialMasteryMap.currentStreak || 0,
       lastActiveDate: initialMasteryMap.lastActiveDate || '',
@@ -66,43 +66,8 @@ export const useMasteryStore = create<MasteryStore>()(
         void get().syncToCloud();
       },
 
-      savePhrase: (phraseOrString) => {
-        const newPhrase = typeof phraseOrString === 'string' 
-          ? { id: crypto.randomUUID(), tp: phraseOrString, en: 'User Saved Phrase *', notes: '' }
-          : phraseOrString;
-        
-        set((state) => {
-          const currentPhrases = state.savedPhrases || []; 
-          const exists = currentPhrases.some(p => typeof p === 'string' ? p === newPhrase.tp : p.tp === newPhrase.tp);
-          if (exists) return state;
-          return { savedPhrases: [...currentPhrases, newPhrase] };
-        });
-        void get().syncToCloud();
-      },
-
-      updatePhraseNote: (id, notes) => {
-        set((state) => {
-          const currentPhrases = state.savedPhrases || [];
-          return {
-            savedPhrases: currentPhrases.map(p => {
-              if (typeof p === 'string') return p;
-              return p.id === id ? { ...p, notes } : p;
-            })
-          };
-        });
-        void get().syncToCloud();
-      },
-
-      deletePhrase: (id) => {
-        set((state) => {
-          const currentPhrases = state.savedPhrases || [];
-          return {
-            savedPhrases: currentPhrases.filter(p => {
-              if (typeof p === 'string') return p !== id; // safety catch
-              return p.id !== id;
-            })
-          };
-        });
+      savePhrase: (phrase) => {
+        set((state) => ({ savedPhrases: [...new Set([...state.savedPhrases, phrase])] }));
         void get().syncToCloud();
       },
 
@@ -127,6 +92,11 @@ export const useMasteryStore = create<MasteryStore>()(
         void get().syncToCloud();
       },
 
+      setProfileImage: (url) => {
+        set({ profileImage: url });
+        void get().syncToCloud();
+      },
+
       setLastUpdated: (date) => set({ lastUpdated: date }),
 
       getStatusSummary: () => {
@@ -147,11 +117,11 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       syncToCloud: async () => {
-        const { vocabulary, chapters, lastUpdated, studentName, savedPhrases, currentStreak, lastActiveDate } = get();
+        const { vocabulary, chapters, lastUpdated, studentName, profileImage, savedPhrases, currentStreak, lastActiveDate } = get();
         try {
           const userId = getUserId();
           await setDoc(doc(db, 'users', userId), {
-            vocabulary, chapters, lastUpdated, studentName, savedPhrases, currentStreak, lastActiveDate
+            vocabulary, chapters, lastUpdated, studentName, profileImage, savedPhrases, currentStreak, lastActiveDate
           });
         } catch (err) {
           console.error("Firebase Sync Error:", err);
@@ -168,6 +138,7 @@ export const useMasteryStore = create<MasteryStore>()(
               chapters: data.chapters || initialMasteryMap.chapters,
               lastUpdated: data.lastUpdated || '',
               studentName: data.studentName || 'Student',
+              profileImage: data.profileImage || '',
               savedPhrases: data.savedPhrases || [],
               currentStreak: data.currentStreak || 0,
               lastActiveDate: data.lastActiveDate || ''
