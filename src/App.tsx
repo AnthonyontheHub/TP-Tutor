@@ -1,3 +1,4 @@
+/* src/App.tsx */
 import { useState, useEffect } from 'react'; 
 import Dashboard from './components/Dashboard';
 import ChatSession from './components/ChatSession';
@@ -8,11 +9,17 @@ export default function App() {
   const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
 
   useEffect(() => {
-    // Fixed: Capture and return the unsubscribe function
-    const unsubscribe = useMasteryStore.getState().syncFromCloud();
-    return () => {
-      if (unsubscribe) unsubscribe();
-    };
+    // Access the state directly via the store instance
+    const state = useMasteryStore.getState();
+    
+    // Check if the function exists before calling to prevent the TypeError
+    // and provide a blank white screen crash.
+    if (typeof state.syncFromCloud === 'function') {
+      const unsubscribe = state.syncFromCloud();
+      return () => {
+        if (typeof unsubscribe === 'function') unsubscribe();
+      };
+    }
   }, []);
 
   const handleAskLina = (prompt: string) => {
