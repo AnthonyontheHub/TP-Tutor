@@ -25,14 +25,11 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
   const [isLoading, setIsLoading] = useState(false);
   
   const store = useMasteryStore();
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const historyRef = useRef<any[]>([]);
 
-  // Correct Scoped Auto-Scroll logic
   useEffect(() => { 
-    if (isActive && scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
-    } 
+    if (isActive) messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); 
   }, [messages, isActive]);
   
   useEffect(() => { 
@@ -98,23 +95,19 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
           <>
             <m.div 
               className="drawer-backdrop" 
-              initial={{ opacity: 0 }} animate={{ opacity: 0.6 }} exit={{ opacity: 0 }} 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} 
               onClick={onEndSession} 
-              style={{ position: 'fixed', inset: 0, background: 'black', zIndex: 1999 }} 
             />
             <m.div 
               className="chat-drawer" 
               drag="y" dragConstraints={{ top: 0 }} onDragEnd={(_, info) => { if (info.offset.y > 150) onEndSession(); }}
               initial={{ y: '100%' }} animate={{ y: '0%' }} exit={{ y: '100%' }} 
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              style={{ position: 'fixed', bottom: 0, left: 0, right: 0, height: '92vh', zIndex: 2000, background: '#111', borderTopLeftRadius: '20px', borderTopRightRadius: '20px', display: 'flex', flexDirection: 'column' }}
+              onClick={(e) => e.stopPropagation()}
             >
-              <div style={{ width: '100%', padding: '16px 0', cursor: 'grab', flexShrink: 0 }} onClick={onEndSession}>
-                <div style={{ width: '48px', height: '6px', backgroundColor: '#666', borderRadius: '10px', margin: '0 auto' }} />
-              </div>
+              <div className="drawer__handle" onClick={onEndSession} />
               
-              {/* Scoped Scroll Area */}
-              <div ref={scrollAreaRef} style={{ flex: 1, overflowY: 'auto', padding: '20px', scrollBehavior: 'smooth' }}>
+              <div className="drawer__scroll-area">
                  {!localStorage.getItem('TP_GEMINI_KEY') && <div style={{ color: '#ff6b6b', textAlign: 'center', marginBottom: '20px' }}>Please set your API Key in Settings to chat with Lina.</div>}
                  
                  {messages.map((msg) => (
@@ -139,6 +132,7 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
                      )}
                    </div>
                  ))}
+                 <div ref={messagesEndRef} />
               </div>
 
               <div style={{ padding: '16px', background: '#111', borderTop: '1px solid #333', display: 'flex', gap: '8px' }}>
