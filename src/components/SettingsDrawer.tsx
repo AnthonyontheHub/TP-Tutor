@@ -22,52 +22,78 @@ export default function SettingsDrawer({ onClose, isSandboxMode, setIsSandboxMod
   return (
     <AnimatePresence>
       <motion.div 
-        className="drawer-backdrop" 
+        key="backdrop"
         initial={{ opacity: 0 }} 
         animate={{ opacity: 1 }} 
         exit={{ opacity: 0 }} 
-        onClick={onClose} 
+        onClick={onClose}
+        className="drawer-backdrop"
       />
       
-      <motion.div 
-        className="settings-drawer"
-        initial={{ opacity: 0, scale: 0.95 }} 
-        animate={{ opacity: 1, scale: 1 }} 
-        exit={{ opacity: 0, scale: 0.95 }} 
+      <motion.div
+        key="content"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 20 }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+        onClick={(e) => e.stopPropagation()}
+        className="settings-drawer"
       >
         <div className="drawer__handle" />
+        
         <div className="drawer__scroll-area">
-          <h2 style={{ fontSize: '2.4rem', marginBottom: '24px', color: 'white' }}>SETTINGS</h2>
+          <h2 style={{ color: 'white', marginTop: 0, letterSpacing: '0.1em' }}>SETTINGS</h2>
 
-          <div style={{ background: '#1a1a1a', padding: '16px', borderRadius: '12px', borderLeft: '4px solid #3b82f6', marginBottom: '16px' }}>
-            <label style={{ display: 'flex', justifyContent: 'space-between', color: 'white', alignItems: 'center', fontWeight: 'bold', cursor: 'pointer' }}>
-              <span>Sandbox Mode (Offline)</span>
+          <div className="settings-section" style={{ background: '#1a1a1a', padding: '15px', borderRadius: '12px', marginBottom: '15px', border: '1px solid #333' }}>
+            <label style={{ display: 'flex', justifyContent: 'space-between', color: 'white', alignItems: 'center', cursor: 'pointer' }}>
+              <span style={{ fontWeight: 'bold' }}>Sandbox Mode (Offline)</span>
               <input 
                 type="checkbox" 
                 checked={isSandboxMode} 
                 onChange={(e) => setIsSandboxMode(e.target.checked)}
-                style={{ width: '24px', height: '24px', cursor: 'pointer' }}
+                style={{ width: '22px', height: '22px', cursor: 'pointer' }}
               />
             </label>
-            <p style={{ marginTop: '8px', color: '#ccc', fontSize: '0.85rem' }}>Use local dictionary instead of AI.</p>
+            <p style={{ color: '#666', fontSize: '0.75rem', marginTop: '8px' }}>Disables AI features and uses local data only.</p>
           </div>
 
-          <div style={{ background: '#1a1a1a', padding: '16px', borderRadius: '12px', borderLeft: '4px solid #10b981' }}>
-            <p style={{ color: '#888', margin: '0 0 8px 0', fontSize: '0.8rem', fontWeight: 'bold' }}>GEMINI API KEY</p>
+          <div className="settings-section" style={{ background: '#1a1a1a', padding: '15px', borderRadius: '12px', border: '1px solid #333' }}>
+            <p style={{ color: '#3b82f6', margin: '0 0 10px 0', fontSize: '0.7rem', fontWeight: '900', textTransform: 'uppercase' }}>Gemini API Configuration</p>
             <input 
               type="password" 
               value={apiKey} 
               onChange={(e) => setApiKey(e.target.value)}
-              placeholder="Paste API Key here..."
-              style={{ width: '100%', padding: '12px', background: '#000', border: '1px solid #333', color: 'white', borderRadius: '8px', marginBottom: '12px', outline: 'none' }}
+              placeholder="Enter API Key..."
+              style={{ 
+                width: '100%', 
+                padding: '12px', 
+                background: '#000', 
+                border: '1px solid #333', 
+                color: 'white', 
+                borderRadius: '8px', 
+                marginBottom: '12px',
+                fontFamily: 'inherit'
+              }}
             />
-            <button onClick={handleSaveKey} className="btn-review" style={{ width: '100%', margin: 0, padding: '12px', borderRadius: '8px' }}>SAVE KEY</button>
+            <button onClick={handleSaveKey} className="btn-review" style={{ width: '100%', margin: 0 }}>SAVE API KEY</button>
           </div>
-        </div>
-        
-        <div style={{ padding: '20px', borderTop: '1px solid #222' }}>
-          <button onClick={onClose} style={{ width: '100%', padding: '12px', background: '#333', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>✕ CLOSE SETTINGS</button>
+          
+          <button 
+            onClick={onClose}
+            style={{ 
+              width: '100%', 
+              marginTop: '24px', 
+              padding: '12px', 
+              background: 'transparent', 
+              color: '#666', 
+              border: '1px solid #333', 
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontWeight: 'bold'
+            }}
+          >
+            CLOSE
+          </button>
         </div>
       </motion.div>
     </AnimatePresence>
