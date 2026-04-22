@@ -22,12 +22,12 @@
   --col-confident:   #16a34a;
   --col-mastered:    #22c55e;
 
-  /* Status background tints - Brightened for better visibility on all displays */
+  /* Status background tints */
   --bg-not-started: #0d0d0d;
-  --bg-introduced:  #0a1a3a;
-  --bg-practicing:  #2a1800;
-  --bg-confident:   #06220a;
-  --bg-mastered:    #082a10;
+  --bg-introduced:  #040e22;
+  --bg-practicing:  #100800;
+  --bg-confident:   #020c04;
+  --bg-mastered:    #031008;
 }
 
 body {
@@ -93,11 +93,9 @@ body {
   padding: 10px 6px;
   min-height: 84px;
   border: var(--b2) solid transparent;
-  cursor: pointer;
-  transition: all 0.2s ease;
 }
-.vocab-card__word { font-size: 1rem; font-weight: 900; color: #fff; }
-.vocab-card__pos { font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; margin-top: 5px; font-weight: bold; }
+.vocab-card__word { font-size: 1rem; font-weight: 900; }
+.vocab-card__pos { font-size: 0.5rem; color: var(--text-dim); text-transform: uppercase; margin-top: 5px; }
 
 /* Status Skins */
 .vocab-card--not_started { background: var(--bg-not-started); border-color: var(--col-not-started); }
@@ -112,9 +110,9 @@ body {
   background: #1a1a1a;
   color: #fff;
   border: 1px solid #3b82f6;
-  padding: 6px 14px;
+  padding: 8px 14px;
   border-radius: 20px;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-weight: 900;
   cursor: pointer;
   transition: all 0.2s;
@@ -124,14 +122,14 @@ body {
 
 /* Universal Drawer Fixes */
 .drawer-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; }
-.word-drawer, .settings-drawer, .profile-drawer {
+.word-drawer, .settings-drawer, .profile-drawer, .chat-drawer {
   position: fixed; z-index: 2001; background: #111; display: flex; flex-direction: column;
   bottom: 0; left: 0; right: 0; height: 85vh; border-top: var(--b3) solid var(--text);
   border-radius: 24px 24px 0 0;
 }
 
 @media (min-width: 900px) {
-  .word-drawer, .settings-drawer, .profile-drawer {
+  .word-drawer, .settings-drawer, .profile-drawer, .chat-drawer {
     top: 50% !important; left: 50% !important; bottom: auto !important; right: auto !important;
     width: 500px; height: 620px; transform: translate(-50%, -50%) !important;
     border: var(--b3) solid var(--text); border-radius: 24px;
