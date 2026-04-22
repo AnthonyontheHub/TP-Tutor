@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
 import VocabCard from './VocabCard';
 import WordDetailDrawer from './WordDetailDrawer';
@@ -13,8 +14,8 @@ interface Props {
   sortMode: string; 
   sortDirection: 'asc' | 'desc'; 
   posFilter: string;
-  setSortMode: (mode: any) => void;
-  setSortDirection: (dir: any) => void;
+  setSortMode: (mode: string) => void;
+  setSortDirection: (dir: 'asc' | 'desc') => void;
   setPosFilter: (pos: string) => void;
 }
 
@@ -22,7 +23,7 @@ export default function MasteryGrid({
   onAskLina, activeFilter, sortMode, sortDirection, posFilter, 
   setSortMode, setSortDirection, setPosFilter 
 }: Props) {
-  const { vocabulary, savePhrase } = useMasteryStore();
+  const { vocabulary } = useMasteryStore();
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [magneticSuggestions, setMagneticSuggestions] = useState<string[]>([]);
@@ -32,7 +33,7 @@ export default function MasteryGrid({
 
   useEffect(() => {
     const apiKey = localStorage.getItem('TP_GEMINI_KEY');
-    if (selectedWords.length > 1 && apiKey) {
+    if (selectedWords.length > 0 && apiKey) {
       const timer = setTimeout(async () => {
         const results = await fetchSentenceSuggestions(apiKey, selectedWords);
         setMagneticSuggestions(results);
@@ -43,7 +44,6 @@ export default function MasteryGrid({
 
   const handlePointerDown = (word: string) => {
     if (selectedWords.length > 0) return;
-    
     isLongPress.current = false;
     longPressTimer.current = setTimeout(() => {
       isLongPress.current = true;
@@ -53,36 +53,44 @@ export default function MasteryGrid({
   };
 
   const handlePointerUp = (word: string) => {
-    // Clear the timeout if the user lifts their finger before 500ms
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
     }
-    
-    // If this release was the end of a long press, consume the event and stop
     if (isLongPress.current) {
       isLongPress.current = false;
       return; 
     }
-
-    // Normal tap logic
     if (selectedWords.length === 0) {
-      // Not selecting anything yet, so open the drawer
       const target = vocabulary.find(v => v.word === word);
       if (target) setDrawerId(target.id);
     } else {
-      // Already selecting words, so toggle this word
       setSelectedWords(prev => prev.includes(word) ? prev.filter(w => w !== word) : [...prev, word]);
+    }
+  };
+
+  const handleSuggestionAdd = (word: string) => {
+    if (!selectedWords.includes(word)) {
+      setSelectedWords(prev => [...prev, word]);
     }
   };
 
   const displayed = vocabulary
     .filter(w => !activeFilter || w.status === activeFilter)
     .filter(w => posFilter === 'All' || w.partOfSpeech.includes(posFilter))
-    .sort((a: any, b: any) => {
-      const field = sortMode === 'alphabetical' ? 'word' : sortMode;
-      const valA = String(a[field] || '').toLowerCase();
-      const valB = String(b[field] || '').toLowerCase();
+    .sort((a, b) => {
+      // Extended Sorting Logic Implementation
+      if (sortMode === 'length') {
+        return sortDirection === 'asc' ? a.word.length - b.word.length : b.word.length - a.word.length;
+      }
+      if (sortMode === 'type') {
+        const comp = a.partOfSpeech.localeCompare(b.partOfSpeech);
+        return sortDirection === 'asc' ? comp : -comp;
+      }
+      // Assuming frequency is alphabetical fallback since it wasn't tracked in schema
+      const field = sortMode === 'alphabetical' || sortMode === 'frequency' ? 'word' : sortMode;
+      const valA = String(a[field as keyof typeof a] || '').toLowerCase();
+      const valB = String(b[field as keyof typeof b] || '').toLowerCase();
       return sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
     });
 
@@ -91,17 +99,23 @@ export default function MasteryGrid({
       <div className="grid-toolbar" style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
         <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="sort-select">
           <option value="alphabetical">A-Z</option>
-          <option value="status">Mastery</option>
+          <option value="status">Mastery Level</option>
+          <option value="length">Word Length</option>
+          <option value="type">Part of Speech</option>
+          <option value="frequency">Frequency</option>
         </select>
-        <button onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')} className="btn-toggle">
+        <button onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')} className="btn-toggle" style={{ flex: '0 0 50px' }}>
           {sortDirection === 'asc' ? '↑' : '↓'}
         </button>
       </div>
 
       <div className="mastery-grid__cards">
-        {displayed.map((word) => (
-          <div 
+        {displayed.map((word, i) => (
+          <motion.div 
             key={word.id} 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.02, ease: "easeOut" }} // Staggered bottom-up entry
             onPointerDown={() => handlePointerDown(word.word)} 
             onPointerUp={() => handlePointerUp(word.word)}
             style={{ 
@@ -110,23 +124,31 @@ export default function MasteryGrid({
             }}
           >
             <VocabCard word={word} onClick={() => {}} />
-          </div>
+          </motion.div>
         ))}
       </div>
 
       {selectedWords.length > 0 && (
-        <div className="builder-panel">
-          <div className="builder-content">
-            <div style={{ color: 'white', fontSize: '1.2rem', marginBottom: '10px', textAlign: 'center', fontWeight: 'bold' }}>{selectedWords.join(' ')}</div>
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button onClick={() => { onAskLina(`Is "${selectedWords.join(' ')}" correct?`); setSelectedWords([]); }} className="btn-review" style={{ flex: 1, margin: 0 }}>ASK LINA</button>
-              <button onClick={() => setSelectedWords([])} style={{ background: '#333', border: 'none', color: 'white', padding: '16px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>CANCEL</button>
+        <div className="builder-panel" style={{ position: 'fixed', bottom: '20px', left: '10px', right: '10px', background: '#222', padding: '15px', borderRadius: '12px', zIndex: 100, border: '2px solid #3b82f6', boxShadow: '0 -10px 30px rgba(0,0,0,0.8)' }}>
+          <div style={{ color: 'white', fontSize: '1.2rem', marginBottom: '10px', fontWeight: 'bold' }}>{selectedWords.join(' ')}</div>
+          
+          {/* Render Missing Magnetic Suggestions */}
+          {magneticSuggestions.length > 0 && (
+            <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', marginBottom: '12px', scrollbarWidth: 'none' }}>
+              {magneticSuggestions.map(s => (
+                <button key={s} className="suggestion-pill" onClick={() => handleSuggestionAdd(s)}>{s}</button>
+              ))}
             </div>
+          )}
+
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button onClick={() => { onAskLina(`Is "${selectedWords.join(' ')}" correct?`); setSelectedWords([]); }} style={{ flex: 1, padding: '12px', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold' }}>ASK LINA</button>
+            <button onClick={() => setSelectedWords([])} style={{ flex: '0 0 auto', padding: '12px', background: '#444', border: 'none', color: '#fff', borderRadius: '8px' }}>✕</button>
           </div>
         </div>
       )}
 
-      {drawerId && <WordDetailDrawer word={vocabulary.find(v => v.id === drawerId)!} onClose={() => setDrawerId(null)} onAskLina={onAskLina} isSandboxMode={true} />}
+      {drawerId && <WordDetailDrawer word={vocabulary.find(v => v.id === drawerId)!} onClose={() => setDrawerId(null)} onAskLina={onAskLina} isSandboxMode={isSandboxMode} />}
     </div>
   );
 }
