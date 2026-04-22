@@ -13,7 +13,7 @@ interface MasteryActions {
   savePhrase: (phrase: string) => void;
   recordActivity: () => void;
   setStudentName: (name: string) => void; 
-  syncFromCloud: () => () => void; // Fixed: Now strictly returns the unsubscribe function
+  syncFromCloud: () => (() => void) | void;
   syncToCloud: () => Promise<void>; 
   getStatusSummary: () => StatusSummary;
 }
@@ -92,12 +92,12 @@ export const useMasteryStore = create<MasteryStore>()(
 
       getStatusSummary: () => {
         const { vocabulary } = get();
-        const summary: StatusSummary = { not_started: 0, introduced: 0, practicing: 0, confident: 0, mastered: 0 };
+        const summary = { not_started: 0, introduced: 0, practicing: 0, confident: 0, mastered: 0 };
         
         for (const word of vocabulary) { 
           summary[word.status]++; 
         }
-        
+
         return summary;
       },
 
@@ -115,6 +115,7 @@ export const useMasteryStore = create<MasteryStore>()(
 
       syncFromCloud: () => {
         const userId = getUserId();
+        // Returning the unsubscribe function to prevent memory leaks
         return onSnapshot(doc(db, 'users', userId), (snapshot) => {
           if (snapshot.exists()) {
             const data = snapshot.data();
