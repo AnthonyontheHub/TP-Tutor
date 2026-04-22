@@ -14,13 +14,13 @@ interface Props {
   sortMode: string; 
   sortDirection: 'asc' | 'desc'; 
   posFilter: string;
-  setSortMode: (mode: string) => void;
-  setSortDirection: (dir: 'asc' | 'desc') => void;
+  setSortMode: (mode: any) => void;
+  setSortDirection: (dir: any) => void;
   setPosFilter: (pos: string) => void;
 }
 
 export default function MasteryGrid({ 
-  onAskLina, activeFilter, sortMode, sortDirection, posFilter, 
+  onAskLina, isSandboxMode, activeFilter, sortMode, sortDirection, posFilter, 
   setSortMode, setSortDirection, setPosFilter 
 }: Props) {
   const { vocabulary } = useMasteryStore();
@@ -69,39 +69,30 @@ export default function MasteryGrid({
     }
   };
 
-  const handleSuggestionAdd = (word: string) => {
-    if (!selectedWords.includes(word)) {
-      setSelectedWords(prev => [...prev, word]);
-    }
-  };
-
   const displayed = vocabulary
     .filter(w => !activeFilter || w.status === activeFilter)
     .filter(w => posFilter === 'All' || w.partOfSpeech.includes(posFilter))
-    .sort((a, b) => {
-      // Extended Sorting Logic Implementation
-      if (sortMode === 'length') {
-        return sortDirection === 'asc' ? a.word.length - b.word.length : b.word.length - a.word.length;
+    .sort((a: any, b: any) => {
+      let valA, valB;
+      if (sortMode === 'length') { valA = a.word.length; valB = b.word.length; }
+      else if (sortMode === 'type') { valA = a.partOfSpeech; valB = b.partOfSpeech; }
+      else {
+        const field = sortMode === 'alphabetical' ? 'word' : sortMode;
+        valA = String(a[field] || '').toLowerCase();
+        valB = String(b[field] || '').toLowerCase();
       }
-      if (sortMode === 'type') {
-        const comp = a.partOfSpeech.localeCompare(b.partOfSpeech);
-        return sortDirection === 'asc' ? comp : -comp;
-      }
-      // Assuming frequency is alphabetical fallback since it wasn't tracked in schema
-      const field = sortMode === 'alphabetical' || sortMode === 'frequency' ? 'word' : sortMode;
-      const valA = String(a[field as keyof typeof a] || '').toLowerCase();
-      const valB = String(b[field as keyof typeof b] || '').toLowerCase();
-      return sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+      if (typeof valA === 'string') return sortDirection === 'asc' ? valA.localeCompare(valB as string) : (valB as string).localeCompare(valA);
+      return sortDirection === 'asc' ? (valA as number) - (valB as number) : (valB as number) - (valA as number);
     });
 
   return (
     <div className="mastery-grid-container">
-      <div className="grid-toolbar" style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
+      <div className="grid-toolbar">
         <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="sort-select">
           <option value="alphabetical">A-Z</option>
-          <option value="status">Mastery Level</option>
-          <option value="length">Word Length</option>
-          <option value="type">Part of Speech</option>
+          <option value="status">Mastery</option>
+          <option value="length">Length</option>
+          <option value="type">Type</option>
           <option value="frequency">Frequency</option>
         </select>
         <button onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')} className="btn-toggle" style={{ flex: '0 0 50px' }}>
@@ -113,37 +104,29 @@ export default function MasteryGrid({
         {displayed.map((word, i) => (
           <motion.div 
             key={word.id} 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.02, ease: "easeOut" }} // Staggered bottom-up entry
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.01 }}
             onPointerDown={() => handlePointerDown(word.word)} 
             onPointerUp={() => handlePointerUp(word.word)}
-            style={{ 
-              opacity: selectedWords.length > 0 && !selectedWords.includes(word.word) ? 0.3 : 1,
-              touchAction: 'none'
-            }}
+            style={{ opacity: selectedWords.length > 0 && !selectedWords.includes(word.word) ? 0.3 : 1, touchAction: 'none' }}
           >
-            <VocabCard word={word} onClick={() => {}} />
+            <VocabCard word={word} />
           </motion.div>
         ))}
       </div>
 
       {selectedWords.length > 0 && (
-        <div className="builder-panel" style={{ position: 'fixed', bottom: '20px', left: '10px', right: '10px', background: '#222', padding: '15px', borderRadius: '12px', zIndex: 100, border: '2px solid #3b82f6', boxShadow: '0 -10px 30px rgba(0,0,0,0.8)' }}>
+        <div className="builder-panel" style={{ position: 'fixed', bottom: '20px', left: '10px', right: '10px', background: '#111', padding: '15px', borderRadius: '16px', zIndex: 100, border: '2px solid #3b82f6' }}>
           <div style={{ color: 'white', fontSize: '1.2rem', marginBottom: '10px', fontWeight: 'bold' }}>{selectedWords.join(' ')}</div>
           
-          {/* Render Missing Magnetic Suggestions */}
-          {magneticSuggestions.length > 0 && (
-            <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', marginBottom: '12px', scrollbarWidth: 'none' }}>
-              {magneticSuggestions.map(s => (
-                <button key={s} className="suggestion-pill" onClick={() => handleSuggestionAdd(s)}>{s}</button>
-              ))}
-            </div>
-          )}
+          <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', marginBottom: '12px', paddingBottom: '5px' }}>
+            {magneticSuggestions.map((s, idx) => (
+              <button key={idx} className="suggestion-pill" onClick={() => setSelectedWords([...selectedWords, s])}>{s}</button>
+            ))}
+          </div>
 
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button onClick={() => { onAskLina(`Is "${selectedWords.join(' ')}" correct?`); setSelectedWords([]); }} style={{ flex: 1, padding: '12px', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold' }}>ASK LINA</button>
-            <button onClick={() => setSelectedWords([])} style={{ flex: '0 0 auto', padding: '12px', background: '#444', border: 'none', color: '#fff', borderRadius: '8px' }}>✕</button>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button onClick={() => { onAskLina(`Is "${selectedWords.join(' ')}" correct?`); setSelectedWords([]); }} className="btn-review" style={{ margin: 0 }}>ASK LINA</button>
+            <button onClick={() => setSelectedWords([])} style={{ background: '#333', border: 'none', color: '#888', borderRadius: '8px', padding: '0 15px' }}>✕</button>
           </div>
         </div>
       )}
