@@ -9,52 +9,74 @@ interface Props {
 }
 
 export default function SettingsDrawer({ onClose, isSandboxMode, setIsSandboxMode }: Props) {
+  const { vocabulary, updateVocabStatus } = useMasteryStore();
   const [apiKey, setApiKey] = useState('');
-  const { resetProgress, masterAllWords, generateRandomProgress } = useMasteryStore();
 
   useEffect(() => {
     setApiKey(localStorage.getItem('TP_GEMINI_KEY') || '');
   }, []);
 
+  const handleSaveKey = () => {
+    localStorage.setItem('TP_GEMINI_KEY', apiKey);
+    alert('API Key Saved!');
+  };
+
   return (
     <AnimatePresence>
-      <motion.div className="drawer-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} />
+      <motion.div 
+        key="backdrop"
+        initial={{ opacity: 0 }} 
+        animate={{ opacity: 1 }} 
+        exit={{ opacity: 0 }} 
+        onClick={onClose}
+        className="drawer-backdrop"
+        style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 2000 }}
+      />
+      
       <motion.div
-        className="settings-drawer"
-        initial={{ y: '100%', x: '-50%' }}
-        animate={{ y: 0, x: '-50%' }}
-        exit={{ y: '100%', x: '-50%' }}
+        key="content"
+        initial={{ y: '100%' }}
+        animate={{ y: '0%' }}
+        exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+        drag="y"
+        dragConstraints={{ top: 0 }}
+        onDragEnd={(_, info) => { if (info.offset.y > 150) onClose(); }}
+        onClick={(e) => e.stopPropagation()} 
+        className="settings-drawer"
+        style={{ 
+          position: 'fixed', bottom: 0, left: 0, right: 0, 
+          height: '70vh', background: '#111', zIndex: 2001,
+          borderTop: '2px solid #333', borderTopLeftRadius: '20px', borderTopRightRadius: '20px',
+          padding: '0 20px 20px', overflowY: 'auto', boxSizing: 'border-box'
+        }}
       >
-        <div className="drawer__handle" onClick={onClose} />
-        <div className="drawer__scroll-area">
-          <h2 style={{ marginBottom: '24px' }}>SETTINGS</h2>
-          
-          <div style={{ background: '#1a1a1a', padding: '20px', borderRadius: '16px', marginBottom: '16px' }}>
-            <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontWeight: 'bold' }}>Sandbox Mode</span>
-              <input type="checkbox" checked={isSandboxMode} onChange={(e) => setIsSandboxMode(e.target.checked)} />
-            </label>
-          </div>
+        <div style={{ width: '100%', padding: '16px 0', cursor: 'grab', flexShrink: 0, display: 'flex', justifyContent: 'center' }} onClick={onClose}>
+          <div style={{ width: '48px', height: '6px', background: '#444', borderRadius: '3px' }} />
+        </div>
+        <h2 style={{ color: 'white', marginTop: 0 }}>SETTINGS</h2>
 
-          <div style={{ background: '#1a1a1a', padding: '20px', borderRadius: '16px', marginBottom: '32px' }}>
-            <p style={{ color: '#888', fontSize: '0.75rem', marginBottom: '10px' }}>GEMINI API KEY</p>
+        <div className="settings-section" style={{ background: '#1a1a1a', padding: '15px', borderRadius: '12px', marginBottom: '15px' }}>
+          <label style={{ display: 'flex', justifyContent: 'space-between', color: 'white', alignItems: 'center' }}>
+            <span>Sandbox Mode (Offline)</span>
             <input 
-              type="password" value={apiKey} 
-              onChange={(e) => setApiKey(e.target.value)}
-              onBlur={() => localStorage.setItem('TP_GEMINI_KEY', apiKey)}
-              style={{ width: '100%', padding: '12px', background: '#000', border: '1px solid #333', color: 'white', borderRadius: '8px' }}
+              type="checkbox" 
+              checked={isSandboxMode} 
+              onChange={(e) => setIsSandboxMode(e.target.checked)}
+              style={{ width: '20px', height: '20px' }}
             />
-          </div>
+          </label>
+        </div>
 
-          <div style={{ border: '2px dashed #442222', padding: '20px', borderRadius: '16px' }}>
-            <h3 style={{ color: '#ff4444', fontSize: '0.8rem', marginBottom: '12px' }}>DANGER ZONE: SYSTEM OVERRIDE</h3>
-            <div style={{ display: 'grid', gap: '10px' }}>
-              <button onClick={() => { if(confirm("Master everything?")) masterAllWords(); }} style={{ padding: '10px', background: '#222', color: '#16a34a', border: '1px solid #16a34a', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>MASTER ALL WORDS</button>
-              <button onClick={() => { if(confirm("Generate random?")) generateRandomProgress(); }} style={{ padding: '10px', background: '#222', color: '#3b82f6', border: '1px solid #3b82f6', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>RANDOMIZE PROGRESS</button>
-              <button onClick={() => { if(confirm("Wipe everything?")) resetProgress(); }} style={{ padding: '10px', background: '#222', color: '#ff4444', border: '1px solid #ff4444', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>RESET ALL DATA</button>
-            </div>
-          </div>
+        <div className="settings-section" style={{ background: '#1a1a1a', padding: '15px', borderRadius: '12px' }}>
+          <p style={{ color: '#888', margin: '0 0 10px 0', fontSize: '0.8rem' }}>GEMINI API KEY</p>
+          <input 
+            type="password" 
+            value={apiKey} 
+            onChange={(e) => setApiKey(e.target.value)}
+            style={{ width: '100%', padding: '10px', background: '#000', border: '1px solid #333', color: 'white', borderRadius: '6px', marginBottom: '10px' }}
+          />
+          <button onClick={handleSaveKey} className="btn-review" style={{ width: '100%', margin: 0 }}>SAVE KEY</button>
         </div>
       </motion.div>
     </AnimatePresence>
