@@ -1,9 +1,7 @@
 /* src/components/VocabCard.tsx */
 import type { VocabWord } from '../types/mastery';
 
-export default function VocabCard({ word }: { word: VocabWord }) {
-  // Removed pointer-events: none to allow the wrapper div in MasteryGrid 
-  // to capture events more naturally across different mobile browsers.
+export default function VocabCard({ word }: { word: VocabWord; onClick?: () => void }) {
   return (
     <div 
       className={`vocab-card vocab-card--${word.status}`} 
