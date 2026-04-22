@@ -7,33 +7,34 @@ import { useMasteryStore } from './store/masteryStore';
 
 export default function App() {
   const [activeView, setActiveView] = useState<'none' | 'chat' | 'settings' | 'profile'>('none');
-  const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
   const [isSandboxMode, setIsSandboxMode] = useState(true);
 
   useEffect(() => {
     useMasteryStore.getState().syncFromCloud();
   }, []);
 
-  const handleAskLina = (prompt: string) => {
-    setPendingPrompt(prompt);
-    setActiveView('chat'); 
-  };
+  // Sync class to body for the CSS shift effect
+  useEffect(() => {
+    if (activeView !== 'none') {
+      document.body.classList.add('has-active-drawer');
+    } else {
+      document.body.classList.remove('has-active-drawer');
+    }
+  }, [activeView]);
 
   return (
-    <div className={activeView !== 'none' ? 'has-active-drawer' : ''}>
+    <>
       <Dashboard 
         onStartSession={() => setActiveView('chat')} 
         onOpenSettings={() => setActiveView('settings')}
         onOpenProfile={() => setActiveView('profile')}
-        onAskLina={handleAskLina} 
+        onAskLina={(p) => { setActiveView('chat'); /* handle prompt logic if needed */ }} 
         isSandboxMode={isSandboxMode}
       />
       
       <ChatSession 
         isActive={activeView === 'chat'} 
         onEndSession={() => setActiveView('none')} 
-        pendingPrompt={pendingPrompt}
-        clearPrompt={() => setPendingPrompt(null)}
       />
 
       {activeView === 'settings' && (
@@ -49,6 +50,6 @@ export default function App() {
           onClose={() => setActiveView('none')} 
         />
       )}
-    </div>
+    </>
   );
 }
