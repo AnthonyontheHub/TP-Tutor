@@ -7,8 +7,7 @@ interface Props {
 }
 
 export default function ProgressSummary({ activeFilter, onFilterClick }: Props) {
-  // Fixed: Subscribe directly to vocabulary to guarantee component reactivity
-  const vocabulary = useMasteryStore((s) => s.vocabulary); 
+  const vocabulary = useMasteryStore((s) => s.vocabulary);
   const { getStatusSummary, savedPhrases } = useMasteryStore();
   const summary = getStatusSummary();
 
@@ -30,8 +29,6 @@ export default function ProgressSummary({ activeFilter, onFilterClick }: Props) 
 
   return (
     <div style={{ background: '#111', borderRadius: '16px', padding: '20px', border: '1px solid #222', marginBottom: '20px' }}>
-      
-      {/* Achievement Badges Row */}
       <div style={{ display: 'flex', gap: '12px', overflowX: 'auto', marginBottom: '20px', paddingBottom: '10px', scrollbarWidth: 'none' }}>
         {badges.map((badge, i) => (
           <div key={i} style={{ textAlign: 'center', opacity: badge.unlocked ? 1 : 0.2, filter: badge.unlocked ? 'none' : 'grayscale(1)', minWidth: '60px' }}>
@@ -43,22 +40,19 @@ export default function ProgressSummary({ activeFilter, onFilterClick }: Props) 
         ))}
       </div>
 
-      {/* Mastery Distribution Progress Bar */}
       <div style={{ marginBottom: '24px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '8px' }}>
           <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'white' }}>Vocabulary Progress</div>
           <div style={{ fontSize: '0.8rem', color: '#666' }}>{vocabulary.length} Words</div>
         </div>
         <div style={{ height: '8px', background: '#222', borderRadius: '10px', overflow: 'hidden', display: 'flex' }}>
-          <div style={{ width: `${(summary.mastered / totalWords) * 100}%`, height: '100%', background: '#ec4899', transition: 'width 0.5s ease' }} title="Mastered" />
-          <div style={{ width: `${(summary.confident / totalWords) * 100}%`, height: '100%', background: '#10b981', transition: 'width 0.5s ease' }} title="Confident" />
-          <div style={{ width: `${(summary.practicing / totalWords) * 100}%`, height: '100%', background: '#f59e0b', transition: 'width 0.5s ease' }} title="Practicing" />
-          <div style={{ width: `${(summary.introduced / totalWords) * 100}%`, height: '100%', background: '#3b82f6', transition: 'width 0.5s ease' }} title="Introduced" />
-          <div style={{ width: `${(summary.not_started / totalWords) * 100}%`, height: '100%', background: '#1a1a1a', transition: 'width 0.5s ease' }} title="Not Started" />
+          <div style={{ width: `${(summary.mastered / totalWords) * 100}%`, height: '100%', background: '#ec4899', transition: 'width 0.5s ease' }} />
+          <div style={{ width: `${(summary.confident / totalWords) * 100}%`, height: '100%', background: '#10b981', transition: 'width 0.5s ease' }} />
+          <div style={{ width: `${(summary.practicing / totalWords) * 100}%`, height: '100%', background: '#f59e0b', transition: 'width 0.5s ease' }} />
+          <div style={{ width: `${(summary.introduced / totalWords) * 100}%`, height: '100%', background: '#3b82f6', transition: 'width 0.5s ease' }} />
         </div>
       </div>
 
-      {/* Mastery Counts (Clickable Filters) */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
         {statusItems.map((item) => (
           <button
@@ -74,33 +68,10 @@ export default function ProgressSummary({ activeFilter, onFilterClick }: Props) 
               textAlign: 'center'
             }}
           >
-            <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: 'white' }}>
-              {summary[item.status]}
-            </div>
-            <div style={{ fontSize: '0.5rem', color: activeFilter === item.status ? 'white' : '#666', fontWeight: 'bold', marginTop: '2px' }}>
-              {item.label}
-            </div>
+            <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: 'white' }}>{summary[item.status]}</div>
+            <div style={{ fontSize: '0.5rem', color: activeFilter === item.status ? 'white' : '#666', fontWeight: 'bold', marginTop: '2px' }}>{item.label}</div>
           </button>
         ))}
-      </div>
-
-      {/* Weekly Heatmap (Simulation) */}
-      <div style={{ marginTop: '20px', paddingTop: '15px', borderTop: '1px solid #222' }}>
-        <div style={{ fontSize: '0.6rem', color: '#444', fontWeight: 'bold', marginBottom: '8px', textTransform: 'uppercase' }}>Knowledge Activity</div>
-        <div style={{ display: 'flex', gap: '4px' }}>
-          {Array.from({ length: 21 }).map((_, i) => (
-            <div 
-              key={i} 
-              style={{ 
-                width: '10px', 
-                height: '10px', 
-                borderRadius: '2px', 
-                background: i > 17 ? '#10b981' : (i > 10 ? '#064e3b' : '#1a1a1a'),
-                opacity: i === 20 ? 1 : 0.5
-              }} 
-            />
-          ))}
-        </div>
       </div>
     </div>
   );
