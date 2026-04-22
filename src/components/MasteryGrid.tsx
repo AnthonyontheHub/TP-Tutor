@@ -63,21 +63,24 @@ export default function MasteryGrid({
     }, 500);
   };
 
-  const handlePointerUp = (word: string) => {
+  const cancelLongPress = () => {
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
     }
-    
+  };
+
+  const handleClick = (word: string, id: string) => {
     if (isLongPress.current) {
-      isLongPress.current = false;
+      // If the action was a long press, we ignore this click event
       return; 
     }
 
     if (selectedWords.length === 0) {
-      const target = vocabulary.find(v => v.word === word);
-      if (target) setDrawerId(target.id);
+      // Normal single tap -> Open Drawer
+      setDrawerId(id);
     } else {
+      // Multi-select toggle tap -> Add/Remove from builder
       setSelectedWords(prev => prev.includes(word) ? prev.filter(w => w !== word) : [...prev, word]);
     }
   };
@@ -98,14 +101,14 @@ export default function MasteryGrid({
 
   return (
     <div className="mastery-grid-container">
-      <div className="grid-toolbar" style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
-        <select value={posFilter} onChange={(e) => setPosFilter(e.target.value)} className="sort-select">
+      <div className="grid-toolbar" style={{ display: 'flex', gap: '10px', marginBottom: '15px', alignItems: 'center' }}>
+        <select value={posFilter} onChange={(e) => setPosFilter(e.target.value)} className="sort-select" style={{ flex: 1 }}>
           {POS_OPTIONS.map(pos => (
             <option key={pos} value={pos}>{pos}</option>
           ))}
         </select>
         
-        <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="sort-select">
+        <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="sort-select" style={{ flex: 1 }}>
           <option value="alphabetical">A-Z</option>
           <option value="status">Mastery</option>
         </select>
@@ -120,11 +123,15 @@ export default function MasteryGrid({
           <div 
             key={word.id} 
             onPointerDown={() => handlePointerDown(word.word)} 
-            onPointerUp={() => handlePointerUp(word.word)}
+            onPointerUp={cancelLongPress}
+            onPointerLeave={cancelLongPress}
+            onPointerCancel={cancelLongPress}
+            onClick={() => handleClick(word.word, word.id)}
+            onContextMenu={(e) => e.preventDefault()}
             className="grid-item-wrapper"
             style={{ 
               opacity: selectedWords.length > 0 && !selectedWords.includes(word.word) ? 0.3 : 1,
-              touchAction: 'none',
+              touchAction: 'pan-y', // Allows vertical scroll but prevents zoom/swipe interference
               cursor: 'pointer'
             }}
           >
@@ -174,15 +181,13 @@ export default function MasteryGrid({
         </div>
       )}
 
-      {drawerId && (
-        <WordDetailDrawer 
-          isOpen={true}
-          word={vocabulary.find(v => v.id === drawerId)!} 
-          onClose={() => setDrawerId(null)} 
-          onAskLina={onAskLina} 
-          isSandboxMode={isSandboxMode} 
-        />
-      )}
+      <WordDetailDrawer 
+        isOpen={!!drawerId}
+        word={vocabulary.find(v => v.id === drawerId) || null} 
+        onClose={() => setDrawerId(null)} 
+        onAskLina={onAskLina} 
+        isSandboxMode={isSandboxMode} 
+      />
     </div>
   );
 }
