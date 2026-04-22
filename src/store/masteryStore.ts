@@ -12,15 +12,17 @@ interface MasteryActions {
   savePhrase: (phrase: string) => void;
   recordActivity: () => void;
   setStudentName: (name: string) => void; 
-  syncFromCloud: () => () => void; // FIX: Now returns the cleanup function
+  syncFromCloud: () => () => void; // Fixed: Now returns the unsubscribe function
   syncToCloud: () => Promise<void>; 
   getStatusSummary: () => StatusSummary & { xp: number, level: number, rankTitle: string };
 }
 
 type MasteryStore = MasteryMap & MasteryActions;
 
+// XP Mapping: Values for each status level
 const XP_MAP = { not_started: 0, introduced: 10, practicing: 25, confident: 50, mastered: 100 };
 
+// Helper to get or create a unique user ID for the database
 const getUserId = () => {
   let userId = localStorage.getItem('tp_tutor_user_id');
   if (!userId) {
@@ -98,6 +100,7 @@ export const useMasteryStore = create<MasteryStore>()(
           summary.xp += XP_MAP[word.status];
         }
 
+        // Calculate level based on 500 XP per level
         const level = Math.floor(summary.xp / 500) + 1;
         
         let rankTitle = "nimi lili"; 
@@ -120,27 +123,23 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       syncFromCloud: () => {
-        try {
-          const userId = getUserId();
-          const unsubscribe = onSnapshot(doc(db, 'users', userId), (snapshot) => {
-            if (snapshot.exists()) {
-              const data = snapshot.data();
-              set({
-                vocabulary: data.vocabulary || initialMasteryMap.vocabulary,
-                chapters: data.chapters || initialMasteryMap.chapters,
-                lastUpdated: data.lastUpdated || '',
-                studentName: data.studentName || 'Student',
-                savedPhrases: data.savedPhrases || [],
-                currentStreak: data.currentStreak || 0,
-                lastActiveDate: data.lastActiveDate || ''
-              });
-            }
-          });
-          return unsubscribe; 
-        } catch (err) {
-          console.error("Firebase Initialization Error:", err);
-          return () => {}; // Safe fallback if offline
-        }
+        const userId = getUserId();
+        // Fixed: Return the unsubscribe function to prevent memory leaks
+        const unsubscribe = onSnapshot(doc(db, 'users', userId), (snapshot) => {
+          if (snapshot.exists()) {
+            const data = snapshot.data();
+            set({
+              vocabulary: data.vocabulary || initialMasteryMap.vocabulary,
+              chapters: data.chapters || initialMasteryMap.chapters,
+              lastUpdated: data.lastUpdated || '',
+              studentName: data.studentName || 'Student',
+              savedPhrases: data.savedPhrases || [],
+              currentStreak: data.currentStreak || 0,
+              lastActiveDate: data.lastActiveDate || ''
+            });
+          }
+        });
+        return unsubscribe;
       }
     }),
     { name: 'tp-tutor-mastery' }
