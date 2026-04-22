@@ -22,7 +22,7 @@
   --col-confident:   #16a34a;
   --col-mastered:    #22c55e;
 
-  /* Status background tints - Adjusted for higher visibility */
+  /* Status background tints - Brightened for better visibility on all displays */
   --bg-not-started: #0d0d0d;
   --bg-introduced:  #0a1a3a;
   --bg-practicing:  #2a1800;
@@ -94,12 +94,12 @@ body {
   min-height: 84px;
   border: var(--b2) solid transparent;
   cursor: pointer;
-  transition: background 0.3s ease, border-color 0.3s ease;
+  transition: all 0.2s ease;
 }
 .vocab-card__word { font-size: 1rem; font-weight: 900; color: #fff; }
-.vocab-card__pos { font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase; margin-top: 5px; font-weight: bold; }
+.vocab-card__pos { font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; margin-top: 5px; font-weight: bold; }
 
-/* Status Skins - These must remain exactly as named for VocabCard to work */
+/* Status Skins */
 .vocab-card--not_started { background: var(--bg-not-started); border-color: var(--col-not-started); }
 .vocab-card--introduced  { background: var(--bg-introduced);  border-color: var(--col-introduced); }
 .vocab-card--practicing  { background: var(--bg-practicing);  border-color: var(--col-practicing); }
