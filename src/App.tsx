@@ -9,15 +9,17 @@ export default function App() {
   const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
 
   useEffect(() => {
-    // Access the state directly via the store instance
-    const state = useMasteryStore.getState();
+    // Safety check: ensure syncFromCloud exists and is a function
+    const store = useMasteryStore.getState();
     
-    // Check if the function exists before calling to prevent the TypeError
-    // and provide a blank white screen crash.
-    if (typeof state.syncFromCloud === 'function') {
-      const unsubscribe = state.syncFromCloud();
+    if (typeof store.syncFromCloud === 'function') {
+      const unsubscribe = store.syncFromCloud();
+      
       return () => {
-        if (typeof unsubscribe === 'function') unsubscribe();
+        // Only call unsubscribe if it is actually returned as a function
+        if (typeof unsubscribe === 'function') {
+          unsubscribe();
+        }
       };
     }
   }, []);
