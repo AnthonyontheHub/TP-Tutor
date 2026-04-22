@@ -39,6 +39,13 @@ export default function MasteryGrid({
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isLongPress = useRef(false);
 
+  // FIXED: Memory leak cleanup for unmounted component timers
+  useEffect(() => {
+    return () => {
+      if (longPressTimer.current) clearTimeout(longPressTimer.current);
+    };
+  }, []);
+
   useEffect(() => {
     const apiKey = localStorage.getItem('TP_GEMINI_KEY');
     if (selectedWords.length > 1 && apiKey) {
@@ -119,7 +126,7 @@ export default function MasteryGrid({
               cursor: 'pointer'
             }}
           >
-            <VocabCard word={word} />
+            <VocabCard word={word} onClick={() => {}} />
           </div>
         ))}
       </div>
