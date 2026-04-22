@@ -19,15 +19,18 @@ export default function UserProfileDrawer({ onClose }: Props) {
           onClick={onClose} 
           style={{ position: 'fixed', inset: 0, background: 'black', zIndex: 1999 }} 
         />
+        {/* Slides from Right instead of Bottom */}
         <motion.div 
-          initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} 
-          drag="y"
-          dragConstraints={{ top: 0 }}
-          onDragEnd={(_, info) => { if (info.offset.y > 150) onClose(); }}
-          style={{ position: 'fixed', bottom: 0, left: 0, right: 0, height: '75vh', background: '#111', zIndex: 2000, borderTopLeftRadius: '20px', borderTopRightRadius: '20px', padding: '0 24px 24px', display: 'flex', flexDirection: 'column' }}
+          initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} 
+          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+          style={{ 
+            position: 'fixed', top: 0, bottom: 0, right: 0, width: '85%', maxWidth: '400px', 
+            background: '#111', zIndex: 2000, borderLeft: '1px solid #333', 
+            padding: '24px', display: 'flex', flexDirection: 'column', overflowY: 'auto' 
+          }}
         >
-          <div style={{ width: '100%', padding: '16px 0', cursor: 'grab', flexShrink: 0, display: 'flex', justifyContent: 'center' }} onClick={onClose}>
-            <div style={{ width: '48px', height: '6px', background: '#444', borderRadius: '3px' }} />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+            <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#888', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
           </div>
           
           <div style={{ marginBottom: '32px', textAlign: 'center' }}>
