@@ -1,5 +1,5 @@
 /* src/components/Dashboard.tsx */
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import ProgressSummary from './ProgressSummary';
 import MasteryGrid from './MasteryGrid';
@@ -10,18 +10,13 @@ import SetupScreen from './SetupScreen';
 import type { MasteryStatus } from '../types/mastery';
 
 export default function Dashboard({ onStartSession, onAskLina }: { onStartSession: () => void; onAskLina: (p: string) => void }) {
-  const { studentName, currentStreak, vocabulary, savedPhrases } = useMasteryStore();
-  
-  // FIXED: Sync Sandbox preference securely with localStorage
-  const [isSandboxMode, setIsSandboxMode] = useState(() => {
-    const saved = localStorage.getItem('tp_sandbox_mode');
-    return saved !== null ? saved === 'true' : true;
-  });
+  // Fixed: Replaced destructured store call with individual selectors to prevent over-fetching
+  const studentName = useMasteryStore((s) => s.studentName);
+  const currentStreak = useMasteryStore((s) => s.currentStreak);
+  const vocabulary = useMasteryStore((s) => s.vocabulary);
+  const savedPhrases = useMasteryStore((s) => s.savedPhrases);
 
-  useEffect(() => {
-    localStorage.setItem('tp_sandbox_mode', String(isSandboxMode));
-  }, [isSandboxMode]);
-
+  const [isSandboxMode, setIsSandboxMode] = useState(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false); 
   const [isProfileOpen, setIsProfileOpen] = useState(false); 
   
