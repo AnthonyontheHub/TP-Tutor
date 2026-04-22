@@ -21,10 +21,11 @@ export default function ProgressSummary({ activeFilter, onFilterClick }: Props) 
   ];
 
   const statusItems: { status: MasteryStatus; label: string; color: string }[] = [
-    { status: 'introduced', label: 'INTRO', color: '#3b82f6' },
-    { status: 'practicing', label: 'WORK', color: '#f59e0b' },
-    { status: 'confident', label: 'GOOD', color: '#10b981' },
-    { status: 'mastered', label: 'DONE', color: '#22c55e' },
+    { status: 'not_started', label: 'Not Started', color: '#ffffff' },
+    { status: 'introduced', label: 'Introduced', color: '#3b82f6' },
+    { status: 'practicing', label: 'Practicing', color: '#f59e0b' },
+    { status: 'confident', label: 'Confident', color: '#10b981' },
+    { status: 'mastered', label: 'Mastered', color: '#22c55e' },
   ];
 
   return (
@@ -63,25 +64,27 @@ export default function ProgressSummary({ activeFilter, onFilterClick }: Props) 
       </div>
 
       {/* Mastery Counts (Clickable Filters) */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
         {statusItems.map((item) => (
           <button
             key={item.status}
             onClick={() => onFilterClick(activeFilter === item.status ? null : item.status)}
             style={{
+              flex: '1 1 calc(33% - 8px)',
               background: activeFilter === item.status ? item.color : '#1a1a1a',
               border: 'none',
-              padding: '12px 8px',
+              padding: '12px 6px',
               borderRadius: '12px',
               cursor: 'pointer',
               transition: 'all 0.2s ease',
-              textAlign: 'center'
+              textAlign: 'center',
+              color: activeFilter === item.status ? (item.status === 'not_started' || item.status === 'practicing' ? '#000' : '#fff') : 'white'
             }}
           >
-            <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: 'white' }}>
-              {summary[item.status]}
+            <div style={{ fontSize: '1rem', fontWeight: 'bold' }}>
+              {summary[item.status as keyof typeof summary] || 0}
             </div>
-            <div style={{ fontSize: '0.5rem', color: activeFilter === item.status ? 'white' : '#666', fontWeight: 'bold', marginTop: '2px' }}>
+            <div style={{ fontSize: '0.45rem', fontWeight: 'bold', marginTop: '2px', textTransform: 'uppercase' }}>
               {item.label}
             </div>
           </button>
