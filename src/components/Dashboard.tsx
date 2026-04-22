@@ -5,7 +5,6 @@ import MasteryGrid from './MasteryGrid';
 import SettingsDrawer from './SettingsDrawer'; 
 import UserProfileDrawer from './UserProfileDrawer'; 
 import SetupScreen from './SetupScreen';
-import PhraseGrid from './PhraseGrid'; // Fixed: Imported missing component
 import type { MasteryStatus } from '../types/mastery';
 
 export default function Dashboard({ onStartSession, onAskLina }: { onStartSession: () => void; onAskLina: (p: string) => void }) {
@@ -58,7 +57,7 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
                 id="pos-filter"
                 value={posFilter} 
                 onChange={(e) => setPosFilter(e.target.value)}
-                style={{ padding: '8px', borderRadius: '6px', background: '#222', color: '#fff', border: '1px solid #444', outline: 'none' }}
+                style={{ padding: '8px', borderRadius: '6px', background: '#222', color: '#fff', border: '1px solid #444', outline: 'none', flex: 1 }}
               >
                 <option value="All">All Parts of Speech</option>
                 <option value="noun">Noun</option>
@@ -83,19 +82,15 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
           </>
         ) : (
           <div style={{ padding: '20px 0' }}>
-            <h2 className="section-title" style={{ marginBottom: '15px' }}>SAVED PHRASES</h2>
-            {savedPhrases.length === 0 ? <p style={{ color: '#666', marginBottom: '20px' }}>No phrases saved yet.</p> : savedPhrases.map((p, i) => (
+            {savedPhrases.length === 0 ? <p>No phrases saved yet.</p> : savedPhrases.map((p, i) => (
               <div key={i} style={{ background: '#111', borderLeft: '4px solid #10b981', padding: '15px', borderRadius: '8px', marginBottom: '10px' }}>{p}</div>
             ))}
-            
-            {/* Fixed: Rendered the missing PhraseGrid component */}
-            <PhraseGrid onAskLina={onAskLina} activeFilter={activeFilter} selectedWords={[]} />
           </div>
         )}
       </main>
 
-      {isSettingsOpen && <SettingsDrawer onClose={() => setIsSettingsOpen(false)} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} />}
-      {isProfileOpen && <UserProfileDrawer onClose={() => setIsProfileOpen(false)} />}
+      <SettingsDrawer isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} />
+      <UserProfileDrawer isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
     </div>
   );
 }
