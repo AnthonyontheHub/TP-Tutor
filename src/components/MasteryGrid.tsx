@@ -36,7 +36,7 @@ export default function MasteryGrid({
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [magneticSuggestions, setMagneticSuggestions] = useState<string[]>([]);
   
-  // New States for Builder Panel Interactions
+  // States for Builder Panel Interactions
   const [activePillMenu, setActivePillMenu] = useState<string | null>(null);
   const [translationText, setTranslationText] = useState<string | null>(null);
 
@@ -118,9 +118,7 @@ export default function MasteryGrid({
     
     // Offline / Sandbox Fallback: Dictionary Lookup
     const fallbackTranslation = selectedWords.map(w => {
-      // Find exact match in our dictionary
       const match = vocabulary.find(v => v.word === w);
-      // Grab just the first, primary meaning if it exists
       return match ? match.meanings.split(',')[0].trim() : w;
     }).join(' ');
     
@@ -150,7 +148,9 @@ export default function MasteryGrid({
       <div className="grid-toolbar" style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
         <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="sort-select">
           <option value="alphabetical">A-Z</option>
-          <option value="status">Mastery</option>
+          <option value="status">Mastery Level</option>
+          <option value="partOfSpeech">Word Type (POS)</option>
+          <option value="meanings">English Meaning</option>
         </select>
         <button onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')} className="btn-toggle">
           {sortDirection === 'asc' ? '↑' : '↓'}
