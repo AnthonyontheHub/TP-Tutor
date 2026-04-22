@@ -1,3 +1,4 @@
+/* src/store/masteryStore.ts */
 import { db } from '../services/firebase';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
@@ -6,23 +7,21 @@ import type { MasteryMap, MasteryStatus, StatusSummary } from '../types/mastery'
 import { initialMasteryMap } from '../data/initialMasteryMap';
 
 interface MasteryActions {
-  updateVocabStatus: (wordId: string, status: MasteryStatus) => void;
+  updateVocabStatus: (wordIdOrText: string, status: MasteryStatus) => void;
   updateConceptStatus: (chapterId: string, conceptId: string, status: MasteryStatus) => void;
   setLastUpdated: (date: string) => void;
   savePhrase: (phrase: string) => void;
   recordActivity: () => void;
   setStudentName: (name: string) => void; 
-  syncFromCloud: () => () => void; // Fixed: Now returns the unsubscribe function
+  syncFromCloud: () => void;
   syncToCloud: () => Promise<void>; 
   getStatusSummary: () => StatusSummary & { xp: number, level: number, rankTitle: string };
 }
 
 type MasteryStore = MasteryMap & MasteryActions;
 
-// XP Mapping: Values for each status level
 const XP_MAP = { not_started: 0, introduced: 10, practicing: 25, confident: 50, mastered: 100 };
 
-// Helper to get or create a unique user ID for the database
 const getUserId = () => {
   let userId = localStorage.getItem('tp_tutor_user_id');
   if (!userId) {
@@ -41,10 +40,12 @@ export const useMasteryStore = create<MasteryStore>()(
       currentStreak: initialMasteryMap.currentStreak || 0,
       lastActiveDate: initialMasteryMap.lastActiveDate || '',
 
-      updateVocabStatus: (wordId, status) => {
+      updateVocabStatus: (wordIdOrText, status) => {
         set((state) => ({
           vocabulary: state.vocabulary.map((w) =>
-            w.id === wordId ? { ...w, status } : w
+            (w.id === wordIdOrText || w.word.toLowerCase() === wordIdOrText.toLowerCase()) 
+              ? { ...w, status } 
+              : w
           ),
         }));
         get().recordActivity();
@@ -100,9 +101,7 @@ export const useMasteryStore = create<MasteryStore>()(
           summary.xp += XP_MAP[word.status];
         }
 
-        // Calculate level based on 500 XP per level
         const level = Math.floor(summary.xp / 500) + 1;
-        
         let rankTitle = "nimi lili"; 
         if (level >= 5) rankTitle = "jan pi toki pona"; 
         if (level >= 10) rankTitle = "jan sona"; 
@@ -124,8 +123,7 @@ export const useMasteryStore = create<MasteryStore>()(
 
       syncFromCloud: () => {
         const userId = getUserId();
-        // Fixed: Return the unsubscribe function to prevent memory leaks
-        const unsubscribe = onSnapshot(doc(db, 'users', userId), (snapshot) => {
+        onSnapshot(doc(db, 'users', userId), (snapshot) => {
           if (snapshot.exists()) {
             const data = snapshot.data();
             set({
@@ -139,7 +137,6 @@ export const useMasteryStore = create<MasteryStore>()(
             });
           }
         });
-        return unsubscribe;
       }
     }),
     { name: 'tp-tutor-mastery' }
