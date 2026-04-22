@@ -3,7 +3,7 @@ import { db } from '../services/firebase';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { doc, setDoc, onSnapshot } from 'firebase/firestore';
-import type { MasteryMap, MasteryStatus, StatusSummary, SavedPhrase } from '../types/mastery';
+import type { MasteryMap, MasteryStatus, StatusSummary } from '../types/mastery';
 import { initialMasteryMap } from '../data/initialMasteryMap';
 
 interface MasteryActions {
@@ -11,11 +11,9 @@ interface MasteryActions {
   updateConceptStatus: (chapterId: string, conceptId: string, status: MasteryStatus) => void;
   setLastUpdated: (date: string) => void;
   savePhrase: (phrase: string) => void;
-  removePhrase: (id: string) => void;
-  updatePhraseComment: (id: string, comment: string) => void;
   recordActivity: () => void;
   setStudentName: (name: string) => void; 
-  syncFromCloud: () => any;
+  syncFromCloud: () => () => void; // Updated to return the unsubscribe function
   syncToCloud: () => Promise<void>; 
   getStatusSummary: () => StatusSummary & { xp: number, level: number, rankTitle: string };
 }
@@ -24,19 +22,10 @@ type MasteryStore = MasteryMap & MasteryActions;
 
 const XP_MAP = { not_started: 0, introduced: 10, practicing: 25, confident: 50, mastered: 100 };
 
-// Fixed: Add fallback to prevent crash in non-HTTPS local networks
-const generateId = () => {
-  try {
-    return crypto.randomUUID();
-  } catch (e) {
-    return Math.random().toString(36).substring(2, 15);
-  }
-};
-
 const getUserId = () => {
   let userId = localStorage.getItem('tp_tutor_user_id');
   if (!userId) {
-    userId = generateId();
+    userId = crypto.randomUUID();
     localStorage.setItem('tp_tutor_user_id', userId);
   }
   return userId;
@@ -76,26 +65,7 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       savePhrase: (phrase) => {
-        set((state) => {
-          const newPhrase: SavedPhrase = { id: generateId(), text: phrase, comment: '' };
-          return { savedPhrases: [...state.savedPhrases, newPhrase] };
-        });
-        void get().syncToCloud();
-      },
-
-      removePhrase: (id) => {
-        set((state) => ({
-          savedPhrases: state.savedPhrases.filter((p: any) => typeof p === 'string' ? p !== id : p.id !== id)
-        }));
-        void get().syncToCloud();
-      },
-
-      updatePhraseComment: (id, comment) => {
-        set((state) => ({
-          savedPhrases: state.savedPhrases.map((p: any) => 
-            typeof p === 'object' && p.id === id ? { ...p, comment } : p
-          )
-        }));
+        set((state) => ({ savedPhrases: [...new Set([...state.savedPhrases, phrase])] }));
         void get().syncToCloud();
       },
 
@@ -153,7 +123,7 @@ export const useMasteryStore = create<MasteryStore>()(
 
       syncFromCloud: () => {
         const userId = getUserId();
-        // Fixed: Ensure the unsubscribe function is actually returned to the App.tsx component
+        // Returned the onSnapshot listener function so it can be invoked to unsubscribe
         return onSnapshot(doc(db, 'users', userId), (snapshot) => {
           if (snapshot.exists()) {
             const data = snapshot.data();
