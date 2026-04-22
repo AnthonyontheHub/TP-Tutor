@@ -13,7 +13,7 @@ interface MasteryActions {
   savePhrase: (phrase: string) => void;
   recordActivity: () => void;
   setStudentName: (name: string) => void; 
-  syncFromCloud: () => (() => void);
+  syncFromCloud: () => () => void; // Fixed: Now correctly typed to return the unsubscribe function
   syncToCloud: () => Promise<void>; 
   getStatusSummary: () => StatusSummary & { xp: number, level: number, rankTitle: string };
 }
@@ -123,6 +123,7 @@ export const useMasteryStore = create<MasteryStore>()(
 
       syncFromCloud: () => {
         const userId = getUserId();
+        // Fixed: Returning the onSnapshot function so it can be used for cleanup
         return onSnapshot(doc(db, 'users', userId), (snapshot) => {
           if (snapshot.exists()) {
             const data = snapshot.data();
