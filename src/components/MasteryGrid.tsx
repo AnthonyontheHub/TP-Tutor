@@ -54,7 +54,6 @@ export default function MasteryGrid({
     }
   }, [selectedWords]);
 
-  // Handle just the long-press multiselect timer
   const handlePointerDown = (word: string) => {
     isLongPress.current = false;
     longPressTimer.current = setTimeout(() => {
@@ -64,17 +63,12 @@ export default function MasteryGrid({
     }, 500);
   };
 
-  // Safely clear the timer if the user moves off the element before 500ms
-  const handlePointerUpOrLeave = () => {
+  const handlePointerUp = (word: string) => {
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
     }
-  };
-
-  // Handle the actual tap/click reliably
-  const handleClick = (word: string) => {
-    // If this click is the tail-end of a long press, ignore it
+    
     if (isLongPress.current) {
       isLongPress.current = false;
       return; 
@@ -105,15 +99,17 @@ export default function MasteryGrid({
   return (
     <div className="mastery-grid-container">
       <div className="grid-toolbar" style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
-        <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="sort-select">
-          <option value="alphabetical">A-Z</option>
-          <option value="status">Mastery</option>
-        </select>
         <select value={posFilter} onChange={(e) => setPosFilter(e.target.value)} className="sort-select">
           {POS_OPTIONS.map(pos => (
             <option key={pos} value={pos}>{pos}</option>
           ))}
         </select>
+        
+        <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="sort-select">
+          <option value="alphabetical">A-Z</option>
+          <option value="status">Mastery</option>
+        </select>
+
         <button onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')} className="btn-toggle">
           {sortDirection === 'asc' ? '↑' : '↓'}
         </button>
@@ -124,16 +120,12 @@ export default function MasteryGrid({
           <div 
             key={word.id} 
             onPointerDown={() => handlePointerDown(word.word)} 
-            onPointerUp={handlePointerUpOrLeave}
-            onPointerLeave={handlePointerUpOrLeave}
-            onPointerCancel={handlePointerUpOrLeave}
-            onClick={() => handleClick(word.word)}
+            onPointerUp={() => handlePointerUp(word.word)}
             className="grid-item-wrapper"
             style={{ 
               opacity: selectedWords.length > 0 && !selectedWords.includes(word.word) ? 0.3 : 1,
               touchAction: 'none',
-              cursor: 'pointer',
-              userSelect: 'none'
+              cursor: 'pointer'
             }}
           >
             <VocabCard word={word} />
@@ -184,6 +176,7 @@ export default function MasteryGrid({
 
       {drawerId && (
         <WordDetailDrawer 
+          isOpen={true}
           word={vocabulary.find(v => v.id === drawerId)!} 
           onClose={() => setDrawerId(null)} 
           onAskLina={onAskLina} 
