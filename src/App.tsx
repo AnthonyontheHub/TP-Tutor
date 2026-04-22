@@ -13,7 +13,7 @@ export default function App() {
     useMasteryStore.getState().syncFromCloud();
   }, []);
 
-  // Controls the dashboard shift
+  // Update Body class for CSS animations
   useEffect(() => {
     if (activeView !== 'none') {
       document.body.classList.add('has-active-drawer');
