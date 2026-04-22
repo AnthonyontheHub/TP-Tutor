@@ -18,15 +18,11 @@ interface Props {
   setPosFilter: (pos: string) => void;
 }
 
-const STATUS_HIERARCHY: MasteryStatus[] = [
-  'not_started', 'introduced', 'practicing', 'confident', 'mastered'
-];
-
 export default function MasteryGrid({ 
-  onAskLina, isSandboxMode, activeFilter, sortMode, sortDirection, posFilter, 
+  onAskLina, activeFilter, sortMode, sortDirection, posFilter, 
   setSortMode, setSortDirection, setPosFilter 
 }: Props) {
-  const { vocabulary } = useMasteryStore();
+  const { vocabulary, savePhrase } = useMasteryStore();
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [magneticSuggestions, setMagneticSuggestions] = useState<string[]>([]);
@@ -76,48 +72,37 @@ export default function MasteryGrid({
   };
 
   const displayed = vocabulary
-    .filter(w => {
-      // 1. Filter by Parts of Speech
-      if (posFilter !== 'All' && !w.partOfSpeech.includes(posFilter)) return false;
-      
-      // 2. Cascade Filter (Show this level AND above, exclude below)
-      if (activeFilter) {
-        const filterIndex = STATUS_HIERARCHY.indexOf(activeFilter);
-        const wordIndex = STATUS_HIERARCHY.indexOf(w.status);
-        if (wordIndex < filterIndex) return false;
-      }
-      return true;
-    })
-    .sort((a, b) => {
-      // 3. Smart Sorting based on the Filter 
-      // If a filter is active, force group them by status (active at top, ascending upwards)
-      if (activeFilter || sortMode === 'status') {
-        const indexA = STATUS_HIERARCHY.indexOf(a.status);
-        const indexB = STATUS_HIERARCHY.indexOf(b.status);
-        if (indexA !== indexB) {
-          // If we have an active filter, ALWAYS sort ascending from the filter point
-          if (activeFilter) return indexA - indexB; 
-          // Otherwise obey the toggle direction
-          return sortDirection === 'asc' ? indexA - indexB : indexB - indexA;
-        }
-      }
-
-      // 4. Default / Fallback Alphabetical
-      const valA = String(a.word || '').toLowerCase();
-      const valB = String(b.word || '').toLowerCase();
+    .filter(w => !activeFilter || w.status === activeFilter)
+    .filter(w => posFilter === 'All' || w.partOfSpeech.includes(posFilter))
+    .sort((a: any, b: any) => {
+      const field = sortMode === 'alphabetical' ? 'word' : sortMode;
+      const valA = String(a[field] || '').toLowerCase();
+      const valB = String(b[field] || '').toLowerCase();
       return sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
     });
 
   return (
     <div className="mastery-grid-container">
-      <div className="grid-toolbar" style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
-        <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="sort-select" style={{ flex: 1, padding: '10px', borderRadius: '8px', background: '#222', color: 'white', border: '1px solid #444', outline: 'none' }}>
-          <option value="alphabetical">A-Z</option>
-          <option value="status">Mastery Level</option>
+      <div className="grid-toolbar" style={{ display: 'flex', gap: '10px', marginBottom: '15px', flexWrap: 'wrap', alignItems: 'center' }}>
+        <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="sort-select" style={{ padding: '8px', borderRadius: '6px', background: '#222', color: '#fff', border: '1px solid #444', outline: 'none', flex: 1 }}>
+          <option value="alphabetical">Sort: A-Z</option>
+          <option value="status">Sort: Mastery</option>
         </select>
-        <button onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')} className="btn-toggle" style={{ flex: 0, padding: '0 20px' }}>
+        <button onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')} className="btn-toggle" style={{ padding: '8px 16px', flex: 'none' }}>
           {sortDirection === 'asc' ? '↑' : '↓'}
         </button>
+        <select 
+          value={posFilter} 
+          onChange={(e) => setPosFilter(e.target.value)}
+          style={{ padding: '8px', borderRadius: '6px', background: '#222', color: '#fff', border: '1px solid #444', outline: 'none', flex: 1 }}
+        >
+          <option value="All">Filter: All POS</option>
+          <option value="noun">Noun</option>
+          <option value="verb">Verb</option>
+          <option value="adjective">Adjective</option>
+          <option value="adverb">Adverb</option>
+          <option value="particle">Particle</option>
+        </select>
       </div>
 
       <div className="mastery-grid__cards">
@@ -144,7 +129,7 @@ export default function MasteryGrid({
         </div>
       )}
 
-      <WordDetailDrawer word={vocabulary.find(v => v.id === drawerId) || null} onClose={() => setDrawerId(null)} onAskLina={onAskLina} isSandboxMode={isSandboxMode} />
+      {drawerId && <WordDetailDrawer word={vocabulary.find(v => v.id === drawerId)!} onClose={() => setDrawerId(null)} onAskLina={onAskLina} isSandboxMode={isSandboxMode} />}
     </div>
   );
 }
