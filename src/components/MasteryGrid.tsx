@@ -57,28 +57,30 @@ export default function MasteryGrid({
     longPressTimer.current = setTimeout(() => {
       isLongPressActive.current = true;
       soundService.playBlip(523.25, 'sine', 0.05);
-      setSelectedWords(prev => prev.includes(word) ? prev : [...prev, word]);
+      // Toggle selection immediately on long press
+      setSelectedWords(prev => prev.includes(word) ? prev.filter(w => w !== word) : [...prev, word]);
     }, 500);
   };
 
   const handlePointerUp = (word: string) => {
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
     }
     
-    // If we just finished a long press, do nothing else
+    // If it was a long press, we've already toggled the word in Down timer.
+    // We just return here to prevent opening the drawer.
     if (isLongPressActive.current) {
       return; 
     }
 
-    // If we are already in selection mode (at least one word selected), 
-    // tapping simply toggles the word in the list.
-    if (selectedWords.length > 0) {
-      setSelectedWords(prev => prev.includes(word) ? prev.filter(w => w !== word) : [...prev, word]);
-    } else {
-      // Normal tap behavior: open drawer
+    // Normal Tap logic
+    if (selectedWords.length === 0) {
       const target = vocabulary.find(v => v.word === word);
       if (target) setDrawerId(target.id);
+    } else {
+      // If we are already in selection mode, a tap toggles selection
+      setSelectedWords(prev => prev.includes(word) ? prev.filter(w => w !== word) : [...prev, word]);
     }
   };
 
