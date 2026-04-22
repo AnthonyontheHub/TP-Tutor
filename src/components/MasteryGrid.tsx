@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import VocabCard from './VocabCard';
 import WordDetailDrawer from './WordDetailDrawer';
-import PhraseGrid from './PhraseGrid';
 import { soundService } from '../services/soundService';
 import { fetchSentenceSuggestions } from '../services/linaService';
 import type { MasteryStatus } from '../types/mastery';
@@ -14,16 +13,16 @@ interface Props {
   sortMode: string; 
   sortDirection: 'asc' | 'desc'; 
   posFilter: string;
-  setSortMode: (mode: string) => void;
-  setSortDirection: (dir: 'asc' | 'desc') => void;
+  setSortMode: (mode: any) => void;
+  setSortDirection: (dir: any) => void;
   setPosFilter: (pos: string) => void;
 }
 
 export default function MasteryGrid({ 
-  onAskLina, isSandboxMode, activeFilter, sortMode, sortDirection, posFilter, 
-  setSortMode, setSortDirection 
+  onAskLina, activeFilter, sortMode, sortDirection, posFilter, 
+  setSortMode, setSortDirection, setPosFilter 
 }: Props) {
-  const { vocabulary } = useMasteryStore();
+  const { vocabulary, savePhrase } = useMasteryStore();
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [magneticSuggestions, setMagneticSuggestions] = useState<string[]>([]);
@@ -40,7 +39,7 @@ export default function MasteryGrid({
       }, 800);
       return () => clearTimeout(timer);
     } else {
-        setMagneticSuggestions([]);
+      setMagneticSuggestions([]);
     }
   }, [selectedWords]);
 
@@ -87,11 +86,11 @@ export default function MasteryGrid({
   return (
     <div className="mastery-grid-container">
       <div className="grid-toolbar" style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
-        <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="btn-toggle" style={{ flex: 1, appearance: 'none', textAlign: 'center' }}>
-          <option value="alphabetical">Sort: A-Z</option>
-          <option value="status">Sort: Mastery</option>
+        <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="sort-select">
+          <option value="alphabetical">A-Z</option>
+          <option value="status">Mastery</option>
         </select>
-        <button onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')} className="btn-toggle" style={{ flex: '0 0 auto' }}>
+        <button onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')} className="btn-toggle">
           {sortDirection === 'asc' ? '↑' : '↓'}
         </button>
       </div>
@@ -107,7 +106,7 @@ export default function MasteryGrid({
               touchAction: 'none'
             }}
           >
-            <VocabCard word={word} onClick={() => {}} />
+            <VocabCard word={word} />
           </div>
         ))}
       </div>
@@ -117,19 +116,23 @@ export default function MasteryGrid({
           <div style={{ color: 'white', fontSize: '1.2rem', marginBottom: '10px' }}>{selectedWords.join(' ')}</div>
           
           {magneticSuggestions.length > 0 && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '10px' }}>
-                  {magneticSuggestions.map((sug, i) => (
-                      <span key={i} className="suggestion-pill" onClick={() => onAskLina(`Does "${sug}" mean what I think it means?`)}>{sug}</span>
-                  ))}
-              </div>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '15px' }}>
+              {magneticSuggestions.map((sug, i) => (
+                <button 
+                  key={i} 
+                  className="suggestion-pill" 
+                  onClick={() => onAskLina(`Does "${sug}" mean something?`)}
+                >
+                  {sug}
+                </button>
+              ))}
+            </div>
           )}
 
           <button onClick={() => { onAskLina(`Is "${selectedWords.join(' ')}" correct?`); setSelectedWords([]); }} className="btn-review">ASK LINA</button>
-          <button onClick={() => setSelectedWords([])} style={{ background: 'none', border: 'none', color: '#666', width: '100%', marginTop: '10px', padding: '10px', fontWeight: 'bold', cursor: 'pointer' }}>CANCEL</button>
+          <button onClick={() => setSelectedWords([])} style={{ background: 'none', border: 'none', color: '#666', width: '100%', marginTop: '10px', cursor: 'pointer' }}>Cancel</button>
         </div>
       )}
-
-      <PhraseGrid onAskLina={onAskLina} activeFilter={activeFilter} selectedWords={selectedWords} />
 
       {drawerId && <WordDetailDrawer word={vocabulary.find(v => v.id === drawerId)!} onClose={() => setDrawerId(null)} onAskLina={onAskLina} isSandboxMode={isSandboxMode} />}
     </div>
