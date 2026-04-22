@@ -33,10 +33,10 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
           <h1 className="dashboard__title">TOKI PONA</h1>
           <button onClick={() => setIsProfileOpen(true)} className="dashboard__profile-trigger">👤 {studentName.toUpperCase()}</button>
         </div>
-        <div className="dashboard__header-right">
+        <div className="dashboard__header-right" style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
           {currentStreak > 0 && <div className="dashboard__streak">🔥 {currentStreak}</div>}
-          <button onClick={onStartSession} className="dashboard__icon-btn">💬</button>
-          <button onClick={() => setIsSettingsOpen(true)} className="dashboard__icon-btn">⚙️</button>
+          <button onClick={onStartSession} className="dashboard__icon-btn">💬 Chat</button>
+          <button onClick={() => setIsSettingsOpen(true)} className="dashboard__icon-btn">⚙️ Settings</button>
         </div>
       </header>
 
@@ -50,36 +50,17 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
         </div>
 
         {viewMode === 'grid' ? (
-          <>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px' }}>
-              <label htmlFor="pos-filter" style={{ fontWeight: 'bold', fontSize: '0.9rem', color: '#888' }}>Filter POS:</label>
-              <select 
-                id="pos-filter"
-                value={posFilter} 
-                onChange={(e) => setPosFilter(e.target.value)}
-                style={{ flex: 1, padding: '10px', borderRadius: '8px', background: '#222', color: '#fff', border: '1px solid #444', outline: 'none' }}
-              >
-                <option value="All">All Parts of Speech</option>
-                <option value="noun">Noun</option>
-                <option value="verb">Verb</option>
-                <option value="adjective">Adjective</option>
-                <option value="adverb">Adverb</option>
-                <option value="phrase">Phrase</option>
-              </select>
-            </div>
-            
-            <MasteryGrid 
-              onAskLina={onAskLina} 
-              isSandboxMode={isSandboxMode} 
-              activeFilter={activeFilter} 
-              sortMode={sortMode} 
-              sortDirection={sortDirection} 
-              posFilter={posFilter}
-              setSortMode={setSortMode}
-              setSortDirection={setSortDirection}
-              setPosFilter={setPosFilter} 
-            />
-          </>
+          <MasteryGrid 
+            onAskLina={onAskLina} 
+            isSandboxMode={isSandboxMode} 
+            activeFilter={activeFilter} 
+            sortMode={sortMode} 
+            sortDirection={sortDirection} 
+            posFilter={posFilter}
+            setSortMode={setSortMode}
+            setSortDirection={setSortDirection}
+            setPosFilter={setPosFilter} 
+          />
         ) : (
           <div style={{ padding: '20px 0' }}>
             {savedPhrases.length === 0 ? <p>No phrases saved yet.</p> : savedPhrases.map((p, i) => (
@@ -89,8 +70,8 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
         )}
       </main>
 
-      <SettingsDrawer isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} />
-      <UserProfileDrawer isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
+      {isSettingsOpen && <SettingsDrawer onClose={() => setIsSettingsOpen(false)} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} />}
+      {isProfileOpen && <UserProfileDrawer onClose={() => setIsProfileOpen(false)} />}
     </div>
   );
 }
