@@ -1,4 +1,6 @@
-/* src/types/mastery.ts */
+// src/types/mastery.ts
+// ─── Status ──────────────────────────────────────────────────────────────────
+
 export const MASTERY_STATUS = {
   NOT_STARTED: 'not_started',
   INTRODUCED: 'introduced',
@@ -9,30 +11,93 @@ export const MASTERY_STATUS = {
 
 export type MasteryStatus = (typeof MASTERY_STATUS)[keyof typeof MASTERY_STATUS];
 
-export const STATUS_META: Record<MasteryStatus, { emoji: string; label: string; meaning: string; color: string; glow: string }> = {
-  not_started: { emoji: '⬜', label: 'Not Started', meaning: 'Concept not introduced.', color: '#505050', glow: 'rgba(255,255,255,0.1)' },
-  introduced: { emoji: '🔵', label: 'Introduced', meaning: 'Concept presented.', color: '#3b82f6', glow: 'rgba(59, 130, 246, 0.5)' },
-  practicing: { emoji: '🟡', label: 'Practicing', meaning: 'Actively working.', color: '#f59e0b', glow: 'rgba(245, 158, 11, 0.5)' },
-  confident: { emoji: '🟢', label: 'Confident', meaning: 'Consistently correct.', color: '#10b981', glow: 'rgba(16, 185, 129, 0.5)' },
-  mastered: { emoji: '✅', label: 'Mastered', meaning: 'Fully automatic.', color: '#ec4899', glow: 'rgba(236, 72, 153, 0.5)' },
+export const STATUS_META: Record<
+  MasteryStatus,
+  { emoji: string; label: string; meaning: string }
+> = {
+  not_started: {
+    emoji: '⬜',
+    label: 'Not Started',
+    meaning: 'Concept has not yet been introduced.',
+  },
+  introduced: {
+    emoji: '🔵',
+    label: 'Introduced',
+    meaning: 'Concept has been presented but not yet practiced or tested.',
+  },
+  practicing: {
+    emoji: '🟡',
+    label: 'Practicing',
+    meaning: 'Actively working on it; some errors or hesitation still present.',
+  },
+  confident: {
+    emoji: '🟢',
+    label: 'Confident',
+    meaning: 'Consistently correct with some conscious effort.',
+  },
+  mastered: {
+    emoji: '✅',
+    label: 'Mastered',
+    meaning:
+      'Fully automatic — confirmed correct across multiple sessions. Set by mutual agreement.',
+  },
 };
+
+// ─── Grammar Concepts ─────────────────────────────────────────────────────────
+
+export interface GrammarConcept {
+  id: string;
+  concept: string;
+  status: MasteryStatus;
+  sessionNotes: string;
+}
+
+// ─── Chapters ─────────────────────────────────────────────────────────────────
+
+export interface Chapter {
+  id: string;
+  title: string;
+  order: number;
+  // order === 0 is reserved for the Introduction section
+  concepts: GrammarConcept[];
+}
+
+// ─── Vocabulary ───────────────────────────────────────────────────────────────
+
+export interface VocabWord {
+  id: string;
+  word: string;
+  partOfSpeech: string;
+  meanings: string;
+  status: MasteryStatus;
+  // Flagged when a word consistently performs at Mastered level but mutual
+  // agreement has not yet been given to officially promote it.
+  isMasteryCandidate: boolean;
+  sessionNotes: string;
+}
+
+// ─── Top-level Map ────────────────────────────────────────────────────────────
 
 export interface SavedPhrase {
   id: string;
   text: string;
   comment: string;
-  timestamp: number;
 }
 
 export interface MasteryMap {
   studentName: string;
   curriculumLevel: string;
   lastUpdated: string;
-  chapters: any[]; 
-  vocabulary: any[];
-  savedPhrases: SavedPhrase[]; 
+  chapters: Chapter[];   // index 0 = Introduction
+  vocabulary: VocabWord[];
+  
+  // NEW FEATURES
+  savedPhrases: (string | SavedPhrase)[]; 
   currentStreak: number;
   lastActiveDate: string;
 }
+
+
+// ─── Status summary helper type ───────────────────────────────────────────────
 
 export type StatusSummary = Record<MasteryStatus, number>;
