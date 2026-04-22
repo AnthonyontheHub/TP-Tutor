@@ -4,7 +4,7 @@ import { useMasteryStore } from '../store/masteryStore';
 import VocabCard from './VocabCard';
 import WordDetailDrawer from './WordDetailDrawer';
 import { soundService } from '../services/soundService';
-import { fetchSentenceSuggestions } from '../services/linaService';
+import { fetchSentenceSuggestions, fetchQuickTranslation } from '../services/linaService';
 import type { MasteryStatus } from '../types/mastery';
 
 interface Props { 
@@ -31,18 +31,22 @@ export default function MasteryGrid({
   onAskLina, isSandboxMode, activeFilter, sortMode, sortDirection, posFilter, 
   setSortMode, setSortDirection, setPosFilter 
 }: Props) {
-  const { vocabulary } = useMasteryStore();
+  const { vocabulary, savePhrase } = useMasteryStore();
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [magneticSuggestions, setMagneticSuggestions] = useState<string[]>([]);
   
+  // New States for Builder Panel Interactions
+  const [activePillMenu, setActivePillMenu] = useState<string | null>(null);
+  const [translationText, setTranslationText] = useState<string | null>(null);
+
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isLongPress = useRef(false);
 
   useEffect(() => {
     const apiKey = localStorage.getItem('TP_GEMINI_KEY');
     if (selectedWords.length > 1) {
-      if (apiKey) {
+      if (apiKey && !isSandboxMode) {
         const timer = setTimeout(async () => {
           const results = await fetchSentenceSuggestions(apiKey, selectedWords);
           setMagneticSuggestions(results);
@@ -53,7 +57,6 @@ export default function MasteryGrid({
         const baseCombo = selectedWords.join(' ');
         const combos = [baseCombo];
         
-        // Generate basic Toki Pona sentence structures
         if (selectedWords.length === 2 && !selectedWords.includes('li')) {
           combos.push(`${selectedWords[0]} li ${selectedWords[1]}`);
         } else if (selectedWords.length >= 3 && !selectedWords.includes('li')) {
@@ -65,8 +68,10 @@ export default function MasteryGrid({
       }
     } else {
       setMagneticSuggestions([]);
+      setActivePillMenu(null);
+      setTranslationText(null);
     }
-  }, [selectedWords]);
+  }, [selectedWords, isSandboxMode]);
 
   const handlePointerDown = (word: string) => {
     isLongPress.current = false;
@@ -94,6 +99,36 @@ export default function MasteryGrid({
     } else {
       setSelectedWords(prev => prev.includes(word) ? prev.filter(w => w !== word) : [...prev, word]);
     }
+  };
+
+  // Translation Handlers
+  const handleTranslateDown = async () => {
+    const phrase = selectedWords.join(' ');
+    const apiKey = localStorage.getItem('TP_GEMINI_KEY');
+    
+    setTranslationText("..."); 
+
+    if (apiKey && !isSandboxMode) {
+      const result = await fetchQuickTranslation(apiKey, phrase);
+      if (result) {
+        setTranslationText(result);
+        return;
+      }
+    }
+    
+    // Offline / Sandbox Fallback: Dictionary Lookup
+    const fallbackTranslation = selectedWords.map(w => {
+      // Find exact match in our dictionary
+      const match = vocabulary.find(v => v.word === w);
+      // Grab just the first, primary meaning if it exists
+      return match ? match.meanings.split(',')[0].trim() : w;
+    }).join(' ');
+    
+    setTranslationText(fallbackTranslation);
+  };
+
+  const handleTranslateUp = () => {
+    setTranslationText(null);
   };
 
   const displayed = vocabulary
@@ -143,22 +178,66 @@ export default function MasteryGrid({
       {selectedWords.length > 1 && (
         <div className="builder-panel">
           <div className="builder-content">
+            
+            {/* Magnetic Suggestions Area */}
             {magneticSuggestions.length > 0 && (
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '15px', justifyContent: 'center' }}>
                 {magneticSuggestions.map((s, i) => (
-                  <button 
-                    key={i} 
-                    className="suggestion-pill"
-                    onClick={() => onAskLina(`Let's practice this: "${s}"`)}
-                  >
-                    {s}
-                  </button>
+                  <div key={i} style={{ position: 'relative' }}>
+                    <button 
+                      className="suggestion-pill"
+                      onClick={() => setActivePillMenu(activePillMenu === s ? null : s)}
+                      style={{ borderColor: activePillMenu === s ? '#fff' : '#3b82f6' }}
+                    >
+                      {s}
+                    </button>
+                    
+                    {/* Action Popup Menu for Pill */}
+                    {activePillMenu === s && (
+                      <div style={{ 
+                        position: 'absolute', bottom: '120%', left: '50%', transform: 'translateX(-50%)', 
+                        background: '#222', padding: '6px', borderRadius: '8px', display: 'flex', gap: '6px', 
+                        border: '1px solid #444', zIndex: 10, boxShadow: '0 4px 12px rgba(0,0,0,0.5)'
+                      }}>
+                        <button 
+                          className="btn-toggle" 
+                          style={{ padding: '6px 10px', fontSize: '0.75rem', margin: 0 }}
+                          onClick={() => { onAskLina(`Let's practice this: "${s}"`); setActivePillMenu(null); }}
+                        >
+                          ASK
+                        </button>
+                        <button 
+                          className="btn-toggle" 
+                          style={{ padding: '6px 10px', fontSize: '0.75rem', margin: 0, background: '#16a34a' }}
+                          onClick={() => { savePhrase(s); setActivePillMenu(null); }}
+                        >
+                          SAVE
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
             )}
 
-            <div style={{ color: 'white', fontSize: '1.2rem', marginBottom: '15px', fontWeight: 'bold', textAlign: 'center' }}>
-              {selectedWords.join(' ')}
+            {/* Selected Words Display and Translation Toggle */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '15px', marginBottom: '15px' }}>
+              <div style={{ color: translationText ? '#a855f7' : 'white', fontSize: '1.2rem', fontWeight: 'bold', textAlign: 'center', minHeight: '1.5rem' }}>
+                {translationText ? translationText : selectedWords.join(' ')}
+              </div>
+              <button 
+                onPointerDown={handleTranslateDown}
+                onPointerUp={handleTranslateUp}
+                onPointerLeave={handleTranslateUp}
+                style={{ 
+                  background: 'none', border: '2px solid #555', borderRadius: '50%', 
+                  width: '28px', height: '28px', color: '#999', cursor: 'help',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontWeight: 'bold', touchAction: 'none'
+                }}
+              >
+                ?
+              </button>
             </div>
 
             <div style={{ display: 'flex', gap: '10px' }}>
@@ -170,7 +249,7 @@ export default function MasteryGrid({
                 ASK LINA
               </button>
               <button 
-                onClick={() => setSelectedWords([])} 
+                onClick={() => { setSelectedWords([]); setActivePillMenu(null); }} 
                 className="btn-toggle"
                 style={{ flex: 1 }}
               >
