@@ -21,9 +21,11 @@ const STATUS_EMOJI = {
 };
 
 const generateId = () => {
-  return typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-    ? crypto.randomUUID()
-    : 'msg-' + Date.now() + '-' + Math.random().toString(36).substring(2, 9);
+  try {
+    return crypto.randomUUID();
+  } catch (e) {
+    return Math.random().toString(36).substring(2, 15);
+  }
 };
 
 export default function ChatSession({ onEndSession, isActive, pendingPrompt, clearPrompt }: Props) {
