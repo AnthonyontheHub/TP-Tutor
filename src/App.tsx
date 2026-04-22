@@ -8,7 +8,7 @@ export default function App() {
   const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
 
   useEffect(() => {
-    // FIX: Properly bind and execute the cleanup function to prevent memory leaks
+    // Fixed: Capture and return the unsubscribe function
     const unsubscribe = useMasteryStore.getState().syncFromCloud();
     return () => {
       if (unsubscribe) unsubscribe();
