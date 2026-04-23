@@ -5,7 +5,7 @@ import VocabCard from './VocabCard';
 import WordDetailDrawer from './WordDetailDrawer';
 import { soundService } from '../services/soundService';
 import { fetchSentenceSuggestions, fetchQuickTranslation } from '../services/linaService';
-import type { MasteryStatus } from '../types/mastery';
+import type { MasteryStatus, VocabWord } from '../types/mastery';
 
 interface Props {
   onAskLina: (p: string) => void;
@@ -93,21 +93,24 @@ export default function MasteryGrid({
     if (Math.hypot(dx, dy) > MOVE_THRESHOLD) cancelLongPress();
   };
 
-  const handlePointerUp = (word: string) => {
+  // Pure cleanup — no tap action here so pointerCancel doesn't silently drop taps
+  const handlePointerUp = () => {
     pointerStart.current = null;
     if (longPressTimer.current) { clearTimeout(longPressTimer.current); longPressTimer.current = null; }
+  };
 
+  // onClick is the browser's most reliable tap signal — never fires after a
+  // scroll, swipe, or pointerCancel, making it far more reliable on mobile.
+  const handleCardClick = (word: VocabWord) => {
     if (isLongPress.current) {
-      isLongPress.current = false;
-      return; // long-press already handled on timer fire
+      isLongPress.current = false; // consume the flag so the next tap works
+      return;
     }
-
     if (selectedWords.length === 0) {
-      const target = vocabulary.find(v => v.word === word);
-      if (target) setDrawerId(target.id);
+      setDrawerId(word.id);
     } else {
       setSelectedWords(prev =>
-        prev.includes(word) ? prev.filter(w => w !== word) : [...prev, word]
+        prev.includes(word.word) ? prev.filter(w => w !== word.word) : [...prev, word.word]
       );
     }
   };
@@ -170,8 +173,9 @@ export default function MasteryGrid({
             key={word.id}
             onPointerDown={(e) => handlePointerDown(e, word.word)}
             onPointerMove={handlePointerMove}
-            onPointerUp={() => handlePointerUp(word.word)}
+            onPointerUp={handlePointerUp}
             onPointerCancel={cancelLongPress}
+            onClick={() => handleCardClick(word)}
             className="grid-item-wrapper"
             style={{
               opacity: selectedWords.length > 0 && !selectedWords.includes(word.word) ? 0.3 : 1,
