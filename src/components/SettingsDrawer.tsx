@@ -12,7 +12,7 @@ interface Props {
 
 export default function SettingsDrawer({ isOpen, onClose, isSandboxMode, setIsSandboxMode }: Props) {
   const [apiKey, setApiKey] = useState('');
-  const { resetAllVocab, clearAllPhrases, setStudentName } = useMasteryStore();
+  const { resetAsNewUser, randomizeVocab, masterAllVocab } = useMasteryStore();
 
   useEffect(() => {
     setApiKey(localStorage.getItem('TP_GEMINI_KEY') || '');
@@ -23,22 +23,22 @@ export default function SettingsDrawer({ isOpen, onClose, isSandboxMode, setIsSa
     alert('API Key saved!');
   };
 
-  const handleResetVocab = () => {
-    if (window.confirm('Reset ALL vocabulary progress to Not Started? This cannot be undone.')) {
-      resetAllVocab();
-    }
-  };
-
-  const handleClearPhrases = () => {
-    if (window.confirm('Delete all saved phrases? This cannot be undone.')) {
-      clearAllPhrases();
-    }
-  };
-
-  const handleResetProfile = () => {
-    if (window.confirm('Reset your profile and start over? This will clear your name and streak.')) {
-      setStudentName('');
+  const handleResetNewUser = () => {
+    if (window.confirm('Reset EVERYTHING and start over as a new user? All progress, phrases, and your profile will be erased.')) {
+      resetAsNewUser();
       onClose();
+    }
+  };
+
+  const handleRandomize = () => {
+    if (window.confirm('Randomize all vocabulary statuses? This will mix your progress randomly.')) {
+      randomizeVocab();
+    }
+  };
+
+  const handleMasterAll = () => {
+    if (window.confirm('Mark ALL vocabulary as Mastered?')) {
+      masterAllVocab();
     }
   };
 
@@ -99,14 +99,14 @@ export default function SettingsDrawer({ isOpen, onClose, isSandboxMode, setIsSa
           <div className="danger-zone">
             <p className="settings-label" style={{ color: '#ef4444', marginBottom: '12px' }}>DANGER ZONE</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <button onClick={handleResetVocab} className="btn-danger">
-                Reset All Vocabulary Progress
+              <button onClick={handleResetNewUser} className="btn-danger">
+                Reset Everything — Start as New User
               </button>
-              <button onClick={handleClearPhrases} className="btn-danger">
-                Clear All Saved Phrases
+              <button onClick={handleRandomize} className="btn-danger">
+                Randomize Learning Progress
               </button>
-              <button onClick={handleResetProfile} className="btn-danger">
-                Reset Profile &amp; Start Over
+              <button onClick={handleMasterAll} className="btn-danger">
+                Mark All Words as Mastered
               </button>
             </div>
           </div>

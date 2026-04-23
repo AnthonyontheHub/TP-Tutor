@@ -4,7 +4,7 @@ import { useMasteryStore } from '../store/masteryStore';
 import VocabCard from './VocabCard';
 import WordDetailDrawer from './WordDetailDrawer';
 import { soundService } from '../services/soundService';
-import { fetchSentenceSuggestions } from '../services/linaService';
+import { fetchSentenceSuggestions, fetchQuickTranslation } from '../services/linaService';
 import type { MasteryStatus } from '../types/mastery';
 
 interface Props { 
@@ -31,15 +31,20 @@ export default function MasteryGrid({
   onAskLina, isSandboxMode, activeFilter, sortMode, sortDirection, posFilter, 
   setSortMode, setSortDirection, setPosFilter 
 }: Props) {
-  const { vocabulary } = useMasteryStore();
+  const { vocabulary, savePhrase } = useMasteryStore();
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [magneticSuggestions, setMagneticSuggestions] = useState<string[]>([]);
+  const [translation, setTranslation] = useState<string | null>(null);
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [savedConfirm, setSavedConfirm] = useState(false);
   
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isLongPress = useRef(false);
 
   useEffect(() => {
+    setTranslation(null);
+    setSavedConfirm(false);
     const apiKey = localStorage.getItem('TP_GEMINI_KEY');
     if (selectedWords.length > 1 && apiKey) {
       const timer = setTimeout(async () => {
@@ -47,10 +52,26 @@ export default function MasteryGrid({
         setMagneticSuggestions(results);
       }, 800);
       return () => clearTimeout(timer);
-    } else if (selectedWords.length <= 1) {
+    } else {
       setMagneticSuggestions([]);
     }
   }, [selectedWords]);
+
+  const handleTranslate = async () => {
+    const apiKey = localStorage.getItem('TP_GEMINI_KEY');
+    if (!apiKey) { alert('Add your Gemini API key in Settings first.'); return; }
+    setIsTranslating(true);
+    const result = await fetchQuickTranslation(apiKey, selectedWords.join(' '));
+    setTranslation(result);
+    setIsTranslating(false);
+  };
+
+  const handleSave = () => {
+    const sentence = selectedWords.join(' ');
+    savePhrase({ id: sentence, tp: sentence, en: translation ?? '', notes: '' });
+    setSavedConfirm(true);
+    setTimeout(() => setSavedConfirm(false), 2000);
+  };
 
   const handlePointerDown = (word: string) => {
     isLongPress.current = false;
@@ -138,15 +159,24 @@ export default function MasteryGrid({
       {selectedWords.length > 0 && (
         <div className="builder-panel">
           <div className="builder-content">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+            {/* Header row */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
               <div style={{ color: 'white', fontSize: '1.1rem', fontWeight: 'bold' }}>
                 {selectedWords.join(' ')}
               </div>
-              <button onClick={() => setSelectedWords([])} className="btn-toggle" style={{ flex: 'none', width: '36px', height: '36px', padding: 0 }}>✕</button>
+              <button onClick={() => setSelectedWords([])} className="btn-toggle" style={{ flex: 'none', width: '34px', height: '34px', padding: 0, fontSize: '0.9rem' }}>✕</button>
             </div>
 
+            {/* Translation result */}
+            {translation && (
+              <div style={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: '8px', padding: '8px 12px', marginBottom: '10px', color: '#94a3b8', fontSize: '0.85rem', fontStyle: 'italic' }}>
+                {translation}
+              </div>
+            )}
+
+            {/* AI sentence suggestions */}
             {magneticSuggestions.length > 0 && (
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '10px' }}>
                 {magneticSuggestions.map((s, i) => (
                   <button
                     key={i}
@@ -159,13 +189,31 @@ export default function MasteryGrid({
               </div>
             )}
 
-            <button
-              onClick={() => { onAskLina(`Is "${selectedWords.join(' ')}" correct Toki Pona?`); setSelectedWords([]); }}
-              className="btn-review"
-              style={{ margin: 0 }}
-            >
-              ASK LINA
-            </button>
+            {/* Action buttons */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
+              <button
+                onClick={handleTranslate}
+                disabled={isTranslating}
+                className="btn-review"
+                style={{ margin: 0, fontSize: '0.72rem', padding: '10px 4px', opacity: isTranslating ? 0.6 : 1 }}
+              >
+                {isTranslating ? '...' : 'TRANSLATE'}
+              </button>
+              <button
+                onClick={() => { onAskLina(`Let's work on: "${selectedWords.join(' ')}" — is this correct Toki Pona?`); setSelectedWords([]); }}
+                className="btn-review"
+                style={{ margin: 0, fontSize: '0.72rem', padding: '10px 4px' }}
+              >
+                ASK LINA
+              </button>
+              <button
+                onClick={handleSave}
+                className="btn-review"
+                style={{ margin: 0, fontSize: '0.72rem', padding: '10px 4px', background: savedConfirm ? '#10b981' : undefined }}
+              >
+                {savedConfirm ? 'SAVED ✓' : 'SAVE'}
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -11,14 +11,15 @@ interface MasteryActions {
   updateVocabStatus: (wordIdOrText: string, status: MasteryStatus) => void;
   updateConceptStatus: (chapterId: string, conceptId: string, status: MasteryStatus) => void;
   setLastUpdated: (date: string) => void;
-  savePhrase: (phrase: string) => void;
+  savePhrase: (phrase: string | import('../types/mastery').SavedPhrase) => void;
   recordActivity: () => void;
   setStudentName: (name: string) => void;
   setProfileImage: (url: string) => void;
   updatePhraseNote: (id: string, notes: string) => void;
   deletePhrase: (id: string) => void;
-  resetAllVocab: () => void;
-  clearAllPhrases: () => void;
+  resetAsNewUser: () => void;
+  randomizeVocab: () => void;
+  masterAllVocab: () => void;
   syncFromCloud: () => Unsubscribe | void;
   syncToCloud: () => Promise<void>;
   getStatusSummary: () => StatusSummary & { xp: number, level: number, rankTitle: string };
@@ -73,8 +74,9 @@ export const useMasteryStore = create<MasteryStore>()(
 
       savePhrase: (phrase) => {
         set((state) => {
+          const key = typeof phrase === 'string' ? phrase : phrase.tp;
           const already = state.savedPhrases.some(p =>
-            typeof p === 'string' ? p === phrase : p.tp === phrase
+            typeof p === 'string' ? p === key : p.tp === key
           );
           if (already) return state;
           return { savedPhrases: [...state.savedPhrases, phrase] };
@@ -129,15 +131,34 @@ export const useMasteryStore = create<MasteryStore>()(
         void get().syncToCloud();
       },
 
-      resetAllVocab: () => {
+      resetAsNewUser: () => {
+        set({
+          studentName: '',
+          profileImage: '',
+          savedPhrases: [],
+          currentStreak: 0,
+          lastActiveDate: '',
+          vocabulary: initialMasteryMap.vocabulary.map(w => ({ ...w, status: 'not_started' as MasteryStatus })),
+          chapters: initialMasteryMap.chapters,
+        });
+        void get().syncToCloud();
+      },
+
+      randomizeVocab: () => {
+        const statuses: MasteryStatus[] = ['not_started', 'introduced', 'practicing', 'confident', 'mastered'];
         set((state) => ({
-          vocabulary: state.vocabulary.map(w => ({ ...w, status: 'not_started' as MasteryStatus }))
+          vocabulary: state.vocabulary.map(w => ({
+            ...w,
+            status: statuses[Math.floor(Math.random() * statuses.length)],
+          }))
         }));
         void get().syncToCloud();
       },
 
-      clearAllPhrases: () => {
-        set({ savedPhrases: [] });
+      masterAllVocab: () => {
+        set((state) => ({
+          vocabulary: state.vocabulary.map(w => ({ ...w, status: 'mastered' as MasteryStatus }))
+        }));
         void get().syncToCloud();
       },
 

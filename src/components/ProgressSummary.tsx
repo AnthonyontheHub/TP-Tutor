@@ -1,6 +1,5 @@
 /* src/components/ProgressSummary.tsx */
 import { useMasteryStore } from '../store/masteryStore';
-import { STATUS_META } from '../types/mastery';
 import type { MasteryStatus } from '../types/mastery';
 
 interface Props {
@@ -13,17 +12,17 @@ export default function ProgressSummary({ activeFilter, onFilterClick }: Props) 
   const getStatusSummary = useMasteryStore((s) => s.getStatusSummary);
   const summary = getStatusSummary();
 
-  const statusItems: { status: MasteryStatus; label: string; color: string; glow: string }[] = [
-    { status: 'not_started', label: 'NEW',   color: '#505050', glow: 'rgba(255,255,255,0.2)' },
-    { status: 'introduced',  label: 'INTRO', color: '#3b82f6', glow: 'rgba(59,130,246,0.6)'  },
-    { status: 'practicing',  label: 'WORK',  color: '#f59e0b', glow: 'rgba(245,158,11,0.6)'  },
-    { status: 'confident',   label: 'GOOD',  color: '#10b981', glow: 'rgba(16,185,129,0.6)'  },
-    { status: 'mastered',    label: 'DONE',  color: '#ec4899', glow: 'rgba(236,72,153,0.6)'  },
+  const statusItems: { status: MasteryStatus; label: string; emoji: string; color: string; glow: string }[] = [
+    { status: 'not_started', label: 'NEW',   emoji: '⬜', color: '#6b7280', glow: 'rgba(255,255,255,0.25)' },
+    { status: 'introduced',  label: 'INTRO', emoji: '🔵', color: '#3b82f6', glow: 'rgba(59,130,246,0.6)'   },
+    { status: 'practicing',  label: 'WORK',  emoji: '🟡', color: '#f59e0b', glow: 'rgba(245,158,11,0.6)'   },
+    { status: 'confident',   label: 'GOOD',  emoji: '🟢', color: '#10b981', glow: 'rgba(16,185,129,0.6)'   },
+    { status: 'mastered',    label: 'DONE',  emoji: '✅', color: '#22c55e', glow: 'rgba(34,197,94,0.6)'    },
   ];
 
   return (
-    <div style={{ background: '#111', borderRadius: '16px', padding: '16px', border: '1px solid #222', marginBottom: '16px' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '8px' }}>
+    <div style={{ background: '#111', borderRadius: '16px', padding: '14px', border: '1px solid #222', marginBottom: '14px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '6px' }}>
         {statusItems.map((item) => {
           const isActive = activeFilter === item.status;
           const isDimmed = activeFilter !== null && !isActive;
@@ -34,21 +33,26 @@ export default function ProgressSummary({ activeFilter, onFilterClick }: Props) 
               style={{
                 background: isActive ? item.color : '#1a1a1a',
                 border: isActive ? `2px solid ${item.color}` : '1px solid #333',
-                padding: '12px 4px',
+                padding: '10px 4px 8px',
                 borderRadius: '12px',
                 cursor: 'pointer',
                 transition: 'all 0.25s ease',
-                opacity: isDimmed ? 0.3 : 1,
-                boxShadow: isActive ? `0 0 18px ${item.glow}` : 'none',
-                transform: isActive ? 'scale(1.05)' : 'scale(1)',
+                opacity: isDimmed ? 0.25 : 1,
+                boxShadow: isActive ? `0 0 16px ${item.glow}` : 'none',
+                transform: isActive ? 'scale(1.06)' : 'scale(1)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '4px',
               }}
             >
-              <div style={{ fontSize: '1rem', fontWeight: 'bold', color: 'white' }}>
+              <span style={{ fontSize: '1.1rem', lineHeight: 1 }}>{item.emoji}</span>
+              <span style={{ fontSize: '1rem', fontWeight: 'bold', color: 'white', lineHeight: 1 }}>
                 {summary[item.status]}
-              </div>
-              <div style={{ fontSize: '0.5rem', color: isActive ? 'white' : '#666', fontWeight: 'bold', marginTop: '4px' }}>
+              </span>
+              <span style={{ fontSize: '0.48rem', color: isActive ? 'rgba(255,255,255,0.85)' : '#555', fontWeight: '700', letterSpacing: '0.04em' }}>
                 {item.label}
-              </div>
+              </span>
             </button>
           );
         })}
