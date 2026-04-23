@@ -102,8 +102,8 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
         )}
       </main>
 
-      {isSettingsOpen && <SettingsDrawer onClose={() => setIsSettingsOpen(false)} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} />}
-      {isProfileOpen && <UserProfileDrawer onClose={() => setIsProfileOpen(false)} />}
+      <SettingsDrawer isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} />
+      <UserProfileDrawer isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
     </div>
   );
 }

@@ -8,9 +8,10 @@ import type { MasteryMap } from '../types/mastery';
 
 export const initialMasteryMap: MasteryMap = {
   studentName: '',
+  profileImage: '',
   curriculumLevel: 'Introduction',
   lastUpdated: '',
-  
+
   // NEW FEATURES INITIALIZATION
   savedPhrases: [],
   currentStreak: 0,

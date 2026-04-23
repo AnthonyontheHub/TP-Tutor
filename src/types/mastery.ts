@@ -80,19 +80,21 @@ export interface VocabWord {
 
 export interface SavedPhrase {
   id: string;
-  text: string;
-  comment: string;
+  tp: string;
+  en: string;
+  notes: string;
 }
 
 export interface MasteryMap {
   studentName: string;
+  profileImage: string;
   curriculumLevel: string;
   lastUpdated: string;
   chapters: Chapter[];   // index 0 = Introduction
   vocabulary: VocabWord[];
-  
+
   // NEW FEATURES
-  savedPhrases: (string | SavedPhrase)[]; 
+  savedPhrases: (string | SavedPhrase)[];
   currentStreak: number;
   lastActiveDate: string;
 }
