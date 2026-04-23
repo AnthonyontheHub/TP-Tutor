@@ -37,18 +37,21 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
     if (isActive) messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); 
   }, [messages, isActive]);
   
-  useEffect(() => { 
+  useEffect(() => {
+    if (!isActive || !pendingPrompt) return;
+    // Clear previous session so a new prompted task starts clean
+    setMessages([]);
+    setInput('');
+    historyRef.current = [];
     const key = localStorage.getItem('TP_GEMINI_KEY');
-    if (isActive && pendingPrompt && !isLoading) { 
-       if (key) {
-         sendToLina(pendingPrompt, key); 
-       } else {
-         // Fixed: Prevent stale prompts if the user hasn't supplied a key yet
-         alert("Please add your Gemini API Key in settings first!");
-       }
-       if (clearPrompt) clearPrompt(); 
-    } 
-  }, [isActive, pendingPrompt, isLoading, clearPrompt]);
+    if (key) {
+      sendToLina(pendingPrompt, key);
+    } else {
+      alert('Please add your Gemini API Key in Settings first!');
+    }
+    clearPrompt?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isActive, pendingPrompt]);
 
   async function sendToLina(txt: string, overrideKey?: string) {
     const key = overrideKey || localStorage.getItem('TP_GEMINI_KEY');

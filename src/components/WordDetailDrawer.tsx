@@ -4,7 +4,7 @@ import { STATUS_META } from '../types/mastery';
 import type { VocabWord } from '../types/mastery';
 
 export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isSandboxMode }: { isOpen: boolean; word?: VocabWord | null; onClose: () => void; onAskLina: (p: string) => void; isSandboxMode: boolean }) {
-  const partsOfSpeech = word ? word.partOfSpeech.split('/').map(p => p.trim()) : [];
+  const partsOfSpeech = word?.partOfSpeech?.split('/').map(p => p.trim()) ?? [];
   const updateVocabStatus = useMasteryStore((s) => s.updateVocabStatus);
 
   return (

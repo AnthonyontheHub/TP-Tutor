@@ -8,7 +8,9 @@ interface Props {
 }
 
 export default function ProgressSummary({ activeFilter, onFilterClick }: Props) {
-  useMasteryStore((s) => s.vocabulary);
+  // Subscribe to vocabulary so the component re-renders on every status change
+  // (getStatusSummary is a stable function ref and won't trigger re-renders alone)
+  const _vocab = useMasteryStore((s) => s.vocabulary);
   const getStatusSummary = useMasteryStore((s) => s.getStatusSummary);
   const summary = getStatusSummary();
 

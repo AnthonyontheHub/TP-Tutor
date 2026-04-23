@@ -15,8 +15,8 @@ export default function SettingsDrawer({ isOpen, onClose, isSandboxMode, setIsSa
   const { resetAsNewUser, randomizeVocab, masterAllVocab } = useMasteryStore();
 
   useEffect(() => {
-    setApiKey(localStorage.getItem('TP_GEMINI_KEY') || '');
-  }, []);
+    if (isOpen) setApiKey(localStorage.getItem('TP_GEMINI_KEY') || '');
+  }, [isOpen]);
 
   const handleSaveKey = () => {
     localStorage.setItem('TP_GEMINI_KEY', apiKey);
