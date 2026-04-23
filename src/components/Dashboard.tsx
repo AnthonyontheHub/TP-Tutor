@@ -96,7 +96,9 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
               SAVED PHRASES
             </h3>
             {savedPhrases.length === 0 ? <p style={{ color: '#888' }}>No phrases saved yet.</p> : savedPhrases.map((p, i) => (
-              <div key={i} style={{ background: '#111', borderLeft: '4px solid #10b981', padding: '15px', borderRadius: '8px', marginBottom: '10px', color: '#eee' }}>{p}</div>
+              <div key={i} style={{ background: '#111', borderLeft: '4px solid #10b981', padding: '15px', borderRadius: '8px', marginBottom: '10px', color: '#eee' }}>
+                {typeof p === 'string' ? p : p.tp}
+              </div>
             ))}
           </div>
         )}
