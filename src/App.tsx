@@ -1,5 +1,5 @@
 /* src/App.tsx */
-import { useState, useEffect } from 'react'; 
+import { useState, useEffect, useCallback } from 'react';
 import Dashboard from './components/Dashboard';
 import ChatSession from './components/ChatSession';
 import { useMasteryStore } from './store/masteryStore'; 
@@ -18,22 +18,26 @@ export default function App() {
     };
   }, []);
 
-  const handleAskLina = (prompt: string) => {
+  const handleAskLina = useCallback((prompt: string) => {
     setPendingPrompt(prompt);
-    setIsChatOpen(true); 
-  };
+    setIsChatOpen(true);
+  }, []);
+
+  const handleClearPrompt = useCallback(() => setPendingPrompt(null), []);
+  const handleEndSession = useCallback(() => setIsChatOpen(false), []);
+  const handleStartSession = useCallback(() => setIsChatOpen(true), []);
 
   return (
     <>
-      <Dashboard 
-        onStartSession={() => setIsChatOpen(true)} 
-        onAskLina={handleAskLina} 
+      <Dashboard
+        onStartSession={handleStartSession}
+        onAskLina={handleAskLina}
       />
-      <ChatSession 
-        isActive={isChatOpen} 
-        onEndSession={() => setIsChatOpen(false)} 
+      <ChatSession
+        isActive={isChatOpen}
+        onEndSession={handleEndSession}
         pendingPrompt={pendingPrompt}
-        clearPrompt={() => setPendingPrompt(null)}
+        clearPrompt={handleClearPrompt}
       />
     </>
   );

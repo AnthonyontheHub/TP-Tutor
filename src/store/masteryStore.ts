@@ -110,7 +110,7 @@ export const useMasteryStore = create<MasteryStore>()(
         set((state) => ({
           savedPhrases: state.savedPhrases.map(p => {
             if (typeof p === 'string') {
-              return p === id ? { id, tp: p, en: 'User Saved Phrase', notes } : p;
+              return p === id ? { id, tp: p, en: 'User Saved Phrase *', notes } : p;
             }
             return p.id === id ? { ...p, notes } : p;
           })
