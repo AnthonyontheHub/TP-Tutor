@@ -364,6 +364,97 @@ select {
   color: var(--text);
 }
 
+/* ─── Settings Drawer Controls ──────────────────────────────────────────── */
+.settings-section {
+  background: var(--surface-2);
+  padding: 14px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.settings-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+  cursor: pointer;
+}
+
+.settings-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #888;
+  text-transform: uppercase;
+  display: block;
+}
+
+.settings-checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--blue);
+}
+
+.settings-input {
+  width: 100%;
+  padding: 10px 12px;
+  background: #000;
+  border: 1px solid var(--border);
+  color: white;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  font-family: var(--font);
+  outline: none;
+  box-sizing: border-box;
+}
+
+.settings-input:focus {
+  border-color: var(--blue);
+}
+
+.btn-settings {
+  display: block;
+  width: 100%;
+  padding: 11px;
+  background: var(--blue);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+/* ─── Danger Zone ───────────────────────────────────────────────────────── */
+.danger-zone {
+  border: 1px solid #3f0a0a;
+  padding: 16px;
+  border-radius: 12px;
+  margin-top: 24px;
+  background: #0f0000;
+}
+
+.btn-danger {
+  display: block;
+  width: 100%;
+  padding: 11px;
+  background: transparent;
+  color: #ef4444;
+  border: 1px solid #7f1d1d;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.btn-danger:hover { background: #1f0000; }
+
 /* ─── Scrollbars ────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -371,20 +462,3 @@ select {
 
 /* ─── Misc ──────────────────────────────────────────────────────────────── */
 button:active { transform: scale(0.97); }
-
-select {
-  background: #1a1a1a;
-  border: 1px solid #333;
-  color: white;
-  padding: 10px 15px;
-  border-radius: 8px;
-  font-family: var(--font);
-  width: 100%;
-}
-
-.danger-zone {
-  border: 1px solid #222;
-  padding: 20px;
-  border-radius: 12px;
-  margin-top: 40px;
-}

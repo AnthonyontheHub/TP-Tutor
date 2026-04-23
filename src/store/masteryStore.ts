@@ -17,6 +17,8 @@ interface MasteryActions {
   setProfileImage: (url: string) => void;
   updatePhraseNote: (id: string, notes: string) => void;
   deletePhrase: (id: string) => void;
+  resetAllVocab: () => void;
+  clearAllPhrases: () => void;
   syncFromCloud: () => Unsubscribe | void;
   syncToCloud: () => Promise<void>;
   getStatusSummary: () => StatusSummary & { xp: number, level: number, rankTitle: string };
@@ -124,6 +126,18 @@ export const useMasteryStore = create<MasteryStore>()(
             typeof p === 'string' ? p !== id : p.id !== id
           )
         }));
+        void get().syncToCloud();
+      },
+
+      resetAllVocab: () => {
+        set((state) => ({
+          vocabulary: state.vocabulary.map(w => ({ ...w, status: 'not_started' as MasteryStatus }))
+        }));
+        void get().syncToCloud();
+      },
+
+      clearAllPhrases: () => {
+        set({ savedPhrases: [] });
         void get().syncToCloud();
       },
 

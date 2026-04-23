@@ -95,29 +95,39 @@ export default function MasteryGrid({
       return sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
     });
 
+  const cancelLongPress = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+    isLongPress.current = false;
+  };
+
   return (
-    <div className="mastery-grid-container">
-      <div className="grid-toolbar" style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
+    <div className="mastery-grid-container" style={{ paddingBottom: selectedWords.length > 0 ? '200px' : undefined }}>
+      <div className="grid-toolbar">
         <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="sort-select">
           <option value="alphabetical">A-Z</option>
           <option value="status">Mastery</option>
         </select>
-        <button onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')} className="btn-toggle">
+        <button onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')} className="btn-toggle" style={{ flex: 'none', width: '42px' }}>
           {sortDirection === 'asc' ? '↑' : '↓'}
         </button>
       </div>
 
       <div className="mastery-grid__cards">
         {displayed.map((word) => (
-          <div 
-            key={word.id} 
-            onPointerDown={() => handlePointerDown(word.word)} 
+          <div
+            key={word.id}
+            onPointerDown={() => handlePointerDown(word.word)}
             onPointerUp={() => handlePointerUp(word.word)}
+            onPointerCancel={cancelLongPress}
+            onPointerLeave={cancelLongPress}
             className="grid-item-wrapper"
-            style={{ 
+            style={{
               opacity: selectedWords.length > 0 && !selectedWords.includes(word.word) ? 0.3 : 1,
-              touchAction: 'none',
-              cursor: 'pointer'
+              touchAction: 'manipulation',
+              cursor: 'pointer',
             }}
           >
             <VocabCard word={word} />
@@ -128,17 +138,20 @@ export default function MasteryGrid({
       {selectedWords.length > 0 && (
         <div className="builder-panel">
           <div className="builder-content">
-            <div style={{ color: 'white', fontSize: '1.2rem', marginBottom: '15px', fontWeight: 'bold' }}>
-              {selectedWords.join(' ')}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <div style={{ color: 'white', fontSize: '1.1rem', fontWeight: 'bold' }}>
+                {selectedWords.join(' ')}
+              </div>
+              <button onClick={() => setSelectedWords([])} className="btn-toggle" style={{ flex: 'none', width: '36px', height: '36px', padding: 0 }}>✕</button>
             </div>
-            
+
             {magneticSuggestions.length > 0 && (
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '15px' }}>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
                 {magneticSuggestions.map((s, i) => (
-                  <button 
-                    key={i} 
+                  <button
+                    key={i}
                     className="suggestion-pill"
-                    onClick={() => onAskLina(`Let's practice this: "${s}"`)}
+                    onClick={() => { onAskLina(`Let's practice this: "${s}"`); setSelectedWords([]); }}
                   >
                     {s}
                   </button>
@@ -146,22 +159,13 @@ export default function MasteryGrid({
               </div>
             )}
 
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button 
-                onClick={() => { onAskLina(`Is "${selectedWords.join(' ')}" correct?`); setSelectedWords([]); }} 
-                className="btn-review" 
-                style={{ margin: 0, flex: 2 }}
-              >
-                ASK LINA
-              </button>
-              <button 
-                onClick={() => setSelectedWords([])} 
-                className="btn-toggle"
-                style={{ flex: 1 }}
-              >
-                CLEAR
-              </button>
-            </div>
+            <button
+              onClick={() => { onAskLina(`Is "${selectedWords.join(' ')}" correct Toki Pona?`); setSelectedWords([]); }}
+              className="btn-review"
+              style={{ margin: 0 }}
+            >
+              ASK LINA
+            </button>
           </div>
         </div>
       )}

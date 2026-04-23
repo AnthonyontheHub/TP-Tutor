@@ -59,13 +59,12 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
 
         {viewMode === 'grid' ? (
           <>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px', padding: '0 5px' }}>
-              <label htmlFor="pos-filter" style={{ fontWeight: 'bold' }}>Filter POS:</label>
-              <select 
+            <div className="grid-toolbar">
+              <select
                 id="pos-filter"
-                value={posFilter} 
+                value={posFilter}
                 onChange={(e) => setPosFilter(e.target.value)}
-                style={{ padding: '8px', borderRadius: '6px', background: '#222', color: '#fff', border: '1px solid #444', outline: 'none' }}
+                className="sort-select"
               >
                 <option value="All">All Parts of Speech</option>
                 <option value="noun">Noun</option>
