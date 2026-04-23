@@ -70,7 +70,13 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       savePhrase: (phrase) => {
-        set((state) => ({ savedPhrases: [...new Set([...state.savedPhrases, phrase])] }));
+        set((state) => {
+          const already = state.savedPhrases.some(p =>
+            typeof p === 'string' ? p === phrase : p.tp === phrase
+          );
+          if (already) return state;
+          return { savedPhrases: [...state.savedPhrases, phrase] };
+        });
         void get().syncToCloud();
       },
 

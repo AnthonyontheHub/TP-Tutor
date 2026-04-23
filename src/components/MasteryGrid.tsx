@@ -120,7 +120,7 @@ export default function MasteryGrid({
               cursor: 'pointer'
             }}
           >
-            <VocabCard word={word} onClick={() => {}} />
+            <VocabCard word={word} />
           </div>
         ))}
       </div>
