@@ -22,7 +22,6 @@ interface ChatMessage {
   role: 'user' | 'assistant';
   displayContent: string;
   raw?: string;
-  // proposedChanges kept for internal bookkeeping but no longer rendered as a UI card
   proposedChanges?: ProposedChange[];
 }
 
@@ -42,15 +41,13 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const vocabulary   = useMasteryStore(s => s.vocabulary);
-  const studentName  = useMasteryStore(s => s.studentName);
-  const applyScoreDeltas = useMasteryStore(s => s.applyScoreDeltas);
-  const setLastUpdated   = useMasteryStore(s => s.setLastUpdated);
+  const updateVocabStatus   = useMasteryStore(s => s.updateVocabStatus);
+  const updateConceptStatus = useMasteryStore(s => s.updateConceptStatus);
+  const setLastUpdated      = useMasteryStore(s => s.setLastUpdated);
 
-  const messagesEndRef  = useRef<HTMLDivElement>(null);
-  const historyRef      = useRef<{ role: 'user' | 'assistant'; content: string }[]>([]);
-  // Accumulates every proposed delta from all assistant turns this session.
-  const sessionDeltasRef = useRef<ProposedChange[]>([]);
+  const messagesEndRef    = useRef<HTMLDivElement>(null);
+  const historyRef        = useRef<{ role: 'user' | 'assistant'; content: string }[]>([]);
+  const sessionChangesRef = useRef<ProposedChange[]>([]);
 
   useEffect(() => {
     if (isActive) messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -61,7 +58,7 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
     setMessages([]);
     setInput('');
     historyRef.current = [];
-    sessionDeltasRef.current = [];
+    sessionChangesRef.current = [];
     const key = resolveApiKey();
     if (key || isSandboxMode) {
       sendToLina(pendingPrompt, key);
@@ -72,21 +69,23 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActive, pendingPrompt]);
 
-  // Called when the user closes the chat — applies accumulated deltas then
-  // fetches a plain-language recap before dismissing.
   async function handleEndSession() {
-    const deltas = sessionDeltasRef.current;
+    const changes = sessionChangesRef.current;
 
-    if (deltas.length === 0 || isSandboxMode) {
+    if (changes.length === 0 || isSandboxMode) {
       onEndSession();
       return;
     }
 
-    // Apply score changes to the store immediately.
-    applyScoreDeltas(deltas);
+    for (const change of changes) {
+      if (change.type === 'vocab') {
+        updateVocabStatus(change.id, change.newStatus);
+      } else {
+        updateConceptStatus(change.id, change.newStatus);
+      }
+    }
     setLastUpdated(new Date().toLocaleDateString());
 
-    // Generate a brief recap message.
     const key = resolveApiKey();
     const recapId = crypto.randomUUID();
     setMessages(prev => [...prev, {
@@ -96,15 +95,14 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
     }]);
     setIsLoading(true);
 
-    const recap = await fetchSessionRecap(key, deltas);
+    const recap = await fetchSessionRecap(key, changes);
     setMessages(prev => prev.map(msg =>
       msg.id === recapId ? { ...msg, displayContent: recap } : msg
     ));
     setIsLoading(false);
 
-    // Short pause so the user can read the recap before the drawer closes.
     await new Promise(r => setTimeout(r, 2200));
-    sessionDeltasRef.current = [];
+    sessionChangesRef.current = [];
     onEndSession();
   }
 
@@ -134,10 +132,21 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
 
     try {
       const key = resolveApiKey(overrideKey);
-      // Grab the freshest data directly from the store right before sending
-const freshVocab = useMasteryStore.getState().vocabulary;
-const freshName = useMasteryStore.getState().studentName;
-const sys = buildSystemPrompt(freshVocab, freshName);
+      const state = useMasteryStore.getState();
+      const activeCurriculum = state.activeCurriculumId
+        ? state.curriculums.find(c => c.id === state.activeCurriculumId)
+        : null;
+      const activeModule = activeCurriculum && state.activeModuleId
+        ? activeCurriculum.modules.find(m => m.id === state.activeModuleId)
+        : null;
+
+      const sys = buildSystemPrompt(
+        state.vocabulary,
+        state.concepts,
+        state.studentName,
+        activeCurriculum?.title,
+        activeModule?.title
+      );
       const windowedHistory = historyRef.current.slice(-HISTORY_WINDOW);
       let full = '';
 
@@ -148,10 +157,9 @@ const sys = buildSystemPrompt(freshVocab, freshName);
         ));
       }
 
-      // Parse and accumulate deltas — they are applied in bulk when the session ends.
       const changes = parseProposedChanges(full);
       if (changes && changes.length > 0) {
-        sessionDeltasRef.current.push(...changes);
+        sessionChangesRef.current.push(...changes);
         setMessages(prev => prev.map(msg =>
           msg.id === assistantId ? { ...msg, proposedChanges: changes } : msg
         ));
@@ -218,16 +226,14 @@ const sys = buildSystemPrompt(freshVocab, freshName);
                       {msg.displayContent || (isLoading && msg.role === 'assistant' ? '...' : '')}
                     </div>
 
-                    {/* Subtle pending-changes indicator — no button, just context */}
                     {msg.proposedChanges && msg.proposedChanges.length > 0 && (
                       <div style={{ marginTop: '6px', textAlign: 'left' }}>
                         {msg.proposedChanges.map((c, i) => (
                           <span
                             key={i}
-                            style={{ display: 'inline-block', marginRight: '6px', fontSize: '0.68rem', color: c.delta > 0 ? '#22c55e' : '#ef4444', fontWeight: 700 }}
+                            style={{ display: 'inline-block', marginRight: '6px', fontSize: '0.68rem', color: '#22c55e', fontWeight: 700 }}
                           >
-                            {STATUS_EMOJI[vocabulary.find(v => v.id === c.wordId || v.word === c.wordId)?.status ?? 'not_started']}
-                            {' '}{c.wordId} {c.delta > 0 ? '+' : ''}{c.delta}
+                            {STATUS_EMOJI[c.newStatus]} {c.id} → {c.newStatus}
                           </span>
                         ))}
                       </div>
