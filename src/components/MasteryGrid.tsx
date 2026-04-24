@@ -31,6 +31,8 @@ export default function MasteryGrid({
   setSortMode, setSortDirection, setPosFilter
 }: Props) {
   const { vocabulary, savePhrase } = useMasteryStore();
+  // selectedWords is an ordered array — duplicates allowed so the same word
+  // can appear multiple times in the sentence being built.
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [magneticSuggestions, setMagneticSuggestions] = useState<string[]>([]);
@@ -43,18 +45,13 @@ export default function MasteryGrid({
   const isLongPress   = useRef(false);
   const pointerStart  = useRef<{ x: number; y: number } | null>(null);
 
-  // Auto-translate + suggestions whenever selected words change.
-  // The `active` flag prevents stale async responses from overwriting fresh state.
   useEffect(() => {
     setTranslation(null);
     setIsAutoTranslating(false);
     if (confirmTimer.current) { clearTimeout(confirmTimer.current); confirmTimer.current = null; }
     setSavedConfirm(false);
 
-    if (selectedWords.length === 0) {
-      setMagneticSuggestions([]);
-      return;
-    }
+    if (selectedWords.length === 0) { setMagneticSuggestions([]); return; }
 
     const apiKey = resolveApiKey();
     if (!apiKey) { setMagneticSuggestions([]); return; }
@@ -62,10 +59,11 @@ export default function MasteryGrid({
     setIsAutoTranslating(true);
     let active = true;
     const timer = setTimeout(async () => {
+      const uniqueWords = [...new Set(selectedWords)];
       const [transResult, suggResults] = await Promise.all([
         fetchQuickTranslation(apiKey, selectedWords.join(' ')),
         selectedWords.length >= 2
-          ? fetchSentenceSuggestions(apiKey, selectedWords)
+          ? fetchSentenceSuggestions(apiKey, uniqueWords)
           : Promise.resolve([]),
       ]);
       if (active) {
@@ -83,7 +81,6 @@ export default function MasteryGrid({
   const cancelLongPress = () => {
     if (longPressTimer.current) { clearTimeout(longPressTimer.current); longPressTimer.current = null; }
     pointerStart.current = null;
-    // Intentionally NOT resetting isLongPress.current — onClick needs to consume it.
   };
 
   const handlePointerDown = (e: React.PointerEvent, word: string) => {
@@ -92,7 +89,8 @@ export default function MasteryGrid({
     longPressTimer.current = setTimeout(() => {
       isLongPress.current = true;
       soundService.playBlip(523.25, 'sine', 0.05);
-      setSelectedWords(prev => prev.includes(word) ? prev : [...prev, word]);
+      // Long-press always appends — duplicates are intentional.
+      setSelectedWords(prev => [...prev, word]);
     }, 500);
   };
 
@@ -103,24 +101,18 @@ export default function MasteryGrid({
     if (Math.hypot(dx, dy) > MOVE_THRESHOLD) cancelLongPress();
   };
 
-  // Pure cleanup — tap logic lives in onClick so pointerCancel can't drop it.
   const handlePointerUp = () => {
     pointerStart.current = null;
     if (longPressTimer.current) { clearTimeout(longPressTimer.current); longPressTimer.current = null; }
   };
 
-  // onClick is the browser's most reliable tap signal — never fires after scroll/cancel.
   const handleCardClick = (word: VocabWord) => {
-    if (isLongPress.current) {
-      isLongPress.current = false;
-      return;
-    }
+    if (isLongPress.current) { isLongPress.current = false; return; }
     if (selectedWords.length === 0) {
       setDrawerId(word.id);
     } else {
-      setSelectedWords(prev =>
-        prev.includes(word.word) ? prev.filter(w => w !== word.word) : [...prev, word.word]
-      );
+      // In multi-select mode, tapping always appends (allows "mi moku e moku").
+      setSelectedWords(prev => [...prev, word.word]);
     }
   };
 
@@ -157,18 +149,15 @@ export default function MasteryGrid({
         const diff = a.partOfSpeech.localeCompare(b.partOfSpeech);
         return sortDirection === 'asc' ? diff : -diff;
       }
-      // Default: alphabetical by word
       const valA = a.word.toLowerCase();
       const valB = b.word.toLowerCase();
       return sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
     });
 
   return (
-    // Container onClick clears multi-select when tapping empty grid space.
-    // Each card stops propagation so container onClick doesn't fire on card taps.
     <div
       className="mastery-grid-container"
-      style={{ paddingBottom: selectedWords.length > 0 ? '220px' : undefined }}
+      style={{ paddingBottom: selectedWords.length > 0 ? '240px' : undefined }}
       onClick={() => { if (selectedWords.length > 0) setSelectedWords([]); }}
     >
       <div className="grid-toolbar">
@@ -188,50 +177,99 @@ export default function MasteryGrid({
       </div>
 
       <div className="mastery-grid__cards">
-        {displayed.map((word) => (
-          <div
-            key={word.id}
-            onPointerDown={(e) => handlePointerDown(e, word.word)}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerUp}
-            onPointerCancel={cancelLongPress}
-            onClick={(e) => { e.stopPropagation(); handleCardClick(word); }}
-            className="grid-item-wrapper"
-            style={{
-              opacity: selectedWords.length > 0 && !selectedWords.includes(word.word) ? 0.3 : 1,
-              touchAction: 'pan-y',
-              cursor: 'pointer',
-            }}
-          >
-            <VocabCard word={word} />
-          </div>
-        ))}
+        {displayed.map((word) => {
+          // Collect every position (1-indexed) where this word appears in the sentence.
+          const positions: number[] = [];
+          selectedWords.forEach((w, i) => { if (w === word.word) positions.push(i + 1); });
+          const isSelected = positions.length > 0;
+
+          return (
+            <div
+              key={word.id}
+              onPointerDown={(e) => handlePointerDown(e, word.word)}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onPointerCancel={cancelLongPress}
+              onClick={(e) => { e.stopPropagation(); handleCardClick(word); }}
+              className="grid-item-wrapper"
+              style={{
+                position: 'relative',
+                opacity: selectedWords.length > 0 && !isSelected ? 0.3 : 1,
+                touchAction: 'pan-y',
+                cursor: 'pointer',
+              }}
+            >
+              <VocabCard word={word} />
+
+              {/* Position bubbles — one per occurrence in the sentence */}
+              {positions.length > 0 && (
+                <div style={{
+                  position: 'absolute',
+                  top: 3,
+                  right: 3,
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: '2px',
+                  justifyContent: 'flex-end',
+                  maxWidth: '64px',
+                  pointerEvents: 'none',
+                }}>
+                  {positions.map(pos => (
+                    <span
+                      key={pos}
+                      style={{
+                        background: '#3b82f6',
+                        color: 'white',
+                        borderRadius: '50%',
+                        width: '16px',
+                        height: '16px',
+                        fontSize: '0.58rem',
+                        fontWeight: 800,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        lineHeight: 1,
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.6)',
+                      }}
+                    >
+                      {pos}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       {selectedWords.length > 0 && (
         <div className="builder-panel" onClick={(e) => e.stopPropagation()}>
           <div className="builder-content">
-            {/* Auto-translation above the phrase */}
+
+            {/* Auto-translation — always visible, shows '...' while fetching */}
             <div style={{
-              minHeight: '22px',
-              color: isAutoTranslating ? '#555' : '#64748b',
-              fontSize: '0.8rem',
+              minHeight: '20px',
+              color: isAutoTranslating ? '#444' : '#64748b',
+              fontSize: '0.78rem',
               fontStyle: 'italic',
-              marginBottom: '6px',
+              marginBottom: '8px',
+              letterSpacing: '0.01em',
             }}>
-              {isAutoTranslating ? '...' : (translation ?? '')}
+              {isAutoTranslating ? '· · ·' : (translation ?? '')}
             </div>
 
-            {/* Sentence + dismiss */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-              <div style={{ color: 'white', fontSize: '1.1rem', fontWeight: 'bold' }}>
+            {/* Sentence row: words + backspace (✕ removes last word) */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', gap: '8px' }}>
+              <div style={{ color: 'white', fontSize: '1.1rem', fontWeight: 'bold', flex: 1, wordBreak: 'break-word' }}>
                 {selectedWords.join(' ')}
               </div>
+              {/* ✕ = backspace: remove the last word */}
               <button
-                onClick={() => setSelectedWords([])}
+                onClick={() => setSelectedWords(prev => prev.slice(0, -1))}
                 className="btn-toggle"
                 style={{ flex: 'none', width: '34px', height: '34px', padding: 0, fontSize: '0.9rem' }}
-              >✕</button>
+                title="Remove last word"
+              >⌫</button>
             </div>
 
             {/* AI sentence suggestions */}
@@ -249,14 +287,21 @@ export default function MasteryGrid({
               </div>
             )}
 
-            {/* Action row */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+            {/* Action row: ASK LINA | CLEAR | SAVE */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
               <button
                 onClick={() => { onAskLina(`Let's work on: "${selectedWords.join(' ')}" — is this correct Toki Pona?`); setSelectedWords([]); }}
                 className="btn-review"
                 style={{ margin: 0, fontSize: '0.72rem', padding: '10px 4px' }}
               >
                 ASK LINA
+              </button>
+              <button
+                onClick={() => setSelectedWords([])}
+                className="btn-review"
+                style={{ margin: 0, fontSize: '0.72rem', padding: '10px 4px', background: '#374151' }}
+              >
+                CLEAR
               </button>
               <button
                 onClick={handleSave}
