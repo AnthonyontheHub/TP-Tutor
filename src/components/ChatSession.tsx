@@ -4,7 +4,7 @@ import { m, AnimatePresence, LazyMotion, domMax } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
 import {
   buildSystemPrompt, streamCompletion, stripProposedChanges,
-  parseProposedChanges, resolveApiKey,
+  parseProposedChanges, resolveApiKey, fetchSessionRecap,
 } from '../services/linaService';
 import type { ProposedChange } from '../services/linaService';
 import type { MasteryStatus } from '../types/mastery';
@@ -17,26 +17,24 @@ interface Props {
   isSandboxMode: boolean;
 }
 
-// Fix 2: Proper type for chat messages — replaces the previous any[].
 interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
   displayContent: string;
   raw?: string;
+  // proposedChanges kept for internal bookkeeping but no longer rendered as a UI card
   proposedChanges?: ProposedChange[];
-  changesApplied?: boolean;
 }
 
 const STATUS_EMOJI: Record<MasteryStatus, string> = {
   not_started: '⬜',
-  introduced: '🔵',
-  practicing: '🟡',
-  confident: '🟢',
-  mastered: '✅',
+  introduced:  '🔵',
+  practicing:  '🟡',
+  confident:   '🟢',
+  mastered:    '✅',
 };
 
 const HISTORY_WINDOW = 10;
-
 const SANDBOX_RESPONSE = '[SANDBOX MODE]: o toki! I am in offline testing mode. No API tokens are being used right now.';
 
 export default function ChatSession({ onEndSession, isActive, pendingPrompt, clearPrompt, isSandboxMode }: Props) {
@@ -44,13 +42,15 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const vocabulary = useMasteryStore(s => s.vocabulary);
-  const studentName = useMasteryStore(s => s.studentName);
-  const updateVocabStatus = useMasteryStore(s => s.updateVocabStatus);
-  const setLastUpdated = useMasteryStore(s => s.setLastUpdated);
+  const vocabulary   = useMasteryStore(s => s.vocabulary);
+  const studentName  = useMasteryStore(s => s.studentName);
+  const applyScoreDeltas = useMasteryStore(s => s.applyScoreDeltas);
+  const setLastUpdated   = useMasteryStore(s => s.setLastUpdated);
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const historyRef = useRef<{ role: 'user' | 'assistant'; content: string }[]>([]);
+  const messagesEndRef  = useRef<HTMLDivElement>(null);
+  const historyRef      = useRef<{ role: 'user' | 'assistant'; content: string }[]>([]);
+  // Accumulates every proposed delta from all assistant turns this session.
+  const sessionDeltasRef = useRef<ProposedChange[]>([]);
 
   useEffect(() => {
     if (isActive) messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -61,6 +61,7 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
     setMessages([]);
     setInput('');
     historyRef.current = [];
+    sessionDeltasRef.current = [];
     const key = resolveApiKey();
     if (key || isSandboxMode) {
       sendToLina(pendingPrompt, key);
@@ -70,6 +71,42 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
     clearPrompt?.();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActive, pendingPrompt]);
+
+  // Called when the user closes the chat — applies accumulated deltas then
+  // fetches a plain-language recap before dismissing.
+  async function handleEndSession() {
+    const deltas = sessionDeltasRef.current;
+
+    if (deltas.length === 0 || isSandboxMode) {
+      onEndSession();
+      return;
+    }
+
+    // Apply score changes to the store immediately.
+    applyScoreDeltas(deltas);
+    setLastUpdated(new Date().toLocaleDateString());
+
+    // Generate a brief recap message.
+    const key = resolveApiKey();
+    const recapId = crypto.randomUUID();
+    setMessages(prev => [...prev, {
+      id: recapId,
+      role: 'assistant',
+      displayContent: '· · ·',
+    }]);
+    setIsLoading(true);
+
+    const recap = await fetchSessionRecap(key, deltas);
+    setMessages(prev => prev.map(msg =>
+      msg.id === recapId ? { ...msg, displayContent: recap } : msg
+    ));
+    setIsLoading(false);
+
+    // Short pause so the user can read the recap before the drawer closes.
+    await new Promise(r => setTimeout(r, 2200));
+    sessionDeltasRef.current = [];
+    onEndSession();
+  }
 
   async function sendToLina(txt: string, overrideKey?: string) {
     if (isLoading || !txt.trim()) return;
@@ -108,8 +145,10 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
         ));
       }
 
+      // Parse and accumulate deltas — they are applied in bulk when the session ends.
       const changes = parseProposedChanges(full);
       if (changes && changes.length > 0) {
+        sessionDeltasRef.current.push(...changes);
         setMessages(prev => prev.map(msg =>
           msg.id === assistantId ? { ...msg, proposedChanges: changes } : msg
         ));
@@ -128,19 +167,6 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
     }
   }
 
-  function handleApplyChanges(msgId: string) {
-    setMessages(prev => prev.map(msg => {
-      if (msg.id !== msgId || !msg.proposedChanges) return msg;
-      msg.proposedChanges.forEach((change: ProposedChange) => {
-        if (change.type === 'vocab' && change.wordId) {
-          updateVocabStatus(change.wordId, change.newStatus);
-        }
-      });
-      setLastUpdated(new Date().toLocaleDateString());
-      return { ...msg, changesApplied: true };
-    }));
-  }
-
   return (
     <LazyMotion features={domMax}>
       <AnimatePresence>
@@ -149,17 +175,22 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
             <m.div
               className="drawer-backdrop"
               initial={{ opacity: 0 }} animate={{ opacity: 0.6 }} exit={{ opacity: 0 }}
-              onClick={onEndSession}
+              onClick={handleEndSession}
               style={{ position: 'fixed', inset: 0, background: 'black', zIndex: 1999 }}
             />
             <m.div
               className="chat-drawer"
-              drag="y" dragConstraints={{ top: 0 }} onDragEnd={(_, info) => { if (info.offset.y > 150) onEndSession(); }}
+              drag="y"
+              dragConstraints={{ top: 0 }}
+              onDragEnd={(_, info) => { if (info.offset.y > 150) handleEndSession(); }}
               initial={{ y: '100%' }} animate={{ y: '0%' }} exit={{ y: '100%' }}
               style={{ position: 'fixed', bottom: 0, left: 0, right: 0, height: '92vh', zIndex: 2000, background: '#111', borderTopLeftRadius: '20px', borderTopRightRadius: '20px', display: 'flex', flexDirection: 'column' }}
             >
               <div style={{ width: '100%', padding: '16px 0', cursor: 'grab', flexShrink: 0 }}>
-                <div style={{ width: '48px', height: '6px', backgroundColor: '#666', borderRadius: '10px', margin: '0 auto' }} onClick={onEndSession} />
+                <div
+                  style={{ width: '48px', height: '6px', backgroundColor: '#666', borderRadius: '10px', margin: '0 auto' }}
+                  onClick={handleEndSession}
+                />
               </div>
 
               {isSandboxMode && (
@@ -184,20 +215,18 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
                       {msg.displayContent || (isLoading && msg.role === 'assistant' ? '...' : '')}
                     </div>
 
-                    {msg.proposedChanges && !msg.changesApplied && msg.role === 'assistant' && (
-                      <div style={{ marginTop: '10px', background: '#222', padding: '12px', borderRadius: '12px', textAlign: 'left', border: '2px solid #333' }}>
-                        <div style={{ fontSize: '0.7rem', color: '#888', marginBottom: '8px', fontWeight: 'bold' }}>PROPOSED UPDATES</div>
+                    {/* Subtle pending-changes indicator — no button, just context */}
+                    {msg.proposedChanges && msg.proposedChanges.length > 0 && (
+                      <div style={{ marginTop: '6px', textAlign: 'left' }}>
                         {msg.proposedChanges.map((c, i) => (
-                          <div key={i} style={{ color: '#ddd', fontSize: '0.85rem', marginBottom: '4px' }}>
-                            {STATUS_EMOJI[c.newStatus] ?? '✅'} {c.wordId}
-                          </div>
+                          <span
+                            key={i}
+                            style={{ display: 'inline-block', marginRight: '6px', fontSize: '0.68rem', color: c.delta > 0 ? '#22c55e' : '#ef4444', fontWeight: 700 }}
+                          >
+                            {STATUS_EMOJI[vocabulary.find(v => v.id === c.wordId || v.word === c.wordId)?.status ?? 'not_started']}
+                            {' '}{c.wordId} {c.delta > 0 ? '+' : ''}{c.delta}
+                          </span>
                         ))}
-                        <button
-                          onClick={() => handleApplyChanges(msg.id)}
-                          style={{ width: '100%', marginTop: '10px', background: '#4CAF50', color: 'white', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
-                        >
-                          APPLY CHANGES
-                        </button>
                       </div>
                     )}
                   </div>

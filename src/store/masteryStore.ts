@@ -5,9 +5,11 @@ import { persist } from 'zustand/middleware';
 import { doc, setDoc, onSnapshot } from 'firebase/firestore';
 import type { Unsubscribe } from 'firebase/firestore';
 import type { MasteryMap, MasteryStatus, StatusSummary } from '../types/mastery';
+import { scoreToStatus, STATUS_MIDPOINT } from '../types/mastery';
 import { initialMasteryMap } from '../data/initialMasteryMap';
 
 interface MasteryActions {
+  applyScoreDeltas: (deltas: { wordId: string; delta: number }[]) => void;
   updateVocabStatus: (wordIdOrText: string, status: MasteryStatus) => void;
   updateConceptStatus: (chapterId: string, conceptId: string, status: MasteryStatus) => void;
   setLastUpdated: (date: string) => void;
@@ -22,12 +24,14 @@ interface MasteryActions {
   masterAllVocab: () => void;
   syncFromCloud: () => Unsubscribe | void;
   syncToCloud: () => Promise<void>;
-  getStatusSummary: () => StatusSummary & { xp: number, level: number, rankTitle: string };
+  getStatusSummary: () => StatusSummary & { xp: number; level: number; rankTitle: string };
 }
 
 type MasteryStore = MasteryMap & MasteryActions;
 
 const XP_MAP = { not_started: 0, introduced: 10, practicing: 25, confident: 50, mastered: 100 };
+
+const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
 
 const getUserId = () => {
   let userId = localStorage.getItem('tp_tutor_user_id');
@@ -48,16 +52,36 @@ export const useMasteryStore = create<MasteryStore>()(
       currentStreak: initialMasteryMap.currentStreak || 0,
       lastActiveDate: initialMasteryMap.lastActiveDate || '',
 
-      updateVocabStatus: (wordIdOrText, status) => {
+      // Primary scoring action — adjusts confidenceScore and re-derives status.
+      applyScoreDeltas: (deltas) => {
         set((state) => ({
-          vocabulary: state.vocabulary.map((w) =>
-            (w.id === wordIdOrText || w.word.toLowerCase() === wordIdOrText.toLowerCase()) 
-              ? { ...w, status } 
-              : w
-          ),
+          vocabulary: state.vocabulary.map((w) => {
+            const d = deltas.find(
+              (delta) =>
+                delta.wordId === w.id ||
+                delta.wordId.toLowerCase() === w.word.toLowerCase()
+            );
+            if (!d) return w;
+            const newScore = clamp((w.confidenceScore ?? 0) + d.delta, 0, 100);
+            return { ...w, confidenceScore: newScore, status: scoreToStatus(newScore) };
+          }),
         }));
         get().recordActivity();
-        void get().syncToCloud(); 
+        void get().syncToCloud();
+      },
+
+      // Kept for backward-compat. Converts a direct status assignment into a
+      // score nudge to the midpoint of the target tier — nothing breaks.
+      updateVocabStatus: (wordIdOrText, status) => {
+        set((state) => ({
+          vocabulary: state.vocabulary.map((w) => {
+            if (w.id !== wordIdOrText && w.word.toLowerCase() !== wordIdOrText.toLowerCase()) return w;
+            const targetScore = STATUS_MIDPOINT[status];
+            return { ...w, confidenceScore: targetScore, status };
+          }),
+        }));
+        get().recordActivity();
+        void get().syncToCloud();
       },
 
       updateConceptStatus: (chapterId, conceptId, status) => {
@@ -87,11 +111,9 @@ export const useMasteryStore = create<MasteryStore>()(
       recordActivity: () => {
         const today = new Date().toDateString();
         const lastDate = get().lastActiveDate;
-        
         if (lastDate !== today) {
           const yesterday = new Date();
           yesterday.setDate(yesterday.getDate() - 1);
-          
           if (lastDate === yesterday.toDateString()) {
             set((state) => ({ currentStreak: state.currentStreak + 1, lastActiveDate: today }));
           } else {
@@ -100,22 +122,13 @@ export const useMasteryStore = create<MasteryStore>()(
         }
       },
 
-      setStudentName: (name) => {
-        set({ studentName: name });
-        void get().syncToCloud();
-      },
-
-      setProfileImage: (url) => {
-        set({ profileImage: url });
-        void get().syncToCloud();
-      },
+      setStudentName: (name) => { set({ studentName: name }); void get().syncToCloud(); },
+      setProfileImage: (url) => { set({ profileImage: url }); void get().syncToCloud(); },
 
       updatePhraseNote: (id, notes) => {
         set((state) => ({
           savedPhrases: state.savedPhrases.map(p => {
-            if (typeof p === 'string') {
-              return p === id ? { id, tp: p, en: 'User Saved Phrase *', notes } : p;
-            }
+            if (typeof p === 'string') return p === id ? { id, tp: p, en: 'User Saved Phrase *', notes } : p;
             return p.id === id ? { ...p, notes } : p;
           })
         }));
@@ -138,26 +151,29 @@ export const useMasteryStore = create<MasteryStore>()(
           savedPhrases: [],
           currentStreak: 0,
           lastActiveDate: '',
-          vocabulary: initialMasteryMap.vocabulary.map(w => ({ ...w, status: 'not_started' as MasteryStatus })),
+          vocabulary: initialMasteryMap.vocabulary.map(w => ({
+            ...w,
+            confidenceScore: 0,
+            status: 'not_started' as MasteryStatus,
+          })),
           chapters: initialMasteryMap.chapters,
         });
         void get().syncToCloud();
       },
 
       randomizeVocab: () => {
-        const statuses: MasteryStatus[] = ['not_started', 'introduced', 'practicing', 'confident', 'mastered'];
         set((state) => ({
-          vocabulary: state.vocabulary.map(w => ({
-            ...w,
-            status: statuses[Math.floor(Math.random() * statuses.length)],
-          }))
+          vocabulary: state.vocabulary.map(w => {
+            const score = Math.floor(Math.random() * 101);
+            return { ...w, confidenceScore: score, status: scoreToStatus(score) };
+          })
         }));
         void get().syncToCloud();
       },
 
       masterAllVocab: () => {
         set((state) => ({
-          vocabulary: state.vocabulary.map(w => ({ ...w, status: 'mastered' as MasteryStatus }))
+          vocabulary: state.vocabulary.map(w => ({ ...w, confidenceScore: 92, status: 'mastered' as MasteryStatus }))
         }));
         void get().syncToCloud();
       },
@@ -167,17 +183,14 @@ export const useMasteryStore = create<MasteryStore>()(
       getStatusSummary: () => {
         const { vocabulary } = get();
         const summary = { not_started: 0, introduced: 0, practicing: 0, confident: 0, mastered: 0, xp: 0 };
-        
-        for (const word of vocabulary) { 
-          summary[word.status]++; 
+        for (const word of vocabulary) {
+          summary[word.status]++;
           summary.xp += XP_MAP[word.status];
         }
-
         const level = Math.floor(summary.xp / 500) + 1;
-        let rankTitle = "nimi lili"; 
-        if (level >= 5) rankTitle = "jan pi toki pona"; 
-        if (level >= 10) rankTitle = "jan sona"; 
-        
+        let rankTitle = 'nimi lili';
+        if (level >= 5) rankTitle = 'jan pi toki pona';
+        if (level >= 10) rankTitle = 'jan sona';
         return { ...summary, level, rankTitle };
       },
 
@@ -186,31 +199,42 @@ export const useMasteryStore = create<MasteryStore>()(
         try {
           const userId = getUserId();
           await setDoc(doc(db, 'users', userId), {
-            vocabulary, chapters, lastUpdated, studentName, profileImage, savedPhrases, currentStreak, lastActiveDate
+            vocabulary, chapters, lastUpdated, studentName, profileImage,
+            savedPhrases, currentStreak, lastActiveDate,
           });
         } catch (err) {
-          console.error("Firebase Sync Error:", err);
+          console.error('Firebase Sync Error:', err);
         }
       },
 
       syncFromCloud: () => {
         const userId = getUserId();
         return onSnapshot(doc(db, 'users', userId), (snapshot) => {
-          if (snapshot.exists()) {
-            const data = snapshot.data();
-            set({
-              vocabulary: data.vocabulary || initialMasteryMap.vocabulary,
-              chapters: data.chapters || initialMasteryMap.chapters,
-              lastUpdated: data.lastUpdated || '',
-              studentName: data.studentName || 'Student',
-              profileImage: data.profileImage || '',
-              savedPhrases: data.savedPhrases || [],
-              currentStreak: data.currentStreak || 0,
-              lastActiveDate: data.lastActiveDate || ''
-            });
-          }
+          if (!snapshot.exists()) return;
+          const data = snapshot.data();
+
+          // Change 6: Backfill confidenceScore for legacy records that only have status.
+          const vocabulary = (data.vocabulary || initialMasteryMap.vocabulary).map(
+            (w: any) => {
+              if (typeof w.confidenceScore === 'number') return w;
+              // Old record — seed score from the midpoint of its stored status tier.
+              const status: MasteryStatus = w.status || 'not_started';
+              return { ...w, confidenceScore: STATUS_MIDPOINT[status] };
+            }
+          );
+
+          set({
+            vocabulary,
+            chapters: data.chapters || initialMasteryMap.chapters,
+            lastUpdated: data.lastUpdated || '',
+            studentName: data.studentName || 'Student',
+            profileImage: data.profileImage || '',
+            savedPhrases: data.savedPhrases || [],
+            currentStreak: data.currentStreak || 0,
+            lastActiveDate: data.lastActiveDate || '',
+          });
         });
-      }
+      },
     }),
     { name: 'tp-tutor-mastery' }
   )

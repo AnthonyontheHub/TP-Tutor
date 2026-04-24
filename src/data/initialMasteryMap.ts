@@ -36,18 +36,21 @@ export const initialMasteryMap: MasteryMap = {
           concept: 'Origins & authorship (Sonja Lang, 2001)',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'intro-design-goals',
           concept: 'Core design goals (minimalism, present-moment focus)',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'intro-influences',
           concept: 'Philosophical influences (Taoism, Sapir-Whorf hypothesis)',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'intro-publications',
@@ -55,6 +58,7 @@ export const initialMasteryMap: MasteryMap = {
             'Publication history: lipu pu (2014, 120 words) & lipu ku (2021, 137 words)',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'intro-misconceptions',
@@ -62,6 +66,7 @@ export const initialMasteryMap: MasteryMap = {
             'Common misconceptions (anarcho-primitivism, Piraha similarities)',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
       ],
     },
@@ -77,54 +82,63 @@ export const initialMasteryMap: MasteryMap = {
           concept: 'Consonant inventory (9): p, t, k, s, m, n, l, j, w',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch1-vowels',
           concept: 'Vowel inventory (5): a, e, i, o, u',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch1-syllable-structure',
           concept: 'Syllable structure / phonotactics: (C)V(N) and CV(N)',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch1-stress',
           concept: 'Stress rule (always on first syllable)',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch1-allophony',
           concept: 'Allophony (voiced/unvoiced variation, l as tap, etc.)',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch1-nasal-assimilation',
           concept: 'Final nasal assimilation',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch1-forbidden',
           concept: 'Forbidden elements: diphthongs, consonant clusters, tones',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch1-orthography',
           concept: 'Latin alphabet orthography — lowercase default',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch1-capitalization',
           concept: 'Capitalization rules (proper nouns / unofficial words)',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
       ],
     },
@@ -140,18 +154,21 @@ export const initialMasteryMap: MasteryMap = {
           concept: 'SVO word order (Subject-Verb-Object)',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch2-li',
           concept: 'The li particle — separates subject from predicate',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch2-e',
           concept: 'The e particle — marks direct object',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch2-li-omission',
@@ -159,24 +176,28 @@ export const initialMasteryMap: MasteryMap = {
             'li Omission Rule — dropped when subject is only mi or sina',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch2-predicate-types',
           concept: 'Predicate types: verb, adjective, or noun after li',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch2-tense-free',
           concept: 'Tense-free grammar — context determines time',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch2-en',
           concept: 'The en particle — joins multiple subjects',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
       ],
     },
@@ -193,18 +214,21 @@ export const initialMasteryMap: MasteryMap = {
             'Polysemy — words change function based on syntactic position',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch3-head-initial',
           concept: 'Head-initial modifier system — first word is the head',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch3-single-modifier',
           concept: 'Single-modifier phrases (e.g., jan lili = child)',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch3-multiple-modifiers',
@@ -212,12 +236,14 @@ export const initialMasteryMap: MasteryMap = {
             'Multiple modifiers — each applies independently to the head (not nested)',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch3-context',
           concept: 'Context as primary meaning-carrier',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
       ],
     },
@@ -234,12 +260,14 @@ export const initialMasteryMap: MasteryMap = {
             'pi function — regroups following words into a single modifier phrase',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch4-pi-minimum',
           concept: 'pi requires at least 2 content words after it',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch4-pi-vs-direct',
@@ -247,12 +275,14 @@ export const initialMasteryMap: MasteryMap = {
             'pi vs. direct modification (simple possession: tomo mi, not tomo pi mi)',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch4-pi-possession',
           concept: 'pi for multi-word possession (e.g., tomo pi jan Alu)',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch4-pi-multiple',
@@ -260,6 +290,7 @@ export const initialMasteryMap: MasteryMap = {
             'Multiple pi phrases — grammatically valid but strongly discouraged',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
       ],
     },
@@ -276,18 +307,21 @@ export const initialMasteryMap: MasteryMap = {
             'ala — universal negation (placed after the word it negates)',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch5-ala-modifier',
           concept: 'ala as subject modifier (jan ala = nobody)',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch5-a-not-a',
           concept: 'A-not-A structure — yes/no questions (verb ala verb)',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch5-a-not-a-answers',
@@ -295,6 +329,7 @@ export const initialMasteryMap: MasteryMap = {
             'Answering A-not-A questions (repeat verb = yes; verb + ala = no)',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch5-anu-seme',
@@ -302,6 +337,7 @@ export const initialMasteryMap: MasteryMap = {
             'anu seme tag — turns any statement into a yes/no question',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch5-seme',
@@ -309,6 +345,7 @@ export const initialMasteryMap: MasteryMap = {
             'seme pronoun — wh- questions (replaces the unknown element)',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
       ],
     },
@@ -325,72 +362,84 @@ export const initialMasteryMap: MasteryMap = {
             'Preverb position — after subject/li, before the main verb',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch6-wile',
           concept: 'wile — to want to / need to',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch6-ken',
           concept: 'ken — to be able to / can',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch6-kama',
           concept: 'kama — to begin to / to become',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch6-awen',
           concept: 'awen — to continue to / keep',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch6-alasa',
           concept: 'alasa — to try to',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch6-secondary-preverbs',
           concept: 'Secondary preverbs: sona, open, pini, lukin',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch6-lon',
           concept: 'lon — location / existence (at, in, on)',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch6-tawa',
           concept: 'tawa — movement / perspective (to, for, toward)',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch6-tan',
           concept: 'tan — source / cause (from, because of)',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch6-kepeken',
           concept: 'kepeken — instrumentality (using, with)',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch6-sama',
           concept: 'sama — similarity / comparison (like, as)',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
       ],
     },
@@ -406,12 +455,14 @@ export const initialMasteryMap: MasteryMap = {
           concept: 'Five-color schema: pimeja, walo, loje, jelo, laso',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch7-laso-grue',
           concept: 'laso covers both blue and green (grue category)',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch7-color-combos',
@@ -419,6 +470,7 @@ export const initialMasteryMap: MasteryMap = {
             'Color combination for shades (e.g., laso loje = purple)',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch7-pi-colors',
@@ -426,18 +478,21 @@ export const initialMasteryMap: MasteryMap = {
             'pi for complex color descriptions (e.g., sewi pi pimeja walo = gray sky)',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch7-basic-numbers',
           concept: 'Basic number system: wan (1), tu (2), mute (3+), ala (0)',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch7-extended-numbers',
           concept: 'Extended number system: luka (5), mute (20), ale (100)',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch7-additive-construction',
@@ -445,6 +500,7 @@ export const initialMasteryMap: MasteryMap = {
             'Additive number construction (e.g., tu wan = 3, tu tu = 4)',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch7-number-philosophy',
@@ -452,6 +508,7 @@ export const initialMasteryMap: MasteryMap = {
             'Philosophy: precision in large numbers is intentionally discouraged',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
       ],
     },
@@ -468,6 +525,7 @@ export const initialMasteryMap: MasteryMap = {
             'Compounding — head + modifier(s) to express specific ideas',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch8-fixed-compounds',
@@ -475,6 +533,7 @@ export const initialMasteryMap: MasteryMap = {
             'Common fixed compounds (jan pona, telo nasa, tomo tawa)',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch8-lexicalization',
@@ -482,12 +541,14 @@ export const initialMasteryMap: MasteryMap = {
             'Lexicalization debate — resistance to fixed compound meanings',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch8-context',
           concept: 'Context as the meaning-carrier, not vocabulary',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch8-thinking-tp',
@@ -495,6 +556,7 @@ export const initialMasteryMap: MasteryMap = {
             "'Thinking in Toki Pona' — avoiding native language projection",
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch8-simplicity',
@@ -502,6 +564,7 @@ export const initialMasteryMap: MasteryMap = {
             'Stylistic preference for simple, direct sentences over complex constructions',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
       ],
     },
@@ -517,6 +580,7 @@ export const initialMasteryMap: MasteryMap = {
           concept: 'Latin alphabet as the default writing system',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch9-sitelen-pona',
@@ -524,6 +588,7 @@ export const initialMasteryMap: MasteryMap = {
             'sitelen pona — logographic system, one grapheme per word',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch9-sitelen-pona-compounding',
@@ -531,6 +596,7 @@ export const initialMasteryMap: MasteryMap = {
             'sitelen pona compounding — modifier grapheme inside/above head grapheme',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch9-sitelen-sitelen',
@@ -538,6 +604,7 @@ export const initialMasteryMap: MasteryMap = {
             'sitelen sitelen — non-linear, mixed logographic + syllabic system',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
         {
           id: 'ch9-sitelen-sitelen-purpose',
@@ -545,6 +612,7 @@ export const initialMasteryMap: MasteryMap = {
             'sitelen sitelen purpose — contemplative, slow engagement with language',
           status: 'not_started',
           sessionNotes: '',
+      confidenceScore: 0,
         },
       ],
     },
@@ -563,6 +631,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── akesi ───────────────────────────────────────────────────────────────
     {
@@ -573,6 +642,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── ala ─────────────────────────────────────────────────────────────────
     {
@@ -583,6 +653,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── alasa ────────────────────────────────────────────────────────────────
     {
@@ -593,6 +664,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── ale / ali ────────────────────────────────────────────────────────────
     {
@@ -603,6 +675,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── ante ─────────────────────────────────────────────────────────────────
     {
@@ -613,6 +686,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── anu ──────────────────────────────────────────────────────────────────
     {
@@ -623,6 +697,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── awen ─────────────────────────────────────────────────────────────────
     {
@@ -633,6 +708,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── e ────────────────────────────────────────────────────────────────────
     {
@@ -643,6 +719,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── en ───────────────────────────────────────────────────────────────────
     {
@@ -653,6 +730,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── esun ─────────────────────────────────────────────────────────────────
     {
@@ -663,6 +741,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── ijo ──────────────────────────────────────────────────────────────────
     {
@@ -673,6 +752,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── ike ──────────────────────────────────────────────────────────────────
     {
@@ -683,6 +763,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── ilo ──────────────────────────────────────────────────────────────────
     {
@@ -693,6 +774,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── insa ─────────────────────────────────────────────────────────────────
     {
@@ -703,6 +785,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── jaki ─────────────────────────────────────────────────────────────────
     {
@@ -713,6 +796,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── jan ──────────────────────────────────────────────────────────────────
     {
@@ -723,6 +807,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── jelo ─────────────────────────────────────────────────────────────────
     {
@@ -733,6 +818,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── jo ───────────────────────────────────────────────────────────────────
     {
@@ -743,6 +829,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── kala ─────────────────────────────────────────────────────────────────
     {
@@ -753,6 +840,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── kalama ───────────────────────────────────────────────────────────────
     {
@@ -763,6 +851,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── kama ─────────────────────────────────────────────────────────────────
     {
@@ -773,6 +862,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── kasi ─────────────────────────────────────────────────────────────────
     {
@@ -783,6 +873,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── ken ──────────────────────────────────────────────────────────────────
     {
@@ -793,6 +884,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── kepeken ──────────────────────────────────────────────────────────────
     {
@@ -803,6 +895,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── kili ─────────────────────────────────────────────────────────────────
     {
@@ -813,6 +906,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── kin ──────────────────────────────────────────────────────────────────
     {
@@ -823,6 +917,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── kipisi ───────────────────────────────────────────────────────────────
     {
@@ -833,6 +928,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── kiwen ────────────────────────────────────────────────────────────────
     {
@@ -843,6 +939,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── ko ───────────────────────────────────────────────────────────────────
     {
@@ -853,6 +950,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── kon ──────────────────────────────────────────────────────────────────
     {
@@ -863,6 +961,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── kule ─────────────────────────────────────────────────────────────────
     {
@@ -873,6 +972,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── kulupu ───────────────────────────────────────────────────────────────
     {
@@ -883,6 +983,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── kute ─────────────────────────────────────────────────────────────────
     {
@@ -893,6 +994,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── la ───────────────────────────────────────────────────────────────────
     {
@@ -903,6 +1005,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── lape ─────────────────────────────────────────────────────────────────
     {
@@ -913,6 +1016,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── laso ─────────────────────────────────────────────────────────────────
     {
@@ -923,6 +1027,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── lawa ─────────────────────────────────────────────────────────────────
     {
@@ -933,6 +1038,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── len ──────────────────────────────────────────────────────────────────
     {
@@ -943,6 +1049,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── lete ─────────────────────────────────────────────────────────────────
     {
@@ -953,6 +1060,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── li ───────────────────────────────────────────────────────────────────
     {
@@ -963,6 +1071,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── lili ─────────────────────────────────────────────────────────────────
     {
@@ -973,6 +1082,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── linja ────────────────────────────────────────────────────────────────
     {
@@ -983,6 +1093,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── lipu ─────────────────────────────────────────────────────────────────
     {
@@ -993,6 +1104,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── loje ─────────────────────────────────────────────────────────────────
     {
@@ -1003,6 +1115,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── lon ──────────────────────────────────────────────────────────────────
     {
@@ -1013,6 +1126,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── luka ─────────────────────────────────────────────────────────────────
     {
@@ -1023,6 +1137,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── lukin ────────────────────────────────────────────────────────────────
     {
@@ -1033,6 +1148,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── lupa ─────────────────────────────────────────────────────────────────
     {
@@ -1043,6 +1159,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── ma ───────────────────────────────────────────────────────────────────
     {
@@ -1053,6 +1170,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── mama ─────────────────────────────────────────────────────────────────
     {
@@ -1063,6 +1181,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── mani ─────────────────────────────────────────────────────────────────
     {
@@ -1073,6 +1192,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── meli ─────────────────────────────────────────────────────────────────
     {
@@ -1083,6 +1203,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── mi ───────────────────────────────────────────────────────────────────
     {
@@ -1093,6 +1214,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── mije ─────────────────────────────────────────────────────────────────
     {
@@ -1103,6 +1225,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── moku ─────────────────────────────────────────────────────────────────
     {
@@ -1113,6 +1236,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── moli ─────────────────────────────────────────────────────────────────
     {
@@ -1123,6 +1247,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── monsi ────────────────────────────────────────────────────────────────
     {
@@ -1133,6 +1258,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── mu ───────────────────────────────────────────────────────────────────
     {
@@ -1143,6 +1269,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── mun ──────────────────────────────────────────────────────────────────
     {
@@ -1153,6 +1280,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── musi ─────────────────────────────────────────────────────────────────
     {
@@ -1163,6 +1291,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── mute ─────────────────────────────────────────────────────────────────
     {
@@ -1173,6 +1302,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── namako ───────────────────────────────────────────────────────────────
     {
@@ -1183,6 +1313,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── nasa ─────────────────────────────────────────────────────────────────
     {
@@ -1193,6 +1324,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── nasin ────────────────────────────────────────────────────────────────
     {
@@ -1203,6 +1335,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── nena ─────────────────────────────────────────────────────────────────
     {
@@ -1213,6 +1346,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── ni ───────────────────────────────────────────────────────────────────
     {
@@ -1223,6 +1357,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── nimi ─────────────────────────────────────────────────────────────────
     {
@@ -1233,6 +1368,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── noka ─────────────────────────────────────────────────────────────────
     {
@@ -1243,6 +1379,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── o ────────────────────────────────────────────────────────────────────
     {
@@ -1253,6 +1390,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── oko ──────────────────────────────────────────────────────────────────
     {
@@ -1263,6 +1401,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── olin ─────────────────────────────────────────────────────────────────
     {
@@ -1273,6 +1412,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── ona ──────────────────────────────────────────────────────────────────
     {
@@ -1283,6 +1423,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── open ─────────────────────────────────────────────────────────────────
     {
@@ -1293,6 +1434,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── pakala ───────────────────────────────────────────────────────────────
     {
@@ -1303,6 +1445,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── pali ─────────────────────────────────────────────────────────────────
     {
@@ -1313,6 +1456,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── palisa ───────────────────────────────────────────────────────────────
     {
@@ -1323,6 +1467,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── pan ──────────────────────────────────────────────────────────────────
     {
@@ -1333,6 +1478,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── pi ───────────────────────────────────────────────────────────────────
     {
@@ -1343,6 +1489,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── pilin ────────────────────────────────────────────────────────────────
     {
@@ -1353,6 +1500,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── pimeja ───────────────────────────────────────────────────────────────
     {
@@ -1363,6 +1511,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── pini ─────────────────────────────────────────────────────────────────
     {
@@ -1373,6 +1522,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── pipi ─────────────────────────────────────────────────────────────────
     {
@@ -1383,6 +1533,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── poka ─────────────────────────────────────────────────────────────────
     {
@@ -1393,6 +1544,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── poki ─────────────────────────────────────────────────────────────────
     {
@@ -1403,6 +1555,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── pona ─────────────────────────────────────────────────────────────────
     {
@@ -1413,6 +1566,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── pu ───────────────────────────────────────────────────────────────────
     {
@@ -1423,6 +1577,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── sama ─────────────────────────────────────────────────────────────────
     {
@@ -1433,6 +1588,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── seli ─────────────────────────────────────────────────────────────────
     {
@@ -1443,6 +1599,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── selo ─────────────────────────────────────────────────────────────────
     {
@@ -1453,6 +1610,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── seme ─────────────────────────────────────────────────────────────────
     {
@@ -1463,6 +1621,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── sewi ─────────────────────────────────────────────────────────────────
     {
@@ -1473,6 +1632,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── sijelo ───────────────────────────────────────────────────────────────
     {
@@ -1483,6 +1643,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── sike ─────────────────────────────────────────────────────────────────
     {
@@ -1493,6 +1654,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── sin ──────────────────────────────────────────────────────────────────
     {
@@ -1503,6 +1665,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── sina ─────────────────────────────────────────────────────────────────
     {
@@ -1513,6 +1676,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── sinpin ───────────────────────────────────────────────────────────────
     {
@@ -1523,6 +1687,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── sitelen ──────────────────────────────────────────────────────────────
     {
@@ -1533,6 +1698,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── sona ─────────────────────────────────────────────────────────────────
     {
@@ -1543,6 +1709,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── soweli ───────────────────────────────────────────────────────────────
     {
@@ -1553,6 +1720,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── suli ─────────────────────────────────────────────────────────────────
     {
@@ -1563,6 +1731,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── suno ─────────────────────────────────────────────────────────────────
     {
@@ -1573,6 +1742,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── supa ─────────────────────────────────────────────────────────────────
     {
@@ -1583,6 +1753,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── suwi ─────────────────────────────────────────────────────────────────
     {
@@ -1593,6 +1764,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── tan ──────────────────────────────────────────────────────────────────
     {
@@ -1603,6 +1775,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── taso ─────────────────────────────────────────────────────────────────
     {
@@ -1613,6 +1786,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── tawa ─────────────────────────────────────────────────────────────────
     {
@@ -1623,6 +1797,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── telo ─────────────────────────────────────────────────────────────────
     {
@@ -1633,6 +1808,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── tenpo ────────────────────────────────────────────────────────────────
     {
@@ -1643,6 +1819,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── toki ─────────────────────────────────────────────────────────────────
     {
@@ -1653,6 +1830,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── tomo ─────────────────────────────────────────────────────────────────
     {
@@ -1663,6 +1841,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── tonsi ────────────────────────────────────────────────────────────────
     {
@@ -1673,6 +1852,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── tu ───────────────────────────────────────────────────────────────────
     {
@@ -1683,6 +1863,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── unpa ─────────────────────────────────────────────────────────────────
     {
@@ -1693,6 +1874,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── uta ──────────────────────────────────────────────────────────────────
     {
@@ -1703,6 +1885,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── utala ────────────────────────────────────────────────────────────────
     {
@@ -1713,6 +1896,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── walo ─────────────────────────────────────────────────────────────────
     {
@@ -1723,6 +1907,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── wan ──────────────────────────────────────────────────────────────────
     {
@@ -1733,6 +1918,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── waso ─────────────────────────────────────────────────────────────────
     {
@@ -1743,6 +1929,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── wawa ─────────────────────────────────────────────────────────────────
     {
@@ -1753,6 +1940,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── weka ─────────────────────────────────────────────────────────────────
     {
@@ -1763,6 +1951,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── wile ─────────────────────────────────────────────────────────────────
     {
@@ -1773,6 +1962,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
     // ── nanpa ────────────────────────────────────────────────────────────────
     {
@@ -1783,6 +1973,7 @@ export const initialMasteryMap: MasteryMap = {
       status: 'not_started',
       isMasteryCandidate: false,
       sessionNotes: '',
+      confidenceScore: 0,
     },
   ],
 };

@@ -43,6 +43,32 @@ export const STATUS_META: Record<
   },
 };
 
+// ─── Score → Status derivation ────────────────────────────────────────────────
+// Status is derived from confidenceScore; it is never stored independently.
+//   0–19  → not_started
+//  20–39  → introduced
+//  40–64  → practicing
+//  65–84  → confident
+//  85–100 → mastered
+
+export function scoreToStatus(score: number): MasteryStatus {
+  if (score >= 85) return 'mastered';
+  if (score >= 65) return 'confident';
+  if (score >= 40) return 'practicing';
+  if (score >= 20) return 'introduced';
+  return 'not_started';
+}
+
+// Midpoint of each tier's range — used to seed confidenceScore when reading
+// legacy cloud data that only has a status field.
+export const STATUS_MIDPOINT: Record<MasteryStatus, number> = {
+  not_started: 9,
+  introduced:  29,
+  practicing:  52,
+  confident:   74,
+  mastered:    92,
+};
+
 // ─── Grammar Concepts ─────────────────────────────────────────────────────────
 
 export interface GrammarConcept {
@@ -69,9 +95,10 @@ export interface VocabWord {
   word: string;
   partOfSpeech: string;
   meanings: string;
+  // confidenceScore is the source of truth (0–100).
+  // status is derived from it via scoreToStatus() and kept in sync.
+  confidenceScore: number;
   status: MasteryStatus;
-  // Flagged when a word consistently performs at Mastered level but mutual
-  // agreement has not yet been given to officially promote it.
   isMasteryCandidate: boolean;
   sessionNotes: string;
 }

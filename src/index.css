@@ -233,6 +233,8 @@ select {
   background: var(--surface);
   user-select: none;
   cursor: pointer;
+  position: relative;
+  overflow: visible;
 }
 
 .vocab-card--not_started  { border-color: #374151; background: #080808; }
