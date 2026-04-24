@@ -18,24 +18,34 @@ export interface ProposedChange {
   newStatus: MasteryStatus;
 }
 
+// Resolves the API key with env-var fallback for local dev.
+export function resolveApiKey(overrideKey?: string): string {
+  return overrideKey
+    || localStorage.getItem('TP_GEMINI_KEY')
+    || (import.meta.env.VITE_GEMINI_API_KEY as string | undefined)
+    || '';
+}
+
+// Req 5: Only pass 'introduced' and 'practicing' words — mastered words are
+// excluded to reduce token usage and keep Lina focused on current targets.
 export function buildSystemPrompt(vocabulary: VocabWord[], studentName: string) {
-  const knownVocab = vocabulary
-    .filter(v => v.status !== 'not_started')
+  const activeVocab = vocabulary
+    .filter(v => v.status === 'introduced' || v.status === 'practicing')
     .map(v => `${v.word} (${v.status})`)
     .join(', ');
 
   return `
     You are Lina, an encouraging and expert Toki Pona tutor.
     The student's name is ${studentName}.
-    
+
     CURRENT STUDENT PROGRESS:
-    Known Words: ${knownVocab || 'None yet'}
-    
+    Active words (introduced/practicing): ${activeVocab || 'None yet'}
+
     YOUR RULES:
     1. Speak naturally, but occasionally use Toki Pona words the student knows.
     2. If a student builds a sentence, celebrate it! Correct it gently if needed.
     3. At the end of every response, if the student demonstrated knowledge, append a "PROPOSED CHANGES" section.
-    
+
     FORMAT FOR PROPOSED CHANGES:
     ---
     CHANGE: vocab | [word_id] | [new_status]
@@ -63,28 +73,23 @@ export async function* streamCompletion(
   const result = await chat.sendMessageStream(lastMessage);
 
   for await (const chunk of result.stream) {
-    const chunkText = chunk.text();
-    yield chunkText;
+    yield chunk.text();
   }
 }
 
+// Req 1: Use native JSON output mode — no regex parsing needed.
 export async function fetchSentenceSuggestions(apiKey: string, words: string[]) {
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const model = genAI.getGenerativeModel({
+    model: "gemini-1.5-flash",
+    generationConfig: { responseMimeType: "application/json" },
+  });
 
-  const prompt = `
-    Act as a Toki Pona tutor. Given these specific words: [${words.join(', ')}], 
-    generate 3 short, grammatically correct Toki Pona sentences using most or all of them. 
-    You MAY add necessary particles like "li", "e", "en", "la", or "pi".
-    Return ONLY a JSON array of strings: ["sentence 1", "sentence 2", "sentence 3"]
-  `;
+  const prompt = `Act as a Toki Pona tutor. Given these words: [${words.join(', ')}], generate 3 short grammatically correct Toki Pona sentences using most or all of them. You MAY add particles like "li", "e", "en", "la", or "pi". Return a JSON array of strings: ["sentence 1", "sentence 2", "sentence 3"]`;
 
   try {
     const result = await model.generateContent(prompt);
-    const text = result.response.text();
-    const jsonMatch = text.match(/\[[\s\S]*\]/);
-    const cleanedText = jsonMatch ? jsonMatch[0] : text;
-    return JSON.parse(cleanedText) as string[];
+    return JSON.parse(result.response.text()) as string[];
   } catch (e) {
     console.error("Lina Suggestion Error:", e);
     return [];
@@ -106,6 +111,25 @@ export async function fetchQuickTranslation(apiKey: string, text: string) {
   }
 }
 
+// Req 1: Use native JSON output mode — no regex parsing needed.
+export async function fetchExamplesForWord(apiKey: string, word: string, partsOfSpeech: string[]) {
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({
+    model: "gemini-1.5-flash",
+    generationConfig: { responseMimeType: "application/json" },
+  });
+
+  const prompt = `Act as a Toki Pona dictionary. For the word "${word}", provide one simple example sentence for each of these parts of speech: ${partsOfSpeech.join(', ')}. Return ONLY a JSON object mapping each part of speech to a sentence, e.g. {"noun": "sentence", "verb": "sentence"}`;
+
+  try {
+    const result = await model.generateContent(prompt);
+    return JSON.parse(result.response.text()) as Record<string, string>;
+  } catch (e) {
+    console.error("Lina Dictionary Error:", e);
+    return partsOfSpeech.reduce((acc, pos) => ({ ...acc, [pos]: `${word} li lon.` }), {} as Record<string, string>);
+  }
+}
+
 export function stripProposedChanges(text: string) {
   return text.split('---')[0].trim();
 }
@@ -113,37 +137,15 @@ export function stripProposedChanges(text: string) {
 export function parseProposedChanges(text: string): ProposedChange[] | null {
   const changes: ProposedChange[] = [];
   const lines = text.split('\n');
-  
+
   lines.forEach(line => {
     if (line.includes('CHANGE: vocab')) {
       const parts = line.split('|').map(p => p.trim());
       if (parts.length >= 3) {
-        changes.push({
-          type: 'vocab',
-          wordId: parts[1],
-          newStatus: parts[2] as MasteryStatus
-        });
+        changes.push({ type: 'vocab', wordId: parts[1], newStatus: parts[2] as MasteryStatus });
       }
     }
   });
 
   return changes.length > 0 ? changes : null;
-}
-
-export async function fetchExamplesForWord(apiKey: string, word: string, partsOfSpeech: string[]) {
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-  const prompt = `Act as a Toki Pona dictionary. For the word "${word}", provide one simple example sentence for each of these parts of speech: ${partsOfSpeech.join(', ')}. Return ONLY a JSON object: {"noun": "sentence", "verb": "sentence"}`;
-
-  try {
-    const result = await model.generateContent(prompt);
-    const text = result.response.text();
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    const cleanedText = jsonMatch ? jsonMatch[0] : text;
-    return JSON.parse(cleanedText);
-  } catch (e) {
-    console.error("Lina Dictionary Error:", e);
-    return partsOfSpeech.reduce((acc, pos) => ({ ...acc, [pos]: `${word} li lon.` }), {});
-  }
 }

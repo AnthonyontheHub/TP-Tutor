@@ -1,5 +1,5 @@
 /* src/components/Dashboard.tsx */
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import ProgressSummary from './ProgressSummary';
 import MasteryGrid from './MasteryGrid';
@@ -9,14 +9,13 @@ import UserProfileDrawer from './UserProfileDrawer';
 import SetupScreen from './SetupScreen';
 import type { MasteryStatus } from '../types/mastery';
 
-export default function Dashboard({ onStartSession, onAskLina }: { onStartSession: () => void; onAskLina: (p: string) => void }) {
+export default function Dashboard({ onStartSession, onAskLina, isSandboxMode, setIsSandboxMode }: {
+  onStartSession: () => void;
+  onAskLina: (p: string) => void;
+  isSandboxMode: boolean;
+  setIsSandboxMode: (val: boolean) => void;
+}) {
   const { studentName, currentStreak, vocabulary, savedPhrases } = useMasteryStore();
-  const [isSandboxMode, setIsSandboxMode] = useState(
-    () => localStorage.getItem('tp_sandbox_mode') !== 'false'
-  );
-  useEffect(() => {
-    localStorage.setItem('tp_sandbox_mode', String(isSandboxMode));
-  }, [isSandboxMode]);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 

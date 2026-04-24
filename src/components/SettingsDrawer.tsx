@@ -12,12 +12,17 @@ interface Props {
 
 export default function SettingsDrawer({ isOpen, onClose, isSandboxMode, setIsSandboxMode }: Props) {
   const [apiKey, setApiKey] = useState('');
+  // Req 6: Local draft so the checkbox doesn't immediately mutate global state.
+  const [localSandboxMode, setLocalSandboxMode] = useState(isSandboxMode);
   const { resetAsNewUser, randomizeVocab, masterAllVocab } = useMasteryStore();
   const dragControls = useDragControls();
 
   useEffect(() => {
-    if (isOpen) setApiKey(localStorage.getItem('TP_GEMINI_KEY') || '');
-  }, [isOpen]);
+    if (isOpen) {
+      setApiKey(localStorage.getItem('TP_GEMINI_KEY') || '');
+      setLocalSandboxMode(isSandboxMode);
+    }
+  }, [isOpen, isSandboxMode]);
 
   const handleSaveKey = () => {
     localStorage.setItem('TP_GEMINI_KEY', apiKey);
@@ -91,17 +96,35 @@ export default function SettingsDrawer({ isOpen, onClose, isSandboxMode, setIsSa
 
           <h2 style={{ color: 'white', marginTop: 0, marginBottom: '20px', fontSize: '1rem', letterSpacing: '0.1em' }}>SETTINGS</h2>
 
-          {/* Sandbox Mode */}
+          {/* Sandbox Mode — uses local draft state, applied only after confirm */}
           <div className="settings-section">
-            <label className="settings-row">
+            <label className="settings-row" style={{ marginBottom: '10px' }}>
               <span className="settings-label">Sandbox Mode (Offline)</span>
               <input
                 type="checkbox"
-                checked={isSandboxMode}
-                onChange={(e) => setIsSandboxMode(e.target.checked)}
+                checked={localSandboxMode}
+                onChange={(e) => setLocalSandboxMode(e.target.checked)}
                 className="settings-checkbox"
               />
             </label>
+            {localSandboxMode !== isSandboxMode && (
+              <button
+                onClick={() => {
+                  const msg = localSandboxMode
+                    ? 'Enable Sandbox Mode? The app will work offline without using any API tokens.'
+                    : 'Disable Sandbox Mode? This will enable real API usage and consume tokens.';
+                  if (window.confirm(msg)) {
+                    setIsSandboxMode(localSandboxMode);
+                  } else {
+                    setLocalSandboxMode(isSandboxMode);
+                  }
+                }}
+                className="btn-settings"
+                style={{ fontSize: '0.72rem' }}
+              >
+                SAVE SANDBOX SETTING
+              </button>
+            )}
           </div>
 
           {/* API Key */}

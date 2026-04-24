@@ -4,7 +4,7 @@ import { useMasteryStore } from '../store/masteryStore';
 import VocabCard from './VocabCard';
 import WordDetailDrawer from './WordDetailDrawer';
 import { soundService } from '../services/soundService';
-import { fetchSentenceSuggestions, fetchQuickTranslation } from '../services/linaService';
+import { fetchSentenceSuggestions, fetchQuickTranslation, resolveApiKey } from '../services/linaService';
 import type { MasteryStatus, VocabWord } from '../types/mastery';
 
 interface Props {
@@ -56,7 +56,7 @@ export default function MasteryGrid({
       return;
     }
 
-    const apiKey = localStorage.getItem('TP_GEMINI_KEY');
+    const apiKey = resolveApiKey();
     if (!apiKey) { setMagneticSuggestions([]); return; }
 
     setIsAutoTranslating(true);
