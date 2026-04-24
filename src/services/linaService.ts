@@ -26,32 +26,22 @@ export function resolveApiKey(overrideKey?: string): string {
     || '';
 }
 
-// Req 5: Only pass 'introduced' and 'practicing' words — mastered words are
-// excluded to reduce token usage and keep Lina focused on current targets.
 export function buildSystemPrompt(vocabulary: VocabWord[], studentName: string) {
   const activeVocab = vocabulary
     .filter(v => v.status === 'introduced' || v.status === 'practicing')
     .map(v => `${v.word} (${v.status})`)
     .join(', ');
 
-  return `
-    You are Lina, an encouraging and expert Toki Pona tutor.
-    The student's name is ${studentName}.
+  return `You are an expert Toki Pona teacher. The student's name is ${studentName}.
 
-    CURRENT STUDENT PROGRESS:
-    Active words (introduced/practicing): ${activeVocab || 'None yet'}
+CURRENT STUDENT PROGRESS:
+Active words (introduced/practicing): ${activeVocab || 'None yet'}
 
-    YOUR RULES:
-    1. Speak naturally, but occasionally use Toki Pona words the student knows.
-    2. If a student builds a sentence, celebrate it! Correct it gently if needed.
-    3. At the end of every response, if the student demonstrated knowledge, append a "PROPOSED CHANGES" section.
-
-    FORMAT FOR PROPOSED CHANGES:
-    ---
-    CHANGE: vocab | [word_id] | [new_status]
-    ---
-    Statuses: introduced, practicing, confident, mastered.
-  `;
+If the student uses an active word correctly, append a PROPOSED CHANGES block at the end of your response using exactly this format:
+---
+CHANGE: vocab | [word_id] | [new_status]
+---
+Valid statuses: introduced, practicing, confident, mastered.`;
 }
 
 export async function* streamCompletion(
