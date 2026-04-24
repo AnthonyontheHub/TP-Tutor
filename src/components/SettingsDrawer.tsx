@@ -12,9 +12,8 @@ interface Props {
 
 export default function SettingsDrawer({ isOpen, onClose, isSandboxMode, setIsSandboxMode }: Props) {
   const [apiKey, setApiKey] = useState('');
-  // Req 6: Local draft so the checkbox doesn't immediately mutate global state.
   const [localSandboxMode, setLocalSandboxMode] = useState(isSandboxMode);
-  const { resetAsNewUser, randomizeVocab, masterAllVocab } = useMasteryStore();
+  const { resetAsNewUser } = useMasteryStore();
   const dragControls = useDragControls();
 
   useEffect(() => {
@@ -38,21 +37,9 @@ export default function SettingsDrawer({ isOpen, onClose, isSandboxMode, setIsSa
   };
 
   const handleResetNewUser = () => {
-    if (window.confirm('Reset EVERYTHING and start over as a new user? All progress, phrases, and your profile will be erased.')) {
+    if (window.confirm('Reset EVERYTHING and start over as a new user? All progress will be erased.')) {
       resetAsNewUser();
       onClose();
-    }
-  };
-
-  const handleRandomize = () => {
-    if (window.confirm('Randomize all vocabulary statuses? This will mix your progress randomly.')) {
-      randomizeVocab();
-    }
-  };
-
-  const handleMasterAll = () => {
-    if (window.confirm('Mark ALL vocabulary as Mastered?')) {
-      masterAllVocab();
     }
   };
 
@@ -86,7 +73,6 @@ export default function SettingsDrawer({ isOpen, onClose, isSandboxMode, setIsSa
           className="settings-drawer"
           style={{ padding: '0 20px 20px', overflowY: 'auto', boxSizing: 'border-box' }}
         >
-          {/* Drag handle — only this area initiates drag */}
           <div
             style={{ padding: '12px 0 6px', cursor: 'grab', touchAction: 'none' }}
             onPointerDown={(e) => dragControls.start(e)}
@@ -96,7 +82,6 @@ export default function SettingsDrawer({ isOpen, onClose, isSandboxMode, setIsSa
 
           <h2 style={{ color: 'white', marginTop: 0, marginBottom: '20px', fontSize: '1rem', letterSpacing: '0.1em' }}>SETTINGS</h2>
 
-          {/* Sandbox Mode — uses local draft state, applied only after confirm */}
           <div className="settings-section">
             <label className="settings-row" style={{ marginBottom: '10px' }}>
               <span className="settings-label">Sandbox Mode (Offline)</span>
@@ -127,7 +112,6 @@ export default function SettingsDrawer({ isOpen, onClose, isSandboxMode, setIsSa
             )}
           </div>
 
-          {/* API Key */}
           <div className="settings-section">
             <p className="settings-label" style={{ marginBottom: '8px' }}>GEMINI API KEY</p>
             <input
@@ -149,28 +133,11 @@ export default function SettingsDrawer({ isOpen, onClose, isSandboxMode, setIsSa
             </div>
           </div>
 
-          {/* Danger Zone */}
           <div className="danger-zone">
             <p className="settings-label" style={{ color: '#ef4444', marginBottom: '12px' }}>DANGER ZONE</p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <button onClick={handleResetNewUser} className="btn-danger">
-                Reset Data
-              </button>
-              <button
-                onClick={handleRandomize}
-                className="btn-danger"
-                style={{ color: '#c084fc', borderColor: '#7e22ce' }}
-              >
-                Randomize
-              </button>
-              <button
-                onClick={handleMasterAll}
-                className="btn-danger"
-                style={{ color: '#fbbf24', borderColor: '#92400e' }}
-              >
-                Master All
-              </button>
-            </div>
+            <button onClick={handleResetNewUser} className="btn-danger">
+              Reset Data
+            </button>
           </div>
         </motion.div>
       )}

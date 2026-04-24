@@ -11,20 +11,14 @@ export const STATUS_EMOJI: Record<string, string> = {
 };
 
 // Offline word-by-word gloss built from local vocabulary data — no API needed.
-export function buildOfflineTranslation(selectedWords: string[], vocabulary: VocabWord[]): string {
-  const glosses = selectedWords.map(w => {
-    const entry = vocabulary.find(v => v.word === w);
-    if (!entry) return w;
-    const firstMeaning = entry.meanings.split(/[,;]/)[0].trim().replace(/^to /, '');
-    return firstMeaning;
-  });
-  return glosses.join(' · ');
+export function buildOfflineTranslation(selectedWords: string[], _vocabulary: VocabWord[]): string {
+  return selectedWords.join(' · ');
 }
 
-// Change 3: delta-based proposed change — wordId + signed integer delta.
 export interface ProposedChange {
-  wordId: string;
-  delta: number;
+  type: 'vocab' | 'concept';
+  id: string;
+  newStatus: MasteryStatus;
 }
 
 // Resolves the API key with env-var fallback for local dev.
@@ -35,50 +29,51 @@ export function resolveApiKey(overrideKey?: string): string {
     || '';
 }
 
-export function buildSystemPrompt(vocabulary: VocabWord[], studentName: string) {
-  const practicing = vocabulary
-    .filter(v => v.status === 'practicing')
-    .map(v => `${v.word}(${v.confidenceScore})`)
-    .join(', ');
-  const introduced = vocabulary
-    .filter(v => v.status === 'introduced')
-    .map(v => `${v.word}(${v.confidenceScore})`)
-    .join(', ');
-  const mastered = vocabulary
-    .filter(v => v.status === 'mastered')
-    .map(v => v.word)
-    .join(', ');
+export function buildSystemPrompt(
+  vocabulary: any[],
+  concepts: any[],
+  studentName: string,
+  activeCurriculumTitle?: string,
+  activeModuleTitle?: string
+) {
+  const activeVocab = vocabulary
+    .filter(v => v.status === 'introduced' || v.status === 'practicing' || v.status === 'confident')
+    .map(v => `${v.word} (${v.status}) - Notes: ${v.sessionNotes || 'None'}`)
+    .join('\n');
 
-  return `You are a Toki Pona language teacher. Student: ${studentName}.
+  const activeConcepts = concepts
+    .filter(c => c.status === 'introduced' || c.status === 'practicing' || c.status === 'confident')
+    .map(c => `${c.title} (${c.status}) - Notes: ${c.sessionNotes || 'None'}`)
+    .join('\n');
 
-VOCABULARY SNAPSHOT (score 0–100):
-  Practicing: ${practicing || 'none'}
-  Introduced: ${introduced || 'none'}
-  Mastered:   ${mastered || 'none'}
+  const lessonContext = activeModuleTitle
+    ? `CURRENT LESSON GOAL:\nThe student has explicitly chosen to study: ${activeCurriculumTitle} - ${activeModuleTitle}. Focus your teaching and drills entirely on this topic today.`
+    : `CURRENT LESSON GOAL:\nFree practice. Chat naturally and test them on their active vocabulary.`;
 
-LESSON STRUCTURE — follow these three phases in order during a daily review:
-  Phase 1 · WARM-UP: Test practicing-tier words with simple recall and translation tasks. One word at a time. Give immediate feedback.
-  Phase 2 · CHALLENGE: Use introduced-tier words in short sentences. Ask the student to build or translate a sentence using 2–3 words together.
-  Phase 3 · FREE PRACTICE: Let the student build their own sentence or ask a question. Respond naturally in Toki Pona with an English gloss.
+  return `
+    You are an expert Toki Pona teacher.
+    The student's name is ${studentName}.
 
-BEHAVIORAL RULES:
-  - Speak directly to ${studentName}, never break character as their teacher.
-  - Keep each message short — one task or question per turn.
-  - After mastered words appear correctly, say so briefly but do not test them.
-  - Do not introduce new vocabulary unless the student asks.
-  - If the student makes an error, correct kindly and ask them to try again before moving on.
+    ${lessonContext}
 
-SCORING — only score words actually used or tested this session:
-  Correct, confident use in a new context: +8 to +12
-  Correct but hesitant or prompted:        +3 to +6
-  Minor error, self-corrected:             -3 to -5
-  Clear mistake or misuse:                 -8 to -15
+    CURRENT STUDENT PROGRESS & MEMORY:
+    You must use these session notes to remember what the student struggled with last time.
+    Active Words:
+    ${activeVocab || 'None'}
 
-After each turn where words were tested, append:
----
-CHANGE: vocab | [word] | [delta]
----
-[delta] is a signed integer, e.g. +8 or -10. Only include words from the Practicing or Introduced lists above.`;
+    Active Concepts:
+    ${activeConcepts || 'None'}
+
+    YOUR RULES:
+    1. At the end of every response, if the student demonstrated knowledge, append a "PROPOSED CHANGES" section.
+
+    FORMAT FOR PROPOSED CHANGES:
+    ---
+    CHANGE: vocab | [word_id] | [new_status]
+    CHANGE: concept | [concept_id] | [new_status]
+    ---
+    Statuses: introduced, practicing, confident, mastered.
+  `;
 }
 
 export async function* streamCompletion(
@@ -155,44 +150,45 @@ export function stripProposedChanges(text: string) {
   return text.split('---')[0].trim();
 }
 
-// Change 3: parses "CHANGE: vocab | word_id | +8" → { wordId, delta }.
-// Case-insensitive, strips markdown bold, collapses whitespace.
+// Parses "CHANGE: vocab | word_id | new_status" and "CHANGE: concept | id | new_status"
 export function parseProposedChanges(text: string): ProposedChange[] | null {
+  const VALID_STATUSES: MasteryStatus[] = ['not_started', 'introduced', 'practicing', 'confident', 'mastered'];
   const changes: ProposedChange[] = [];
   for (const rawLine of text.split('\n')) {
     const line = rawLine.replace(/\*\*/g, '').replace(/\s+/g, ' ').trim();
-    if (!/change:\s*vocab/i.test(line)) continue;
+    if (!/change:\s*(vocab|concept)/i.test(line)) continue;
     const parts = line.split('|').map(p => p.trim());
     if (parts.length < 3) continue;
-    const wordId = parts[1];
-    const delta = parseInt(parts[2].replace(/[^-+\d]/g, ''), 10);
-    if (wordId && !isNaN(delta)) changes.push({ wordId, delta });
+    const typeMatch = parts[0].match(/change:\s*(vocab|concept)/i);
+    if (!typeMatch) continue;
+    const type = typeMatch[1].toLowerCase() as 'vocab' | 'concept';
+    const id = parts[1];
+    const rawStatus = parts[2].toLowerCase().replace(/[^a-z_]/g, '') as MasteryStatus;
+    if (id && VALID_STATUSES.includes(rawStatus)) {
+      changes.push({ type, id, newStatus: rawStatus });
+    }
   }
   return changes.length > 0 ? changes : null;
 }
 
-// Generates a brief plain-language recap of score changes for the end of session.
 export async function fetchSessionRecap(
   apiKey: string,
-  deltas: { wordId: string; delta: number }[]
+  changes: ProposedChange[]
 ): Promise<string> {
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-  const summary = deltas
-    .map(d => `${d.wordId}: ${d.delta > 0 ? '+' : ''}${d.delta}`)
+  const summary = changes
+    .map(c => `${c.id}: → ${c.newStatus}`)
     .join(', ');
-  const prompt = `You are a Toki Pona teacher giving a student a brief end-of-session summary. The following words had their confidence scores adjusted this session: ${summary}. Write 2–3 sentences in plain English (no bullet points, no headers) describing which words improved, which dropped, and offer one encouraging word. Keep it concise.`;
+  const prompt = `You are a Toki Pona teacher giving a student a brief end-of-session summary. The following words and concepts had their mastery status updated this session: ${summary}. Write 2–3 sentences in plain English (no bullet points, no headers) describing what improved. Keep it concise and encouraging.`;
   try {
     const result = await model.generateContent(prompt);
     return result.response.text().trim();
   } catch (e) {
     console.error('Session recap error:', e);
-    // Fallback: build a plain summary without the API
-    const ups = deltas.filter(d => d.delta > 0).map(d => d.wordId);
-    const downs = deltas.filter(d => d.delta < 0).map(d => d.wordId);
-    const parts: string[] = [];
-    if (ups.length) parts.push(`${ups.join(', ')} moved up`);
-    if (downs.length) parts.push(`${downs.join(', ')} dropped a little`);
-    return parts.length ? `Session complete! ${parts.join('; ')}.` : 'Session complete! Keep practising.';
+    const improved = changes.filter(c => c.newStatus !== 'not_started').map(c => c.id);
+    return improved.length
+      ? `Session complete! Great work on: ${improved.join(', ')}.`
+      : 'Session complete! Keep practising.';
   }
 }

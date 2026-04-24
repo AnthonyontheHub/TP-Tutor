@@ -8,9 +8,12 @@ interface Props {
 }
 
 export default function ProgressSummary({ activeFilter, onFilterClick }: Props) {
-  const _vocab = useMasteryStore((s) => s.vocabulary);
-  const getStatusSummary = useMasteryStore((s) => s.getStatusSummary);
-  const summary = getStatusSummary();
+  const vocabulary = useMasteryStore((s) => s.vocabulary);
+
+  const summary = vocabulary.reduce(
+    (acc, w) => { acc[w.status]++; return acc; },
+    { not_started: 0, introduced: 0, practicing: 0, confident: 0, mastered: 0 } as Record<MasteryStatus, number>
+  );
 
   const statusItems: { status: MasteryStatus; label: string; emoji: string; color: string; glow: string }[] = [
     { status: 'not_started', label: 'NEW',   emoji: '⬜', color: '#9ca3af', glow: 'rgba(156,163,175,0.5)' },
