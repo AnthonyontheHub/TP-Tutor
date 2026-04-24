@@ -235,11 +235,11 @@ select {
   cursor: pointer;
 }
 
-.vocab-card--not_started  { border-color: #222; background: #080808; }
+.vocab-card--not_started  { border-color: #374151; background: #080808; }
 .vocab-card--introduced   { border-color: #1d4ed8; background: #0c1a3a; }
 .vocab-card--practicing   { border-color: #92400e; background: #1a1000; }
-.vocab-card--confident    { border-color: #065f46; background: #001810; }
-.vocab-card--mastered     { border-color: #831843; background: #1a0010; }
+.vocab-card--confident    { border-color: #16a34a; background: #001a0a; }
+.vocab-card--mastered     { border-color: #22c55e; background: #002010; }
 
 .vocab-card__word {
   font-weight: 700;

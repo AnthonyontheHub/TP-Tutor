@@ -9,6 +9,7 @@ import type { MasteryStatus, VocabWord } from '../types/mastery';
 
 interface Props {
   onAskLina: (p: string) => void;
+  onSaved?: (phraseId: string) => void;
   isSandboxMode: boolean;
   activeFilter: MasteryStatus | null;
   sortMode: string;
@@ -23,10 +24,10 @@ const STATUS_RANK: Record<MasteryStatus, number> = {
   not_started: 0, introduced: 1, practicing: 2, confident: 3, mastered: 4
 };
 
-const MOVE_THRESHOLD = 8; // px before we cancel long-press
+const MOVE_THRESHOLD = 8;
 
 export default function MasteryGrid({
-  onAskLina, isSandboxMode, activeFilter, sortMode, sortDirection, posFilter,
+  onAskLina, onSaved, isSandboxMode, activeFilter, sortMode, sortDirection, posFilter,
   setSortMode, setSortDirection, setPosFilter
 }: Props) {
   const { vocabulary, savePhrase } = useMasteryStore();
@@ -34,7 +35,7 @@ export default function MasteryGrid({
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [magneticSuggestions, setMagneticSuggestions] = useState<string[]>([]);
   const [translation, setTranslation] = useState<string | null>(null);
-  const [isTranslating, setIsTranslating] = useState(false);
+  const [isAutoTranslating, setIsAutoTranslating] = useState(false);
   const [savedConfirm, setSavedConfirm] = useState(false);
 
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -42,27 +43,39 @@ export default function MasteryGrid({
   const isLongPress   = useRef(false);
   const pointerStart  = useRef<{ x: number; y: number } | null>(null);
 
-  // Clear translation + confirmation, then fetch suggestions debounced.
-  // Bug fix: stale fetch guard via `active` flag prevents old async calls
-  // from overwriting state after selectedWords has already changed again.
+  // Auto-translate + suggestions whenever selected words change.
+  // The `active` flag prevents stale async responses from overwriting fresh state.
   useEffect(() => {
     setTranslation(null);
+    setIsAutoTranslating(false);
     if (confirmTimer.current) { clearTimeout(confirmTimer.current); confirmTimer.current = null; }
     setSavedConfirm(false);
 
-    const apiKey = localStorage.getItem('TP_GEMINI_KEY');
-    if (selectedWords.length < 2 || !apiKey) {
+    if (selectedWords.length === 0) {
       setMagneticSuggestions([]);
       return;
     }
 
+    const apiKey = localStorage.getItem('TP_GEMINI_KEY');
+    if (!apiKey) { setMagneticSuggestions([]); return; }
+
+    setIsAutoTranslating(true);
     let active = true;
     const timer = setTimeout(async () => {
-      const results = await fetchSentenceSuggestions(apiKey, selectedWords);
-      if (active) setMagneticSuggestions(results);
-    }, 800);
+      const [transResult, suggResults] = await Promise.all([
+        fetchQuickTranslation(apiKey, selectedWords.join(' ')),
+        selectedWords.length >= 2
+          ? fetchSentenceSuggestions(apiKey, selectedWords)
+          : Promise.resolve([]),
+      ]);
+      if (active) {
+        setTranslation(transResult ?? '(translation unavailable)');
+        setMagneticSuggestions(suggResults);
+        setIsAutoTranslating(false);
+      }
+    }, 900);
 
-    return () => { active = false; clearTimeout(timer); };
+    return () => { active = false; clearTimeout(timer); setIsAutoTranslating(false); };
   }, [selectedWords]);
 
   // ── Pointer handlers ──────────────────────────────────────────────────────
@@ -70,8 +83,7 @@ export default function MasteryGrid({
   const cancelLongPress = () => {
     if (longPressTimer.current) { clearTimeout(longPressTimer.current); longPressTimer.current = null; }
     pointerStart.current = null;
-    // NOTE: intentionally NOT resetting isLongPress.current here so that
-    // a completed long-press isn't re-treated as a tap in handlePointerUp.
+    // Intentionally NOT resetting isLongPress.current — onClick needs to consume it.
   };
 
   const handlePointerDown = (e: React.PointerEvent, word: string) => {
@@ -84,8 +96,6 @@ export default function MasteryGrid({
     }, 500);
   };
 
-  // Cancel long-press if the finger moves more than MOVE_THRESHOLD pixels —
-  // this is the scroll-vs-hold disambiguation that replaces onPointerLeave.
   const handlePointerMove = (e: React.PointerEvent) => {
     if (!pointerStart.current || !longPressTimer.current) return;
     const dx = e.clientX - pointerStart.current.x;
@@ -93,17 +103,16 @@ export default function MasteryGrid({
     if (Math.hypot(dx, dy) > MOVE_THRESHOLD) cancelLongPress();
   };
 
-  // Pure cleanup — no tap action here so pointerCancel doesn't silently drop taps
+  // Pure cleanup — tap logic lives in onClick so pointerCancel can't drop it.
   const handlePointerUp = () => {
     pointerStart.current = null;
     if (longPressTimer.current) { clearTimeout(longPressTimer.current); longPressTimer.current = null; }
   };
 
-  // onClick is the browser's most reliable tap signal — never fires after a
-  // scroll, swipe, or pointerCancel, making it far more reliable on mobile.
+  // onClick is the browser's most reliable tap signal — never fires after scroll/cancel.
   const handleCardClick = (word: VocabWord) => {
     if (isLongPress.current) {
-      isLongPress.current = false; // consume the flag so the next tap works
+      isLongPress.current = false;
       return;
     }
     if (selectedWords.length === 0) {
@@ -117,49 +126,60 @@ export default function MasteryGrid({
 
   // ── Builder actions ───────────────────────────────────────────────────────
 
-  const handleTranslate = async () => {
-    if (isTranslating) return; // guard against rapid double-clicks
-    const apiKey = localStorage.getItem('TP_GEMINI_KEY');
-    if (!apiKey) { alert('Add your Gemini API key in Settings first.'); return; }
-    setIsTranslating(true);
-    const result = await fetchQuickTranslation(apiKey, selectedWords.join(' '));
-    setTranslation(result ?? '(translation failed — check your API key)');
-    setIsTranslating(false);
-  };
-
   const handleSave = () => {
     const sentence = selectedWords.join(' ');
     savePhrase({ id: sentence, tp: sentence, en: translation ?? '', notes: '' });
     if (confirmTimer.current) clearTimeout(confirmTimer.current);
     setSavedConfirm(true);
-    confirmTimer.current = setTimeout(() => { setSavedConfirm(false); confirmTimer.current = null; }, 2000);
+    confirmTimer.current = setTimeout(() => {
+      setSavedConfirm(false);
+      confirmTimer.current = null;
+      setSelectedWords([]);
+      onSaved?.(sentence);
+    }, 800);
   };
 
   // ── Display list ──────────────────────────────────────────────────────────
 
   const displayed = vocabulary
     .filter(w => !activeFilter || w.status === activeFilter)
-    .filter(w => posFilter === 'All' || w.partOfSpeech.includes(posFilter))
+    .filter(w => posFilter === 'All' || w.partOfSpeech.toLowerCase().includes(posFilter.toLowerCase()))
     .sort((a, b) => {
       if (sortMode === 'status') {
         const diff = STATUS_RANK[a.status] - STATUS_RANK[b.status];
         return sortDirection === 'asc' ? diff : -diff;
       }
-      const field = (sortMode === 'alphabetical' ? 'word' : sortMode) as keyof typeof a;
-      const valA = String(a[field] || '').toLowerCase();
-      const valB = String(b[field] || '').toLowerCase();
+      if (sortMode === 'length') {
+        const diff = a.word.length - b.word.length;
+        return sortDirection === 'asc' ? diff : -diff;
+      }
+      if (sortMode === 'partOfSpeech') {
+        const diff = a.partOfSpeech.localeCompare(b.partOfSpeech);
+        return sortDirection === 'asc' ? diff : -diff;
+      }
+      // Default: alphabetical by word
+      const valA = a.word.toLowerCase();
+      const valB = b.word.toLowerCase();
       return sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
     });
 
   return (
-    <div className="mastery-grid-container" style={{ paddingBottom: selectedWords.length > 0 ? '220px' : undefined }}>
+    // Container onClick clears multi-select when tapping empty grid space.
+    // Each card stops propagation so container onClick doesn't fire on card taps.
+    <div
+      className="mastery-grid-container"
+      style={{ paddingBottom: selectedWords.length > 0 ? '220px' : undefined }}
+      onClick={() => { if (selectedWords.length > 0) setSelectedWords([]); }}
+    >
       <div className="grid-toolbar">
         <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="sort-select">
-          <option value="alphabetical">A-Z</option>
-          <option value="status">Mastery</option>
+          <option value="alphabetical">A → Z</option>
+          <option value="status">Mastery Level</option>
+          <option value="length">Word Length</option>
+          <option value="partOfSpeech">Part of Speech</option>
         </select>
         <button
-          onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')}
+          onClick={(e) => { e.stopPropagation(); setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc'); }}
           className="btn-toggle"
           style={{ flex: 'none', width: '42px' }}
         >
@@ -175,12 +195,10 @@ export default function MasteryGrid({
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
             onPointerCancel={cancelLongPress}
-            onClick={() => handleCardClick(word)}
+            onClick={(e) => { e.stopPropagation(); handleCardClick(word); }}
             className="grid-item-wrapper"
             style={{
               opacity: selectedWords.length > 0 && !selectedWords.includes(word.word) ? 0.3 : 1,
-              // pan-y: browser handles vertical scroll (fires pointerCancel to cancel
-              // long-press); JS handles everything else including long-press detection.
               touchAction: 'pan-y',
               cursor: 'pointer',
             }}
@@ -191,8 +209,19 @@ export default function MasteryGrid({
       </div>
 
       {selectedWords.length > 0 && (
-        <div className="builder-panel">
+        <div className="builder-panel" onClick={(e) => e.stopPropagation()}>
           <div className="builder-content">
+            {/* Auto-translation above the phrase */}
+            <div style={{
+              minHeight: '22px',
+              color: isAutoTranslating ? '#555' : '#64748b',
+              fontSize: '0.8rem',
+              fontStyle: 'italic',
+              marginBottom: '6px',
+            }}>
+              {isAutoTranslating ? '...' : (translation ?? '')}
+            </div>
+
             {/* Sentence + dismiss */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
               <div style={{ color: 'white', fontSize: '1.1rem', fontWeight: 'bold' }}>
@@ -204,13 +233,6 @@ export default function MasteryGrid({
                 style={{ flex: 'none', width: '34px', height: '34px', padding: 0, fontSize: '0.9rem' }}
               >✕</button>
             </div>
-
-            {/* Translation result */}
-            {translation && (
-              <div style={{ background: '#1a1a1a', border: '1px solid #333', borderRadius: '8px', padding: '8px 12px', marginBottom: '10px', color: '#94a3b8', fontSize: '0.85rem', fontStyle: 'italic' }}>
-                {translation}
-              </div>
-            )}
 
             {/* AI sentence suggestions */}
             {magneticSuggestions.length > 0 && (
@@ -228,15 +250,7 @@ export default function MasteryGrid({
             )}
 
             {/* Action row */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
-              <button
-                onClick={handleTranslate}
-                disabled={isTranslating}
-                className="btn-review"
-                style={{ margin: 0, fontSize: '0.72rem', padding: '10px 4px', opacity: isTranslating ? 0.6 : 1 }}
-              >
-                {isTranslating ? '...' : 'TRANSLATE'}
-              </button>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
               <button
                 onClick={() => { onAskLina(`Let's work on: "${selectedWords.join(' ')}" — is this correct Toki Pona?`); setSelectedWords([]); }}
                 className="btn-review"

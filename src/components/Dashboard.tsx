@@ -4,8 +4,8 @@ import { useMasteryStore } from '../store/masteryStore';
 import ProgressSummary from './ProgressSummary';
 import MasteryGrid from './MasteryGrid';
 import PhraseGrid from './PhraseGrid';
-import SettingsDrawer from './SettingsDrawer'; 
-import UserProfileDrawer from './UserProfileDrawer'; 
+import SettingsDrawer from './SettingsDrawer';
+import UserProfileDrawer from './UserProfileDrawer';
 import SetupScreen from './SetupScreen';
 import type { MasteryStatus } from '../types/mastery';
 
@@ -17,26 +17,31 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
   useEffect(() => {
     localStorage.setItem('tp_sandbox_mode', String(isSandboxMode));
   }, [isSandboxMode]);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false); 
-  const [isProfileOpen, setIsProfileOpen] = useState(false); 
-  
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'phrasebook'>('grid');
   const [posFilter, setPosFilter] = useState('All');
-  const [sortMode, setSortMode] = useState<'alphabetical' | 'status' | 'frequency' | 'length' | 'type'>('alphabetical');
+  const [sortMode, setSortMode] = useState<string>('alphabetical');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [focusPhraseId, setFocusPhraseId] = useState<string | null>(null);
 
   if (!studentName || studentName === 'Student') return <SetupScreen />;
 
   const handleDailyReview = () => {
     const reviewWords = vocabulary.filter(w => w.status === 'practicing' || w.status === 'introduced').map(w => w.word);
-    
-    // Fixed: Handle the case where there are no active review words
     if (reviewWords.length > 0) {
       onAskLina(`toki Lina! Please quiz me on: ${reviewWords.slice(0,10).join(', ')}`);
     } else {
       onAskLina(`toki Lina! I don't have any specific words to review right now. Can you teach me a new concept?`);
     }
+  };
+
+  // Called by MasteryGrid after saving a phrase — switch to phrasebook and open note editor.
+  const handleSaved = (phraseId: string) => {
+    setFocusPhraseId(phraseId);
+    setViewMode('phrasebook');
   };
 
   return (
@@ -56,7 +61,7 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
       <main className="dashboard__main">
         <ProgressSummary activeFilter={activeFilter} onFilterClick={setActiveFilter} />
         <button onClick={handleDailyReview} className="btn-review">⚡ START DAILY REVIEW</button>
-        
+
         <div className="dashboard__view-toggle">
           <button onClick={() => setViewMode('grid')} className={`btn-toggle ${viewMode === 'grid' ? 'active' : ''}`}>VOCAB GRID</button>
           <button onClick={() => setViewMode('phrasebook')} className={`btn-toggle ${viewMode === 'phrasebook' ? 'active' : ''}`}>PHRASEBOOK</button>
@@ -76,26 +81,34 @@ export default function Dashboard({ onStartSession, onAskLina }: { onStartSessio
                 <option value="verb">Verb</option>
                 <option value="adjective">Adjective</option>
                 <option value="adverb">Adverb</option>
+                <option value="number">Number</option>
                 <option value="phrase">Phrase</option>
               </select>
             </div>
-            
-            <MasteryGrid 
-              onAskLina={onAskLina} 
-              isSandboxMode={isSandboxMode} 
-              activeFilter={activeFilter} 
-              sortMode={sortMode} 
-              sortDirection={sortDirection} 
+
+            <MasteryGrid
+              onAskLina={onAskLina}
+              onSaved={handleSaved}
+              isSandboxMode={isSandboxMode}
+              activeFilter={activeFilter}
+              sortMode={sortMode}
+              sortDirection={sortDirection}
               posFilter={posFilter}
               setSortMode={setSortMode}
               setSortDirection={setSortDirection}
-              setPosFilter={setPosFilter} 
+              setPosFilter={setPosFilter}
             />
           </>
         ) : (
           <div style={{ padding: '20px 0' }}>
-            <PhraseGrid onAskLina={onAskLina} activeFilter={activeFilter} selectedWords={[]} />
-            
+            <PhraseGrid
+              onAskLina={onAskLina}
+              activeFilter={activeFilter}
+              selectedWords={[]}
+              focusPhraseId={focusPhraseId}
+              clearFocusPhrase={() => setFocusPhraseId(null)}
+            />
+
             <h3 style={{ marginTop: '30px', marginBottom: '15px', color: '#fff', fontSize: '1.2rem', fontWeight: 'bold', borderBottom: '1px solid #333', paddingBottom: '10px' }}>
               SAVED PHRASES
             </h3>

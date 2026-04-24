@@ -1,6 +1,6 @@
 /* src/components/SettingsDrawer.tsx */
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
 
 interface Props {
@@ -13,6 +13,7 @@ interface Props {
 export default function SettingsDrawer({ isOpen, onClose, isSandboxMode, setIsSandboxMode }: Props) {
   const [apiKey, setApiKey] = useState('');
   const { resetAsNewUser, randomizeVocab, masterAllVocab } = useMasteryStore();
+  const dragControls = useDragControls();
 
   useEffect(() => {
     if (isOpen) setApiKey(localStorage.getItem('TP_GEMINI_KEY') || '');
@@ -21,6 +22,14 @@ export default function SettingsDrawer({ isOpen, onClose, isSandboxMode, setIsSa
   const handleSaveKey = () => {
     localStorage.setItem('TP_GEMINI_KEY', apiKey);
     alert('API Key saved!');
+  };
+
+  const handleRemoveKey = () => {
+    if (window.confirm('Remove your API key from this device?')) {
+      localStorage.removeItem('TP_GEMINI_KEY');
+      setApiKey('');
+      alert('API key removed.');
+    }
   };
 
   const handleResetNewUser = () => {
@@ -58,15 +67,28 @@ export default function SettingsDrawer({ isOpen, onClose, isSandboxMode, setIsSa
       {isOpen && (
         <motion.div
           key="content"
+          drag="y"
+          dragControls={dragControls}
+          dragListener={false}
+          dragConstraints={{ top: 0 }}
+          dragElastic={{ top: 0, bottom: 0.3 }}
+          onDragEnd={(_, info) => { if (info.offset.y > 120) onClose(); }}
           initial={{ y: '100%' }}
           animate={{ y: '0%' }}
           exit={{ y: '100%' }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           onClick={(e) => e.stopPropagation()}
           className="settings-drawer"
-          style={{ padding: '20px', overflowY: 'auto', boxSizing: 'border-box' }}
+          style={{ padding: '0 20px 20px', overflowY: 'auto', boxSizing: 'border-box' }}
         >
-          <div className="drawer__handle" />
+          {/* Drag handle — only this area initiates drag */}
+          <div
+            style={{ padding: '12px 0 6px', cursor: 'grab', touchAction: 'none' }}
+            onPointerDown={(e) => dragControls.start(e)}
+          >
+            <div className="drawer__handle" style={{ margin: '0 auto' }} />
+          </div>
+
           <h2 style={{ color: 'white', marginTop: 0, marginBottom: '20px', fontSize: '1rem', letterSpacing: '0.1em' }}>SETTINGS</h2>
 
           {/* Sandbox Mode */}
@@ -92,7 +114,16 @@ export default function SettingsDrawer({ isOpen, onClose, isSandboxMode, setIsSa
               className="settings-input"
               placeholder="Enter API key..."
             />
-            <button onClick={handleSaveKey} className="btn-settings">SAVE KEY</button>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button onClick={handleSaveKey} className="btn-settings" style={{ flex: 2 }}>SAVE KEY</button>
+              <button
+                onClick={handleRemoveKey}
+                className="btn-settings"
+                style={{ flex: 1, background: '#374151', fontSize: '0.72rem' }}
+              >
+                REMOVE
+              </button>
+            </div>
           </div>
 
           {/* Danger Zone */}
@@ -102,10 +133,18 @@ export default function SettingsDrawer({ isOpen, onClose, isSandboxMode, setIsSa
               <button onClick={handleResetNewUser} className="btn-danger">
                 Reset Everything — Start as New User
               </button>
-              <button onClick={handleRandomize} className="btn-danger">
+              <button
+                onClick={handleRandomize}
+                className="btn-danger"
+                style={{ color: '#c084fc', borderColor: '#7e22ce' }}
+              >
                 Randomize Learning Progress
               </button>
-              <button onClick={handleMasterAll} className="btn-danger">
+              <button
+                onClick={handleMasterAll}
+                className="btn-danger"
+                style={{ color: '#fbbf24', borderColor: '#92400e' }}
+              >
                 Mark All Words as Mastered
               </button>
             </div>

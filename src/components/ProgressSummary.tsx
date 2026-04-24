@@ -8,18 +8,16 @@ interface Props {
 }
 
 export default function ProgressSummary({ activeFilter, onFilterClick }: Props) {
-  // Subscribe to vocabulary so the component re-renders on every status change
-  // (getStatusSummary is a stable function ref and won't trigger re-renders alone)
   const _vocab = useMasteryStore((s) => s.vocabulary);
   const getStatusSummary = useMasteryStore((s) => s.getStatusSummary);
   const summary = getStatusSummary();
 
   const statusItems: { status: MasteryStatus; label: string; emoji: string; color: string; glow: string }[] = [
-    { status: 'not_started', label: 'NEW',   emoji: '⬜', color: '#6b7280', glow: 'rgba(255,255,255,0.25)' },
-    { status: 'introduced',  label: 'INTRO', emoji: '🔵', color: '#3b82f6', glow: 'rgba(59,130,246,0.6)'   },
-    { status: 'practicing',  label: 'WORK',  emoji: '🟡', color: '#f59e0b', glow: 'rgba(245,158,11,0.6)'   },
-    { status: 'confident',   label: 'GOOD',  emoji: '🟢', color: '#10b981', glow: 'rgba(16,185,129,0.6)'   },
-    { status: 'mastered',    label: 'DONE',  emoji: '✅', color: '#22c55e', glow: 'rgba(34,197,94,0.6)'    },
+    { status: 'not_started', label: 'NEW',   emoji: '⬜', color: '#9ca3af', glow: 'rgba(156,163,175,0.5)' },
+    { status: 'introduced',  label: 'INTRO', emoji: '🔵', color: '#3b82f6', glow: 'rgba(59,130,246,0.6)'  },
+    { status: 'practicing',  label: 'WORK',  emoji: '🟡', color: '#f59e0b', glow: 'rgba(245,158,11,0.6)'  },
+    { status: 'confident',   label: 'GOOD',  emoji: '🟢', color: '#16a34a', glow: 'rgba(22,163,74,0.6)'   },
+    { status: 'mastered',    label: 'DONE',  emoji: '✅', color: '#22c55e', glow: 'rgba(34,197,94,0.65)'  },
   ];
 
   return (
@@ -33,14 +31,16 @@ export default function ProgressSummary({ activeFilter, onFilterClick }: Props) 
               key={item.status}
               onClick={() => onFilterClick(isActive ? null : item.status)}
               style={{
-                background: isActive ? item.color : '#1a1a1a',
-                border: isActive ? `2px solid ${item.color}` : '1px solid #333',
+                background: isActive ? `${item.color}22` : '#0d0d0d',
+                border: isActive ? `2px solid ${item.color}` : `1px solid ${item.color}44`,
                 padding: '10px 4px 8px',
                 borderRadius: '12px',
                 cursor: 'pointer',
                 transition: 'all 0.25s ease',
-                opacity: isDimmed ? 0.25 : 1,
-                boxShadow: isActive ? `0 0 16px ${item.glow}` : 'none',
+                opacity: isDimmed ? 0.2 : 1,
+                boxShadow: isActive
+                  ? `0 0 14px ${item.glow}, 0 0 4px ${item.glow}`
+                  : `0 0 6px ${item.glow}44`,
                 transform: isActive ? 'scale(1.06)' : 'scale(1)',
                 display: 'flex',
                 flexDirection: 'column',
@@ -49,10 +49,15 @@ export default function ProgressSummary({ activeFilter, onFilterClick }: Props) 
               }}
             >
               <span style={{ fontSize: '1.1rem', lineHeight: 1 }}>{item.emoji}</span>
-              <span style={{ fontSize: '1rem', fontWeight: 'bold', color: 'white', lineHeight: 1 }}>
+              <span style={{ fontSize: '1rem', fontWeight: 'bold', color: item.color, lineHeight: 1 }}>
                 {summary[item.status]}
               </span>
-              <span style={{ fontSize: '0.48rem', color: isActive ? 'rgba(255,255,255,0.85)' : '#555', fontWeight: '700', letterSpacing: '0.04em' }}>
+              <span style={{
+                fontSize: '0.48rem',
+                color: isActive ? item.color : `${item.color}99`,
+                fontWeight: '700',
+                letterSpacing: '0.04em',
+              }}>
                 {item.label}
               </span>
             </button>
