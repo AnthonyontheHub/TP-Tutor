@@ -78,7 +78,7 @@ After each turn where words were tested, append:
 ---
 CHANGE: vocab | [word] | [delta]
 ---
-Only include words from the Practicing or Introduced lists above.`;
+[delta] is a signed integer, e.g. +8 or -10. Only include words from the Practicing or Introduced lists above.`;
 }
 
 export async function* streamCompletion(
