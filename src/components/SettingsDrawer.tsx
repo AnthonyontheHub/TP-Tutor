@@ -154,21 +154,21 @@ export default function SettingsDrawer({ isOpen, onClose, isSandboxMode, setIsSa
             <p className="settings-label" style={{ color: '#ef4444', marginBottom: '12px' }}>DANGER ZONE</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <button onClick={handleResetNewUser} className="btn-danger">
-                Reset Everything — Start as New User
+                Reset Data
               </button>
               <button
                 onClick={handleRandomize}
                 className="btn-danger"
                 style={{ color: '#c084fc', borderColor: '#7e22ce' }}
               >
-                Randomize Learning Progress
+                Randomize
               </button>
               <button
                 onClick={handleMasterAll}
                 className="btn-danger"
                 style={{ color: '#fbbf24', borderColor: '#92400e' }}
               >
-                Mark All Words as Mastered
+                Master All
               </button>
             </div>
           </div>
