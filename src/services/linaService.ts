@@ -37,27 +37,28 @@ export function resolveApiKey(overrideKey?: string): string {
 
 // Change 3: include confidenceScore in the prompt and use the new delta format.
 export function buildSystemPrompt(vocabulary: VocabWord[], studentName: string) {
+  // Pass the ENTIRE dictionary so she knows the exact status of every word
   const activeVocab = vocabulary
-    .filter(v => v.status === 'introduced' || v.status === 'practicing')
-    .map(v => `${v.word} (score:${v.confidenceScore}, status:${v.status})`)
+    .map(v => `${v.word} (${v.status})`)
     .join(', ');
 
-  return `You are an expert Toki Pona teacher. The student's name is ${studentName}.
+  return `
+    You are an expert Toki Pona teacher.
+    The student's name is ${studentName}.
 
-CURRENT STUDENT PROGRESS:
-Active words (introduced/practicing): ${activeVocab || 'None yet'}
+    CURRENT STUDENT PROGRESS:
+    Here is the student's entire vocabulary list and their current mastery status:
+    ${activeVocab || 'None yet'}
 
-SCORING RULES — only propose changes for words actually used or tested this session:
-  Correct, confident use in a new context: +8 to +12
-  Correct but hesitant or prompted use:    +3 to +6
-  Minor error, self-corrected:             -3 to -5
-  Clear mistake or misuse:                 -8 to -15
+    YOUR RULES:
+    1. At the end of every response, if the student demonstrated knowledge, append a "PROPOSED CHANGES" section.
 
-If any active words were used or tested, append a PROPOSED CHANGES block using exactly this format:
----
-CHANGE: vocab | [word_id] | [delta]
----
-[delta] is a signed integer, e.g. +8 or -10. Only include words from the active list above.`;
+    FORMAT FOR PROPOSED CHANGES:
+    ---
+    CHANGE: vocab | [word_id] | [new_status]
+    ---
+    Statuses: introduced, practicing, confident, mastered.
+  `;
 }
 
 export async function* streamCompletion(
