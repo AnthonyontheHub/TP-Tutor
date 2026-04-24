@@ -134,7 +134,10 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
 
     try {
       const key = resolveApiKey(overrideKey);
-      const sys = buildSystemPrompt(vocabulary, studentName);
+      // Grab the freshest data directly from the store right before sending
+const freshVocab = useMasteryStore.getState().vocabulary;
+const freshName = useMasteryStore.getState().studentName;
+const sys = buildSystemPrompt(freshVocab, freshName);
       const windowedHistory = historyRef.current.slice(-HISTORY_WINDOW);
       let full = '';
 
