@@ -2,7 +2,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { m, AnimatePresence, LazyMotion, domMax } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
-import { buildSystemPrompt, streamCompletion, stripProposedChanges, parseProposedChanges, resolveApiKey } from '../services/linaService';
+import {
+  buildSystemPrompt, streamCompletion, stripProposedChanges,
+  parseProposedChanges, resolveApiKey,
+} from '../services/linaService';
+import type { ProposedChange } from '../services/linaService';
 import type { MasteryStatus } from '../types/mastery';
 
 interface Props {
@@ -13,21 +17,30 @@ interface Props {
   isSandboxMode: boolean;
 }
 
-const STATUS_EMOJI = {
+// Fix 2: Proper type for chat messages — replaces the previous any[].
+interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  displayContent: string;
+  raw?: string;
+  proposedChanges?: ProposedChange[];
+  changesApplied?: boolean;
+}
+
+const STATUS_EMOJI: Record<MasteryStatus, string> = {
   not_started: '⬜',
   introduced: '🔵',
   practicing: '🟡',
   confident: '🟢',
-  mastered: '✅'
+  mastered: '✅',
 };
 
-// Req 3: Only keep the last N turns of history to prevent token growth.
 const HISTORY_WINDOW = 10;
 
 const SANDBOX_RESPONSE = '[SANDBOX MODE]: o toki! I am in offline testing mode. No API tokens are being used right now.';
 
 export default function ChatSession({ onEndSession, isActive, pendingPrompt, clearPrompt, isSandboxMode }: Props) {
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -60,27 +73,22 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
 
   async function sendToLina(txt: string, overrideKey?: string) {
     if (isLoading || !txt.trim()) return;
-    // Req 7: In sandbox mode, bypass the API entirely.
-    if (!isSandboxMode) {
-      const key = resolveApiKey(overrideKey);
-      if (!key) return;
-    }
+    if (!isSandboxMode && !resolveApiKey(overrideKey)) return;
 
     setIsLoading(true);
     setInput('');
 
-    setMessages(p => [...p, { id: crypto.randomUUID(), role: 'user', displayContent: txt }]);
+    setMessages(prev => [...prev, { id: crypto.randomUUID(), role: 'user', displayContent: txt }]);
     historyRef.current.push({ role: 'user', content: txt });
 
     const assistantId = crypto.randomUUID();
-    setMessages(p => [...p, { id: assistantId, role: 'assistant', displayContent: '', raw: '' }]);
+    setMessages(prev => [...prev, { id: assistantId, role: 'assistant', displayContent: '', raw: '' }]);
 
-    // Req 7: Return mock response without touching the API.
     if (isSandboxMode) {
-      setMessages(p => p.map(m =>
-        m.id === assistantId
-          ? { ...m, displayContent: SANDBOX_RESPONSE, raw: SANDBOX_RESPONSE }
-          : m
+      setMessages(prev => prev.map(msg =>
+        msg.id === assistantId
+          ? { ...msg, displayContent: SANDBOX_RESPONSE, raw: SANDBOX_RESPONSE }
+          : msg
       ));
       historyRef.current.push({ role: 'assistant', content: SANDBOX_RESPONSE });
       setIsLoading(false);
@@ -90,30 +98,30 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
     try {
       const key = resolveApiKey(overrideKey);
       const sys = buildSystemPrompt(vocabulary, studentName);
-      // Req 3: Sliding window — cap history at HISTORY_WINDOW entries before sending.
       const windowedHistory = historyRef.current.slice(-HISTORY_WINDOW);
       let full = '';
 
       for await (const chunk of streamCompletion(key, sys, windowedHistory)) {
         full += chunk;
-        setMessages(p => p.map(m =>
-          m.id === assistantId ? { ...m, displayContent: stripProposedChanges(full), raw: full } : m
+        setMessages(prev => prev.map(msg =>
+          msg.id === assistantId ? { ...msg, displayContent: stripProposedChanges(full), raw: full } : msg
         ));
       }
 
       const changes = parseProposedChanges(full);
       if (changes && changes.length > 0) {
-        setMessages(p => p.map(m => m.id === assistantId ? { ...m, proposedChanges: changes } : m));
+        setMessages(prev => prev.map(msg =>
+          msg.id === assistantId ? { ...msg, proposedChanges: changes } : msg
+        ));
       }
 
       historyRef.current.push({ role: 'assistant', content: full });
     } catch (e) {
-      // Req 4: Show a user-friendly error in the chat instead of silently failing.
       console.error(e);
-      setMessages(p => p.map(m =>
-        m.id === assistantId
-          ? { ...m, displayContent: 'pakala! I\'m having trouble connecting right now. Please check your API key or network.' }
-          : m
+      setMessages(prev => prev.map(msg =>
+        msg.id === assistantId
+          ? { ...msg, displayContent: "pakala! I'm having trouble connecting right now. Please check your API key or network." }
+          : msg
       ));
     } finally {
       setIsLoading(false);
@@ -121,15 +129,15 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
   }
 
   function handleApplyChanges(msgId: string) {
-    setMessages((prev) => prev.map((m) => {
-      if (m.id !== msgId || !m.proposedChanges) return m;
-      m.proposedChanges.forEach((change: any) => {
+    setMessages(prev => prev.map(msg => {
+      if (msg.id !== msgId || !msg.proposedChanges) return msg;
+      msg.proposedChanges.forEach((change: ProposedChange) => {
         if (change.type === 'vocab' && change.wordId) {
-          updateVocabStatus(change.wordId, change.newStatus as MasteryStatus);
+          updateVocabStatus(change.wordId, change.newStatus);
         }
       });
       setLastUpdated(new Date().toLocaleDateString());
-      return { ...m, changesApplied: true };
+      return { ...msg, changesApplied: true };
     }));
   }
 
@@ -169,7 +177,9 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
 
                 {messages.map((msg) => (
                   <div key={msg.id} style={{ marginBottom: '20px', textAlign: msg.role === 'user' ? 'right' : 'left' }}>
-                    <div style={{ color: '#888', fontSize: '0.7rem', marginBottom: '4px', fontWeight: 'bold' }}>{msg.role === 'assistant' ? 'LINA' : 'YOU'}</div>
+                    <div style={{ color: '#888', fontSize: '0.7rem', marginBottom: '4px', fontWeight: 'bold' }}>
+                      {msg.role === 'assistant' ? 'LINA' : 'YOU'}
+                    </div>
                     <div style={{ background: msg.role === 'assistant' ? '#1a1a1a' : '#3b82f6', padding: '12px', borderRadius: '12px', color: 'white', display: 'inline-block', textAlign: 'left', maxWidth: '85%', fontSize: '0.95rem', lineHeight: '1.4' }}>
                       {msg.displayContent || (isLoading && msg.role === 'assistant' ? '...' : '')}
                     </div>
@@ -177,12 +187,15 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
                     {msg.proposedChanges && !msg.changesApplied && msg.role === 'assistant' && (
                       <div style={{ marginTop: '10px', background: '#222', padding: '12px', borderRadius: '12px', textAlign: 'left', border: '2px solid #333' }}>
                         <div style={{ fontSize: '0.7rem', color: '#888', marginBottom: '8px', fontWeight: 'bold' }}>PROPOSED UPDATES</div>
-                        {msg.proposedChanges.map((c: any, i: number) => (
+                        {msg.proposedChanges.map((c, i) => (
                           <div key={i} style={{ color: '#ddd', fontSize: '0.85rem', marginBottom: '4px' }}>
-                            {STATUS_EMOJI[c.newStatus as keyof typeof STATUS_EMOJI] || '✅'} {c.wordId}
+                            {STATUS_EMOJI[c.newStatus] ?? '✅'} {c.wordId}
                           </div>
                         ))}
-                        <button onClick={() => handleApplyChanges(msg.id)} style={{ width: '100%', marginTop: '10px', background: '#4CAF50', color: 'white', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+                        <button
+                          onClick={() => handleApplyChanges(msg.id)}
+                          style={{ width: '100%', marginTop: '10px', background: '#4CAF50', color: 'white', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
+                        >
                           APPLY CHANGES
                         </button>
                       </div>

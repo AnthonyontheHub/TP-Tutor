@@ -62,7 +62,8 @@ export async function* streamCompletion(
   history: { role: 'user' | 'assistant'; content: string }[]
 ) {
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", systemInstruction: systemPrompt });
+  // Fix 1: gemini-1.5-flash is deprecated (404). Using gemini-2.5-flash.
+  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash", systemInstruction: systemPrompt });
 
   const chat = model.startChat({
     history: history.slice(0, -1).map(h => ({
@@ -79,11 +80,17 @@ export async function* streamCompletion(
   }
 }
 
-// Req 1: Use native JSON output mode — no regex parsing needed.
+// Fix 4: Strip markdown code fences before JSON.parse — Gemini occasionally
+// wraps JSON-mode output in ```json ... ``` even when not asked to.
+function sanitizeJson(text: string): string {
+  return text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
+}
+
 export async function fetchSentenceSuggestions(apiKey: string, words: string[]) {
   const genAI = new GoogleGenerativeAI(apiKey);
+  // Fix 1: updated model name.
   const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-flash",
+    model: "gemini-2.5-flash",
     generationConfig: { responseMimeType: "application/json" },
   });
 
@@ -91,7 +98,7 @@ export async function fetchSentenceSuggestions(apiKey: string, words: string[]) 
 
   try {
     const result = await model.generateContent(prompt);
-    return JSON.parse(result.response.text()) as string[];
+    return JSON.parse(sanitizeJson(result.response.text())) as string[];
   } catch (e) {
     console.error("Lina Suggestion Error:", e);
     return [];
@@ -100,7 +107,8 @@ export async function fetchSentenceSuggestions(apiKey: string, words: string[]) 
 
 export async function fetchQuickTranslation(apiKey: string, text: string) {
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  // Fix 1: updated model name.
+  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
   const prompt = `Translate this Toki Pona phrase to English: "${text}". Provide ONLY the direct English translation, no other text, quotes, or explanation.`;
 
@@ -113,11 +121,11 @@ export async function fetchQuickTranslation(apiKey: string, text: string) {
   }
 }
 
-// Req 1: Use native JSON output mode — no regex parsing needed.
 export async function fetchExamplesForWord(apiKey: string, word: string, partsOfSpeech: string[]) {
   const genAI = new GoogleGenerativeAI(apiKey);
+  // Fix 1: updated model name.
   const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-flash",
+    model: "gemini-2.5-flash",
     generationConfig: { responseMimeType: "application/json" },
   });
 
@@ -125,7 +133,7 @@ export async function fetchExamplesForWord(apiKey: string, word: string, partsOf
 
   try {
     const result = await model.generateContent(prompt);
-    return JSON.parse(result.response.text()) as Record<string, string>;
+    return JSON.parse(sanitizeJson(result.response.text())) as Record<string, string>;
   } catch (e) {
     console.error("Lina Dictionary Error:", e);
     return partsOfSpeech.reduce((acc, pos) => ({ ...acc, [pos]: `${word} li lon.` }), {} as Record<string, string>);
@@ -136,18 +144,26 @@ export function stripProposedChanges(text: string) {
   return text.split('---')[0].trim();
 }
 
+// Fix 3: Case-insensitive, markdown-aware parser.
+// Handles LLM quirks like bold formatting (**CHANGE:**), extra spaces,
+// and mixed capitalisation.
 export function parseProposedChanges(text: string): ProposedChange[] | null {
   const changes: ProposedChange[] = [];
-  const lines = text.split('\n');
 
-  lines.forEach(line => {
-    if (line.includes('CHANGE: vocab')) {
-      const parts = line.split('|').map(p => p.trim());
-      if (parts.length >= 3) {
-        changes.push({ type: 'vocab', wordId: parts[1], newStatus: parts[2] as MasteryStatus });
-      }
+  for (const rawLine of text.split('\n')) {
+    // Strip markdown bold markers and collapse whitespace before matching.
+    const line = rawLine.replace(/\*\*/g, '').replace(/\s+/g, ' ').trim();
+    if (!/change:\s*vocab/i.test(line)) continue;
+
+    const parts = line.split('|').map(p => p.trim());
+    if (parts.length < 3) continue;
+
+    const wordId = parts[1];
+    const newStatus = parts[2].toLowerCase() as MasteryStatus;
+    if (wordId && newStatus) {
+      changes.push({ type: 'vocab', wordId, newStatus });
     }
-  });
+  }
 
   return changes.length > 0 ? changes : null;
 }
