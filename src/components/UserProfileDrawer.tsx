@@ -1,6 +1,5 @@
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
-import type { MasteryStatus } from '../types/mastery';
 
 interface Props {
   isOpen: boolean;
@@ -8,17 +7,11 @@ interface Props {
 }
 
 export default function UserProfileDrawer({ isOpen, onClose }: Props) {
-  const studentName = useMasteryStore(s => s.studentName);
-  const vocabulary  = useMasteryStore(s => s.vocabulary);
-  const concepts    = useMasteryStore(s => s.concepts);
+  const { studentName, currentStreak, savedPhrases, getStatusSummary } = useMasteryStore();
   const dragControls = useDragControls();
 
-  const statusCounts = vocabulary.reduce(
-    (acc, w) => { acc[w.status]++; return acc; },
-    { not_started: 0, introduced: 0, practicing: 0, confident: 0, mastered: 0 } as Record<MasteryStatus, number>
-  );
-  const totalLearned = statusCounts.introduced + statusCounts.practicing + statusCounts.confident + statusCounts.mastered;
-  const masteredConcepts = concepts.filter(c => c.status === 'mastered').length;
+  const summary = getStatusSummary();
+  const totalLearned = summary.introduced + summary.practicing + summary.confident + summary.mastered;
 
   return (
     <AnimatePresence>
@@ -48,6 +41,7 @@ export default function UserProfileDrawer({ isOpen, onClose }: Props) {
           onClick={(e) => e.stopPropagation()}
           style={{ padding: '0 24px 24px' }}
         >
+          {/* Drag handle */}
           <div
             style={{ padding: '12px 0 6px', cursor: 'grab', touchAction: 'none' }}
             onPointerDown={(e) => dragControls.start(e)}
@@ -68,25 +62,19 @@ export default function UserProfileDrawer({ isOpen, onClose }: Props) {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <div style={{ background: '#1a1a1a', padding: '20px', borderRadius: '12px', borderLeft: '4px solid #10b981' }}>
-              <div style={{ fontSize: '0.85rem', color: '#aaa', marginBottom: '4px' }}>Vocabulary Progress</div>
-              <div style={{ fontSize: '1.8rem', color: '#fff', fontWeight: 'bold' }}>
-                {totalLearned} <span style={{ fontSize: '1rem', color: '#888' }}>/ {vocabulary.length} Words</span>
-              </div>
+            <div style={{ background: '#1a1a1a', padding: '20px', borderRadius: '12px', borderLeft: '4px solid #f59e0b' }}>
+              <div style={{ fontSize: '0.85rem', color: '#aaa', marginBottom: '4px' }}>Current Streak</div>
+              <div style={{ fontSize: '1.8rem', color: '#fff', fontWeight: 'bold' }}>🔥 {currentStreak} Days</div>
             </div>
 
-            <div style={{ background: '#1a1a1a', padding: '20px', borderRadius: '12px', borderLeft: '4px solid #22c55e' }}>
-              <div style={{ fontSize: '0.85rem', color: '#aaa', marginBottom: '4px' }}>Words Mastered</div>
-              <div style={{ fontSize: '1.8rem', color: '#fff', fontWeight: 'bold' }}>
-                {statusCounts.mastered} <span style={{ fontSize: '1rem', color: '#888' }}>Words</span>
-              </div>
+            <div style={{ background: '#1a1a1a', padding: '20px', borderRadius: '12px', borderLeft: '4px solid #10b981' }}>
+              <div style={{ fontSize: '0.85rem', color: '#aaa', marginBottom: '4px' }}>Vocabulary Progress</div>
+              <div style={{ fontSize: '1.8rem', color: '#fff', fontWeight: 'bold' }}>{totalLearned} <span style={{ fontSize: '1rem', color: '#888' }}>/ 124 Words</span></div>
             </div>
 
             <div style={{ background: '#1a1a1a', padding: '20px', borderRadius: '12px', borderLeft: '4px solid #8b5cf6' }}>
-              <div style={{ fontSize: '0.85rem', color: '#aaa', marginBottom: '4px' }}>Concepts Mastered</div>
-              <div style={{ fontSize: '1.8rem', color: '#fff', fontWeight: 'bold' }}>
-                {masteredConcepts} <span style={{ fontSize: '1rem', color: '#888' }}>/ {concepts.length} Concepts</span>
-              </div>
+              <div style={{ fontSize: '0.85rem', color: '#aaa', marginBottom: '4px' }}>Saved Phrases</div>
+              <div style={{ fontSize: '1.8rem', color: '#fff', fontWeight: 'bold' }}>{savedPhrases.length} <span style={{ fontSize: '1rem', color: '#888' }}>Phrases</span></div>
             </div>
           </div>
         </motion.div>
