@@ -35,29 +35,50 @@ export function resolveApiKey(overrideKey?: string): string {
     || '';
 }
 
-// Change 3: include confidenceScore in the prompt and use the new delta format.
 export function buildSystemPrompt(vocabulary: VocabWord[], studentName: string) {
-  const activeVocab = vocabulary
-    .filter(v => v.status === 'introduced' || v.status === 'practicing')
-    .map(v => `${v.word} (score:${v.confidenceScore}, status:${v.status})`)
+  const practicing = vocabulary
+    .filter(v => v.status === 'practicing')
+    .map(v => `${v.word}(${v.confidenceScore})`)
+    .join(', ');
+  const introduced = vocabulary
+    .filter(v => v.status === 'introduced')
+    .map(v => `${v.word}(${v.confidenceScore})`)
+    .join(', ');
+  const mastered = vocabulary
+    .filter(v => v.status === 'mastered')
+    .map(v => v.word)
     .join(', ');
 
-  return `You are an expert Toki Pona teacher. The student's name is ${studentName}.
+  return `You are a Toki Pona language teacher. Student: ${studentName}.
 
-CURRENT STUDENT PROGRESS:
-Active words (introduced/practicing): ${activeVocab || 'None yet'}
+VOCABULARY SNAPSHOT (score 0–100):
+  Practicing: ${practicing || 'none'}
+  Introduced: ${introduced || 'none'}
+  Mastered:   ${mastered || 'none'}
 
-SCORING RULES — only propose changes for words actually used or tested this session:
+LESSON STRUCTURE — follow these three phases in order during a daily review:
+  Phase 1 · WARM-UP: Test practicing-tier words with simple recall and translation tasks. One word at a time. Give immediate feedback.
+  Phase 2 · CHALLENGE: Use introduced-tier words in short sentences. Ask the student to build or translate a sentence using 2–3 words together.
+  Phase 3 · FREE PRACTICE: Let the student build their own sentence or ask a question. Respond naturally in Toki Pona with an English gloss.
+
+BEHAVIORAL RULES:
+  - Speak directly to ${studentName}, never break character as their teacher.
+  - Keep each message short — one task or question per turn.
+  - After mastered words appear correctly, say so briefly but do not test them.
+  - Do not introduce new vocabulary unless the student asks.
+  - If the student makes an error, correct kindly and ask them to try again before moving on.
+
+SCORING — only score words actually used or tested this session:
   Correct, confident use in a new context: +8 to +12
-  Correct but hesitant or prompted use:    +3 to +6
+  Correct but hesitant or prompted:        +3 to +6
   Minor error, self-corrected:             -3 to -5
   Clear mistake or misuse:                 -8 to -15
 
-If any active words were used or tested, append a PROPOSED CHANGES block using exactly this format:
+After each turn where words were tested, append:
 ---
-CHANGE: vocab | [word_id] | [delta]
+CHANGE: vocab | [word] | [delta]
 ---
-[delta] is a signed integer, e.g. +8 or -10. Only include words from the active list above.`;
+Only include words from the Practicing or Introduced lists above.`;
 }
 
 export async function* streamCompletion(

@@ -99,6 +99,7 @@ export interface VocabWord {
   // status is derived from it via scoreToStatus() and kept in sync.
   confidenceScore: number;
   status: MasteryStatus;
+  useCount: number;
   isMasteryCandidate: boolean;
   sessionNotes: string;
 }

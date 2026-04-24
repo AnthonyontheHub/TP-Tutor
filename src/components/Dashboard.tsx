@@ -29,12 +29,26 @@ export default function Dashboard({ onStartSession, onAskLina, isSandboxMode, se
   if (!studentName || studentName === 'Student') return <SetupScreen />;
 
   const handleDailyReview = () => {
-    const reviewWords = vocabulary.filter(w => w.status === 'practicing' || w.status === 'introduced').map(w => w.word);
-    if (reviewWords.length > 0) {
-      onAskLina(`toki Lina! Please quiz me on: ${reviewWords.slice(0,10).join(', ')}`);
-    } else {
-      onAskLina(`toki Lina! I don't have any specific words to review right now. Can you teach me a new concept?`);
+    const practicingWords = vocabulary
+      .filter(w => w.status === 'practicing')
+      .sort((a, b) => a.confidenceScore - b.confidenceScore) // lowest scores first
+      .slice(0, 6)
+      .map(w => `${w.word} (score: ${w.confidenceScore})`);
+    const introducedWords = vocabulary
+      .filter(w => w.status === 'introduced')
+      .slice(0, 4)
+      .map(w => w.word);
+
+    if (practicingWords.length === 0 && introducedWords.length === 0) {
+      onAskLina(`toki Lina! I have no words to review right now — either I haven't started yet or everything is mastered. What should we work on?`);
+      return;
     }
+
+    const parts: string[] = [];
+    if (practicingWords.length > 0) parts.push(`Practicing (lowest scores first): ${practicingWords.join(', ')}`);
+    if (introducedWords.length > 0) parts.push(`Introduced (need more practice): ${introducedWords.join(', ')}`);
+
+    onAskLina(`toki Lina! Let's do a daily review. Please follow the 3-phase lesson structure.\n\n${parts.join('\n')}\n\nStart with Phase 1 — warm up my practicing words.`);
   };
 
   // Called by MasteryGrid after saving a phrase — switch to phrasebook and open note editor.

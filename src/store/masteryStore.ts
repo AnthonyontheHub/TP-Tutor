@@ -52,7 +52,8 @@ export const useMasteryStore = create<MasteryStore>()(
       currentStreak: initialMasteryMap.currentStreak || 0,
       lastActiveDate: initialMasteryMap.lastActiveDate || '',
 
-      // Primary scoring action — adjusts confidenceScore and re-derives status.
+      // Primary scoring action — adjusts confidenceScore, re-derives status,
+      // and increments useCount for every word that Lina scored this session.
       applyScoreDeltas: (deltas) => {
         set((state) => ({
           vocabulary: state.vocabulary.map((w) => {
@@ -63,7 +64,12 @@ export const useMasteryStore = create<MasteryStore>()(
             );
             if (!d) return w;
             const newScore = clamp((w.confidenceScore ?? 0) + d.delta, 0, 100);
-            return { ...w, confidenceScore: newScore, status: scoreToStatus(newScore) };
+            return {
+              ...w,
+              confidenceScore: newScore,
+              status: scoreToStatus(newScore),
+              useCount: (w.useCount ?? 0) + 1,
+            };
           }),
         }));
         get().recordActivity();
@@ -213,13 +219,14 @@ export const useMasteryStore = create<MasteryStore>()(
           if (!snapshot.exists()) return;
           const data = snapshot.data();
 
-          // Change 6: Backfill confidenceScore for legacy records that only have status.
+          // Backfill confidenceScore and useCount for legacy records.
           const vocabulary = (data.vocabulary || initialMasteryMap.vocabulary).map(
             (w: any) => {
-              if (typeof w.confidenceScore === 'number') return w;
+              const useCount = typeof w.useCount === 'number' ? w.useCount : 0;
+              if (typeof w.confidenceScore === 'number') return { ...w, useCount };
               // Old record — seed score from the midpoint of its stored status tier.
               const status: MasteryStatus = w.status || 'not_started';
-              return { ...w, confidenceScore: STATUS_MIDPOINT[status] };
+              return { ...w, confidenceScore: STATUS_MIDPOINT[status], useCount };
             }
           );
 

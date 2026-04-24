@@ -160,6 +160,10 @@ export default function MasteryGrid({
         const diff = a.partOfSpeech.localeCompare(b.partOfSpeech);
         return sortDirection === 'asc' ? diff : -diff;
       }
+      if (sortMode === 'useCount') {
+        const diff = (a.useCount ?? 0) - (b.useCount ?? 0);
+        return sortDirection === 'asc' ? diff : -diff;
+      }
       const valA = a.word.toLowerCase();
       const valB = b.word.toLowerCase();
       return sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
@@ -177,6 +181,7 @@ export default function MasteryGrid({
           <option value="status">Mastery Level</option>
           <option value="length">Word Length</option>
           <option value="partOfSpeech">Part of Speech</option>
+          <option value="useCount">Most Used</option>
         </select>
         <button
           onClick={(e) => { e.stopPropagation(); setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc'); }}

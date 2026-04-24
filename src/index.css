@@ -474,6 +474,20 @@ select {
 
 .btn-danger:hover { background: #1f0000; }
 
+/* ─── Progress Bar ──────────────────────────────────────────────────────── */
+.progress-bar-track {
+  height: 6px;
+  background: #1a1a1a;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
 /* ─── Scrollbars ────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
