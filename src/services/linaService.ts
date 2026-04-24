@@ -10,6 +10,18 @@ export const STATUS_EMOJI: Record<string, string> = {
   mastered: '✅'
 };
 
+// Offline word-by-word gloss built from local vocabulary data — no API needed.
+// Takes the first meaning fragment (before any comma or semicolon) for brevity.
+export function buildOfflineTranslation(selectedWords: string[], vocabulary: VocabWord[]): string {
+  const glosses = selectedWords.map(w => {
+    const entry = vocabulary.find(v => v.word === w);
+    if (!entry) return w;
+    const firstMeaning = entry.meanings.split(/[,;]/)[0].trim().replace(/^to /, '');
+    return firstMeaning;
+  });
+  return glosses.join(' · ');
+}
+
 export interface ProposedChange {
   type: 'vocab' | 'concept';
   wordId?: string;

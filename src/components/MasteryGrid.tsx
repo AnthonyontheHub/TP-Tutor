@@ -4,7 +4,7 @@ import { useMasteryStore } from '../store/masteryStore';
 import VocabCard from './VocabCard';
 import WordDetailDrawer from './WordDetailDrawer';
 import { soundService } from '../services/soundService';
-import { fetchSentenceSuggestions, fetchQuickTranslation, resolveApiKey } from '../services/linaService';
+import { fetchSentenceSuggestions, fetchQuickTranslation, resolveApiKey, buildOfflineTranslation } from '../services/linaService';
 import type { MasteryStatus, VocabWord } from '../types/mastery';
 
 interface Props {
@@ -53,8 +53,19 @@ export default function MasteryGrid({
 
     if (selectedWords.length === 0) { setMagneticSuggestions([]); return; }
 
+    // Sandbox: build a word-by-word gloss immediately from local data — no API call.
+    if (isSandboxMode) {
+      setTranslation(buildOfflineTranslation(selectedWords, vocabulary));
+      setMagneticSuggestions([]);
+      return;
+    }
+
     const apiKey = resolveApiKey();
-    if (!apiKey) { setMagneticSuggestions([]); return; }
+    if (!apiKey) {
+      setTranslation(buildOfflineTranslation(selectedWords, vocabulary));
+      setMagneticSuggestions([]);
+      return;
+    }
 
     setIsAutoTranslating(true);
     let active = true;
@@ -67,14 +78,14 @@ export default function MasteryGrid({
           : Promise.resolve([]),
       ]);
       if (active) {
-        setTranslation(transResult ?? '(translation unavailable)');
+        setTranslation(transResult ?? buildOfflineTranslation(selectedWords, vocabulary));
         setMagneticSuggestions(suggResults);
         setIsAutoTranslating(false);
       }
     }, 900);
 
     return () => { active = false; clearTimeout(timer); setIsAutoTranslating(false); };
-  }, [selectedWords]);
+  }, [selectedWords, isSandboxMode]);
 
   // ── Pointer handlers ──────────────────────────────────────────────────────
 
