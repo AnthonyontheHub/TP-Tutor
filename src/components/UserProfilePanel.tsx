@@ -192,7 +192,7 @@ export default function UserProfilePanel({ onClose }: Props) {
             >
               <option value="">Select...</option>
               {Array.from({ length: 100 }, (_, i) => i + 1).map(age => (
-                <option key={age} value={age}>{age}</option>
+                <option key={age} value={String(age)}>{age}</option>
               ))}
             </select>
           </div>
