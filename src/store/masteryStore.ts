@@ -77,6 +77,7 @@ interface MasteryActions {
   calculateDecay: () => void;
   hardenWord: (wordId: string) => void;
   checkAssessments: (onTrigger: (word: VocabWord) => void) => void;
+  syncAnthonyHistory: () => void;
 }
 
 interface MasteryState {
@@ -96,6 +97,7 @@ interface MasteryState {
   currentPositionNodeId: string;
   selectedWords: string[];
   lessonFilter: string[] | null;
+  historySynced: boolean;
   // Dashboard settings
   widgetDensity: 'Compact' | 'Expanded';
   fogOfWar: 'Strict' | 'Visible';
@@ -127,6 +129,7 @@ export const useMasteryStore = create<MasteryStore>()(
       currentPositionNodeId: 'phi_sim',
       selectedWords: [],
       lessonFilter: null,
+      historySynced: false,
       widgetDensity: 'Expanded',
       fogOfWar: 'Visible',
       showCircuitPaths: true,
@@ -525,15 +528,55 @@ export const useMasteryStore = create<MasteryStore>()(
         return { ...summary, level, rankTitle };
       },
 
+      syncAnthonyHistory: () => {
+        if (get().historySynced) return;
+        
+        const historicalVocab = [
+          'ala', 'alasa', 'ale', 'ali', 'anu', 'awen', 'e', 'en', 'ike', 'ilo', 'insa', 'jan', 'jelo', 'jo', 'kala', 'ken', 'kepeken', 'kili', 'kon', 'kute', 'la', 'lape', 'lawa', 'len', 'lete', 'li', 'lili', 'lipu', 'lon', 'luka', 'lukin', 'mama', 'meli', 'mi', 'mije', 'moku', 'monsi', 'musi', 'mute', 'ni', 'noka', 'oko', 'ona', 'pan', 'pi', 'pilin', 'pimeja', 'pipi', 'poka', 'poki', 'pona', 'seli', 'seme', 'sewi', 'sijelo', 'sina', 'sinpin', 'sona', 'soweli', 'suli', 'supa', 'tan', 'tawa', 'telo', 'tenpo', 'toki', 'tomo', 'tu', 'uta', 'wan', 'waso', 'wawa', 'wile', 'nanpa'
+        ];
+
+        const historicalNodes = [
+          'Philosophy of Simplicity', 'Universal Vowels (a e i o u)', 'The Nine Consonants', 'The Syllable Equation', 'The Pulse (Initial Stress)', 'Name Adaptation', 'Checkpoint: The Sound of Simplicity',
+          'SVO Sentence Structure', "The Divider 'li'", "The Direct Object 'e'", 'The mi/sina Exception', "Connecting Subjects with 'en'", 'Checkpoint: Building the Core',
+          'Head-Initial Rule', 'Simple Modifiers', 'Chain of Modifiers', 'The Art of Polysemy', 'Checkpoint: The Art of Description',
+          "Intro to 'pi'", "Grouping with 'pi'", 'The 2-Word Rule', 'pi Stacks', 'Checkpoint: Complex Concepts',
+          "Negation with 'ala'", 'Yes/No Questions', "Information with 'seme'", "Choice with 'anu seme'", 'Checkpoint: Interaction',
+          'Desire: wile', 'Ability: ken', 'Becoming: kama', 'Locality: lon', 'Motion: tawa', 'Origin: tan', 'Utility: kepeken', 'Checkpoint: Action & Location',
+          'Primary Colors', 'Light & Dark', 'Numbers: wan & tu', 'Quantities: mute & ale', 'Zero: ala', 'Checkpoint: Specifics'
+        ];
+
+        set((state) => ({
+          historySynced: true,
+          vocabulary: state.vocabulary.map(w => {
+            if (historicalVocab.includes(w.word.toLowerCase()) || historicalVocab.includes(w.id)) {
+              return { ...w, status: 'practicing' as MasteryStatus, baseScore: 625, confidenceScore: 625 };
+            }
+            return w;
+          }),
+          levels: state.levels.map(level => ({
+            ...level,
+            nodes: level.nodes.map(node => {
+              if (historicalNodes.includes(node.title)) {
+                return { ...node, status: 'mastered' as const };
+              }
+              return node;
+            })
+          }))
+        }));
+
+        get().refreshCurriculumStatus();
+        void get().syncToCloud();
+      },
+
       syncToCloud: async (explicitUserId) => {
-        const { vocabulary, levels, lastUpdated, studentName, profile, lore, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, widgetDensity, fogOfWar, showCircuitPaths } = get();
+        const { vocabulary, levels, lastUpdated, studentName, profile, lore, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, historySynced, widgetDensity, fogOfWar, showCircuitPaths } = get();
         const targetId = explicitUserId || userId;
         if (!targetId || targetId === 'guest_user') return;
 
         try {
           await setDoc(doc(db, 'users', targetId), {
             vocabulary, levels, lastUpdated, studentName, profile, lore, profileImage,
-            savedPhrases, currentStreak, lastActiveDate, hasCompletedSetup, currentPositionNodeId,
+            savedPhrases, currentStreak, lastActiveDate, hasCompletedSetup, currentPositionNodeId, historySynced,
             widgetDensity, fogOfWar, showCircuitPaths
           }, { merge: true });
         } catch (err) {
@@ -633,6 +676,7 @@ export const useMasteryStore = create<MasteryStore>()(
             lastActiveDate: data.lastActiveDate || '',
             hasCompletedSetup: data.hasCompletedSetup || false,
             currentPositionNodeId: data.currentPositionNodeId || 'phi_sim',
+            historySynced: data.historySynced || false,
             widgetDensity: data.widgetDensity || 'Expanded',
             fogOfWar: data.fogOfWar || 'Visible',
             showCircuitPaths: data.showCircuitPaths !== undefined ? data.showCircuitPaths : true,
