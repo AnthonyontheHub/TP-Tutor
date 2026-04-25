@@ -72,6 +72,7 @@ interface MasteryActions {
   setSelectedWords: (words: string[]) => void;
   addWordToSelection: (word: string) => void;
   removeWordFromSelection: (word: string) => void;
+  toggleWordSelection: (word: string) => void;
   setLessonFilter: (wordIds: string[] | null) => void;
   calculateDecay: () => void;
   hardenWord: (wordId: string) => void;
@@ -480,6 +481,16 @@ export const useMasteryStore = create<MasteryStore>()(
         const newSelected = [...state.selectedWords];
         newSelected.splice(index, 1);
         return { selectedWords: newSelected };
+      }),
+      toggleWordSelection: (word) => set((state) => {
+        const index = state.selectedWords.indexOf(word);
+        if (index === -1) {
+          return { selectedWords: [...state.selectedWords, word] };
+        } else {
+          const newSelected = [...state.selectedWords];
+          newSelected.splice(index, 1);
+          return { selectedWords: newSelected };
+        }
       }),
 
       setLessonFilter: (wordIds) => set({ lessonFilter: wordIds }),

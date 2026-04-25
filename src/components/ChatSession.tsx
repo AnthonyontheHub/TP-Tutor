@@ -174,17 +174,55 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
   return (
     <LazyMotion features={domMax}>
       <m.div
-        className="side-panel chat-drawer"
+        className="chat-drawer"
         initial={{ x: '100%' }}
         animate={{ x: 0 }}
         exit={{ x: '100%' }}
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
         onMouseUp={handleTextSelection}
         onTouchEnd={handleTextSelection}
+        style={{
+          width: '100%',
+          maxWidth: '500px',
+          height: '100%',
+          background: 'var(--surface-opaque)',
+          display: 'flex',
+          flexDirection: 'column',
+          position: 'relative',
+          boxShadow: '-10px 0 30px rgba(0,0,0,0.5)',
+          borderLeft: '1px solid var(--border)'
+        }}
       >
-        <header className="side-panel-header" style={{ justifyContent: 'space-between' }}>
-          <h2 style={{ fontSize: '0.9rem', fontWeight: 900, letterSpacing: '0.15em', color: 'var(--gold)' }}>NEURAL LINK</h2>
-          <button onClick={handleEndSession} className="btn-close-glowing">✕</button>
+        <header style={{ 
+          height: 'var(--header-height)', 
+          padding: '0 20px', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between',
+          borderBottom: '1px solid var(--border)',
+          background: 'rgba(5,5,5,0.95)',
+          backdropFilter: 'var(--glass)'
+        }}>
+          <h2 style={{ fontSize: '0.8rem', fontWeight: 900, letterSpacing: '0.2em', color: 'var(--gold)', margin: 0 }}>NEURAL LINK</h2>
+          <button 
+            onClick={handleEndSession} 
+            style={{ 
+              background: 'none', 
+              border: 'none', 
+              color: 'var(--gold)', 
+              fontSize: '1.2rem', 
+              cursor: 'pointer',
+              padding: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'transform 0.2s'
+            }}
+            onMouseOver={e => e.currentTarget.style.transform = 'scale(1.1)'}
+            onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
+          >
+            ✕
+          </button>
         </header>
 
         {translateBubble && (

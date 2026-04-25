@@ -25,23 +25,19 @@ export default function MasteryGrid({
   onAskLina, isSandboxMode, activeFilter, sortMode, sortDirection, posFilter,
   setSortMode, setSortDirection, setPosFilter
 }: Props) {
-  const { vocabulary, selectedWords, addWordToSelection, removeWordFromSelection, setSelectedWords, lessonFilter } = useMasteryStore();
+  const { vocabulary, selectedWords, toggleWordSelection, setSelectedWords, lessonFilter } = useMasteryStore();
   const [drawerId, setDrawerId] = useState<string | null>(null);
 
   const handleCardClick = (word: VocabWord) => {
     if (selectedWords.length === 0) {
       setDrawerId(word.id);
     } else {
-      if (selectedWords.includes(word.word)) {
-        removeWordFromSelection(word.word);
-      } else {
-        addWordToSelection(word.word);
-      }
+      toggleWordSelection(word.word);
     }
   };
 
   const handleCardLongPress = (word: VocabWord) => {
-    addWordToSelection(word.word);
+    toggleWordSelection(word.word);
   };
 
   const displayed = vocabulary

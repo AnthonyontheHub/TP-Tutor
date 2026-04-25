@@ -181,6 +181,8 @@ export interface CurriculumNode {
   richContent?: ContentBlock[];
   visualFramework?: string;
   requiredWordIds?: string[];
+  suggestedMethod?: 'Jan Lina Chat' | 'Builder Drill' | 'Quiz';
+  type?: 'Topic' | 'Drill' | 'Checkpoint';
 }
 
 export interface CurriculumLevel {

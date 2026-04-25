@@ -33,6 +33,8 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   // Translation & Builder State
   const [translation, setTranslation] = useState<string | null>(null);
   const [isAutoTranslating, setIsAutoTranslating] = useState(false);
+  const [showSaveNote, setShowSaveNote] = useState(false);
+  const [saveNoteInput, setSaveNoteInput] = useState('');
   const [savedConfirm, setSavedConfirm] = useState(false);
   const confirmTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -49,6 +51,8 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
     setIsAutoTranslating(false);
     if (confirmTimer.current) { clearTimeout(confirmTimer.current); confirmTimer.current = null; }
     setSavedConfirm(false);
+    setShowSaveNote(false);
+    setSaveNoteInput('');
 
     if (selectedWords.length === 0) return;
 
@@ -106,9 +110,11 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
 
   const handleSaveSentence = () => {
     const sentence = selectedWords.join(' ');
-    savePhrase({ id: sentence, tp: sentence, en: translation ?? '', notes: '' });
+    savePhrase({ id: sentence, tp: sentence, en: translation ?? '', notes: saveNoteInput });
     if (confirmTimer.current) clearTimeout(confirmTimer.current);
     setSavedConfirm(true);
+    setShowSaveNote(false);
+    setSaveNoteInput('');
     confirmTimer.current = setTimeout(() => {
       setSavedConfirm(false);
       confirmTimer.current = null;
@@ -148,7 +154,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
         </div>
       </header>
 
-      <main className="dashboard__main">
+      <main className="dashboard__main" style={{ paddingBottom: '12rem' }}>
         <ProgressSummary activeFilter={activeFilter} onFilterClick={setActiveFilter} />
         
         {/* Row 2: Review Controls */}
@@ -315,7 +321,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
         <SentenceBuilder 
           translation={translation}
           isAutoTranslating={isAutoTranslating}
-          onSave={handleSaveSentence}
+          onSave={() => setShowSaveNote(true)}
           onPractice={(s) => { onAskLina(`toki jan Lina! Let's practice this: "${s}"`); setSelectedWords([]); }}
           onExplain={(s) => { onAskLina(`toki jan Lina! Can you explain the grammar of this phrase: "${s}"?`); setSelectedWords([]); }}
           onRemoveLast={() => {
@@ -326,6 +332,41 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
         />
 
         <AnimatePresence>
+          {showSaveNote && (
+            <div className="modal-backdrop" style={{ zIndex: 5001 }}>
+              <motion.div 
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                className="glass-panel"
+                style={{ width: '90%', maxWidth: '400px', border: '1px solid var(--gold)' }}
+                onClick={e => e.stopPropagation()}
+              >
+                <h3 style={{ color: 'var(--gold)', marginBottom: '15px' }}>SAVE PHRASE</h3>
+                <div style={{ marginBottom: '10px', fontSize: '0.9rem', color: '#ccc' }}>
+                   <strong>{selectedWords.join(' ')}</strong>
+                   <br/>
+                   <span style={{ fontSize: '0.75rem', opacity: 0.7 }}>{translation}</span>
+                </div>
+                <textarea 
+                  value={saveNoteInput} 
+                  onChange={e => setSaveNoteInput(e.target.value)}
+                  placeholder="Add a note to this phrase..."
+                  style={{ width: '100%', height: '80px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', borderRadius: '4px', color: 'white', padding: '10px', marginBottom: '15px', resize: 'none' }}
+                  autoFocus
+                />
+                <div style={{ display: 'flex', gap: '8px' }}>
+                   <button onClick={handleSaveSentence} className="btn-review" style={{ flex: 1, margin: 0 }}>SAVE</button>
+                   <button onClick={() => { setShowSaveNote(false); setSaveNoteInput(''); }} className="btn-toggle" style={{ flex: 1 }}>CANCEL</button>
+                </div>
+                <div style={{ marginTop: '10px', display: 'flex', gap: '8px' }}>
+                   <button onClick={() => { setSelectedWords([]); setShowSaveNote(false); }} className="btn-toggle" style={{ flex: 1, color: '#ef4444' }}>DELETE</button>
+                   <button onClick={() => setShowSaveNote(false)} className="btn-toggle" style={{ flex: 1 }}>EDIT</button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+
           {assessmentWord && (
             <div className="modal-backdrop" style={{ zIndex: 3000 }}>
               <motion.div 

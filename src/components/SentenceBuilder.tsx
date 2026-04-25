@@ -53,19 +53,23 @@ export default function SentenceBuilder({
             display: 'flex',
             gap: '4px',
             justifyContent: 'center',
-            height: '20px',
-            overflow: 'hidden'
+            height: '18px',
+            overflow: 'hidden',
+            fontSize: '0.55rem',
+            color: 'rgba(255,255,255,0.35)',
+            fontWeight: 800,
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            marginTop: '2px'
           }}>
             {selectedWords.map((word, idx) => {
-              const vocab = vocabulary.find(v => v.word === word);
-              const definition = vocab?.meanings?.split(',')[0].trim() || '?';
+              const vocab = vocabulary.find(v => v.word.toLowerCase() === word.toLowerCase());
+              // Take the first meaning (before any comma or semicolon)
+              const hint = vocab?.meanings?.split(/[;,]/)[0].trim() || '?';
               return (
-                <React.Fragment key={idx}>
-                  <span style={{ fontSize: '0.6rem', color: 'var(--gold)', opacity: 0.8, fontWeight: 700 }}>
-                    {definition}
-                  </span>
-                  {idx < selectedWords.length - 1 && <span style={{ fontSize: '0.6rem', color: '#444' }}>|</span>}
-                </React.Fragment>
+                <span key={idx}>
+                  {hint}{idx < selectedWords.length - 1 ? ' | ' : ''}
+                </span>
               );
             })}
           </div>
@@ -74,20 +78,30 @@ export default function SentenceBuilder({
           <div style={{
             flex: 1,
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '1.2rem',
-            fontWeight: 900,
-            color: 'white',
-            letterSpacing: '0.02em',
             textAlign: 'center'
           }}>
-            {isAutoTranslating ? (
-              <motion.span animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.5 }}>
-                {sentence}
-              </motion.span>
-            ) : (
-              sentence
+            <div style={{
+              fontSize: '1.2rem',
+              fontWeight: 900,
+              color: 'white',
+              letterSpacing: '0.02em',
+              lineHeight: 1.1
+            }}>
+              {isAutoTranslating ? (
+                <motion.span animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.5 }}>
+                  {sentence}
+                </motion.span>
+              ) : (
+                sentence
+              )}
+            </div>
+            {translation && !isAutoTranslating && (
+              <div style={{ fontSize: '0.7rem', color: 'var(--gold)', opacity: 0.9, fontWeight: 600, marginTop: '2px' }}>
+                {translation}
+              </div>
             )}
           </div>
 

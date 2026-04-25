@@ -1,60 +1,6 @@
+/* src/data/initialMasteryMap.ts */
 import type { MasteryStatus, CurriculumLevel } from '../types/mastery';
-
-const roadmap: CurriculumLevel[] = [
-  {
-    id: "book_1",
-    title: "Book 1: Introduction",
-    nodes: [
-      { 
-        id: "intro_ch1", 
-        title: "Phonology and Orthography", 
-        requiredVocabIds: ["a", "mu"], 
-        requiredGrammarIds: [],
-        status: 'active'
-      },
-      { 
-        id: "intro_ch2", 
-        title: "Subjects and Predicates", 
-        requiredVocabIds: ["mi", "sina", "ona", "li"], 
-        requiredGrammarIds: ["particle_li"],
-        status: 'locked'
-      },
-      { 
-        id: "intro_ch3", 
-        title: "Objects and Actions", 
-        requiredVocabIds: ["e", "moku", "pali"], 
-        requiredGrammarIds: ["particle_e"],
-        status: 'locked'
-      }
-    ]
-  },
-  {
-    id: "book_2",
-    title: "Book 2: pona sona",
-    nodes: [
-      { 
-        id: "inter_ch1", 
-        title: "Modification and pi", 
-        requiredVocabIds: ["pi", "pona", "suli"], 
-        requiredGrammarIds: ["particle_pi"],
-        status: 'locked'
-      }
-    ]
-  },
-  {
-    id: "book_3",
-    title: "Book 3: Advanced",
-    nodes: [
-      { 
-        id: "adv_ch1", 
-        title: "The la Particle", 
-        requiredVocabIds: ["la", "tenpo"], 
-        requiredGrammarIds: ["particle_la"],
-        status: 'locked'
-      }
-    ]
-  }
-];
+import { curriculumRoadmap } from './curriculum';
 
 const initialVocabulary = [
   { word: "a", frequencyRank: 10, status: "not_started" as MasteryStatus, type: 'word' as const, sessionNotes: "" },
@@ -191,6 +137,6 @@ const initialVocabulary = [
 ];
 
 export const initialMasteryMap = {
-  roadmap,
+  roadmap: curriculumRoadmap,
   initialVocabulary,
 };

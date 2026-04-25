@@ -125,30 +125,33 @@ export default function NodeDossier({ node, onBack, onAskLina, isSandboxMode }: 
         {!node.richContent && <p style={{ color: '#666', fontStyle: 'italic' }}>Detailed dossier content pending decryption...</p>}
       </div>
 
-      <footer style={{ borderTop: '1px solid #222', paddingTop: '20px', flexShrink: 0 }}>
-        <h4 style={{ color: '#888', fontSize: '0.7rem', fontWeight: 800, marginBottom: '12px' }}>NODE SANDBOX</h4>
+      <footer className="mt-8 pt-8 border-t border-gray-800" style={{ flexShrink: 0 }}>
+        <h4 style={{ color: '#888', fontSize: '0.7rem', fontWeight: 800, marginBottom: '12px', letterSpacing: '0.1em' }}>NODE SANDBOX</h4>
         
-        <VocabGrid 
-          onAskLina={onAskLina} 
-          isSandboxMode={isSandboxMode} 
-          filterIds={node.requiredWordIds || node.requiredVocabIds} 
-          hideToolbar={true}
-        />
+        <div style={{ minHeight: '100px' }}>
+          <VocabGrid 
+            onAskLina={onAskLina} 
+            isSandboxMode={isSandboxMode} 
+            filterIds={node.requiredWordIds || node.requiredVocabIds} 
+            hideToolbar={true}
+          />
+        </div>
 
         <button 
           onClick={() => onAskLina(`toki jan Lina! I'm studying ${node.title}. Let's do a deep-dive practice session on this concept.`)}
-          className="btn-review"
           style={{ 
             width: '100%', 
-            margin: '20px 0 0 0',
+            marginTop: '24px',
             background: 'var(--gold)',
             color: 'black',
             fontWeight: 900,
             fontSize: '1rem',
-            padding: '16px',
-            borderRadius: '8px',
+            padding: '18px',
+            borderRadius: '12px',
             border: 'none',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            boxShadow: '0 0 20px rgba(251, 191, 36, 0.3)',
+            transition: 'transform 0.2s active'
           }}
         >
           [ ✦ CONSULT LINA ]
