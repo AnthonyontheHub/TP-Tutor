@@ -80,11 +80,19 @@ export interface LoreEntry {
   detail: string;
 }
 
+export interface ProgressSnapshot {
+  date: string;
+  xp: number;
+  totalLearned: number;
+  streak: number;
+}
+
 export interface UserProfile {
   name: string;
   age: string;
   location: string;
   sex: string;
+  history: ProgressSnapshot[];
 }
 
 export type ReviewVibe = 'chill' | 'deep';

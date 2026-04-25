@@ -61,7 +61,14 @@ export default function Dashboard({ onStartSession, onAskLina, isSandboxMode, se
           <button onClick={() => setView('profile')} className="dashboard__profile-trigger">👤 {studentName?.toUpperCase() || 'STUDENT'}</button>
         </div>
         <div className="dashboard__header-right">
-          {currentStreak > 0 && <div className="dashboard__streak">🔥 {currentStreak}</div>}
+          {currentStreak > 0 && (
+            <div 
+              className="dashboard__streak" 
+              onClick={() => setView('achievements')}
+            >
+              🔥 {currentStreak}
+            </div>
+          )}
           <button onClick={() => setView('instructions')} className="dashboard__icon-btn">?</button>
           <button onClick={onStartSession} className="dashboard__icon-btn">💬</button>
           <button onClick={() => setView('settings')} className="dashboard__icon-btn">⚙️</button>

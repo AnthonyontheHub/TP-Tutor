@@ -90,7 +90,7 @@ export const useMasteryStore = create<MasteryStore>()(
     (set, get) => ({
       userId: null,
       studentName: 'Anthony',
-      profile: { name: 'Anthony', age: '', location: '', sex: '' },
+      profile: { name: 'Anthony', age: '', location: '', sex: '', history: [] },
       lore: [],
       reviewVibe: 'chill',
       profileImage: '',
@@ -179,14 +179,38 @@ export const useMasteryStore = create<MasteryStore>()(
       recordActivity: () => {
         const today = new Date().toDateString();
         const lastDate = get().lastActiveDate;
+        
+        let newStreak = get().currentStreak;
+        let streakChanged = false;
+
         if (lastDate !== today) {
           const yesterday = new Date();
           yesterday.setDate(yesterday.getDate() - 1);
           if (lastDate === yesterday.toDateString()) {
-            set((state) => ({ currentStreak: state.currentStreak + 1, lastActiveDate: today }));
+            newStreak += 1;
           } else {
-            set({ currentStreak: 1, lastActiveDate: today });
+            newStreak = 1;
           }
+          streakChanged = true;
+          set({ currentStreak: newStreak, lastActiveDate: today });
+        }
+
+        if (streakChanged) {
+          const summary = get().getStatusSummary();
+          const totalLearned = summary.introduced + summary.practicing + summary.confident + summary.mastered;
+          const snapshot = {
+            date: today,
+            xp: summary.xp,
+            totalLearned,
+            streak: newStreak
+          };
+          
+          set(state => ({
+            profile: {
+              ...state.profile,
+              history: [...(state.profile.history || []), snapshot]
+            }
+          }));
         }
       },
 
@@ -225,7 +249,7 @@ export const useMasteryStore = create<MasteryStore>()(
       resetAsNewUser: () => {
         set({
           studentName: '',
-          profile: { name: '', age: '', location: '', sex: '' },
+          profile: { name: '', age: '', location: '', sex: '', history: [] },
           lore: [],
           reviewVibe: 'chill',
           profileImage: '',
@@ -244,7 +268,7 @@ export const useMasteryStore = create<MasteryStore>()(
       resetProfileAndRunSetup: () => {
         set({
           studentName: '',
-          profile: { name: '', age: '', location: '', sex: '' },
+          profile: { name: '', age: '', location: '', sex: '', history: [] },
           lore: [],
           profileImage: '',
           hasCompletedSetup: false,

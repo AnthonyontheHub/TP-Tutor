@@ -6,11 +6,12 @@ import LoginPage from './components/LoginPage';
 import UserProfileDrawer from './components/UserProfileDrawer';
 import SettingsDrawer from './components/SettingsDrawer';
 import Instructions from './components/Instructions';
+import AchievementsDrawer from './components/AchievementsDrawer';
 import SetupScreen from './components/SetupScreen';
 import { useMasteryStore } from './store/masteryStore';
 import { useAuthStore } from './store/authStore';
 
-export type AppView = 'dashboard' | 'profile' | 'settings' | 'instructions';
+export type AppView = 'dashboard' | 'profile' | 'settings' | 'instructions' | 'achievements';
 
 export default function App() {
   const { user, loading } = useAuthStore();
@@ -103,6 +104,10 @@ export default function App() {
 
       {currentView === 'instructions' && (
         <Instructions isOpen={true} onClose={() => setCurrentView('dashboard')} />
+      )}
+
+      {currentView === 'achievements' && (
+        <AchievementsDrawer onClose={() => setCurrentView('dashboard')} />
       )}
 
       {showSetup && <SetupScreen />}
