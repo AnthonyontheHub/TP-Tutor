@@ -25,7 +25,7 @@ export default function MasteryGrid({
   onAskLina, isSandboxMode, activeFilter, sortMode, sortDirection, posFilter,
   setSortMode, setSortDirection, setPosFilter
 }: Props) {
-  const { vocabulary, selectedWords, addWordToSelection, removeWordFromSelection, setSelectedWords } = useMasteryStore();
+  const { vocabulary, selectedWords, addWordToSelection, removeWordFromSelection, setSelectedWords, lessonFilter } = useMasteryStore();
   const [drawerId, setDrawerId] = useState<string | null>(null);
 
   const handleCardClick = (word: VocabWord) => {
@@ -45,7 +45,11 @@ export default function MasteryGrid({
   };
 
   const displayed = vocabulary
-    .filter(w => posFilter === 'All' || w.partOfSpeech.toLowerCase().includes(posFilter.toLowerCase()))
+    .filter(w => {
+      const passesLesson = !lessonFilter || lessonFilter.includes(w.id) || lessonFilter.includes(w.word);
+      const passesPos = posFilter === 'All' || w.partOfSpeech.toLowerCase().includes(posFilter.toLowerCase());
+      return passesLesson && passesPos;
+    })
     .sort((a, b) => {
       if (sortMode === 'status') {
         const diff = STATUS_RANK[a.status] - STATUS_RANK[b.status];

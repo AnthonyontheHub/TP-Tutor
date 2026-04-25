@@ -20,7 +20,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   isSandboxMode: boolean;
   setIsSandboxMode: (val: boolean) => void;
 }) {
-  const { studentName, currentStreak, vocabulary, savedPhrases, reviewVibe, setReviewVibe, selectedWords, setSelectedWords, savePhrase } = useMasteryStore();
+  const { studentName, currentStreak, vocabulary, savedPhrases, reviewVibe, setReviewVibe, selectedWords, setSelectedWords, savePhrase, lessonFilter, setLessonFilter } = useMasteryStore();
 
   const [activeView, setActiveView] = useState<DashboardView>('vocab');
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
@@ -206,7 +206,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
             animate={{ opacity: 1, y: 0 }}
             className="grid-toolbar"
           >
-            <select value={posFilter} onChange={(e) => setPosFilter(e.target.value)} className="sort-select">
+            <select value={posFilter} onChange={(e) => { setPosFilter(e.target.value); setLessonFilter(null); }} className="sort-select">
               <option value="All">All Parts of Speech</option>
               <option value="noun">Noun</option>
               <option value="verb">Verb</option>
@@ -220,6 +220,33 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
 
         {/* Main Viewport */}
         <div className="dashboard__content-area" style={{ position: 'relative', minHeight: '400px' }}>
+          {lessonFilter && (
+            <motion.div 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              style={{ 
+                background: 'rgba(251, 191, 36, 0.05)', 
+                border: '1px solid var(--gold)', 
+                borderRadius: '4px', 
+                padding: '8px 12px', 
+                marginBottom: '12px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}
+            >
+              <span style={{ fontSize: '0.75rem', color: 'var(--gold)', fontWeight: 800 }}>
+                FILTERED BY LESSON WORDS ({lessonFilter.length})
+              </span>
+              <button 
+                onClick={() => setLessonFilter(null)}
+                style={{ background: 'none', border: 'none', color: 'var(--gold)', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 900 }}
+              >
+                CLEAR X
+              </button>
+            </motion.div>
+          )}
+
           <AnimatePresence mode="wait">
             <motion.div
               key={activeView}
@@ -242,7 +269,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
                 />
               )}
               {activeView === 'roadmap' && (
-                <CurriculumRoadmap />
+                <CurriculumRoadmap onSetActiveView={setActiveView} onAskLina={onAskLina} />
               )}
               {activeView === 'phrasebook' && (
                 <div style={{ padding: '0' }}>

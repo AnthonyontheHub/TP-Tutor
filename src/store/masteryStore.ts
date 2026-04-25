@@ -11,6 +11,7 @@ import type {
 } from '../types/mastery';
 import { scoreToStatus, STATUS_MIDPOINT } from '../types/mastery';
 import { initialMasteryMap } from '../data/initialMasteryMap';
+import { curriculumRoadmap } from '../data/curriculum';
 
 function toFullVocabWord(v: { word: string; status: MasteryStatus; type: 'word' | 'grammar'; sessionNotes: string; frequencyRank?: number }): VocabWord {
   const score = STATUS_MIDPOINT[v.status];
@@ -69,6 +70,7 @@ interface MasteryActions {
   setSelectedWords: (words: string[]) => void;
   addWordToSelection: (word: string) => void;
   removeWordFromSelection: (word: string) => void;
+  setLessonFilter: (wordIds: string[] | null) => void;
 }
 
 interface MasteryState {
@@ -86,6 +88,7 @@ interface MasteryState {
   lastActiveDate: string;
   hasCompletedSetup: boolean;
   selectedWords: string[];
+  lessonFilter: string[] | null;
   // Dashboard settings
   widgetDensity: 'Compact' | 'Expanded';
   fogOfWar: 'Strict' | 'Visible';
@@ -109,12 +112,13 @@ export const useMasteryStore = create<MasteryStore>()(
       profileImage: '',
       lastUpdated: '',
       vocabulary: mappedVocabulary,
-      levels: initialMasteryMap.roadmap,
+      levels: curriculumRoadmap,
       savedPhrases: [],
       currentStreak: 0,
       lastActiveDate: '',
       hasCompletedSetup: false,
       selectedWords: [],
+      lessonFilter: null,
       widgetDensity: 'Expanded',
       fogOfWar: 'Visible',
       showCircuitPaths: true,
@@ -435,6 +439,8 @@ export const useMasteryStore = create<MasteryStore>()(
         return { selectedWords: newSelected };
       }),
 
+      setLessonFilter: (wordIds) => set({ lessonFilter: wordIds }),
+
       getStatusSummary: () => {
         const { vocabulary } = get();
         const summary = { not_started: 0, introduced: 0, practicing: 0, confident: 0, mastered: 0, xp: 0 };
@@ -531,7 +537,7 @@ export const useMasteryStore = create<MasteryStore>()(
 
           set({
             vocabulary,
-            levels: data.levels || initialMasteryMap.roadmap,
+            levels: data.levels || curriculumRoadmap,
             lastUpdated: data.lastUpdated || '',
             studentName: data.studentName || 'Anthony',
             profile: data.profile || { name: data.studentName || 'Anthony', age: '', location: '', sex: '' },
