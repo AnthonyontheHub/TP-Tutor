@@ -20,7 +20,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   isSandboxMode: boolean;
   setIsSandboxMode: (val: boolean) => void;
 }) {
-  const { studentName, currentStreak, vocabulary, savedPhrases, reviewVibe, setReviewVibe, selectedWords, setSelectedWords, savePhrase, lessonFilter, setLessonFilter, calculateDecay, checkAssessments, hardenWord, syncAnthonyHistory, historySynced } = useMasteryStore();
+  const { studentName, currentStreak, vocabulary, savedPhrases, reviewVibe, setReviewVibe, selectedWords, setSelectedWords, savePhrase, lessonFilter, setLessonFilter, calculateDecay, checkAssessments, hardenWord } = useMasteryStore();
 
   const [activeView, setActiveView] = useState<DashboardView>('vocab');
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
@@ -37,12 +37,6 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   const [saveNoteInput, setSaveNoteInput] = useState('');
   const [savedConfirm, setSavedConfirm] = useState(false);
   const confirmTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    if (studentName === 'Anthony' && !historySynced) {
-      syncAnthonyHistory();
-    }
-  }, [studentName, historySynced, syncAnthonyHistory]);
 
   useEffect(() => {
     calculateDecay();
