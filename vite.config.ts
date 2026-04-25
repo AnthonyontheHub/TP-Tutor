@@ -4,7 +4,5 @@ import react from '@vitejs/plugin-react'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  export default defineConfig({
-  plugins: [react()],
-}); // This MUST match your repo name exactly (case sensitive)
+  base: '/tp-tutor/', // This MUST match your repo name exactly (case sensitive)
 })
