@@ -1,7 +1,7 @@
 /* src/components/SentenceBuilder.tsx */
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { VocabWord } from '../types/mastery';
+import type { VocabWord } from '../types/mastery';
 
 interface SentenceBuilderProps {
   selectedWords: string[];
