@@ -409,6 +409,26 @@ select {
   font-weight: 700;
 }
 
+.vocab-card__status {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.03);
+}
+
+.vocab-card__status:hover {
+  background: rgba(255,255,255,0.1);
+  transform: scale(1.1);
+}
+
 /* ─── Modals ────────────────────────────────────────────────────────── */
 .modal-backdrop {
   position: fixed;

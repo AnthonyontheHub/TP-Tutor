@@ -42,6 +42,9 @@ export interface ProposedChange {
 
 // Resolves the API key with env-var fallback for local dev.
 export function resolveApiKey(overrideKey?: string): string {
+  // If sandbox mode is explicitly on via localStorage, return empty
+  if (localStorage.getItem('tp_sandbox_mode') === 'true') return '';
+
   return overrideKey
     || localStorage.getItem('TP_GEMINI_KEY')
     || (import.meta.env.VITE_GEMINI_API_KEY as string | undefined)

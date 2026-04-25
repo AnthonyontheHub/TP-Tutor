@@ -114,7 +114,7 @@ export const useMasteryStore = create<MasteryStore>()(
     (set, get) => ({
       userId: null,
       studentName: 'Anthony',
-      profile: { name: 'Anthony', age: '', location: '', sex: '', history: [] },
+      profile: { name: 'Anthony', age: '', locationString: '', sex: '', history: [] },
       lore: [],
       reviewVibe: 'chill',
       profileImage: '',
@@ -529,7 +529,7 @@ export const useMasteryStore = create<MasteryStore>()(
       switchProfile: (name: string) => {
         set({
           studentName: name,
-          profile: { name, age: '', location: '', sex: '', history: [] },
+          profile: { name, age: '', locationString: '', sex: '', history: [] },
           lore: [],
           reviewVibe: 'chill',
           profileImage: '',
@@ -549,6 +549,9 @@ export const useMasteryStore = create<MasteryStore>()(
         
         // Prevent sync for guest users and any non-main profile (Sandbox mode)
         if (!targetId || targetId === 'guest_user' || (studentName && studentName.toLowerCase() !== 'anthony')) return;
+
+        // NEW: Also check explicit sandbox mode toggle
+        if (localStorage.getItem('tp_sandbox_mode') === 'true') return;
 
         try {
           await setDoc(doc(db, 'users', targetId), {

@@ -90,7 +90,10 @@ export interface ProgressSnapshot {
 export interface UserProfile {
   name: string;
   age: string;
-  location: string;
+  locationString: string;
+  zip?: string;
+  city?: string;
+  state?: string;
   sex: string;
   history: ProgressSnapshot[];
 }

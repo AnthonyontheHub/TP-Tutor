@@ -124,6 +124,13 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
 
   const getActiveStyle = (p: AppPanel) => activePanels.includes(p) ? { borderColor: 'var(--gold)', color: 'var(--gold)', boxShadow: '0 0 10px var(--gold-glow)' } : {};
 
+  const roadmapProgress = useMemo(() => {
+    const allNodes = (levels || []).flatMap(l => l.nodes);
+    if (allNodes.length === 0) return 0;
+    const mastered = allNodes.filter(n => n.status === 'mastered').length;
+    return Math.round((mastered / allNodes.length) * 100);
+  }, [levels]);
+
   return (
     <div className="dashboard">
       {/* Row 1: Mastery Counters */}
@@ -137,6 +144,17 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
           >
             👤 {studentName?.toUpperCase() || 'STUDENT'}
           </button>
+          
+          {/* Roadmap Progress Indicator */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginLeft: '12px', background: 'rgba(255,255,255,0.03)', padding: '4px 12px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <div style={{ width: '60px', height: '4px', background: '#222', borderRadius: '2px', overflow: 'hidden' }}>
+              <motion.div 
+                animate={{ width: `${roadmapProgress}%` }}
+                style={{ height: '100%', background: 'var(--gold)', boxShadow: '0 0 10px var(--gold-glow)' }} 
+              />
+            </div>
+            <span style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--gold)', minWidth: '35px' }}>{roadmapProgress}%</span>
+          </div>
         </div>
         <div className="dashboard__header-right">
           {currentStreak > 0 && (

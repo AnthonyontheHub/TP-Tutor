@@ -52,26 +52,47 @@ function EditableField({
 }
 
 export default function UserProfilePanel({ onClose }: Props) {
-  const { profile, updateProfile, lore, addLore, deleteLore, currentStreak, savedPhrases, getStatusSummary, clearLocalData, switchProfile } = useMasteryStore();
+  const { profile, updateProfile, lore, addLore, deleteLore, currentStreak, savedPhrases, getStatusSummary, clearLocalData, switchProfile, setProfileImage } = useMasteryStore();
   const { logout, setUser, signIn, isGuest, user } = useAuthStore();
 
   const [loreCategory, setLoreCategory] = useState<LoreCategory>('Work');
   const [loreDetail, setLoreDetail] = useState('');
   const [switchName, setSwitchName] = useState('');
+  const [zipInput, setZipInput] = useState(profile.zip || '');
+  const [isLookupLoading, setIsLookupLoading] = useState(false);
 
   const summary = getStatusSummary();
   const totalLearned = summary.introduced + summary.practicing + summary.confident + summary.mastered;
 
-  const handleAddLore = () => {
-    if (!loreDetail.trim()) return;
-    addLore(loreCategory, loreDetail);
-    setLoreDetail('');
+  const handleZipLookup = async (zip: string) => {
+    setZipInput(zip);
+    if (zip.length === 5) {
+      setIsLookupLoading(true);
+      try {
+        const resp = await fetch(`https://api.zippopotam.us/us/${zip}`);
+        if (resp.ok) {
+          const data = await resp.json();
+          const place = data.places[0];
+          const city = place['place name'];
+          const state = place['state abbreviation'];
+          updateProfile({ zip, city, state, locationString: `${city}, ${state}` });
+        }
+      } catch (e) {
+        console.error("Zip lookup failed", e);
+      } finally {
+        setIsLookupLoading(false);
+      }
+    }
   };
 
-  const handleSwitchProfile = () => {
-    if (!switchName.trim()) return;
-    switchProfile(switchName.trim());
-    setSwitchName('');
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setProfileImage(reader.result as string);
+    };
+    reader.readAsDataURL(file);
   };
 
   return (
@@ -84,22 +105,101 @@ export default function UserProfilePanel({ onClose }: Props) {
     >
       <header className="side-panel-header" style={{ justifyContent: 'space-between' }}>
         <h2 style={{ fontSize: '0.9rem', fontWeight: 900, letterSpacing: '0.15em', color: 'var(--gold)' }}>USER PROFILE</h2>
-        <button onClick={onClose} className="btn-close-glowing">✕</button>
+        <button 
+          onClick={onClose} 
+          style={{ background: 'none', border: 'none', color: '#666', fontSize: '1.2rem', cursor: 'pointer', padding: '8px' }}
+        >✕</button>
       </header>
 
       <div className="side-panel-content">
         <div style={{ marginBottom: '32px', textAlign: 'center' }}>
-          <div style={{ 
-            width: '80px', height: '80px', background: 'var(--surface)', 
-            borderRadius: '2px', display: 'flex', alignItems: 'center', 
-            justifyContent: 'center', fontSize: '2.5rem', margin: '0 auto 16px auto',
-            border: '1px solid var(--gold)',
-            boxShadow: '0 0 15px rgba(255, 191, 0, 0.1)'
-          }}>
-            {user?.photoURL ? <img src={user.photoURL} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👤'}
+          <div style={{ position: 'relative', width: '100px', height: '100px', margin: '0 auto 16px auto' }}>
+            <div style={{ 
+              width: '100%', height: '100%', background: 'var(--surface)', 
+              borderRadius: '50%', display: 'flex', alignItems: 'center', 
+              justifyContent: 'center', fontSize: '2.5rem',
+              border: '2px solid var(--gold)',
+              boxShadow: '0 0 20px rgba(255, 191, 0, 0.2)',
+              overflow: 'hidden'
+            }}>
+              {useMasteryStore.getState().profileImage ? <img src={useMasteryStore.getState().profileImage} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👤'}
+            </div>
+            <label style={{ 
+              position: 'absolute', bottom: 0, right: 0, 
+              background: 'var(--gold)', color: 'black', 
+              width: '28px', height: '28px', borderRadius: '50%',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '0.8rem', cursor: 'pointer', boxShadow: '0 2px 10px rgba(0,0,0,0.5)'
+            }}>
+              📷
+              <input type="file" hidden accept="image/*" onChange={handlePhotoUpload} />
+            </label>
           </div>
-          <h2 style={{ margin: 0, color: 'white', fontSize: '1.6rem', fontWeight: 900, textTransform: 'uppercase' }}>{profile.name || 'Student'}</h2>
-          <div style={{ color: 'var(--gold)', fontSize: '0.7rem', marginTop: '4px', fontWeight: 900, letterSpacing: '0.1em' }}>Neural Link: {isGuest ? 'LOCAL ONLY' : 'CLOUD SYNC ACTIVE'}</div>
+          <EditableField 
+            label="Display Name" 
+            value={profile.name} 
+            onSave={(val) => updateProfile({ name: val })} 
+          />
+          <div style={{ color: 'var(--gold)', fontSize: '0.6rem', marginTop: '8px', fontWeight: 900, letterSpacing: '0.1em', opacity: 0.8 }}>
+            NEURAL LINK: {isGuest ? 'LOCAL' : 'CLOUD'}
+          </div>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '24px' }}>
+          <div className="glass-panel" style={{ padding: '12px' }}>
+            <label className="section-title" style={{ fontSize: '0.55rem' }}>Age</label>
+            <select 
+              value={profile.age} 
+              onChange={(e) => updateProfile({ age: e.target.value })}
+              className="sort-select"
+              style={{ width: '100%', border: 'none', background: 'transparent', padding: '4px 0', fontSize: '1rem', fontWeight: 700 }}
+            >
+              <option value="">Select...</option>
+              {Array.from({ length: 100 }, (_, i) => i + 1).map(age => (
+                <option key={age} value={age}>{age}</option>
+              ))}
+            </select>
+          </div>
+          <div className="glass-panel" style={{ padding: '12px' }}>
+            <label className="section-title" style={{ fontSize: '0.55rem' }}>Sex</label>
+            <select 
+              value={profile.sex} 
+              onChange={(e) => updateProfile({ sex: e.target.value })}
+              className="sort-select"
+              style={{ width: '100%', border: 'none', background: 'transparent', padding: '4px 0', fontSize: '1rem', fontWeight: 700 }}
+            >
+              <option value="">Select...</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Non-Binary">Non-Binary</option>
+              <option value="Other">Other</option>
+              <option value="Hidden">Private</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="glass-panel" style={{ marginBottom: '24px', padding: '12px' }}>
+          <label className="section-title" style={{ fontSize: '0.55rem' }}>Location (Zip Code)</label>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <input 
+              type="text" 
+              maxLength={5}
+              value={zipInput}
+              onChange={(e) => handleZipLookup(e.target.value)}
+              placeholder="90210"
+              className="settings-input"
+              style={{ flex: '0 0 80px', marginBottom: 0, padding: '8px', fontSize: '1rem', fontWeight: 900, textAlign: 'center' }}
+            />
+            <div style={{ flex: 1 }}>
+               {isLookupLoading ? (
+                 <span style={{ fontSize: '0.7rem', color: '#666' }}>SYNCING GEODATA...</span>
+               ) : (
+                 <div style={{ fontSize: '0.9rem', color: 'white', fontWeight: 700 }}>
+                   {profile.city ? `${profile.city}, ${profile.state}` : 'Enter Zip...'}
+                 </div>
+               )}
+            </div>
+          </div>
         </div>
 
         <div className="glass-panel" style={{ marginBottom: '32px' }}>
@@ -109,7 +209,7 @@ export default function UserProfilePanel({ onClose }: Props) {
               type="text" 
               value={switchName}
               onChange={(e) => setSwitchName(e.target.value)}
-              placeholder="Enter name to switch..."
+              placeholder="Enter name..."
               className="settings-input"
               style={{ flex: 1, marginBottom: 0, padding: '8px', fontSize: '0.85rem' }}
               onKeyDown={(e) => e.key === 'Enter' && handleSwitchProfile()}
@@ -121,37 +221,6 @@ export default function UserProfilePanel({ onClose }: Props) {
               SWITCH
             </button>
           </div>
-        </div>
-
-        {isGuest && (
-          <div className="glass-panel" style={{ marginBottom: '32px', border: '1px solid var(--gold)', background: 'rgba(255, 191, 0, 0.05)' }}>
-            <p style={{ fontSize: '0.8rem', color: '#fff', marginBottom: '12px', textAlign: 'center', fontWeight: 700 }}>Guest mode: progress is local only.</p>
-            <button 
-              onClick={() => signIn()}
-              className="btn-review" 
-              style={{ margin: 0, padding: '10px', fontSize: '0.75rem', boxShadow: 'none' }}
-            >
-              LINK GOOGLE ACCOUNT
-            </button>
-          </div>
-        )}
-
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', marginBottom: '32px' }}>
-          <EditableField 
-            label="Age" 
-            value={profile.age} 
-            onSave={(val) => updateProfile({ age: val })} 
-          />
-          <EditableField 
-            label="Sex" 
-            value={profile.sex} 
-            onSave={(val) => updateProfile({ sex: val })} 
-          />
-          <EditableField 
-            label="Location" 
-            value={profile.location} 
-            onSave={(val) => updateProfile({ location: val })} 
-          />
         </div>
 
         <div className="glass-panel" style={{ marginBottom: '32px' }}>
@@ -204,24 +273,8 @@ export default function UserProfilePanel({ onClose }: Props) {
           </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '40px' }}>
-          <button 
-            onClick={() => {
-              clearLocalData();
-              setUser(null);
-              logout();
-              onClose();
-            }}
-            className="btn-danger"
-            style={{ 
-              textAlign: 'center', 
-              padding: '12px', 
-              fontSize: '0.8rem',
-              letterSpacing: '0.1em'
-            }}
-          >
-            TERMINATE SESSION
-          </button>
+        <div style={{ paddingBottom: '40px', textAlign: 'center', opacity: 0.3, fontSize: '0.6rem', letterSpacing: '0.1em' }}>
+           SYSTEM ID: {user?.uid || 'LOCAL_HOST'}
         </div>
       </div>
     </motion.div>
