@@ -12,6 +12,8 @@ export const curriculumRoadmap: CurriculumLevel[] = [
         requiredVocabIds: [], 
         requiredGrammarIds: [],
         status: 'active',
+        visualFramework: "/assets/NotebookLM Mind Map.png",
+        requiredWordIds: [],
         richContent: [
           { type: 'text', content: "Filtering the noise into fourteen universal sounds." },
           { type: 'structural', content: "The (C)V(N) Syllable Equation: Every syllable follows a strict pattern of an optional consonant, a vowel, and an optional closing 'n'." },
@@ -24,6 +26,8 @@ export const curriculumRoadmap: CurriculumLevel[] = [
         requiredVocabIds: ["mi", "sina", "ona", "li", "pona", "ike"], 
         requiredGrammarIds: ["particle_li"],
         status: 'locked',
+        visualFramework: "/assets/Subjects and Predicates.png",
+        requiredWordIds: ["mi", "sina", "ona", "li", "pona", "ike"],
         richContent: [
           { type: 'text', content: "Mechanical dividers lock fluid words into strict syntax." },
           { type: 'structural', content: "The Assembly Line Equation: [Subject] + li + [Predicate]. In Toki Pona, the subject always comes first, followed by the action or state." },

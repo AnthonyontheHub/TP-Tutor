@@ -179,6 +179,8 @@ export interface CurriculumNode {
   requiredGrammarIds: string[];
   status: NodeStatus;
   richContent?: ContentBlock[];
+  visualFramework?: string;
+  requiredWordIds?: string[];
 }
 
 export interface CurriculumLevel {
