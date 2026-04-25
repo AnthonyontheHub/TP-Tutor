@@ -6,7 +6,7 @@ import { doc, setDoc, onSnapshot, getDoc } from 'firebase/firestore';
 import type { Unsubscribe } from 'firebase/firestore';
 import type { MasteryStatus, VocabWord, StatusSummary, SavedPhrase, UserProfile, LoreEntry, ReviewVibe, LoreCategory } from '../types/mastery';
 import { scoreToStatus, STATUS_MIDPOINT } from '../types/mastery';
-import { initialVocabulary, initialConcepts, curriculums } from '../data/initialMasteryMap';
+import { initialMasteryMap } from '../data/initialMasteryMap';
 
 interface Concept {
   id: string;
@@ -30,7 +30,7 @@ function toFullVocabWord(v: { word: string; status: MasteryStatus; sessionNotes:
   };
 }
 
-const INITIAL_VOCABULARY: VocabWord[] = initialVocabulary.map(toFullVocabWord);
+const mappedVocabulary: VocabWord[] = initialMasteryMap.initialVocabulary.map(toFullVocabWord);
 
 interface MasteryActions {
   applyScoreDeltas: (deltas: { wordId: string; delta: number }[]) => void;
@@ -68,7 +68,7 @@ interface MasteryState {
   lastUpdated: string;
   vocabulary: VocabWord[];
   concepts: Concept[];
-  curriculums: typeof curriculums;
+  curriculums: typeof initialMasteryMap.curriculums;
   activeCurriculumId: string | null;
   activeModuleId: string | null;
   savedPhrases: (string | SavedPhrase)[];
@@ -92,9 +92,9 @@ export const useMasteryStore = create<MasteryStore>()(
       reviewVibe: 'chill',
       profileImage: '',
       lastUpdated: '',
-      vocabulary: INITIAL_VOCABULARY,
-      concepts: initialConcepts,
-      curriculums,
+      vocabulary: mappedVocabulary,
+      concepts: initialMasteryMap.initialConcepts,
+      curriculums: initialMasteryMap.curriculums,
       activeCurriculumId: null,
       activeModuleId: null,
       savedPhrases: [],
@@ -226,8 +226,8 @@ export const useMasteryStore = create<MasteryStore>()(
           savedPhrases: [],
           currentStreak: 0,
           lastActiveDate: '',
-          vocabulary: INITIAL_VOCABULARY,
-          concepts: initialConcepts,
+          vocabulary: mappedVocabulary,
+          concepts: initialMasteryMap.initialConcepts,
           activeCurriculumId: null,
           activeModuleId: null,
         });
@@ -262,8 +262,8 @@ export const useMasteryStore = create<MasteryStore>()(
           savedPhrases: [],
           currentStreak: 0,
           lastActiveDate: '',
-          vocabulary: INITIAL_VOCABULARY,
-          concepts: initialConcepts,
+          vocabulary: mappedVocabulary,
+          concepts: initialMasteryMap.initialConcepts,
           activeCurriculumId: null,
           activeModuleId: null,
         });
@@ -337,9 +337,9 @@ export const useMasteryStore = create<MasteryStore>()(
           if (!snapshot.exists()) return;
           const data = snapshot.data();
 
-          const vocabulary = (data.vocabulary || INITIAL_VOCABULARY).map(
+          const vocabulary = (data.vocabulary || mappedVocabulary).map(
             (w: any) => {
-              const base = INITIAL_VOCABULARY.find(iv => iv.word === w.word);
+              const base = mappedVocabulary.find(iv => iv.word === w.word);
               const useCount = typeof w.useCount === 'number' ? w.useCount : 0;
               const frequencyRank = typeof w.frequencyRank === 'number' ? w.frequencyRank : (base?.frequencyRank ?? 999);
               
@@ -351,7 +351,7 @@ export const useMasteryStore = create<MasteryStore>()(
 
           set({
             vocabulary,
-            concepts: data.concepts || initialConcepts,
+            concepts: data.concepts || initialMasteryMap.initialConcepts,
             lastUpdated: data.lastUpdated || '',
             studentName: data.studentName || 'Anthony',
             profile: data.profile || { name: data.studentName || 'Anthony', age: '', location: '', sex: '' },

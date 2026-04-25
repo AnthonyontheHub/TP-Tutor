@@ -1,6 +1,6 @@
 import type { MasteryStatus } from '../types/mastery';
 
-export const curriculums = [
+const curriculums = [
   {
     id: "intro",
     title: "Introduction Level",
@@ -31,7 +31,7 @@ export const curriculums = [
   }
 ];
 
-export const initialVocabulary = [
+const initialVocabulary = [
   { word: "a", frequencyRank: 10, status: "not_started" as MasteryStatus, sessionNotes: "" },
   { word: "akesi", frequencyRank: 67, status: "not_started" as MasteryStatus, sessionNotes: "" },
   { word: "ala", frequencyRank: 12, status: "not_started" as MasteryStatus, sessionNotes: "" },
@@ -159,9 +159,15 @@ export const initialVocabulary = [
   { word: "wile", frequencyRank: 33, status: "not_started" as MasteryStatus, sessionNotes: "" }
 ];
 
-export const initialConcepts = [
+const initialConcepts = [
   { id: "particle_li", title: "Subject Separator (li)", status: "not_started" as MasteryStatus, sessionNotes: "" },
   { id: "particle_e", title: "Direct Object Marker (e)", status: "not_started" as MasteryStatus, sessionNotes: "" },
   { id: "particle_pi", title: "Modifier Grouping (pi)", status: "not_started" as MasteryStatus, sessionNotes: "" },
   { id: "pronoun_seme", title: "Question Word (seme)", status: "not_started" as MasteryStatus, sessionNotes: "" }
 ];
+
+export const initialMasteryMap = {
+  curriculums,
+  initialVocabulary,
+  initialConcepts
+};
