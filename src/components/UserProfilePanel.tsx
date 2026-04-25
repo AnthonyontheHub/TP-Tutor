@@ -127,6 +127,10 @@ export default function UserProfilePanel({ onClose }: Props) {
     }
   };
 
+  // --- Added console.log for debugging ---
+  console.log("UserProfilePanel - Current user state:", user);
+  // ------------------------------------
+
   return (
     <motion.div
       className="side-panel"
