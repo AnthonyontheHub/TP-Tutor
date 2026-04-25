@@ -13,11 +13,11 @@ export default function ProgressSummary({ activeFilter, onFilterClick }: Props) 
   const summary = getStatusSummary();
 
   const statusItems: { status: MasteryStatus; label: string; emoji: string; color: string; glow: string }[] = [
-    { status: 'not_started', label: 'NEW',   emoji: '⬜', color: '#9ca3af', glow: 'rgba(156,163,175,0.5)' },
-    { status: 'introduced',  label: 'INTRO', emoji: '🔵', color: '#3b82f6', glow: 'rgba(59,130,246,0.6)'  },
-    { status: 'practicing',  label: 'WORK',  emoji: '🟡', color: '#f59e0b', glow: 'rgba(245,158,11,0.6)'  },
-    { status: 'confident',   label: 'GOOD',  emoji: '🟢', color: '#16a34a', glow: 'rgba(22,163,74,0.6)'   },
-    { status: 'mastered',    label: 'DONE',  emoji: '✅', color: '#22c55e', glow: 'rgba(34,197,94,0.65)'  },
+    { status: 'not_started', label: 'NOT STARTED', emoji: '⬜', color: '#9ca3af', glow: 'rgba(156,163,175,0.5)' },
+    { status: 'introduced',  label: 'INTRODUCED',  emoji: '🔵', color: '#3b82f6', glow: 'rgba(59,130,246,0.6)'  },
+    { status: 'practicing',  label: 'PRACTICING',  emoji: '🟡', color: '#f59e0b', glow: 'rgba(245,158,11,0.6)'  },
+    { status: 'confident',   label: 'CONFIDENT',   emoji: '🟢', color: '#16a34a', glow: 'rgba(22,163,74,0.6)'   },
+    { status: 'mastered',    label: 'MASTERED',    emoji: '✅', color: '#22c55e', glow: 'rgba(34,197,94,0.65)'  },
   ];
 
   return (
@@ -26,6 +26,8 @@ export default function ProgressSummary({ activeFilter, onFilterClick }: Props) 
         {statusItems.map((item) => {
           const isActive = activeFilter === item.status;
           const isDimmed = activeFilter !== null && !isActive;
+          const shouldGlow = activeFilter === null || isActive;
+          
           return (
             <button
               key={item.status}
@@ -37,10 +39,10 @@ export default function ProgressSummary({ activeFilter, onFilterClick }: Props) 
                 borderRadius: '12px',
                 cursor: 'pointer',
                 transition: 'all 0.25s ease',
-                opacity: isDimmed ? 0.2 : 1,
-                boxShadow: isActive
+                opacity: isDimmed ? 0.3 : 1,
+                boxShadow: shouldGlow
                   ? `0 0 14px ${item.glow}, 0 0 4px ${item.glow}`
-                  : `0 0 6px ${item.glow}44`,
+                  : 'none',
                 transform: isActive ? 'scale(1.06)' : 'scale(1)',
                 display: 'flex',
                 flexDirection: 'column',

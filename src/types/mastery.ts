@@ -100,6 +100,7 @@ export interface VocabWord {
   confidenceScore: number;
   status: MasteryStatus;
   useCount: number;
+  frequencyRank: number;
   isMasteryCandidate: boolean;
   sessionNotes: string;
 }

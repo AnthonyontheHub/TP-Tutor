@@ -10,7 +10,7 @@ import { initialVocabulary, initialConcepts, curriculums } from '../data/initial
 
 // Map the simplified initialVocabulary entries to the full VocabWord shape
 // so all existing components keep working without changes.
-function toFullVocabWord(v: { word: string; status: MasteryStatus; sessionNotes: string }): VocabWord {
+function toFullVocabWord(v: { word: string; status: MasteryStatus; sessionNotes: string; frequencyRank?: number }): VocabWord {
   return {
     id: v.word,
     word: v.word,
@@ -19,6 +19,7 @@ function toFullVocabWord(v: { word: string; status: MasteryStatus; sessionNotes:
     confidenceScore: STATUS_MIDPOINT[v.status],
     status: v.status,
     useCount: 0,
+    frequencyRank: v.frequencyRank ?? 999,
     isMasteryCandidate: false,
     sessionNotes: v.sessionNotes,
   };
@@ -259,10 +260,13 @@ export const useMasteryStore = create<MasteryStore>()(
 
           const vocabulary = (data.vocabulary || INITIAL_VOCABULARY).map(
             (w: any) => {
+              const base = INITIAL_VOCABULARY.find(iv => iv.word === w.word);
               const useCount = typeof w.useCount === 'number' ? w.useCount : 0;
-              if (typeof w.confidenceScore === 'number') return { ...w, useCount };
+              const frequencyRank = typeof w.frequencyRank === 'number' ? w.frequencyRank : (base?.frequencyRank ?? 999);
+              
+              if (typeof w.confidenceScore === 'number') return { ...w, useCount, frequencyRank };
               const status: MasteryStatus = w.status || 'not_started';
-              return { ...w, confidenceScore: STATUS_MIDPOINT[status], useCount };
+              return { ...w, confidenceScore: STATUS_MIDPOINT[status], useCount, frequencyRank };
             }
           );
 

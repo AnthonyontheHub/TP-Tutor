@@ -145,7 +145,6 @@ export default function MasteryGrid({
   // ── Display list ──────────────────────────────────────────────────────────
 
   const displayed = vocabulary
-    .filter(w => !activeFilter || w.status === activeFilter)
     .filter(w => posFilter === 'All' || w.partOfSpeech.toLowerCase().includes(posFilter.toLowerCase()))
     .sort((a, b) => {
       if (sortMode === 'status') {
@@ -161,7 +160,7 @@ export default function MasteryGrid({
         return sortDirection === 'asc' ? diff : -diff;
       }
       if (sortMode === 'useCount') {
-        const diff = (a.useCount ?? 0) - (b.useCount ?? 0);
+        const diff = (a.frequencyRank ?? 999) - (b.frequencyRank ?? 999);
         return sortDirection === 'asc' ? diff : -diff;
       }
       const valA = a.word.toLowerCase();
@@ -198,6 +197,7 @@ export default function MasteryGrid({
           const positions: number[] = [];
           selectedWords.forEach((w, i) => { if (w === word.word) positions.push(i + 1); });
           const isSelected = positions.length > 0;
+          const isFilterDimmed = activeFilter && word.status !== activeFilter;
 
           return (
             <div
@@ -210,9 +210,10 @@ export default function MasteryGrid({
               className="grid-item-wrapper"
               style={{
                 position: 'relative',
-                opacity: selectedWords.length > 0 && !isSelected ? 0.3 : 1,
+                opacity: (selectedWords.length > 0 && !isSelected) || isFilterDimmed ? 0.3 : 1,
                 touchAction: 'pan-y',
                 cursor: 'pointer',
+                transition: 'opacity 0.25s ease',
               }}
             >
               <VocabCard word={word} />
