@@ -1,0 +1,3 @@
+{
+  "output": "Successfully modified file: /home/anthonyguera/TP-Tutor/src/components/CurriculumRoadmap.tsx (1 replacements). Here is the updated code:\n...\n    const average = scores.reduce((a, b) => a + b, 0) / scores.length;\n    return Math.round(average);\n  };\n\n  const getMasteryColor = (score: number) => {\n    if (score >= 950) return '#22c55e'; // Mastered: Bright Green\n    if (score >= 751) return '#eab308'; // Confident: Yellow\n    if (score >= 501) return '#3b82f6'; // Practicing: Blue\n    if (score >= 201) return '#a855f7'; // Introduced: Purple\n    return '#444'; // Not started\n  };\n\n  const handleNodeClick = (node: CurriculumNode) => {\n    setSelectedNode(node);\n..."
+}

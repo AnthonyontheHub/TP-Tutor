@@ -1,0 +1,3 @@
+{
+  "output": "Successfully modified file: /home/anthonyguera/TP-Tutor/src/components/MasteryGrid.tsx (1 replacements). Here is the updated code:\n...\n      setSelectedWords(prev => [...prev, word.word]);\n    }\n  };\n\n  const handleCardLongPress = (word: VocabWord) => {\n    // If not in selection mode, enter it by adding the first word\n    if (selectedWords.length === 0) {\n      setSelectedWords([word.word]);\n    } else {\n      // If already in selection mode, just add another (though click does this too)\n      setSelectedWords(prev => [...prev, word.word]);\n    }\n  };\n\n  const handleSave = () => {\n    const sentence = selectedWords.join(' ');\n..."
+}

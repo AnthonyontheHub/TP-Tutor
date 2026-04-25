@@ -1,0 +1,3 @@
+{
+  "output": "Directory listing for /home/anthonyguera/TP-Tutor/src/data:\ninitialMasteryMap.ts (17057 bytes)"
+}

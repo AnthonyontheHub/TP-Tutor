@@ -1,0 +1,3 @@
+{
+  "output": "Found 5 matches for pattern \"chat-drawer\" in path \".\":\n---\nFile: TP-Tutor/src/index.css\nL265:   .chat-drawer {\nL493: .chat-drawer {\n---\nFile: TP-Tutor/src/components/ChatSession.tsx\nL177:         className=\"side-panel chat-drawer\"\n---\nFile: TP-Tutor/src/App.css\nL10: .chat-drawer,\nL11: .chat-drawer *,\n---"
+}

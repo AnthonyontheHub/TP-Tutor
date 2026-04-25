@@ -1,0 +1,3 @@
+{
+  "output": "Output: [main 165e84e] Add dynamic roadmap modals and jan Lina integration\n 2 files changed, 172 insertions(+), 104 deletions(-)\nEnumerating objects: 13, done.\nCounting objects: 100% (13/13), done.\nDelta compression using up to 4 threads\nCompressing objects: 100% (7/7), done.\nWriting objects: 100% (7/7), 2.83 KiB | 1.41 MiB/s, done.\nTotal 7 (delta 5), reused 0 (delta 0), pack-reused 0\nremote: Resolving deltas: 100% (5/5), completed with 5 local objects.\nTo https://github.com/AnthonyontheHub/TP-Tutor.git\n   a2b2b63..165e84e  main -> main\nProcess Group PGID: 15113"
+}

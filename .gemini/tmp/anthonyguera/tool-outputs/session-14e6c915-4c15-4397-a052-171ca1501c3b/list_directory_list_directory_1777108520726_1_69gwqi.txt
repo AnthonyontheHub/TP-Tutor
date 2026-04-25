@@ -1,0 +1,3 @@
+{
+  "output": "Directory listing for /home/anthonyguera/TP-Tutor/src/store:\nauthStore.ts (2261 bytes)\nmasteryStore.ts (23127 bytes)"
+}

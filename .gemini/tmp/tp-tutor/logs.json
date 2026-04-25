@@ -1,0 +1,156 @@
+[
+  {
+    "sessionId": "30ef86a0-e9f6-4723-8023-b21da9b34829",
+    "messageId": 0,
+    "type": "user",
+    "message": "I am vibe coding. Scan the project and implement the following updates:\n\nPermanent Word Levels: Change the learning levels from [New, Intro, Work, Good, Done] to [Not Started, Introduced, Practicing, Confident, Mastered]. You MUST track down and update the underlying TypeScript interfaces, types, enums, Zustand store, and initial seed data so these names are permanently integrated into the data model and won't cause type errors.\n\nProgress Bar UI: The boxes in the progress bar should all glow with their specific level colors by default. When I click to select one, the selected box should remain glowing, and the other four should visually dim.\n\nMastery Grid Focus Mode: Currently, selecting a level in the progress bar shrinks the grid to only show those specific words. Change this behavior: all words must remain visible on the grid at all times. When a level is selected, simply dim the words that do not match the selection so they can still be used for sentence building.\n\nIdentify the files that need to change, fix any resulting type errors, and execute the edits.",
+    "timestamp": "2026-04-25T00:25:47.584Z"
+  },
+  {
+    "sessionId": "30ef86a0-e9f6-4723-8023-b21da9b34829",
+    "messageId": 1,
+    "type": "user",
+    "message": "!npm run dev",
+    "timestamp": "2026-04-25T00:30:31.648Z"
+  },
+  {
+    "sessionId": "30ef86a0-e9f6-4723-8023-b21da9b34829",
+    "messageId": 2,
+    "type": "user",
+    "message": "The UI looks great, but a previous update limited the INITIAL_VOCABULARY to only 8 words. Please find the file where the initial vocabulary/seed data is stored and restore it to include the full standard Toki Pona dictionary (all 120+ words). Make sure they are all initialized with the 'Not Started' status.",
+    "timestamp": "2026-04-25T00:37:26.435Z"
+  },
+  {
+    "sessionId": "ab3ab5f4-51e2-4477-a61a-d86692161483",
+    "messageId": 0,
+    "type": "user",
+    "message": "I am vibe coding. The 'Most used' sort option in the vocabulary grid dropdown is currently not working. It needs to sort words based on their statistical frequency in the Toki Pona language.\n\n\n\nData Update: Locate the file where the vocabulary objects are defined (likely src/data/initialVocabulary.ts or similar).\n\nAdd Frequency Property: Add a frequencyRank property to each word object. Search for standard Toki Pona frequency data and convert that for our use.\n\nSorting Logic: Find the MasteryGrid or the component handling the dropdown. Update the 'Most used' case to sort the displayed words by this frequencyRank in ascending order.\n\nFix Types: Ensure the MasteryWord interface is updated to include frequencyRank: number so there are no TypeScript errors.\n\nIdentify the files, apply the data, and wire up the sort.",
+    "timestamp": "2026-04-25T00:45:36.740Z"
+  },
+  {
+    "sessionId": "ab3ab5f4-51e2-4477-a61a-d86692161483",
+    "messageId": 1,
+    "type": "user",
+    "message": "Stage, commit, and push these changes to main.",
+    "timestamp": "2026-04-25T00:52:48.724Z"
+  },
+  {
+    "sessionId": "ee46c10a-daeb-43a3-bbf9-cabf233d6a26",
+    "messageId": 0,
+    "type": "user",
+    "message": "I am vibe coding. I need to implement a Google Sign-In page and cloud syncing using Firebase.\n\nAuthentication: Set up Firebase Authentication with the Google provider.\n\nLogin UI: Create a LoginPage component. If a user is not authenticated, they should only see this page with a 'Sign in with Google' button.\n\nFirestore Sync: Update the masteryStore (Zustand). When a user logs in, it should fetch their word levels from a Firestore document titled with their uid. When a word level changes, it should auto-save to Firestore.\n\nLocal-to-Cloud Migration: If I have progress saved in localStorage but nothing in Firestore yet, sync the local data up to the cloud on the first login so I don't lose my current progress.\n\nEnvironment Check: Use the existing Firebase configuration in the project.\n\nMap out the files, create the Auth component, and wire up the cloud syncing logic.",
+    "timestamp": "2026-04-25T00:59:33.696Z"
+  },
+  {
+    "sessionId": "ee46c10a-daeb-43a3-bbf9-cabf233d6a26",
+    "messageId": 1,
+    "type": "user",
+    "message": "I am vibe coding. I have a white screen error: does not provide an export named 'User'.\n\nIn src/store/authStore.ts, you are trying to import User as a value. Change the import to import type { User } from 'firebase/auth'; or just use the Firebase User type correctly without importing it as a value.\n\nAlso, double-check any other files where you might have made this same mistake with Firebase types. Fix the imports and restart the dev server.",
+    "timestamp": "2026-04-25T01:06:11.846Z"
+  },
+  {
+    "sessionId": "ee46c10a-daeb-43a3-bbf9-cabf233d6a26",
+    "messageId": 2,
+    "type": "user",
+    "message": "I am vibe coding. The Google Sign-In popup is appearing and then immediately vanishing without letting me log in.\n\nCheck src/store/authStore.ts and src/components/LoginPage.tsx.\n\nEnsure we are using signInWithPopup(auth, googleProvider).\n\nAdd a try...catch block around the sign-in logic to log the exact error code to the console so we can see why it's closing.\n\nCrucial: If signInWithPopup continues to fail on this device, implement a fallback to signInWithRedirect(auth, googleProvider) which is often more stable on Chromebooks.\n\nDouble-check that the Firebase initialization in src/services/firebase.ts is using the correct authDomain from my .env file.",
+    "timestamp": "2026-04-25T01:15:14.504Z"
+  },
+  {
+    "sessionId": "b1b4c413-03f8-4376-a26b-a09cec827b69",
+    "messageId": 0,
+    "type": "user",
+    "message": "Master Prompt: The jan Lina & Context Overhaul\nTask: Refactor the TP-Tutor application to implement personalized learning, the \"jan Lina\" identity, cyclic dev hacks, and enhanced vocab drawers.\n\nFiles to Modify:\n\nsrc/store/masteryStore.ts (Cyclic logic)\n\nsrc/services/linaService.ts (Personalized sentence generation)\n\nsrc/components/WordDetailDrawer.tsx (UI overhaul)\n\nsrc/components/UserProfileDrawer.tsx (Add User Bio/Context field)\n\nsrc/components/VocabCard.tsx (Interaction logic & cyclic hack)\n\nsrc/components/PhraseGrid.tsx (Translation fix)\n\nGlobal search/replace: Replace all instances of \"AI\", \"Assistant\", or \"Lina\" (standalone) with \"jan Lina\".\n\nRequirements:\n\n1. Identity & Rebranding:\n\nUpdate all UI strings and component titles to refer to the assistant as jan Lina.\n\n2. Personalized Context:\n\nUserProfileDrawer: Add a TextArea labeled \"What should jan Lina know about you?\" This state should persist to the users/{uid} profile in Firestore.\n\nlinaService: Update the generation prompt. When generating sentences for a word, include the user's \"Bio\" as context. Tell jan Lina: \"Create 3 Toki Pona sentences using the word [WORD]. Reference the user's interests: [USER_BIO]. Provide English translations.\"\n\n3. The Knowledge Drawer Overhaul:\n\nUpdate WordDetailDrawer to display:\n\nThe primary English translation clearly at the top.\n\nA \"Common Phrases\" section with 2-3 hardcoded examples for core words.\n\nA \"jan Lina's Examples\" section that fetches/displays the personalized sentences.\n\nA \"Quick Cycle\" button that triggers the new cyclic level-up.\n\n4. Cyclic Mastery Logic:\n\nIn masteryStore.ts, implement cycleWordStatus(wordId: string).\n\nLogic: Map current status index in ['not_started', 'introduced', 'practicing', 'confident', 'mastered'] and increment by 1 (modulo length).\n\nIn VocabCard.tsx, update the double-tap gesture to trigger this cycleWordStatus instead of a direct \"Mastered\" jump.\n\n5. Translation Fix:\n\nIn PhraseGrid.tsx and the sentence builder view, ensure the English text displayed above the Toki Pona words is pulled from the meanings array of the word object, defaulting to the first primary English gloss.\n\n6. Instructions Page:\n\nCreate a new component Instructions.tsx (accessible from the sidebar) where jan Lina explains:\n\nSingle Tap: Add word to builder.\n\nDouble Tap: Toggle mastery level (Dev Mode).\n\nLong Press: Open Word Detail/Super Focus.\n\nPoint System: Brief explanation of how practicing earns points toward the next level.",
+    "timestamp": "2026-04-25T01:56:26.552Z"
+  },
+  {
+    "sessionId": "b1b4c413-03f8-4376-a26b-a09cec827b69",
+    "messageId": 1,
+    "type": "user",
+    "message": "Looks good, you may begin.",
+    "timestamp": "2026-04-25T02:02:19.081Z"
+  },
+  {
+    "sessionId": "b1b4c413-03f8-4376-a26b-a09cec827b69",
+    "messageId": 2,
+    "type": "user",
+    "message": "Master Prompt: The \"Lore Builder\" & Linguistic Deep-Dive\nTask: Refactor the TP-Tutor Profile system, hide dev-mode interactions, and implement \"Level 3\" depth in the Word Detail Drawers.\n\nFiles to Modify:\n\nsrc/store/authStore.ts & src/store/masteryStore.ts (Structured Profile State)\n\nsrc/components/UserProfileDrawer.tsx (Lore Builder UI)\n\nsrc/components/WordDetailDrawer.tsx (Deep-Dive Overhaul)\n\nsrc/components/VocabCard.tsx (Hidden gesture logic)\n\nsrc/services/linaService.ts (Lore-aware generation)\n\nRequirements:\n\n1. The Structured Profile & Lore Builder:\n\nStandard Fields: Add input fields for Name, Age, Location, and Sex.\n\nThe Lore Builder: Replace the single Bio textarea with a dynamic list system.\n\nCategory Dropdown: (Options: Work, Hobbies, Pets, Projects, Lifestyle).\n\nDetail Input: Text field for the specific lore.\n\nActions: \"Add\" button to push to a userLore array; \"Delete\" icon next to existing entries.\n\nSync: Ensure this structured object ({ profile: {}, lore: [] }) syncs to Firestore.\n\n2. Deep-Dive Word Drawers (Level 3 Information):\n\nHeader: Word name, large English gloss, and Source Etymology (e.g., \"From Acadian: pali\").\n\nLinguistic Context: Add a \"Grammar Role\" section (Noun/Verb/Adj) and \"Semantic Neighbors\" (Synonyms/Antonyms).\n\nProgressive Examples: Instead of random sentences, display three categorized tiers:\n\nSimple: Subject + Word.\n\nIntermediate: Word + Modifiers.\n\nAdvanced: Complex sentence using la or e.\n\nCommon Compounds: List 2-3 common word pairings (e.g., for telo, show telo nasa).\n\njan Lina’s Personal Take: A section that generates one sentence specifically combining the word with a random piece of the user's saved Lore.\n\n3. Hidden Dev-Mode (Cleanup):\n\nRemove the \"Quick Cycle\" button from the WordDetailDrawer and VocabCard.\n\nGesture Logic: Re-implement the cycleWordStatus logic as a Secret Double-Tap on the VocabCard component itself.\n\nLong-Press: Keep this mapped to opening the WordDetailDrawer.\n\n4. Energy-Aware Review (Vibe Selection):\n\nOn the Dashboard/Daily Review button, add a small toggle: \"Chill\" vs. \"Deep\".\n\nLogic: Pass this \"vibe\" to linaService.\n\n\"Chill\" = prioritize words with high mastery for a light review.\n\n\"Deep\" = prioritize \"Introduced\" or \"Not Started\" words.\n\n5. Detailed Instructions Overhaul:\n\nUpdate Instructions.tsx to explicitly define the mastery levels:\n\nIntroduced: (0-50 pts) - The word is new to you.\n\nPracticing: (51-150 pts) - You're using it, but it's not fluid yet.\n\nConfident: (151-400 pts) - You know it well in most contexts.\n\nMastered: (400+ pts) - The word is now part of your \"mental map.\"",
+    "timestamp": "2026-04-25T02:20:09.975Z"
+  },
+  {
+    "sessionId": "b1b4c413-03f8-4376-a26b-a09cec827b69",
+    "messageId": 3,
+    "type": "user",
+    "message": "git add .",
+    "timestamp": "2026-04-25T02:29:52.081Z"
+  },
+  {
+    "sessionId": "b1b4c413-03f8-4376-a26b-a09cec827b69",
+    "messageId": 4,
+    "type": "user",
+    "message": "git commit -m \"feat: rebranding to jan Lina, adding interlinear glosses, and initial user context logic\"",
+    "timestamp": "2026-04-25T02:30:21.718Z"
+  },
+  {
+    "sessionId": "b1b4c413-03f8-4376-a26b-a09cec827b69",
+    "messageId": 5,
+    "type": "user",
+    "message": "git push",
+    "timestamp": "2026-04-25T02:30:40.940Z"
+  },
+  {
+    "sessionId": "b1b4c413-03f8-4376-a26b-a09cec827b69",
+    "messageId": 6,
+    "type": "user",
+    "message": "add a skip sign in button to the sign in page",
+    "timestamp": "2026-04-25T02:34:56.990Z"
+  },
+  {
+    "sessionId": "ab395b98-93f1-4d48-8618-ba473d55ce63",
+    "messageId": 0,
+    "type": "user",
+    "message": "what is my localhost address?",
+    "timestamp": "2026-04-25T02:41:17.737Z"
+  },
+  {
+    "sessionId": "ab395b98-93f1-4d48-8618-ba473d55ce63",
+    "messageId": 1,
+    "type": "user",
+    "message": "npm run dev.",
+    "timestamp": "2026-04-25T02:42:13.940Z"
+  },
+  {
+    "sessionId": "ab395b98-93f1-4d48-8618-ba473d55ce63",
+    "messageId": 2,
+    "type": "user",
+    "message": "The build is failing because MasteryGrid.tsx is trying to import buildOfflineTranslation from src/services/linaService.ts, but it's missing. Either add a exported buildOfflineTranslation function to the service that maps Toki Pona words to their English meanings from the store, or update the import in MasteryGrid.tsx to use the correct existing translation utility.",
+    "timestamp": "2026-04-25T02:43:41.626Z"
+  },
+  {
+    "sessionId": "ab395b98-93f1-4d48-8618-ba473d55ce63",
+    "messageId": 3,
+    "type": "user",
+    "message": "git add .",
+    "timestamp": "2026-04-25T02:49:54.432Z"
+  },
+  {
+    "sessionId": "ab395b98-93f1-4d48-8618-ba473d55ce63",
+    "messageId": 4,
+    "type": "user",
+    "message": "git commit -m \"fix: resolve build errors and add skip login for dev\"",
+    "timestamp": "2026-04-25T02:50:11.359Z"
+  },
+  {
+    "sessionId": "ab395b98-93f1-4d48-8618-ba473d55ce63",
+    "messageId": 5,
+    "type": "user",
+    "message": "git push",
+    "timestamp": "2026-04-25T02:50:32.467Z"
+  },
+  {
+    "sessionId": "ab395b98-93f1-4d48-8618-ba473d55ce63",
+    "messageId": 6,
+    "type": "user",
+    "message": "npm run dev",
+    "timestamp": "2026-04-25T02:50:54.382Z"
+  }
+]

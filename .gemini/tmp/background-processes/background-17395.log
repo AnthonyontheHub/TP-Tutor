@@ -1,0 +1,12 @@
+
+> tp-tutor@0.1.0 dev
+> vite
+
+8:02:20 AM [vite] (client) Re-optimizing dependencies because lockfile has changed
+Port 5173 is in use, trying another one...
+
+  VITE v6.4.2  ready in 424 ms
+
+  ➜  Local:   http://localhost:5174/TP-Tutor/
+  ➜  Network: use --host to expose
+  ➜  press h + enter to show help

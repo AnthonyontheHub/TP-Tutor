@@ -1,0 +1,3 @@
+{
+  "output": "Successfully overwrote file: /home/anthonyguera/TP-Tutor/src/App.css. Here is the updated code:\n/* Vite default styles cleared — global styles live in index.css */\n\n/* Enable text selection for chat messages and drawers */\n.chat-drawer, \n.chat-drawer *, \n.profile-drawer, \n.profile-drawer *,\n.word-drawer,\n.word-drawer *,\n.settings-drawer,\n.settings-drawer * {\n  user-select: text !important;\n  -webkit-user-select: text !important;\n}\n"
+}

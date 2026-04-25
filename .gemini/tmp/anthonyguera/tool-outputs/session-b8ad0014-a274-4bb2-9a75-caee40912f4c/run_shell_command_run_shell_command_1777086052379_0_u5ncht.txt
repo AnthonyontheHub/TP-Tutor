@@ -1,0 +1,3 @@
+{
+  "output": "Output: Enumerating objects: 9, done.\nCounting objects: 100% (9/9), done.\nDelta compression using up to 4 threads\nCompressing objects: 100% (5/5), done.\nWriting objects: 100% (5/5), 799 bytes | 799.00 KiB/s, done.\nTotal 5 (delta 3), reused 0 (delta 0), pack-reused 0\nremote: Resolving deltas: 100% (3/3), completed with 3 local objects.\nTo https://github.com/AnthonyontheHub/TP-Tutor.git\n   a537985..9f91c00  main -> main\nProcess Group PGID: 11035"
+}

@@ -1,0 +1,3 @@
+{
+  "output": "Output:       masterAllVocab: () => {\n        set((state) => ({\n          vocabulary: state.vocabulary.map(w => ({ ...w, baseScore: 975, confidenceScore: 975, status: 'mastered' as MasteryStatus })),\n          levels: state.levels.map(level => ({\n            ...level,\n            nodes: level.nodes.map(node => ({ ...node, status: 'mastered' as const }))\n          }))\n        }));\n        get().refreshCurriculumStatus();\n        void get().syncToCloud();\n      },\nProcess Group PGID: 15233"
+}
