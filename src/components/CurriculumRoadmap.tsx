@@ -1,6 +1,9 @@
 /* src/components/CurriculumRoadmap.tsx */
+import { useState } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import NodeDossier from './NodeDossier';
+import type { CurriculumNode } from '../types/mastery';
 
 interface Props {
   onSetActiveView: (view: 'vocab' | 'roadmap' | 'phrasebook') => void;
@@ -9,6 +12,7 @@ interface Props {
 
 export default function CurriculumRoadmap({ onSetActiveView, onAskLina }: Props) {
   const { levels, vocabulary, setLessonFilter } = useMasteryStore();
+  const [selectedNode, setSelectedNode] = useState<CurriculumNode | null>(null);
 
   const calculateNodeMastery = (requiredVocabIds: string[], requiredGrammarIds: string[]) => {
     const allIds = [...requiredVocabIds, ...requiredGrammarIds];
@@ -31,13 +35,22 @@ export default function CurriculumRoadmap({ onSetActiveView, onAskLina }: Props)
     return '#444'; // Not started
   };
 
-  const handleNodeClick = (wordIds: string[]) => {
-    setLessonFilter(wordIds);
-    onSetActiveView('vocab');
+  const handleNodeClick = (node: CurriculumNode) => {
+    setSelectedNode(node);
   };
 
   return (
-    <div className="roadmap-container" style={{ padding: '20px 0', paddingBottom: '100px' }}>
+    <div className="roadmap-container" style={{ padding: '20px 0', paddingBottom: '100px', position: 'relative' }}>
+      <AnimatePresence>
+        {selectedNode && (
+          <NodeDossier 
+            node={selectedNode} 
+            onBack={() => setSelectedNode(null)} 
+            onAskLina={onAskLina}
+          />
+        )}
+      </AnimatePresence>
+
       <h1 style={{ color: 'var(--gold)', fontWeight: 900, marginBottom: '24px', fontSize: '1.4rem', letterSpacing: '0.05em' }}>NEURAL PATHWAY ROADMAP</h1>
       
       {levels.map((level, sectorIdx) => (
@@ -72,18 +85,19 @@ export default function CurriculumRoadmap({ onSetActiveView, onAskLina }: Props)
                   key={node.id}
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.98 }}
+                  onClick={() => handleNodeClick(node)}
                   style={{ 
                     padding: '16px', 
                     background: 'rgba(255,255,255,0.03)', 
                     border: `1px solid ${mastery > 200 ? masteryColor : 'var(--border)'}`, 
                     borderRadius: '8px',
-                    boxShadow: mastery > 200 ? `0 0 15px ${masteryColor}22` : 'none'
+                    boxShadow: mastery > 200 ? `0 0 15px ${masteryColor}22` : 'none',
+                    cursor: 'pointer'
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
                     <div 
-                      onClick={() => handleNodeClick([...node.requiredVocabIds, ...node.requiredGrammarIds])}
-                      style={{ cursor: 'pointer', flex: 1 }}
+                      style={{ flex: 1 }}
                     >
                       <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: '0 0 4px 0', color: 'white' }}>{node.title}</h3>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

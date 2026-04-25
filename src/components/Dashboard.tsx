@@ -7,7 +7,7 @@ import PhraseGrid from './PhraseGrid';
 import CurriculumRoadmap from './CurriculumRoadmap';
 import SentenceBuilder from './SentenceBuilder';
 import { fetchQuickTranslation, resolveApiKey, buildOfflineTranslation } from '../services/linaService';
-import type { MasteryStatus } from '../types/mastery';
+import type { MasteryStatus, VocabWord } from '../types/mastery';
 import type { AppPanel } from '../App';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -157,18 +157,24 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
             <button onClick={handleDailyReview} className="btn-review" style={{ flex: 1, marginBottom: 0 }}>
               ⚡ START DAILY REVIEW
             </button>
-            <div style={{ display: 'flex', background: 'var(--surface)', borderRadius: '4px', padding: '4px', border: '1px solid var(--border)', flex: 1 }}>
+            <div style={{ display: 'flex', background: 'var(--surface)', borderRadius: '4px', padding: '4px', border: '1px solid var(--border)', flex: 1.5 }}>
               <button 
                 onClick={() => setReviewVibe('chill')}
-                style={{ flex: 1, border: 'none', background: reviewVibe === 'chill' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'chill' ? 'black' : '#666', borderRadius: '2px', padding: '6px 8px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
+                style={{ flex: 1, border: 'none', background: reviewVibe === 'chill' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'chill' ? 'black' : '#666', borderRadius: '2px', padding: '6px 4px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
               >
                 CHILL
               </button>
               <button 
                 onClick={() => setReviewVibe('deep')}
-                style={{ flex: 1, border: 'none', background: reviewVibe === 'deep' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'deep' ? 'black' : '#666', borderRadius: '2px', padding: '6px 8px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
+                style={{ flex: 1, border: 'none', background: reviewVibe === 'deep' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'deep' ? 'black' : '#666', borderRadius: '2px', padding: '6px 4px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
               >
                 DEEP
+              </button>
+              <button 
+                onClick={() => setReviewVibe('intense')}
+                style={{ flex: 1, border: 'none', background: reviewVibe === 'intense' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'intense' ? 'black' : '#666', borderRadius: '2px', padding: '6px 4px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
+              >
+                INTENSE
               </button>
             </div>
           </div>

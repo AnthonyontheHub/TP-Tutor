@@ -18,7 +18,12 @@ export const curriculumRoadmap: CurriculumLevel[] = [
         title: "Subject + Predicate", 
         requiredVocabIds: ["mi", "sina", "pona", "ike", "li"], 
         requiredGrammarIds: ["particle_li"],
-        status: 'locked'
+        status: 'locked',
+        richContent: [
+          { type: 'text', content: "Mechanical dividers lock fluid words into strict syntax." },
+          { type: 'structural', content: "The Assembly Line Equation: [Subject] + li + [Predicate]. In Toki Pona, the subject always comes first, followed by the action or state." },
+          { type: 'callout', content: "The Omission Rule: 'li' is strictly omitted ONLY when the entire subject is the unmodified pronoun 'mi' or 'sina'." }
+        ]
       },
       { 
         id: "direct_objects", 

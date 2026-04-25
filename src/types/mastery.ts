@@ -95,7 +95,7 @@ export interface UserProfile {
   history: ProgressSnapshot[];
 }
 
-export type ReviewVibe = 'chill' | 'deep';
+export type ReviewVibe = 'chill' | 'deep' | 'intense';
 
 // ─── Scoring Engine Types ─────────────────────────────────────────────────────
 
@@ -167,12 +167,18 @@ export interface VocabWord {
 
 export type NodeStatus = 'locked' | 'active' | 'mastered';
 
+export interface ContentBlock {
+  type: 'text' | 'structural' | 'callout';
+  content: string;
+}
+
 export interface CurriculumNode {
   id: string;
   title: string;
   requiredVocabIds: string[];
   requiredGrammarIds: string[];
   status: NodeStatus;
+  richContent?: ContentBlock[];
 }
 
 export interface CurriculumLevel {

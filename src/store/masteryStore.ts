@@ -413,7 +413,7 @@ export const useMasteryStore = create<MasteryStore>()(
           currentStreak: 0,
           lastActiveDate: '',
           vocabulary: mappedVocabulary,
-          levels: initialMasteryMap.roadmap,
+          levels: curriculumRoadmap,
           hasCompletedSetup: false,
         });
         void get().syncToCloud();
@@ -461,7 +461,7 @@ export const useMasteryStore = create<MasteryStore>()(
           currentStreak: 0,
           lastActiveDate: '',
           vocabulary: mappedVocabulary,
-          levels: initialMasteryMap.roadmap,
+          levels: curriculumRoadmap,
           hasCompletedSetup: false,
         });
       },
