@@ -81,19 +81,11 @@ getRedirectResult(auth).catch((error) => {
 });
 
 // Initialize auth state listener
+// Note: syncFromCloud is handled by App.tsx's useEffect with proper unsubscribe cleanup.
+// This listener only updates auth state and clears local data on logout.
 onAuthStateChanged(auth, (user) => {
-  // First, update the auth store's user state
-  useAuthStore.getState().setUser(user); 
-
-  if (user) {
-    // If user is logged in, sync mastery store with their UID
-    console.log(`Firebase auth state changed: User logged in - ${user.uid}`);
-    useMasteryStore.getState().syncFromCloud(user.uid);
-  } else {
-    // If logged out, reset mastery store to a guest/null state
-    console.log('Firebase auth state changed: User logged out');
-    useMasteryStore.getState().clearLocalData(); // Clears vocabulary, profile, etc.
-    // The userId in masteryStore should also reflect no logged-in user.
-    // Assuming clearLocalData() resets state to its initial values, including userId: null.
+  useAuthStore.getState().setUser(user);
+  if (!user) {
+    useMasteryStore.getState().clearLocalData();
   }
 });

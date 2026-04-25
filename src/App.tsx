@@ -22,7 +22,7 @@ export default function App() {
   
   const [activePanels, setActivePanels] = useState<AppPanel[]>([]);
   const [isSandboxMode, setIsSandboxMode] = useState<boolean>(
-    () => localStorage.getItem('tp_sandbox_mode') !== 'false'
+    () => localStorage.getItem('tp_sandbox_mode') === 'true'
   );
 
   useEffect(() => {

@@ -4,10 +4,6 @@ import { motion } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
 import { useAuthStore } from '../store/authStore';
 import type { LoreCategory } from '../types/mastery';
-// Import signInWithPopup for Google authentication
-import { signInWithPopup } from "firebase/auth";
-// Import auth and googleProvider from firebase configuration
-import { auth, googleProvider } from '../services/firebase';
 
 interface Props {
   isOpen: boolean;
@@ -57,7 +53,7 @@ function EditableField({
 
 export default function UserProfilePanel({ onClose }: Props) {
   const { profile, updateProfile, lore, addLore, deleteLore, currentStreak, savedPhrases, getStatusSummary, clearLocalData, switchProfile, setProfileImage } = useMasteryStore();
-  const { logout, setUser, signIn, isGuest, user } = useAuthStore();
+  const { logout, signIn, isGuest, user } = useAuthStore();
 
   const [loreCategory, setLoreCategory] = useState<LoreCategory>('Work');
   const [loreDetail, setLoreDetail] = useState('');
@@ -112,37 +108,6 @@ export default function UserProfilePanel({ onClose }: Props) {
     reader.readAsDataURL(file);
   };
 
-  // Handler for Google Sign-In
-  const handleGoogleSignIn = async () => {
-    try {
-      const result = await signInWithPopup(auth, googleProvider);
-      const userCredential = result.user;
-      setUser(userCredential); // Assuming setUser updates the authStore with user info
-      console.log("Google sign-in successful:", userCredential);
-      // Optionally, you might want to fetch user data from Firestore here
-    } catch (error) {
-      console.error("Google sign-in failed:", error);
-      // Handle error, e.g., show a message to the user
-    }
-  };
-
-  const handleAddLore = () => {
-    if (loreDetail.trim()) {
-      addLore({ category: loreCategory, detail: loreDetail });
-      setLoreDetail('');
-    }
-  };
-
-  const handleSwitchProfile = () => {
-    if (switchName.trim()) {
-      switchProfile(switchName);
-      setSwitchName('');
-    }
-  };
-
-  // --- Added console.log for debugging ---
-  console.log("UserProfilePanel - Current user state:", user);
-  // ------------------------------------
 
   return (
     <motion.div
@@ -344,37 +309,6 @@ export default function UserProfilePanel({ onClose }: Props) {
             ))}
           </div>
         </div>
-
-        {/* Conditionally render the Google Sign-In button if the user is not logged in */}
-        {!user && (
-          <button 
-            onClick={handleGoogleSignIn}
-            style={{ 
-              background: '#4285F4', // Google blue
-              color: 'white', 
-              border: 'none', 
-              borderRadius: '4px', 
-              padding: '12px 24px', 
-              fontWeight: 700, 
-              fontSize: '1rem',
-              cursor: 'pointer',
-              marginBottom: '20px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              margin: '0 auto 20px auto', // Center the button
-              width: 'fit-content' // Ensure button size is content-based
-            }}
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M23.35 12.3845C23.35 11.5938 23.2875 10.7625 23.1469 9.91125H12V14.1038H18.1838C18.0338 14.7938 17.7112 15.4162 17.2538 15.9112C16.7962 16.4062 16.2225 16.7662 15.5512 16.9762C14.8762 17.1838 14.1712 17.2988 13.4512 17.2988C10.995 17.2988 8.7525 16.3388 7.0875 14.6662C5.4225 12.9938 4.5825 10.7512 4.5825 8.55125C4.5825 7.25625 4.95 6.05625 5.64 5.00625C6.33 3.95625 7.25625 3.10125 8.34 2.47125C9.43125 1.84125 10.6612 1.5 11.9362 1.5C13.9762 1.5 15.9262 2.14125 17.4562 3.43125L15.5512 5.33625C14.7562 4.61625 13.7812 4.19375 12.7238 4.19375C10.995 4.19375 9.40125 5.06625 8.34 6.58125C7.27375 8.09625 6.87375 9.95125 7.01625 11.7988C7.16125 13.6438 8.02125 15.3262 9.4575 16.5262C10.8938 17.7262 12.7312 18.3712 14.58 18.2662C15.7312 18.2212 16.8412 17.9212 17.82 17.3662C18.7988 16.8112 19.6312 16.0462 20.2312 15.1288C20.8312 14.2262 21.1838 13.2112 21.1838 12.1462C21.1838 11.7412 21.1538 11.3512 21.1162 10.9738C21.0762 10.5962 21.0162 10.2338 20.9362 9.88125L23.35 12.3845Z" fill="#FBBC05"/>
-              <path d="M12 23.5C14.8 23.5 17.3333 22.5333 19.2467 20.8333C21.16 19.1333 22.56 16.9167 23.35 14.3033L19.7167 12.0633C19.2033 13.8867 18.1167 15.3333 16.5833 16.31C15.05 17.2867 13.1833 17.79 11.25 17.6367C9.71667 17.5433 8.23333 17.1567 6.95 16.5267C5.66667 15.8967 4.61667 15.0567 3.86667 13.9767C3.11667 12.8967 2.61667 11.6767 2.43167 10.4267C2.24667 9.1767 2.38167 7.9167 2.83167 6.7167L6.46667 8.9367C6.78333 9.7367 6.88333 10.5833 6.88333 11.4267C6.88333 12.9567 6.55667 14.4867 5.90667 15.8567C5.25667 17.2267 4.31667 18.3717 3.13167 19.2367C1.94667 20.0967 0.57167 20.6317 0 20.7967C3.55 22.2967 7.68333 23.5 12 23.5Z" fill="#34A853"/>
-              <path d="M23.35 12.3845C23.35 11.5938 23.2875 10.7625 23.1469 9.91125H12V14.1038H18.1838C18.0338 14.7938 17.7112 15.4162 17.2538 15.9112C16.7962 16.4062 16.2225 16.7662 15.5512 16.9762C14.8762 17.1838 14.1712 17.2988 13.4512 17.2988C10.995 17.2988 8.7525 16.3388 7.0875 14.6662C5.4225 12.9938 4.5825 10.7512 4.5825 8.55125C4.5825 7.25625 4.95 6.05625 5.64 5.00625C6.33 3.95625 7.25625 3.10125 8.34 2.47125C9.43125 1.84125 10.6612 1.5 11.9362 1.5C13.9762 1.5 15.9262 2.14125 17.4562 3.43125L15.5512 5.33625C14.7562 4.61625 13.7812 4.19375 12.7238 4.19375C10.995 4.19375 9.40125 5.06625 8.34 6.58125C7.27375 8.09625 6.87375 9.95125 7.01625 11.7988C7.16125 13.6438 8.02125 15.3262 9.4575 16.5262C10.8938 17.7262 12.7312 18.3712 14.58 18.2662C15.7312 18.2212 16.8412 17.9212 17.82 17.3662C18.7988 16.8112 19.6312 16.0462 20.2312 15.1288C20.8312 14.2262 21.1838 13.2112 21.1838 12.1462C21.1838 11.7412 21.1538 11.3512 21.1162 10.9738C21.0762 10.5962 21.0162 10.2338 20.9362 9.88125L23.35 12.3845Z" fill="#FBBC05"/>
-              <path d="M12 1.5C14.6458 1.5 17.0458 2.43125 18.8938 4.19375L15.5512 7.52625C14.7562 7.07625 13.7812 6.81125 12.7238 6.81125C10.995 6.81125 9.40125 5.93875 8.34 4.42375C7.27375 2.90875 6.87375 1.05375 7.01625 0.00625C7.16125 -0.94375 8.02125 -2.62625 9.4575 -3.82625C10.8938 -5.02625 12.7312 -5.67125 14.58 -5.56625C15.7312 -5.52125 16.8412 -5.22125 17.82 -4.66625C18.7988 -4.11125 19.6312 -3.34625 20.2312 -2.44375C20.8312 -1.54125 21.1838 -0.52625 21.1838 0.53625C21.1838 0.93125 21.1538 1.32125 21.1162 1.69875C21.0762 2.07625 21.0162 2.43875 20.9362 2.79125L18.5212 0.61125C17.9112 0.01125 17.1612 -0.31375 16.2812 -0.31375C15.0812 -0.31375 13.7812 0.39875 12.9012 1.65875C12.0212 2.91875 11.6012 4.42375 11.6512 5.93875C11.6512 7.45375 12.0212 8.95875 12.9012 10.2188C13.7812 11.4788 15.0812 12.1912 16.2812 12.1912C17.0912 12.1912 17.8412 11.9138 18.4612 11.4388C19.0812 10.9638 19.5612 10.3112 19.8412 9.55875L22.1562 11.6988C22.7762 10.8788 23.2038 9.9388 23.35 8.9063C23.4962 7.8738 23.35 6.7163 23.35 5.5313C23.35 4.1463 23.1663 2.8088 22.7838 1.5563L23.35 0.3063L23.35 12.3845Z" fill="#FABC05"/>
-            </svg>
-            Sign in with Google
-          </button>
-        )}
 
         <div style={{ paddingBottom: '40px', textAlign: 'center', opacity: 0.3, fontSize: '0.6rem', letterSpacing: '0.1em' }}>
            SYSTEM ID: {user?.uid || 'LOCAL_HOST'}
