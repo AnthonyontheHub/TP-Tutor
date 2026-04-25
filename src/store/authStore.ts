@@ -8,6 +8,7 @@ import {
   onAuthStateChanged, 
   type User 
 } from 'firebase/auth';
+import { useMasteryStore } from './masteryStore'; // Import masteryStore
 
 interface AuthState {
   user: User | null;
@@ -58,11 +59,15 @@ export const useAuthStore = create<AuthState>((set) => ({
       photoURL: null,
     } as User;
     set({ user: guestUser, isGuest: true, loading: false });
+    // Sync mastery store with guest user ID to ensure it's initialized correctly
+    useMasteryStore.getState().syncFromCloud('guest_user'); 
   },
   logout: async () => {
     try {
       await signOut(auth);
       set({ user: null, isGuest: false });
+      // Reset mastery store to a default/guest state upon logout
+      useMasteryStore.getState().clearLocalData(); // Clears vocabulary, profile, etc.
     } catch (error) {
       console.error('Error signing out:', error);
     }
@@ -77,5 +82,18 @@ getRedirectResult(auth).catch((error) => {
 
 // Initialize auth state listener
 onAuthStateChanged(auth, (user) => {
-  useAuthStore.getState().setUser(user);
+  // First, update the auth store's user state
+  useAuthStore.getState().setUser(user); 
+
+  if (user) {
+    // If user is logged in, sync mastery store with their UID
+    console.log(`Firebase auth state changed: User logged in - ${user.uid}`);
+    useMasteryStore.getState().syncFromCloud(user.uid);
+  } else {
+    // If logged out, reset mastery store to a guest/null state
+    console.log('Firebase auth state changed: User logged out');
+    useMasteryStore.getState().clearLocalData(); // Clears vocabulary, profile, etc.
+    // The userId in masteryStore should also reflect no logged-in user.
+    // Assuming clearLocalData() resets state to its initial values, including userId: null.
+  }
 });
