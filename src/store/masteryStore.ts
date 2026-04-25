@@ -120,6 +120,7 @@ interface MasteryState {
   lessonFilter: string[] | null;
   historySynced: boolean;
   isMainProfile: boolean;
+  cloudSynced: boolean;
   // Dashboard settings
   widgetDensity: 'Compact' | 'Expanded';
   fogOfWar: 'Strict' | 'Visible';
@@ -155,6 +156,7 @@ export const useMasteryStore = create<MasteryStore>()(
       isMainProfile: true,
       fogOfWar: 'Visible',
       showCircuitPaths: true,
+      cloudSynced: false,
 
       setHasCompletedSetup: (val) => { set({ hasCompletedSetup: val }); void get().syncToCloud(); },
 
@@ -569,9 +571,13 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       syncToCloud: async (explicitUserId) => {
-        const { vocabulary, curriculums, lastUpdated, studentName, profile, lore, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, isMainProfile, widgetDensity, fogOfWar, showCircuitPaths } = get();
+        const { vocabulary, curriculums, lastUpdated, studentName, profile, lore, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, isMainProfile, widgetDensity, fogOfWar, showCircuitPaths, cloudSynced } = get();
         const targetId = explicitUserId || userId;
-        
+
+        // Block premature syncs before cloud data has loaded — prevents stale
+        // localStorage data from overwriting Firestore during the auth race window
+        if (!cloudSynced && !explicitUserId) return;
+
         // Prevent sync for guest users and any non-main profile (Sandbox mode)
         if (!targetId || targetId === 'guest_user' || !isMainProfile) return;
 
@@ -603,7 +609,7 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       syncFromCloud: async (uid: string, initialName?: string, initialProfileImage?: string) => {
-        set({ userId: uid });
+        set({ userId: uid, cloudSynced: false });
         if (uid === 'guest_user') return;
         
         const userDocRef = doc(db, 'users', uid);
@@ -612,27 +618,79 @@ export const useMasteryStore = create<MasteryStore>()(
           const docSnap = await getDoc(userDocRef);
           
           if (!docSnap.exists()) {
-            if (initialName && (get().studentName === 'Anthony' || !get().studentName)) {
-              set({ studentName: initialName });
-              get().updateProfile({ name: initialName });
-            }
-            if (initialProfileImage && !get().profileImage) {
-              set({ profileImage: initialProfileImage });
-            }
+            const localName = get().studentName;
+            const isOtherUsersData = initialName && localName &&
+              localName !== 'Anthony' &&
+              localName.toLowerCase() !== initialName.toLowerCase();
 
-            const { vocabulary } = get();
-            const isFresh = vocabulary.every(w => w.status === 'not_started');
-            if (!isFresh) {
-              await get().syncToCloud(uid);
+            if (isOtherUsersData) {
+              // Local data belongs to a different user — start fresh for this account
+              set({
+                studentName: initialName,
+                profile: { name: initialName, age: '', locationString: '', sex: '', history: [] },
+                lore: [],
+                profileImage: initialProfileImage || '',
+                savedPhrases: [],
+                currentStreak: 0,
+                lastActiveDate: '',
+                vocabulary: mappedVocabulary,
+                curriculums: curriculumRoadmap,
+                currentPositionNodeId: 'phi_sim',
+                hasCompletedSetup: false,
+              });
+            } else {
+              if (initialName && (localName === 'Anthony' || !localName)) {
+                set({ studentName: initialName });
+                get().updateProfile({ name: initialName });
+              }
+              if (initialProfileImage && !get().profileImage) {
+                set({ profileImage: initialProfileImage });
+              }
+              const { vocabulary } = get();
+              const isFresh = vocabulary.every(w => w.status === 'not_started');
+              if (!isFresh) {
+                await get().syncToCloud(uid);
+              }
             }
           }
         } catch (err) {
           console.error('Error checking for migration:', err);
+        } finally {
+          // Unblock syncToCloud now that the initial Firestore check is complete
+          set({ cloudSynced: true });
         }
 
         return onSnapshot(userDocRef, (snapshot) => {
           if (!snapshot.exists()) return;
           const data = snapshot.data();
+
+          // Detect contaminated cloud data: a different name + all vocab mastered
+          // indicates test/debug data was accidentally synced to this account
+          const cloudName = data.studentName as string | undefined;
+          const allVocabMastered = Array.isArray(data.vocabulary) &&
+            data.vocabulary.length > 0 &&
+            (data.vocabulary as any[]).every((w) => w.status === 'mastered');
+          const nameMismatch = initialName && cloudName &&
+            cloudName.toLowerCase() !== initialName.toLowerCase();
+
+          if (nameMismatch && allVocabMastered) {
+            set({
+              studentName: initialName,
+              profile: { name: initialName, age: '', locationString: '', sex: '', history: [] },
+              lore: [],
+              profileImage: initialProfileImage || '',
+              savedPhrases: [],
+              currentStreak: 0,
+              lastActiveDate: '',
+              vocabulary: mappedVocabulary,
+              curriculums: curriculumRoadmap,
+              currentPositionNodeId: 'phi_sim',
+              hasCompletedSetup: false,
+              cloudSynced: true,
+            });
+            void get().syncToCloud(uid);
+            return;
+          }
 
           const vocabulary = (data.vocabulary || mappedVocabulary).map(
             (w: any) => {
@@ -705,6 +763,7 @@ export const useMasteryStore = create<MasteryStore>()(
           });
 
           set({
+            cloudSynced: true,
             vocabulary,
             curriculums: mergedCurriculums,
             lastUpdated: data.lastUpdated || '',
@@ -730,7 +789,7 @@ export const useMasteryStore = create<MasteryStore>()(
       name: 'tp-tutor-mastery',
       partialize: (state) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { userId, ...rest } = state;
+        const { userId, cloudSynced, ...rest } = state;
         return rest;
       },
       onRehydrateStorage: () => (state) => {
