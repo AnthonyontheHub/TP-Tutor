@@ -1,3 +1,4 @@
+/* src/components/WordDetailDrawer.tsx */
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
@@ -22,11 +23,11 @@ const NEXT_THRESHOLD: Partial<Record<MasteryStatus, number>> = {
   not_started: 1, introduced: 51, practicing: 151, confident: 401,
 };
 const NEXT_COLOR: Record<MasteryStatus, string> = {
-  not_started: '#1d4ed8',
-  introduced:  '#92400e',
-  practicing:  '#16a34a',
-  confident:   '#22c55e',
-  mastered:    '#22c55e',
+  not_started: '#374151',
+  introduced:  'var(--blue)',
+  practicing:  'var(--amber)',
+  confident:   '#16a34a',
+  mastered:    'var(--cyan)',
 };
 
 const WORD_EXTRA_DATA: Record<string, { etymology: string, neighbors: string[], compounds: string[] }> = {
@@ -71,95 +72,84 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
   return (
     <AnimatePresence>
       {isOpen && word && (
-        <motion.div 
-          key="backdrop" 
-          className="drawer-backdrop" 
-          initial={{ opacity: 0 }} 
-          animate={{ opacity: 1 }} 
-          exit={{ opacity: 0 }} 
-          onClick={onClose} 
-        />
-      )}
-      {isOpen && word && (
-        <motion.div 
-          key="drawer" 
-          className="word-drawer" 
-          initial={{ opacity: 0, scale: 0.95 }} 
-          animate={{ opacity: 1, scale: 1 }} 
-          exit={{ opacity: 0, scale: 0.95 }} 
-          onClick={(e) => e.stopPropagation()}
-          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          style={{ maxHeight: '90vh' }}
-        >
-          <div className="drawer__handle" />
-          <div className="drawer__scroll-area">
+        <div className="modal-backdrop" onClick={onClose}>
+          <motion.div 
+            className="modal-content" 
+            initial={{ opacity: 0, scale: 0.9, y: 20 }} 
+            animate={{ opacity: 1, scale: 1, y: 0 }} 
+            exit={{ opacity: 0, scale: 0.9, y: 20 }} 
+            onClick={(e) => e.stopPropagation()}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            style={{ padding: '24px' }}
+          >
             <div style={{ marginBottom: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <h2 style={{ fontSize: '2.8rem', marginBottom: '0' }}>{word.word}</h2>
+                <h2 style={{ fontSize: '3rem', marginBottom: '0', fontWeight: 900, color: 'white', letterSpacing: '-0.02em' }}>{word.word}</h2>
                 <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '0.8rem', color: '#666', fontWeight: 800, textTransform: 'uppercase' }}>{STATUS_META[word.status].label}</div>
-                  <div style={{ fontSize: '1.2rem' }}>{STATUS_META[word.status].emoji}</div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{STATUS_META[word.status].label}</div>
+                  <div style={{ fontSize: '1.5rem' }}>{STATUS_META[word.status].emoji}</div>
                 </div>
               </div>
-              <div style={{ fontSize: '1.4rem', color: '#3b82f6', fontWeight: 700, marginTop: '-5px' }}>{primaryMeaning}</div>
+              <div style={{ fontSize: '1.4rem', color: 'var(--cyan)', fontWeight: 700, marginTop: '-5px' }}>{primaryMeaning}</div>
               {extra?.etymology && (
-                <div style={{ fontSize: '0.75rem', color: '#555', fontStyle: 'italic', marginTop: '4px' }}>{extra.etymology}</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontStyle: 'italic', marginTop: '6px' }}>{extra.etymology}</div>
               )}
             </div>
 
             {/* Point Progress */}
             <div style={{ marginBottom: '32px' }}>
-              <div className="progress-bar-track" style={{ height: '8px' }}>
+              <div className="progress-bar-track" style={{ height: '10px', background: 'rgba(255,255,255,0.05)' }}>
                 <div
                   className="progress-bar-fill"
                   style={{
                     width: `${tierProgress(word.confidenceScore ?? 0, word.status) * 100}%`,
                     background: NEXT_COLOR[word.status],
+                    boxShadow: `0 0 15px ${NEXT_COLOR[word.status]}66`
                   }}
                 />
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px' }}>
-                <span style={{ fontSize: '0.7rem', color: '#444', fontWeight: 900 }}>{word.confidenceScore} PTS</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
+                <span style={{ fontSize: '0.75rem', color: 'white', fontWeight: 900 }}>{word.confidenceScore} PTS</span>
                 {word.status !== 'mastered' && (
-                  <span style={{ fontSize: '0.7rem', color: '#666', fontWeight: 700 }}>
+                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700 }}>
                     {Math.max(0, (NEXT_THRESHOLD[word.status] ?? 0) - (word.confidenceScore ?? 0))} TO {STATUS_META[NEXT_STATUS[word.status]!].label.toUpperCase()}
                   </span>
                 )}
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '32px' }}>
-              <section>
-                <h3 className="section-title" style={{ marginBottom: '8px' }}>Grammar Role</h3>
-                <div style={{ background: '#111', padding: '12px', borderRadius: '8px', border: '1px solid #222', fontSize: '0.85rem', color: '#ccc' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '32px' }}>
+              <section className="glass-panel" style={{ padding: '12px' }}>
+                <h3 className="section-title" style={{ fontSize: '0.6rem' }}>Grammar Role</h3>
+                <div style={{ fontSize: '0.85rem', color: 'white', fontWeight: 700 }}>
                   {word.partOfSpeech.toUpperCase()}
                 </div>
               </section>
-              <section>
-                <h3 className="section-title" style={{ marginBottom: '8px' }}>Semantic Neighbors</h3>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                  {extra?.neighbors.map(n => (
-                    <span key={n} style={{ background: '#1a1a1a', padding: '4px 8px', borderRadius: '6px', fontSize: '0.7rem', color: '#888', border: '1px solid #222' }}>{n}</span>
-                  )) || <span style={{ color: '#444', fontSize: '0.75rem' }}>No neighbors listed.</span>}
+              <section className="glass-panel" style={{ padding: '12px' }}>
+                <h3 className="section-title" style={{ fontSize: '0.6rem' }}>Neighbors</h3>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                  {extra?.neighbors.slice(0,2).map(n => (
+                    <span key={n} style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{n}</span>
+                  )) || <span style={{ color: '#444', fontSize: '0.65rem' }}>-</span>}
                 </div>
               </section>
             </div>
 
             <section style={{ marginBottom: '32px' }}>
-              <h3 className="section-title" style={{ marginBottom: '12px' }}>Progressive Examples</h3>
+              <h3 className="section-title">jan Lina's Examples</h3>
               <div style={{ display: 'grid', gap: '10px' }}>
                 {['Simple', 'Intermediate', 'Advanced'].map((tier) => {
                   const key = tier.toLowerCase();
                   const content = deepDive?.[key];
                   return (
-                    <div key={tier} style={{ background: '#111', padding: '12px', borderRadius: '10px', borderLeft: `4px solid ${tier === 'Simple' ? '#3b82f6' : tier === 'Intermediate' ? '#f59e0b' : '#ec4899'}` }}>
-                      <div style={{ fontSize: '0.6rem', fontWeight: 900, color: '#555', textTransform: 'uppercase', marginBottom: '4px' }}>{tier}</div>
+                    <div key={tier} className="glass-panel" style={{ padding: '12px', borderLeft: `3px solid ${tier === 'Simple' ? 'var(--blue)' : tier === 'Intermediate' ? 'var(--amber)' : 'var(--pink)'}` }}>
+                      <div style={{ fontSize: '0.55rem', fontWeight: 900, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>{tier}</div>
                       {isLoading ? (
-                        <div style={{ height: '1.2rem', background: '#1a1a1a', borderRadius: '4px', width: '80%' }} className="pulse" />
+                        <div style={{ height: '1.2rem', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', width: '80%' }} />
                       ) : content ? (
-                        <div style={{ fontSize: '0.9rem', color: '#eee' }}>{content}</div>
+                        <div style={{ fontSize: '0.85rem', color: '#eee', lineHeight: '1.4' }}>{content}</div>
                       ) : (
-                        <div style={{ fontSize: '0.8rem', color: '#444', fontStyle: 'italic' }}>Waiting for jan Lina...</div>
+                        <div style={{ fontSize: '0.75rem', color: '#444', fontStyle: 'italic' }}>...</div>
                       )}
                     </div>
                   );
@@ -168,42 +158,34 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
             </section>
 
             <section style={{ marginBottom: '32px' }}>
-              <h3 className="section-title" style={{ marginBottom: '12px' }}>Common Compounds</h3>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                {extra?.compounds.map(c => (
-                  <div key={c} onClick={() => onAskLina(`What does "${c}" mean?`)} style={{ background: '#1a1a1a', border: '1px solid #333', padding: '8px 12px', borderRadius: '8px', fontSize: '0.85rem', color: '#fff', cursor: 'pointer' }}>
-                    {c}
-                  </div>
-                )) || <div style={{ color: '#444', fontSize: '0.75rem' }}>None listed.</div>}
-              </div>
-            </section>
-
-            <section style={{ marginBottom: '24px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <h3 className="section-title" style={{ margin: 0, color: '#ec4899' }}>jan Lina's Personal Take</h3>
-                <button 
-                  onClick={() => onAskLina(`Tell me something personal about "${word.word}".`)}
-                  style={{ background: 'transparent', border: 'none', color: '#3b82f6', fontWeight: 'bold', fontSize: '0.7rem', cursor: 'pointer' }}
-                >
-                  ASK JAN LINA
-                </button>
-              </div>
-              <div style={{ background: '#1a1a1a', padding: '16px', borderRadius: '12px', border: '1px solid #ec489922', position: 'relative' }}>
-                <div style={{ position: 'absolute', top: '-10px', left: '20px', background: '#ec4899', color: 'white', fontSize: '0.6rem', padding: '2px 8px', borderRadius: '4px', fontWeight: 900 }}>LORE-AWARE</div>
+              <h3 className="section-title">Personal Take</h3>
+              <div className="glass-panel" style={{ border: '1px solid rgba(0, 243, 255, 0.1)', background: 'rgba(0, 243, 255, 0.02)' }}>
                 {isLoading ? (
-                  <div style={{ color: '#444', fontSize: '0.85rem' }}>jan Lina is writing...</div>
+                  <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>jan Lina is thinking...</div>
                 ) : deepDive?.personal ? (
-                  <p style={{ color: '#eee', fontSize: '0.95rem', lineHeight: '1.4', margin: 0 }}>{deepDive.personal}</p>
+                  <p style={{ color: '#eee', fontSize: '0.9rem', lineHeight: '1.5', margin: 0 }}>{deepDive.personal}</p>
                 ) : (
-                  <p style={{ color: '#555', fontSize: '0.85rem', fontStyle: 'italic', margin: 0 }}>She needs more lore to give a personal take. Add entries in your Profile!</p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontStyle: 'italic', margin: 0 }}>She needs more lore to give a personal take.</p>
                 )}
               </div>
             </section>
-          </div>
-          <div style={{ padding: '20px', borderTop: '1px solid #222' }}>
-            <button onClick={onClose} style={{ width: '100%', padding: '12px', background: '#333', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>✕ CLOSE</button>
-          </div>
-        </motion.div>
+
+            <button 
+              onClick={onClose} 
+              className="btn-review" 
+              style={{ 
+                margin: 0, 
+                width: '100%', 
+                background: 'var(--surface-2)', 
+                color: 'white', 
+                boxShadow: 'none',
+                border: '1px solid var(--border)'
+              }}
+            >
+              CLOSE
+            </button>
+          </motion.div>
+        </div>
       )}
     </AnimatePresence>
   );

@@ -1,14 +1,126 @@
-/* Vite default styles cleared — global styles live in index.css */
+/* src/App.css */
 
-/* Enable text selection for chat messages and drawers */
+/* Global Theme Styles */
+:root {
+  --neon-glow: 0 0 10px rgba(0, 243, 255, 0.4);
+  --neon-glow-strong: 0 0 20px rgba(0, 243, 255, 0.6);
+}
+
+/* Enable text selection for chat messages and full-screen views */
 .chat-drawer, 
 .chat-drawer *, 
-.profile-drawer, 
-.profile-drawer *,
-.word-drawer,
-.word-drawer *,
-.settings-drawer,
-.settings-drawer * {
+.full-screen-view,
+.full-screen-view *,
+.modal-content,
+.modal-content * {
   user-select: text !important;
   -webkit-user-select: text !important;
+}
+
+/* Glassmorphism utility */
+.glass-panel {
+  background: var(--surface);
+  backdrop-filter: var(--glass);
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+/* Inputs */
+.settings-input {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  color: white;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+  font-family: var(--font);
+  outline: none;
+  transition: all 0.2s;
+}
+
+.settings-input:focus {
+  border-color: var(--cyan);
+  background: rgba(0, 243, 255, 0.02);
+  box-shadow: 0 0 10px rgba(0, 243, 255, 0.1);
+}
+
+/* Settings Row */
+.settings-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+  cursor: pointer;
+  padding: 8px 0;
+}
+
+/* Checkbox */
+.settings-checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--cyan);
+}
+
+/* Buttons */
+.btn-settings {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  background: var(--surface-2);
+  color: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.btn-settings:hover {
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+/* Danger Zone */
+.danger-zone {
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  padding: 20px;
+  border-radius: 20px;
+  margin-top: 32px;
+  background: rgba(239, 68, 68, 0.02);
+}
+
+.btn-danger {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  background: transparent;
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-danger:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+}
+
+/* Animations */
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 0.3; }
+  100% { opacity: 0.6; }
+}
+
+.pulse {
+  animation: pulse 1.5s infinite ease-in-out;
 }

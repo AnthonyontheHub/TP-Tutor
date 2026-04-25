@@ -1,6 +1,5 @@
 /* src/components/SettingsDrawer.tsx */
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence, useDragControls } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
 
 interface Props {
@@ -10,170 +9,96 @@ interface Props {
   setIsSandboxMode: (val: boolean) => void;
 }
 
-export default function SettingsDrawer({ isOpen, onClose, isSandboxMode, setIsSandboxMode }: Props) {
-  const [apiKey, setApiKey] = useState('');
-  // Req 6: Local draft so the checkbox doesn't immediately mutate global state.
-  const [localSandboxMode, setLocalSandboxMode] = useState(isSandboxMode);
-  const { resetAsNewUser, randomizeVocab, masterAllVocab } = useMasteryStore();
-  const dragControls = useDragControls();
+export default function SettingsDrawer({ onClose, isSandboxMode, setIsSandboxMode }: Props) {
+  const { resetProfileAndRunSetup } = useMasteryStore();
 
-  useEffect(() => {
-    if (isOpen) {
-      setApiKey(localStorage.getItem('TP_GEMINI_KEY') || '');
-      setLocalSandboxMode(isSandboxMode);
-    }
-  }, [isOpen, isSandboxMode]);
-
-  const handleSaveKey = () => {
-    localStorage.setItem('TP_GEMINI_KEY', apiKey);
-    alert('API Key saved!');
-  };
-
-  const handleRemoveKey = () => {
-    if (window.confirm('Remove your API key from this device?')) {
-      localStorage.removeItem('TP_GEMINI_KEY');
-      setApiKey('');
-      alert('API key removed.');
-    }
-  };
-
-  const handleResetNewUser = () => {
-    if (window.confirm('Reset EVERYTHING and start over as a new user? All progress, phrases, and your profile will be erased.')) {
-      resetAsNewUser();
+  const handleResetSetup = () => {
+    if (confirm("This will clear your Profile and Lore and restart the onboarding. Your vocabulary progress will be saved. Continue?")) {
+      resetProfileAndRunSetup();
       onClose();
     }
   };
 
-  const handleRandomize = () => {
-    if (window.confirm('Randomize all vocabulary statuses? This will mix your progress randomly.')) {
-      randomizeVocab();
-    }
-  };
-
-  const handleMasterAll = () => {
-    if (window.confirm('Mark ALL vocabulary as Mastered?')) {
-      masterAllVocab();
-    }
-  };
-
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          key="backdrop"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
-          className="drawer-backdrop"
-        />
-      )}
+    <motion.div
+      className="full-screen-view"
+      initial={{ x: '100%' }}
+      animate={{ x: 0 }}
+      exit={{ x: '100%' }}
+      transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+    >
+      <header className="view-header">
+        <button onClick={onClose} className="btn-back">
+          <span>←</span> BACK
+        </button>
+        <h2 style={{ marginLeft: '16px', fontSize: '1rem', fontWeight: 900, letterSpacing: '0.1em' }}>SETTINGS</h2>
+      </header>
 
-      {isOpen && (
-        <motion.div
-          key="content"
-          drag="y"
-          dragControls={dragControls}
-          dragListener={false}
-          dragConstraints={{ top: 0 }}
-          dragElastic={{ top: 0, bottom: 0.3 }}
-          onDragEnd={(_, info) => { if (info.offset.y > 120) onClose(); }}
-          initial={{ y: '100%' }}
-          animate={{ y: '0%' }}
-          exit={{ y: '100%' }}
-          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          onClick={(e) => e.stopPropagation()}
-          className="settings-drawer"
-          style={{ padding: '0 20px 20px', overflowY: 'auto', boxSizing: 'border-box' }}
-        >
-          {/* Drag handle — only this area initiates drag */}
-          <div
-            style={{ padding: '12px 0 6px', cursor: 'grab', touchAction: 'none' }}
-            onPointerDown={(e) => dragControls.start(e)}
-          >
-            <div className="drawer__handle" style={{ margin: '0 auto' }} />
-          </div>
-
-          <h2 style={{ color: 'white', marginTop: 0, marginBottom: '20px', fontSize: '1rem', letterSpacing: '0.1em' }}>SETTINGS</h2>
-
-          {/* Sandbox Mode — uses local draft state, applied only after confirm */}
-          <div className="settings-section">
-            <label className="settings-row" style={{ marginBottom: '10px' }}>
-              <span className="settings-label">Sandbox Mode (Offline)</span>
-              <input
-                type="checkbox"
-                checked={localSandboxMode}
-                onChange={(e) => setLocalSandboxMode(e.target.checked)}
-                className="settings-checkbox"
-              />
-            </label>
-            {localSandboxMode !== isSandboxMode && (
-              <button
-                onClick={() => {
-                  const msg = localSandboxMode
-                    ? 'Enable Sandbox Mode? The app will work offline without using any API tokens.'
-                    : 'Disable Sandbox Mode? This will enable real API usage and consume tokens.';
-                  if (window.confirm(msg)) {
-                    setIsSandboxMode(localSandboxMode);
-                  } else {
-                    setLocalSandboxMode(isSandboxMode);
-                  }
-                }}
-                className="btn-settings"
-                style={{ fontSize: '0.72rem' }}
-              >
-                SAVE SANDBOX SETTING
-              </button>
-            )}
-          </div>
-
-          {/* API Key */}
-          <div className="settings-section">
-            <p className="settings-label" style={{ marginBottom: '8px' }}>GEMINI API KEY</p>
-            <input
-              type="password"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              className="settings-input"
-              placeholder="Enter API key..."
+      <div className="view-content">
+        <div className="glass-panel" style={{ marginBottom: '24px' }}>
+          <h3 className="section-title">Session Preferences</h3>
+          
+          <div className="settings-row" style={{ marginBottom: '20px' }} onClick={() => setIsSandboxMode(!isSandboxMode)}>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>Sandbox Mode</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Disable API calls for testing</div>
+            </div>
+            <input 
+              type="checkbox" 
+              checked={isSandboxMode} 
+              onChange={() => {}}
+              className="settings-checkbox"
             />
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <button onClick={handleSaveKey} className="btn-settings" style={{ flex: 2 }}>SAVE KEY</button>
-              <button
-                onClick={handleRemoveKey}
-                className="btn-settings"
-                style={{ flex: 1, background: '#374151', fontSize: '0.72rem' }}
-              >
-                REMOVE
-              </button>
-            </div>
           </div>
 
-          {/* Danger Zone */}
-          <div className="danger-zone">
-            <p className="settings-label" style={{ color: '#ef4444', marginBottom: '12px' }}>DANGER ZONE</p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <button onClick={handleResetNewUser} className="btn-danger">
-                Reset Data
-              </button>
-              <button
-                onClick={handleRandomize}
-                className="btn-danger"
-                style={{ color: '#c084fc', borderColor: '#7e22ce' }}
-              >
-                Randomize
-              </button>
-              <button
-                onClick={handleMasterAll}
-                className="btn-danger"
-                style={{ color: '#fbbf24', borderColor: '#92400e' }}
-              >
-                Master All
-              </button>
-            </div>
+          <div style={{ marginTop: '20px' }}>
+            <label className="settings-label">Gemini API Key</label>
+            <input 
+              type="password" 
+              placeholder="Paste your key here..."
+              className="settings-input"
+              value={localStorage.getItem('TP_GEMINI_KEY') || ''}
+              onChange={(e) => localStorage.setItem('TP_GEMINI_KEY', e.target.value)}
+            />
+            <p style={{ fontSize: '0.65rem', color: '#555', marginTop: '6px' }}>
+              Your key is stored locally and never sent to our servers.
+            </p>
           </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+        </div>
+
+        <div className="glass-panel" style={{ marginBottom: '24px' }}>
+          <h3 className="section-title">Development & Testing</h3>
+          <button 
+            onClick={handleResetSetup}
+            className="btn-settings"
+            style={{ background: 'var(--surface-2)', border: '1px solid var(--border)', color: 'white' }}
+          >
+            RESET PROFILE & RUN SETUP
+          </button>
+          <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '10px' }}>
+            Use this to re-test the onboarding flow or change your initial student details.
+          </p>
+        </div>
+
+        <div className="danger-zone">
+          <h3 className="section-title" style={{ color: '#ef4444' }}>Danger Zone</h3>
+          <button 
+            onClick={() => {
+              if (confirm("EXTREME DANGER: This will permanently wipe ALL your progress, vocabulary, and cloud data. This cannot be undone. Proceed?")) {
+                useMasteryStore.getState().resetAsNewUser();
+                onClose();
+              }
+            }}
+            className="btn-danger"
+          >
+            WIPE ALL DATA & RESET ACCOUNT
+          </button>
+        </div>
+
+        <div style={{ textAlign: 'center', marginTop: '40px', color: '#222', fontSize: '0.7rem', fontWeight: 900, letterSpacing: '0.2em' }}>
+          TP-TUTOR v0.1.0-GLITCH
+        </div>
+      </div>
+    </motion.div>
   );
 }

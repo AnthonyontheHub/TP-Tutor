@@ -49,6 +49,7 @@ interface MasteryActions {
   updatePhraseNote: (id: string, notes: string) => void;
   deletePhrase: (id: string) => void;
   resetAsNewUser: () => void;
+  resetProfileAndRunSetup: () => void;
   randomizeVocab: () => void;
   masterAllVocab: () => void;
   clearLocalData: () => void;
@@ -56,6 +57,7 @@ interface MasteryActions {
   syncToCloud: (userId?: string) => Promise<void>;
   getStatusSummary: () => StatusSummary & { xp: number; level: number; rankTitle: string };
   setActiveLesson: (curriculumId: string, moduleId: string) => void;
+  setHasCompletedSetup: (val: boolean) => void;
 }
 
 interface MasteryState {
@@ -74,6 +76,7 @@ interface MasteryState {
   savedPhrases: (string | SavedPhrase)[];
   currentStreak: number;
   lastActiveDate: string;
+  hasCompletedSetup: boolean;
 }
 
 type MasteryStore = MasteryState & MasteryActions;
@@ -100,6 +103,9 @@ export const useMasteryStore = create<MasteryStore>()(
       savedPhrases: [],
       currentStreak: 0,
       lastActiveDate: '',
+      hasCompletedSetup: false,
+
+      setHasCompletedSetup: (val) => { set({ hasCompletedSetup: val }); void get().syncToCloud(); },
 
       applyScoreDeltas: (deltas) => {
         set((state) => ({
@@ -230,6 +236,18 @@ export const useMasteryStore = create<MasteryStore>()(
           concepts: initialMasteryMap.initialConcepts,
           activeCurriculumId: null,
           activeModuleId: null,
+          hasCompletedSetup: false,
+        });
+        void get().syncToCloud();
+      },
+
+      resetProfileAndRunSetup: () => {
+        set({
+          studentName: '',
+          profile: { name: '', age: '', location: '', sex: '' },
+          lore: [],
+          profileImage: '',
+          hasCompletedSetup: false,
         });
         void get().syncToCloud();
       },
@@ -266,6 +284,7 @@ export const useMasteryStore = create<MasteryStore>()(
           concepts: initialMasteryMap.initialConcepts,
           activeCurriculumId: null,
           activeModuleId: null,
+          hasCompletedSetup: false,
         });
       },
 
@@ -289,14 +308,14 @@ export const useMasteryStore = create<MasteryStore>()(
         set({ activeCurriculumId: curriculumId, activeModuleId: moduleId }),
 
       syncToCloud: async (explicitUserId) => {
-        const { vocabulary, concepts, lastUpdated, studentName, profile, lore, profileImage, savedPhrases, currentStreak, lastActiveDate, userId } = get();
+        const { vocabulary, concepts, lastUpdated, studentName, profile, lore, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup } = get();
         const targetId = explicitUserId || userId;
         if (!targetId || targetId === 'guest_user') return;
 
         try {
           await setDoc(doc(db, 'users', targetId), {
             vocabulary, concepts, lastUpdated, studentName, profile, lore, profileImage,
-            savedPhrases, currentStreak, lastActiveDate,
+            savedPhrases, currentStreak, lastActiveDate, hasCompletedSetup
           }, { merge: true });
         } catch (err) {
           console.error('Firebase Sync Error:', err);
@@ -360,6 +379,7 @@ export const useMasteryStore = create<MasteryStore>()(
             savedPhrases: data.savedPhrases || [],
             currentStreak: data.currentStreak || 0,
             lastActiveDate: data.lastActiveDate || '',
+            hasCompletedSetup: data.hasCompletedSetup || false,
           });
         });
       },

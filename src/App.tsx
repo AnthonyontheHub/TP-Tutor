@@ -3,11 +3,19 @@ import { useState, useEffect, useCallback } from 'react';
 import Dashboard from './components/Dashboard';
 import ChatSession from './components/ChatSession';
 import LoginPage from './components/LoginPage';
+import UserProfileDrawer from './components/UserProfileDrawer';
+import SettingsDrawer from './components/SettingsDrawer';
+import Instructions from './components/Instructions';
+import SetupScreen from './components/SetupScreen';
 import { useMasteryStore } from './store/masteryStore';
 import { useAuthStore } from './store/authStore';
 
+export type AppView = 'dashboard' | 'profile' | 'settings' | 'instructions';
+
 export default function App() {
   const { user, loading } = useAuthStore();
+  const { studentName, hasCompletedSetup } = useMasteryStore();
+  const [currentView, setCurrentView] = useState<AppView>('dashboard');
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
 
@@ -64,14 +72,41 @@ export default function App() {
     return <LoginPage />;
   }
 
+  // Determine if we need to show setup.
+  // We show it if setup isn't completed.
+  const showSetup = !hasCompletedSetup;
+
   return (
     <>
-      <Dashboard
-        onStartSession={handleStartSession}
-        onAskLina={handleAskLina}
-        isSandboxMode={isSandboxMode}
-        setIsSandboxMode={setIsSandboxMode}
-      />
+      {currentView === 'dashboard' && (
+        <Dashboard
+          onStartSession={handleStartSession}
+          onAskLina={handleAskLina}
+          isSandboxMode={isSandboxMode}
+          setIsSandboxMode={setIsSandboxMode}
+          setView={setCurrentView}
+        />
+      )}
+
+      {currentView === 'profile' && (
+        <UserProfileDrawer isOpen={true} onClose={() => setCurrentView('dashboard')} />
+      )}
+
+      {currentView === 'settings' && (
+        <SettingsDrawer 
+          isOpen={true} 
+          onClose={() => setCurrentView('dashboard')} 
+          isSandboxMode={isSandboxMode} 
+          setIsSandboxMode={setIsSandboxMode} 
+        />
+      )}
+
+      {currentView === 'instructions' && (
+        <Instructions isOpen={true} onClose={() => setCurrentView('dashboard')} />
+      )}
+
+      {showSetup && <SetupScreen />}
+
       <ChatSession
         isActive={isChatOpen}
         onEndSession={handleEndSession}
