@@ -8,7 +8,29 @@ import type { MasteryStatus, VocabWord, StatusSummary, SavedPhrase, UserProfile,
 import { scoreToStatus, STATUS_MIDPOINT } from '../types/mastery';
 import { initialVocabulary, initialConcepts, curriculums } from '../data/initialMasteryMap';
 
-// ... (existing toFullVocabWord and INITIAL_VOCABULARY)
+interface Concept {
+  id: string;
+  title: string;
+  status: MasteryStatus;
+  sessionNotes: string;
+}
+
+function toFullVocabWord(v: { word: string; status: MasteryStatus; sessionNotes: string; frequencyRank?: number }): VocabWord {
+  return {
+    id: v.word,
+    word: v.word,
+    partOfSpeech: '',
+    meanings: '',
+    confidenceScore: STATUS_MIDPOINT[v.status],
+    status: v.status,
+    useCount: 0,
+    frequencyRank: v.frequencyRank ?? 999,
+    isMasteryCandidate: false,
+    sessionNotes: v.sessionNotes,
+  };
+}
+
+const INITIAL_VOCABULARY: VocabWord[] = initialVocabulary.map(toFullVocabWord);
 
 interface MasteryActions {
   applyScoreDeltas: (deltas: { wordId: string; delta: number }[]) => void;
