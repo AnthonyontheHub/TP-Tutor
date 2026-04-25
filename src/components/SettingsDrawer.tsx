@@ -10,12 +10,31 @@ interface Props {
 }
 
 export default function SettingsDrawer({ onClose, isSandboxMode, setIsSandboxMode }: Props) {
-  const { resetProfileAndRunSetup } = useMasteryStore();
+  const { resetProfileAndRunSetup, resetAsNewUser, randomizeVocab, masterAllVocab } = useMasteryStore();
 
   const handleResetSetup = () => {
     if (confirm("This will clear your Profile and Lore and restart the onboarding. Your vocabulary progress will be saved. Continue?")) {
       resetProfileAndRunSetup();
       onClose();
+    }
+  };
+
+  const handleResetNewUser = () => {
+    if (confirm("EXTREME DANGER: This will permanently wipe ALL your progress, vocabulary, and cloud data. This cannot be undone. Proceed?")) {
+      resetAsNewUser();
+      onClose();
+    }
+  };
+
+  const handleRandomize = () => {
+    if (confirm("Randomize all vocabulary statuses? This will mix your progress randomly.")) {
+      randomizeVocab();
+    }
+  };
+
+  const handleMasterAll = () => {
+    if (confirm("Mark ALL vocabulary as Mastered?")) {
+      masterAllVocab();
     }
   };
 
@@ -82,17 +101,28 @@ export default function SettingsDrawer({ onClose, isSandboxMode, setIsSandboxMod
 
         <div className="danger-zone">
           <h3 className="section-title" style={{ color: '#ef4444' }}>Danger Zone</h3>
-          <button 
-            onClick={() => {
-              if (confirm("EXTREME DANGER: This will permanently wipe ALL your progress, vocabulary, and cloud data. This cannot be undone. Proceed?")) {
-                useMasteryStore.getState().resetAsNewUser();
-                onClose();
-              }
-            }}
-            className="btn-danger"
-          >
-            WIPE ALL DATA & RESET ACCOUNT
-          </button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <button 
+              onClick={handleResetNewUser}
+              className="btn-danger"
+            >
+              WIPE ALL DATA & RESET ACCOUNT
+            </button>
+            <button 
+              onClick={handleRandomize}
+              className="btn-danger"
+              style={{ color: '#c084fc', borderColor: 'rgba(192, 132, 252, 0.3)' }}
+            >
+              RANDOMIZE PROGRESS
+            </button>
+            <button 
+              onClick={handleMasterAll}
+              className="btn-danger"
+              style={{ color: '#fbbf24', borderColor: 'rgba(251, 191, 36, 0.3)' }}
+            >
+              MASTER ALL VOCABULARY
+            </button>
+          </div>
         </div>
 
         <div style={{ textAlign: 'center', marginTop: '40px', color: '#222', fontSize: '0.7rem', fontWeight: 900, letterSpacing: '0.2em' }}>
