@@ -20,7 +20,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   isSandboxMode: boolean;
   setIsSandboxMode: (val: boolean) => void;
 }) {
-  const { studentName, currentStreak, vocabulary, savedPhrases, reviewVibe, setReviewVibe, selectedWords, setSelectedWords, savePhrase, lessonFilter, setLessonFilter } = useMasteryStore();
+  const { studentName, currentStreak, vocabulary, savedPhrases, reviewVibe, setReviewVibe, selectedWords, setSelectedWords, savePhrase, lessonFilter, setLessonFilter, calculateDecay, checkAssessments, hardenWord } = useMasteryStore();
 
   const [activeView, setActiveView] = useState<DashboardView>('vocab');
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
@@ -28,12 +28,21 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   const [sortMode, setSortMode] = useState<string>('alphabetical');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [focusPhraseId, setFocusPhraseId] = useState<string | null>(null);
+  const [assessmentWord, setAssessmentWord] = useState<VocabWord | null>(null);
 
   // Translation & Builder State
   const [translation, setTranslation] = useState<string | null>(null);
   const [isAutoTranslating, setIsAutoTranslating] = useState(false);
   const [savedConfirm, setSavedConfirm] = useState(false);
   const confirmTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    calculateDecay();
+    const interval = setInterval(() => {
+      checkAssessments((word) => setAssessmentWord(word));
+    }, 60000); // Check every minute
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     setTranslation(null);
@@ -308,6 +317,27 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
             setSelectedWords(newWords);
           }}
         />
+
+        <AnimatePresence>
+          {assessmentWord && (
+            <div className="modal-backdrop" style={{ zIndex: 3000 }}>
+              <motion.div 
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                className="glass-panel"
+                style={{ width: '90%', maxWidth: '400px', textAlign: 'center', border: '1px solid var(--gold)' }}
+              >
+                <h2 style={{ color: 'var(--gold)', marginBottom: '10px' }}>KNOWLEDGE CHECK</h2>
+                <p>Lina wants to verify your mastery of <strong>{assessmentWord.word}</strong>.</p>
+                <div style={{ margin: '20px 0', display: 'grid', gap: '10px' }}>
+                   <button onClick={() => { onAskLina(`Lina, I'm ready for the Knowledge Check on "${assessmentWord.word}". Give me 3 questions.`); setAssessmentWord(null); }} className="btn-review">START QUIZ</button>
+                   <button onClick={() => setAssessmentWord(null)} style={{ background: 'none', border: 'none', color: '#666', fontSize: '0.8rem' }}>MAYBE LATER</button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
       </main>
     </div>
   );

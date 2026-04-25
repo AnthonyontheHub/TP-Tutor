@@ -8,35 +8,42 @@ export const curriculumRoadmap: CurriculumLevel[] = [
     nodes: [
       { 
         id: "phonology", 
-        title: "Phonology and Orthography", 
+        title: "Phonology", 
         requiredVocabIds: ["a", "mu", "toki", "pona"], 
         requiredGrammarIds: [],
         status: 'active'
       },
       { 
-        id: "basic_sentences", 
-        title: "Basic Sentences (li/e)", 
-        requiredVocabIds: ["mi", "sina", "ona", "moku", "pali", "suli", "lili"], 
-        requiredGrammarIds: ["particle_li", "particle_e"],
+        id: "subject_predicate", 
+        title: "Subject + Predicate", 
+        requiredVocabIds: ["mi", "sina", "pona", "ike", "li"], 
+        requiredGrammarIds: ["particle_li"],
+        status: 'locked'
+      },
+      { 
+        id: "direct_objects", 
+        title: "Direct Objects", 
+        requiredVocabIds: ["moku", "pana", "lukin", "e"], 
+        requiredGrammarIds: ["particle_e"],
         status: 'locked'
       },
       { 
         id: "modifiers", 
-        title: "Modifiers & Colors", 
-        requiredVocabIds: ["pimeja", "walo", "loje", "jelo", "laso", "kule"], 
+        title: "Modifiers", 
+        requiredVocabIds: ["suli", "lili", "jelo", "laso"], 
         requiredGrammarIds: [],
         status: 'locked'
       },
       { 
         id: "prepositions", 
         title: "Prepositions", 
-        requiredVocabIds: ["lon", "kepeken", "tawa", "tan", "poka"], 
+        requiredVocabIds: ["lon", "tawa", "tan"], 
         requiredGrammarIds: [],
         status: 'locked'
       },
       { 
-        id: "pi_particle", 
-        title: "The 'pi' Particle", 
+        id: "pi_pivot", 
+        title: "The 'pi' Pivot", 
         requiredVocabIds: ["pi", "ilo", "kasi", "tomo"], 
         requiredGrammarIds: ["particle_pi"],
         status: 'locked'
@@ -53,20 +60,6 @@ export const curriculumRoadmap: CurriculumLevel[] = [
         requiredVocabIds: ["jan", "ma", "seli", "telo", "suno"], 
         requiredGrammarIds: [],
         status: 'locked'
-      },
-      { 
-        id: "metaphors", 
-        title: "Abstract Metaphors", 
-        requiredVocabIds: ["pilin", "sona", "nasin", "wawa", "kon"], 
-        requiredGrammarIds: [],
-        status: 'locked'
-      },
-      { 
-        id: "preverbs", 
-        title: "Complex Preverbs", 
-        requiredVocabIds: ["wile", "kama", "awen", "ken", "lukin"], 
-        requiredGrammarIds: [],
-        status: 'locked'
       }
     ]
   },
@@ -79,20 +72,6 @@ export const curriculumRoadmap: CurriculumLevel[] = [
         title: "Speed Nasin", 
         requiredVocabIds: ["la", "tenpo", "pini", "open", "sin"], 
         requiredGrammarIds: ["particle_la"],
-        status: 'locked'
-      },
-      { 
-        id: "community_dialects", 
-        title: "Community Dialects", 
-        requiredVocabIds: ["kipisi", "namako", "ali", "ali", "pu"], 
-        requiredGrammarIds: [],
-        status: 'locked'
-      },
-      { 
-        id: "poetic_mastery", 
-        title: "Poetic Mastery", 
-        requiredVocabIds: ["musi", "kalama", "sitelen", "olin", "suwi"], 
-        requiredGrammarIds: [],
         status: 'locked'
       }
     ]

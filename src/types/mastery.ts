@@ -118,7 +118,11 @@ export interface GrammarConcept {
   concept: string;
   status: MasteryStatus;
   sessionNotes: string;
-  baseScore?: number;
+  baseScore: number;
+  hardened?: boolean;
+  isBleeding?: boolean;
+  lastReviewed?: string;
+  scoreHistory?: ScoreHistoryEntry[];
 }
 
 // ─── Chapters ─────────────────────────────────────────────────────────────────
@@ -155,6 +159,8 @@ export interface VocabWord {
   partOfSpeechScores: PartOfSpeechScores;
   lastReviewed: string; // ISO timestamp
   scoreHistory: ScoreHistoryEntry[];
+  hardened: boolean;
+  isBleeding: boolean;
 }
 
 // ─── Curriculum ──────────────────────────────────────────────────────────────

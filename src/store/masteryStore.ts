@@ -30,7 +30,9 @@ function toFullVocabWord(v: { word: string; status: MasteryStatus; type: 'word' 
     sessionNotes: v.sessionNotes,
     partOfSpeechScores: { noun: 0, verb: 0, modifier: 0 },
     lastReviewed: new Date().toISOString(),
-    scoreHistory: []
+    scoreHistory: [],
+    hardened: false,
+    isBleeding: false
   };
 }
 
@@ -71,6 +73,9 @@ interface MasteryActions {
   addWordToSelection: (word: string) => void;
   removeWordFromSelection: (word: string) => void;
   setLessonFilter: (wordIds: string[] | null) => void;
+  calculateDecay: () => void;
+  hardenWord: (wordId: string) => void;
+  checkAssessments: (onTrigger: (word: VocabWord) => void) => void;
 }
 
 interface MasteryState {
@@ -127,18 +132,26 @@ export const useMasteryStore = create<MasteryStore>()(
 
       refreshCurriculumStatus: () => {
         set((state) => {
-          const newLevels = state.levels.map(level => ({
+          let lastNodeMastery = 1000; // Book 1 starts unlocked
+
+          const newLevels = state.levels.map((level, lIdx) => ({
             ...level,
-            nodes: level.nodes.map(node => {
+            nodes: level.nodes.map((node, nIdx) => {
               const allReqs = [...node.requiredVocabIds, ...node.requiredGrammarIds];
-              const masteryReqs = state.vocabulary.filter(v => allReqs.includes(v.id));
+              const vocabReqs = state.vocabulary.filter(v => allReqs.includes(v.id) || allReqs.includes(v.word));
               
-              const isMastered = masteryReqs.length > 0 && masteryReqs.every(v => v.status === 'mastered');
-              const isActive = masteryReqs.some(v => v.status !== 'not_started') || node.status === 'active';
+              const avgScore = vocabReqs.length > 0 
+                ? vocabReqs.reduce((acc, v) => acc + v.baseScore, 0) / vocabReqs.length 
+                : 0;
+
+              const isMastered = vocabReqs.length > 0 && vocabReqs.every(v => v.status === 'mastered');
+              const isUnlocked = lastNodeMastery > 700 || (lIdx === 0 && nIdx === 0);
               
               let newStatus: NodeStatus = 'locked';
               if (isMastered) newStatus = 'mastered';
-              else if (isActive) newStatus = 'active';
+              else if (isUnlocked) newStatus = 'active';
+
+              lastNodeMastery = avgScore;
 
               return { ...node, status: newStatus };
             })
@@ -154,6 +167,13 @@ export const useMasteryStore = create<MasteryStore>()(
             if (w.id !== nodeId && w.word.toLowerCase() !== nodeId.toLowerCase()) return w;
             const newScore = clamp(w.baseScore + points, 0, 1000);
             const historyEntry = { date: now, change: points, reason: context };
+            
+            // Bleed Detection: >50 drop in 48hrs
+            const recentDrops = [historyEntry, ...(w.scoreHistory || [])]
+              .filter(h => h.change < 0 && (new Date(now).getTime() - new Date(h.date).getTime() < 48 * 3600000));
+            const totalDrop = Math.abs(recentDrops.reduce((acc, h) => acc + h.change, 0));
+            const isBleeding = totalDrop > 50;
+
             return {
               ...w,
               baseScore: newScore,
@@ -161,7 +181,8 @@ export const useMasteryStore = create<MasteryStore>()(
               status: scoreToStatus(newScore),
               lastReviewed: now,
               scoreHistory: [historyEntry, ...(w.scoreHistory || [])].slice(0, 5),
-              useCount: w.useCount + 1
+              useCount: w.useCount + 1,
+              isBleeding
             };
           })
         }));
@@ -175,23 +196,45 @@ export const useMasteryStore = create<MasteryStore>()(
         const FORTY_EIGHT_HOURS = 48 * 60 * 60 * 1000;
         set((state) => ({
           vocabulary: state.vocabulary.map((w) => {
+            if (w.hardened) return w;
             const last = new Date(w.lastReviewed || 0).getTime();
             if (now.getTime() - last > FORTY_EIGHT_HOURS) {
-              const decayAmount = -15; // Lina's gentle decay
+              const decayAmount = -15; 
               const newScore = clamp(w.baseScore - 15, 0, 1000);
               if (newScore === w.baseScore) return w;
+              
+              const history = [{ date: now.toISOString(), change: decayAmount, reason: 'decay' }, ...(w.scoreHistory || [])].slice(0, 5);
+              const recentDrops = history.filter(h => h.change < 0 && (now.getTime() - new Date(h.date).getTime() < 48 * 3600000));
+              const totalDrop = Math.abs(recentDrops.reduce((acc, h) => acc + h.change, 0));
+
               return {
                 ...w,
                 baseScore: newScore,
                 confidenceScore: newScore,
                 status: scoreToStatus(newScore),
-                scoreHistory: [{ date: now.toISOString(), change: decayAmount, reason: 'decay' }, ...(w.scoreHistory || [])].slice(0, 5)
+                scoreHistory: history,
+                isBleeding: totalDrop > 50
               };
             }
             return w;
           })
         }));
         void get().syncToCloud();
+      },
+
+      hardenWord: (wordId) => {
+        set(state => ({
+          vocabulary: state.vocabulary.map(w => (w.id === wordId || w.word === wordId) ? { ...w, hardened: true, baseScore: 1000, status: 'mastered' } : w)
+        }));
+        void get().syncToCloud();
+      },
+
+      checkAssessments: (onTrigger) => {
+        const { vocabulary } = get();
+        const candidates = vocabulary.filter(w => w.baseScore >= 500 && w.status !== 'mastered' && !w.hardened);
+        if (candidates.length > 0) {
+          onTrigger(candidates[0]);
+        }
       },
 
       applyScoreDeltas: (deltas) => {

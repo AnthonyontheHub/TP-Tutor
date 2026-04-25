@@ -1,14 +1,12 @@
 /* src/components/SentenceBuilder.tsx */
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import type { VocabWord } from '../types/mastery';
 import { useMasteryStore } from '../store/masteryStore';
 
 interface SentenceBuilderProps {
   onSave: () => void;
   onPractice: (sentence: string) => void;
   onExplain: (sentence: string) => void;
-  onRemoveLast: () => void;
   translation: string | null;
   isAutoTranslating: boolean;
 }
@@ -17,7 +15,6 @@ export default function SentenceBuilder({
   onSave,
   onPractice,
   onExplain,
-  onRemoveLast,
   translation,
   isAutoTranslating
 }: SentenceBuilderProps) {
@@ -29,157 +26,107 @@ export default function SentenceBuilder({
     <AnimatePresence>
       {hasSelection && (
         <motion.div
-          initial={{ y: '100%' }}
-          animate={{ y: 0 }}
-          exit={{ y: '100%' }}
-          transition={{ type: 'spring', damping: 20, stiffness: 200 }}
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 100, opacity: 0 }}
           style={{
             position: 'fixed',
-            bottom: 0,
-            left: 0,
-            right: 0,
+            bottom: '20px',
+            left: '5%',
+            right: '5%',
+            height: '110px',
             zIndex: 2000,
-            background: 'linear-gradient(to bottom, #0f172a, #000)',
-            borderTop: '2px solid var(--gold)',
-            boxShadow: '0 -10px 40px rgba(0,0,0,0.8)',
-            padding: '16px 20px 24px',
-            borderTopLeftRadius: '24px',
-            borderTopRightRadius: '24px',
+            background: 'rgba(15, 23, 42, 0.8)',
+            backdropFilter: 'blur(16px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+            border: '1px solid rgba(251, 191, 36, 0.3)',
+            borderRadius: '20px',
+            boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.8)',
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '8px 16px',
+            overflow: 'hidden'
           }}
         >
-          {/* Top Layer: English Translation */}
-          <div style={{
-            minHeight: '24px',
-            color: isAutoTranslating ? 'var(--gold)' : '#94a3b8',
-            fontSize: '0.9rem',
-            fontStyle: 'italic',
-            textAlign: 'center',
-            marginBottom: '12px',
-            opacity: 0.8
-          }}>
-            {isAutoTranslating ? 'Lina is thinking...' : (translation || 'Constructing translation...')}
-          </div>
-
-          {/* Middle Layer: Large Toki Pona Sentence */}
+          {/* Top Layer: Literal Definitions (Hints) */}
           <div style={{
             display: 'flex',
-            flexWrap: 'wrap',
-            gap: '12px',
+            gap: '4px',
             justifyContent: 'center',
-            marginBottom: '20px',
-            padding: '10px 0'
+            height: '20px',
+            overflow: 'hidden'
           }}>
             {selectedWords.map((word, idx) => {
               const vocab = vocabulary.find(v => v.word === word);
-              const meaning = vocab?.meanings?.split(',')[0].trim() || '';
+              const definition = vocab?.meanings?.split(',')[0].trim() || '?';
               return (
-                <div key={idx} style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: '0.6rem', color: 'var(--gold)', fontWeight: 800, textTransform: 'uppercase', marginBottom: '2px' }}>
-                    {meaning}
-                  </div>
-                  <div style={{ color: 'white', fontSize: '1.5rem', fontWeight: 900, textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
-                    {word}
-                  </div>
-                </div>
+                <React.Fragment key={idx}>
+                  <span style={{ fontSize: '0.6rem', color: 'var(--gold)', opacity: 0.8, fontWeight: 700 }}>
+                    {definition}
+                  </span>
+                  {idx < selectedWords.length - 1 && <span style={{ fontSize: '0.6rem', color: '#444' }}>|</span>}
+                </React.Fragment>
               );
             })}
           </div>
 
-          {/* Bottom Layer: Lina Toolbelt */}
+          {/* Middle Layer: The Sentence */}
           <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '12px'
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '1.2rem',
+            fontWeight: 900,
+            color: 'white',
+            letterSpacing: '0.02em',
+            textAlign: 'center'
           }}>
-            <button
-              onClick={onSave}
-              className="btn-review"
-              style={{
-                margin: 0,
-                padding: '12px 4px',
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '4px',
-                fontSize: '0.6rem'
-              }}
-            >
-              <span style={{ fontSize: '1.2rem' }}>💾</span>
-              <span>SAVE</span>
-            </button>
-
-            <button
-              onClick={() => onPractice(sentence)}
-              className="btn-review"
-              style={{
-                margin: 0,
-                padding: '12px 4px',
-                background: 'rgba(251, 191, 36, 0.1)',
-                border: '1px solid var(--gold)',
-                color: 'var(--gold)',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '4px',
-                fontSize: '0.6rem'
-              }}
-            >
-              <span style={{ fontSize: '1.2rem' }}>💬</span>
-              <span>PRACTICE</span>
-            </button>
-
-            <button
-              onClick={() => onExplain(sentence)}
-              className="btn-review"
-              style={{
-                margin: 0,
-                padding: '12px 4px',
-                background: 'rgba(251, 191, 36, 0.1)',
-                border: '1px solid var(--gold)',
-                color: 'var(--gold)',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '4px',
-                fontSize: '0.6rem'
-              }}
-            >
-              <span style={{ fontSize: '1.2rem' }}>🧠</span>
-              <span>EXPLAIN</span>
-            </button>
-
-            <button
-              onClick={() => setSelectedWords([])}
-              className="btn-review"
-              style={{
-                margin: 0,
-                padding: '12px 4px',
-                background: '#7f1d1d',
-                border: 'none',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '4px',
-                fontSize: '0.6rem'
-              }}
-            >
-              <span style={{ fontSize: '1.2rem' }}>✕</span>
-              <span>CLEAR</span>
-            </button>
+            {isAutoTranslating ? (
+              <motion.span animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.5 }}>
+                {sentence}
+              </motion.span>
+            ) : (
+              sentence
+            )}
           </div>
-          
-          {/* Subtle Pull Indicator */}
+
+          {/* Bottom Layer: Iconic Toolbelt */}
           <div style={{
-            width: '40px',
-            height: '4px',
-            background: 'rgba(255,255,255,0.2)',
-            borderRadius: '2px',
-            margin: '12px auto 0'
-          }} />
+            display: 'flex',
+            justifyContent: 'space-around',
+            alignItems: 'center',
+            padding: '4px 0',
+            borderTop: '1px solid rgba(255,255,255,0.05)'
+          }}>
+            <IconButton onClick={onSave} icon="🔖" label="Save" />
+            <IconButton onClick={() => onExplain(sentence)} icon="✨" label="Explain" color="var(--gold)" />
+            <IconButton onClick={() => onPractice(sentence)} icon="💬" label="Practice" color="var(--gold)" />
+            <IconButton onClick={() => setSelectedWords([])} icon="✕" label="Clear" color="#ef4444" />
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
+  );
+}
+
+function IconButton({ onClick, icon, label, color = 'white' }: { onClick: () => void, icon: string, label: string, color?: string }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        background: 'none',
+        border: 'none',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '2px',
+        cursor: 'pointer',
+        padding: '4px 12px'
+      }}
+    >
+      <span style={{ fontSize: '1.2rem', color }}>{icon}</span>
+      <span style={{ fontSize: '0.5rem', color: '#888', textTransform: 'uppercase', fontWeight: 800 }}>{label}</span>
+    </button>
   );
 }
