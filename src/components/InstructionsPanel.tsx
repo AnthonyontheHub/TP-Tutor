@@ -41,10 +41,10 @@ export default function InstructionsPanel({ onClose }: Props) {
               { status: 'Practicing', color: '#3b82f6', desc: 'Neural pathways forming (51-150 pts).' },
               { status: 'Confident', color: '#eab308', desc: 'High recall reliability (151-400 pts).' },
               { status: 'Mastered', color: '#22c55e', desc: 'Permanent integration achieved (400+ pts).' }
-            ].map((item) => (
-              <div key={i} className="glass-panel" style={{ borderLeft: `3px solid ${m.color}`, padding: '10px 15px' }}>
-                <div style={{ fontWeight: 900, color: '#fff', fontSize: '0.75rem', marginBottom: '2px' }}>{m.status.toUpperCase()}</div>
-                <div style={{ fontSize: '0.7rem', color: '#888' }}>{m.desc}</div>
+            ].map((item, i) => (
+              <div key={i} className="glass-panel" style={{ borderLeft: `3px solid ${item.color}`, padding: '10px 15px' }}>
+                <div style={{ fontWeight: 900, color: '#fff', fontSize: '0.75rem', marginBottom: '2px' }}>{item.status.toUpperCase()}</div>
+                <div style={{ fontSize: '0.7rem', color: '#888' }}>{item.desc}</div>
               </div>
             ))}
           </div>
