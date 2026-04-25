@@ -1,0 +1,3 @@
+{
+  "output": "\nIMPORTANT: The file content has been truncated.\nStatus: Showing lines 1-10 of 197 total lines.\nAction: To read more of the file, you can use the 'start_line' and 'end_line' parameters in a subsequent 'read_file' call. For example, to read the next section of the file, use start_line: 11.\n\n--- FILE CONTENT (truncated) ---\nimport type { MasteryStatus, CurriculumLevel } from '../types/mastery';\n\nconst roadmap: CurriculumLevel[] = [\n  {\n    id: \"book_1\",\n    title: \"Book 1: Introduction\",\n    nodes: [\n      { \n        id: \"intro_ch1\", \n        title: \"Phonology and Orthography\", "
+}

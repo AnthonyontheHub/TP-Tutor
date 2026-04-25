@@ -1,0 +1,3 @@
+{
+  "output": "Directory listing for /home/anthonyguera/TP-Tutor/src/types:\nmastery.ts (5626 bytes)"
+}

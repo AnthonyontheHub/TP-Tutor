@@ -1,0 +1,3 @@
+{
+  "output": "Successfully modified file: /home/anthonyguera/TP-Tutor/src/components/SentenceBuilder.tsx (1 replacements). Here is the updated code:\n...\n            textTransform: 'uppercase',\n            letterSpacing: '0.08em',\n            marginTop: '2px'\n          }}>\n            {selectedWords.map((word, idx) => {\n              const vocab = vocabulary.find(v => v.word.toLowerCase() === word.toLowerCase());\n              // Take the first meaning (before any comma or semicolon)\n              const hint = vocab?.meanings?.split(/[;,]/)[0].trim() || '?';\n              return (\n                <span key={idx}>\n                  {hint}{idx < selectedWords.length - 1 ? ' | ' : ''}\n                </span>\n..."
+}

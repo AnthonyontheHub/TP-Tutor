@@ -1,0 +1,3 @@
+{
+  "output": "Directory listing for /home/anthonyguera/TP-Tutor/src/components:\nChatSession.tsx (11201 bytes)\nDashboard.tsx (6443 bytes)\nLoginPage.tsx (3226 bytes)\nMasteryGrid.tsx (13912 bytes)\nPhraseGrid.tsx (5792 bytes)\nProgressSummary.tsx (3191 bytes)\nSettingsDrawer.tsx (6355 bytes)\nSetupScreen.tsx (2374 bytes)\nUserProfileDrawer.tsx (4825 bytes)\nVocabCard.tsx (3117 bytes)\nWordDetailDrawer.tsx (4934 bytes)"
+}

@@ -1,0 +1,3 @@
+{
+  "output": "Successfully modified file: /home/anthonyguera/TP-Tutor/src/store/masteryStore.ts (1 replacements). Here is the updated code:\n...\n  toggleWordSelection: (word: string) => void;\n  setLessonFilter: (wordIds: string[] | null) => void;\n  calculateDecay: () => void;\n  hardenWord: (wordId: string) => void;\n  checkAssessments: (onTrigger: (word: VocabWord) => void) => void;\n}\n\ninterface MasteryState {\n  userId: string | null;\n  studentName: string;\n..."
+}

@@ -7,6 +7,7 @@ interface SentenceBuilderProps {
   onSave: () => void;
   onPractice: (sentence: string) => void;
   onExplain: (sentence: string) => void;
+  onRemoveLast: () => void;
   translation: string | null;
   isAutoTranslating: boolean;
 }
@@ -15,6 +16,7 @@ export default function SentenceBuilder({
   onSave,
   onPractice,
   onExplain,
+  onRemoveLast,
   translation,
   isAutoTranslating
 }: SentenceBuilderProps) {
@@ -116,6 +118,7 @@ export default function SentenceBuilder({
             <IconButton onClick={onSave} icon="🔖" label="Save" />
             <IconButton onClick={() => onExplain(sentence)} icon="✨" label="Explain" color="var(--gold)" />
             <IconButton onClick={() => onPractice(sentence)} icon="💬" label="Practice" color="var(--gold)" />
+            <IconButton onClick={onRemoveLast} icon="⌫" label="Undo" color="#aaa" />
             <IconButton onClick={() => setSelectedWords([])} icon="✕" label="Clear" color="#ef4444" />
           </div>
         </motion.div>

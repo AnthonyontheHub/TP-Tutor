@@ -1,0 +1,89 @@
+
+> tp-tutor@0.1.0 dev
+> vite
+
+
+
+
+
+
+
+
+
+
+
+  VITE v6.4.2  ready in 388 ms
+
+  ➜  Local:   http://localhost:5173/TP-Tutor/
+  ➜  Network: use --host to expose
+  ➜  press h + enter to show help
+
+
+
+
+
+
+
+
+
+3:52:44 AM [vite] (client) hmr update /src/App.tsx, /src/components/ChatSession.tsx, /src/components/AchievementsPanel.tsx, /src/components/SettingsPanel.tsx, /src/components/SetupScreen.tsx, /src/components/UserProfilePanel.tsx, /src/components/Dashboard.tsx, /src/components/PhraseGrid.tsx, /src/components/MasteryGrid.tsx, /src/components/ProgressSummary.tsx, /src/components/SentenceBuilder.tsx, /src/components/CurriculumRoadmap.tsx, /src/components/WordDetailDrawer.tsx, /src/components/VocabCard.tsx, /src/components/NodeDossier.tsx
+
+
+
+
+
+
+
+
+
+3:52:48 AM [vite] (client) hmr update /src/App.tsx, /src/components/ChatSession.tsx, /src/components/AchievementsPanel.tsx, /src/components/SettingsPanel.tsx, /src/components/SetupScreen.tsx, /src/components/UserProfilePanel.tsx, /src/components/Dashboard.tsx, /src/components/PhraseGrid.tsx, /src/components/MasteryGrid.tsx, /src/components/ProgressSummary.tsx, /src/components/SentenceBuilder.tsx, /src/components/CurriculumRoadmap.tsx, /src/components/WordDetailDrawer.tsx, /src/components/VocabCard.tsx, /src/components/NodeDossier.tsx (x2)
+
+
+
+
+
+
+
+
+
+3:52:51 AM [vite] (client) hmr update /src/App.tsx, /src/components/ChatSession.tsx, /src/components/AchievementsPanel.tsx, /src/components/SettingsPanel.tsx, /src/components/SetupScreen.tsx, /src/components/UserProfilePanel.tsx, /src/components/Dashboard.tsx, /src/components/PhraseGrid.tsx, /src/components/MasteryGrid.tsx, /src/components/ProgressSummary.tsx, /src/components/SentenceBuilder.tsx, /src/components/CurriculumRoadmap.tsx, /src/components/WordDetailDrawer.tsx, /src/components/VocabCard.tsx, /src/components/NodeDossier.tsx (x3)
+
+
+
+
+
+
+
+
+
+3:53:34 AM [vite] (client) hmr update /src/components/NodeDossier.tsx
+
+
+
+
+
+
+
+
+
+3:57:48 AM [vite] (client) hmr update /src/index.css
+
+
+
+
+
+
+
+
+
+3:57:58 AM [vite] (client) hmr update /src/components/Dashboard.tsx
+
+
+
+
+
+
+
+
+
+3:58:01 AM [vite] (client) hmr update /src/components/ProgressSummary.tsx

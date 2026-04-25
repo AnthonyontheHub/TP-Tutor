@@ -1,0 +1,141 @@
+
+> tp-tutor@0.1.0 dev
+> vite
+
+
+
+
+
+
+
+
+
+
+
+  VITE v6.4.2  ready in 463 ms
+
+  ➜  Local:   http://localhost:5173/TP-Tutor/
+  ➜  Network: use --host to expose
+  ➜  press h + enter to show help
+
+
+
+
+
+
+
+
+
+7:38:10 PM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/SettingsDrawer.tsx, /src/components/UserProfileDrawer.tsx, /src/components/SetupScreen.tsx, /src/components/WordDetailDrawer.tsx
+
+
+
+
+
+
+
+
+
+7:46:45 PM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/SettingsDrawer.tsx, /src/components/UserProfileDrawer.tsx, /src/components/SetupScreen.tsx, /src/components/WordDetailDrawer.tsx (x2)
+
+
+
+
+
+
+
+
+
+7:47:02 PM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/SettingsDrawer.tsx, /src/components/UserProfileDrawer.tsx, /src/components/SetupScreen.tsx, /src/components/WordDetailDrawer.tsx (x3)
+
+
+
+
+
+
+
+
+
+7:47:07 PM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/SettingsDrawer.tsx, /src/components/UserProfileDrawer.tsx, /src/components/SetupScreen.tsx, /src/components/WordDetailDrawer.tsx (x4)
+
+
+
+
+
+
+
+
+
+7:47:17 PM [vite] (client) hmr update /src/components/MasteryGrid.tsx
+
+
+
+
+
+
+
+
+
+7:47:24 PM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/SettingsDrawer.tsx, /src/components/UserProfileDrawer.tsx, /src/components/SetupScreen.tsx, /src/components/WordDetailDrawer.tsx
+
+
+
+
+
+
+
+
+
+8:00:23 PM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/SettingsDrawer.tsx, /src/components/UserProfileDrawer.tsx, /src/components/SetupScreen.tsx, /src/components/WordDetailDrawer.tsx (x2)
+8:00:24 PM [vite] (client) ✨ new dependencies optimized: firebase/auth
+8:00:24 PM [vite] (client) ✨ optimized dependencies changed. reloading
+
+
+
+
+
+
+
+
+
+8:01:06 PM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/SettingsDrawer.tsx, /src/components/UserProfileDrawer.tsx, /src/components/SetupScreen.tsx, /src/components/WordDetailDrawer.tsx
+
+
+
+
+
+
+
+
+
+8:01:13 PM [vite] (client) hmr update /src/App.tsx
+
+
+
+
+
+
+
+
+
+8:01:28 PM [vite] (client) hmr update /src/components/UserProfileDrawer.tsx
+
+
+
+
+
+
+
+
+
+8:01:32 PM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/SettingsDrawer.tsx, /src/components/UserProfileDrawer.tsx, /src/components/SetupScreen.tsx, /src/components/WordDetailDrawer.tsx
+
+
+
+
+
+
+
+
+
+8:01:35 PM [vite] 

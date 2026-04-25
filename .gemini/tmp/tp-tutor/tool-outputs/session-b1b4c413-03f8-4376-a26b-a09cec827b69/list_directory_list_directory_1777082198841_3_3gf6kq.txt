@@ -1,0 +1,3 @@
+{
+  "output": "Directory listing for /home/anthonyguera/TP-Tutor/src/services:\nfirebase.ts (997 bytes)\nlinaService.ts (7862 bytes)\nsoundService.ts (1610 bytes)"
+}

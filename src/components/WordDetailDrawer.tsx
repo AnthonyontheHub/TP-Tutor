@@ -7,11 +7,11 @@ import type { VocabWord, MasteryStatus } from '../types/mastery';
 import { fetchDeepDiveExamples, resolveApiKey, stringifyUserContext } from '../services/linaService';
 
 const TIER_RANGES: Record<MasteryStatus, [number, number]> = {
-  not_started: [0,  0],
-  introduced:  [1, 50],
-  practicing:  [51, 150],
-  confident:   [151, 400],
-  mastered:    [401, 500],
+  not_started: [0,   200],
+  introduced:  [201, 500],
+  practicing:  [501, 750],
+  confident:   [751, 949],
+  mastered:    [950, 1000],
 };
 const NEXT_STATUS: Partial<Record<MasteryStatus, MasteryStatus>> = {
   not_started: 'introduced',
@@ -20,7 +20,7 @@ const NEXT_STATUS: Partial<Record<MasteryStatus, MasteryStatus>> = {
   confident:   'mastered',
 };
 const NEXT_THRESHOLD: Partial<Record<MasteryStatus, number>> = {
-  not_started: 1, introduced: 51, practicing: 151, confident: 401,
+  not_started: 201, introduced: 501, practicing: 751, confident: 950,
 };
 const NEXT_COLOR: Record<MasteryStatus, string> = {
   not_started: '#374151',
@@ -101,14 +101,14 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
                 <div
                   className="progress-bar-fill"
                   style={{
-                    width: `${tierProgress(word.confidenceScore ?? 0, word.status) * 100}%`,
+                    width: `${tierProgress(word.baseScore ?? 0, word.status) * 100}%`,
                     background: NEXT_COLOR[word.status],
                     boxShadow: `0 0 15px ${NEXT_COLOR[word.status]}44`
                   }}
                 />
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
-                <span style={{ fontSize: '0.75rem', color: 'white', fontWeight: 900 }}>{word.confidenceScore} NEURAL PTS</span>
+                <span style={{ fontSize: '0.75rem', color: 'white', fontWeight: 900 }}>{word.baseScore} NEURAL PTS</span>
                 {word.status !== 'mastered' && (
                   <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700 }}>
                     NEXT SYNC: {STATUS_META[NEXT_STATUS[word.status]!].label.toUpperCase()}

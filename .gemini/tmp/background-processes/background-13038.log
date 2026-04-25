@@ -1,0 +1,825 @@
+
+> tp-tutor@0.1.0 dev
+> vite
+
+
+
+
+
+
+
+
+
+
+
+  VITE v6.4.2  ready in 411 ms
+
+  ➜  Local:   http://localhost:5173/TP-Tutor/
+  ➜  Network: use --host to expose
+  ➜  press h + enter to show help
+
+
+
+
+
+
+
+
+
+2:24:02 AM [vite] (client) hmr update /src/components/MasteryGrid.tsx
+
+
+
+
+
+
+
+
+
+2:24:09 AM [vite] (client) hmr update /src/components/MasteryGrid.tsx (x2)
+
+
+
+
+
+
+
+
+
+2:27:11 AM [vite] (client) hmr update /src/components/SentenceBuilderBar.tsx
+2:27:48 AM [vite] (client) Pre-transform error: Failed to load url /src/components/SentenceBuilderBar.tsx (resolved id: /home/anthonyguera/TP-Tutor/src/components/SentenceBuilderBar.tsx) in /home/anthonyguera/TP-Tutor/src/components/MasteryGrid.tsx. Does the file exist?
+
+
+
+
+
+
+
+
+
+2:27:56 AM [vite] (client) hmr update /src/components/MasteryGrid.tsx
+2:28:03 AM [vite] (client) Pre-transform error: Failed to resolve import "./SentenceBuilderBar" from "src/components/MasteryGrid.tsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /home/anthonyguera/TP-Tutor/src/components/MasteryGrid.tsx:6:31
+  20 |  import VocabCard from "./VocabCard";
+  21 |  import WordDetailDrawer from "./WordDetailDrawer";
+  22 |  import SentenceBuilderBar from "./SentenceBuilderBar";
+     |                                  ^
+  23 |  import { fetchSentenceSuggestions, fetchQuickTranslation, resolveApiKey, buildOfflineTranslation, stringifyUserContext } from "../services/linaService";
+  24 |  const STATUS_RANK = {
+
+
+
+
+
+
+
+
+
+2:28:03 AM [vite] Internal server error: Failed to resolve import "./SentenceBuilderBar" from "src/components/MasteryGrid.tsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /home/anthonyguera/TP-Tutor/src/components/MasteryGrid.tsx:6:31
+  20 |  import VocabCard from "./VocabCard";
+  21 |  import WordDetailDrawer from "./WordDetailDrawer";
+  22 |  import SentenceBuilderBar from "./SentenceBuilderBar";
+     |                                  ^
+  23 |  import { fetchSentenceSuggestions, fetchQuickTranslation, resolveApiKey, buildOfflineTranslation, stringifyUserContext } from "../services/linaService";
+  24 |  const STATUS_RANK = {
+      at TransformPluginContext._formatLog (file:///home/anthonyguera/TP-Tutor/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:42553:41)
+      at TransformPluginContext.error (file:///home/anthonyguera/TP-Tutor/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:42550:16)
+      at normalizeUrl (file:///home/anthonyguera/TP-Tutor/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:40529:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at async file:///home/anthonyguera/TP-Tutor/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:40648:37
+      at async Promise.all (index 7)
+      at async TransformPluginContext.transform (file:///home/anthonyguera/TP-Tutor/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:40575:7)
+      at async EnvironmentPluginContainer.transform (file:///home/anthonyguera/TP-Tutor/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:42348:18)
+      at async loadAndTransform (file:///home/anthonyguera/TP-Tutor/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:35740:27)
+      at async viteTransformMiddleware (file:///home/anthonyguera/TP-Tutor/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:37264:24)
+
+
+
+
+
+
+
+
+
+2:28:10 AM [vite] Internal server error: Failed to resolve import "./SentenceBuilderBar" from "src/components/MasteryGrid.tsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /home/anthonyguera/TP-Tutor/src/components/MasteryGrid.tsx:6:31
+  20 |  import VocabCard from "./VocabCard";
+  21 |  import WordDetailDrawer from "./WordDetailDrawer";
+  22 |  import SentenceBuilderBar from "./SentenceBuilderBar";
+     |                                  ^
+  23 |  import { fetchSentenceSuggestions, fetchQuickTranslation, resolveApiKey, buildOfflineTranslation, stringifyUserContext } from "../services/linaService";
+  24 |  const STATUS_RANK = {
+      at TransformPluginContext._formatLog (file:///home/anthonyguera/TP-Tutor/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:42553:41)
+      at TransformPluginContext.error (file:///home/anthonyguera/TP-Tutor/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:42550:16)
+      at normalizeUrl (file:///home/anthonyguera/TP-Tutor/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:40529:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at async file:///home/anthonyguera/TP-Tutor/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:40648:37
+      at async Promise.all (index 7)
+      at async TransformPluginContext.transform (file:///home/anthonyguera/TP-Tutor/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:40575:7)
+      at async EnvironmentPluginContainer.transform (file:///home/anthonyguera/TP-Tutor/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:42348:18)
+      at async loadAndTransform (file:///home/anthonyguera/TP-Tutor/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:35740:27)
+      at async viteTransformMiddleware (file:///home/anthonyguera/TP-Tutor/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:37264:24) (x2)
+
+
+
+
+
+
+
+
+
+2:28:16 AM [vite] (client) hmr update /src/components/Dashboard.tsx
+
+
+
+
+
+
+
+
+
+2:28:16 AM [vite] (client) hmr update /src/components/MasteryGrid.tsx
+
+
+
+
+
+
+
+
+
+2:29:03 AM [vite] (client) hmr update /src/index.css
+
+
+
+
+
+
+
+
+
+2:29:10 AM [vite] (client) hmr update /src/components/Dashboard.tsx
+
+
+
+
+
+
+
+
+
+2:29:15 AM [vite] (client) hmr update /src/components/ProgressSummary.tsx
+
+
+
+
+
+
+
+
+
+2:36:43 AM [vite] (client) hmr update /src/components/VocabCard.tsx
+
+
+
+
+
+
+
+
+
+2:41:16 AM [vite] (client) hmr update /src/components/SentenceBuilder.tsx
+
+
+
+
+
+
+
+
+
+2:51:30 AM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/SettingsPanel.tsx, /src/components/UserProfilePanel.tsx, /src/components/AchievementsPanel.tsx, /src/components/SetupScreen.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/VocabCard.tsx, /src/components/WordDetailDrawer.tsx
+
+
+
+
+
+
+
+
+
+2:51:32 AM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/SettingsPanel.tsx, /src/components/UserProfilePanel.tsx, /src/components/AchievementsPanel.tsx, /src/components/SetupScreen.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/VocabCard.tsx, /src/components/WordDetailDrawer.tsx (x2)
+
+
+
+
+
+
+
+
+
+2:51:36 AM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/SettingsPanel.tsx, /src/components/UserProfilePanel.tsx, /src/components/AchievementsPanel.tsx, /src/components/SetupScreen.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/VocabCard.tsx, /src/components/WordDetailDrawer.tsx (x3)
+
+
+
+
+
+
+
+
+
+2:51:36 AM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/SettingsPanel.tsx, /src/components/UserProfilePanel.tsx, /src/components/AchievementsPanel.tsx, /src/components/SetupScreen.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/VocabCard.tsx, /src/components/WordDetailDrawer.tsx (x4)
+
+
+
+
+
+
+
+
+
+2:51:40 AM [vite] (client) hmr update /src/components/MasteryGrid.tsx
+
+
+
+
+
+
+
+
+
+2:51:44 AM [vite] (client) hmr update /src/components/MasteryGrid.tsx (x2)
+
+
+
+
+
+
+
+
+
+2:52:25 AM [vite] (client) hmr update /src/components/Dashboard.tsx
+
+
+
+
+
+
+
+
+
+2:52:29 AM [vite] (client) hmr update /src/components/Dashboard.tsx (x2)
+
+
+
+
+
+
+
+
+
+2:52:29 AM [vite] (client) hmr update /src/components/Dashboard.tsx (x3)
+
+
+
+
+
+
+
+
+
+2:52:45 AM [vite] (client) hmr update /src/components/Dashboard.tsx (x4)
+
+
+
+
+
+
+
+
+
+2:52:52 AM [vite] (client) hmr update /src/App.tsx
+
+
+
+
+
+
+
+
+
+2:52:53 AM [vite] (client) hmr update /src/App.tsx (x2)
+
+
+
+
+
+
+
+
+
+2:53:04 AM [vite] (client) page reload src/App.tsx
+
+
+
+
+
+
+
+
+
+2:53:20 AM [vite] (client) hmr update /src/components/SentenceBuilder.tsx
+
+
+
+
+
+
+
+
+
+2:53:46 AM [vite] (client) hmr update /src/components/MasteryGrid.tsx
+
+
+
+
+
+
+
+
+
+2:55:12 AM [vite] (client) hmr update /src/components/Dashboard.tsx
+
+
+
+
+
+
+
+
+
+2:58:43 AM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/SettingsPanel.tsx, /src/components/UserProfilePanel.tsx, /src/components/AchievementsPanel.tsx, /src/components/SetupScreen.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/VocabCard.tsx, /src/components/WordDetailDrawer.tsx, /src/components/CurriculumRoadmap.tsx, /src/components/SentenceBuilder.tsx
+
+
+
+
+
+
+
+
+
+2:58:43 AM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/SettingsPanel.tsx, /src/components/UserProfilePanel.tsx, /src/components/AchievementsPanel.tsx, /src/components/SetupScreen.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/VocabCard.tsx, /src/components/WordDetailDrawer.tsx, /src/components/CurriculumRoadmap.tsx, /src/components/SentenceBuilder.tsx (x2)
+
+
+
+
+
+
+
+
+
+2:58:47 AM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/SettingsPanel.tsx, /src/components/UserProfilePanel.tsx, /src/components/AchievementsPanel.tsx, /src/components/SetupScreen.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/VocabCard.tsx, /src/components/WordDetailDrawer.tsx, /src/components/CurriculumRoadmap.tsx, /src/components/SentenceBuilder.tsx (x3)
+
+
+
+
+
+
+
+
+
+2:58:47 AM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/SettingsPanel.tsx, /src/components/UserProfilePanel.tsx, /src/components/AchievementsPanel.tsx, /src/components/SetupScreen.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/VocabCard.tsx, /src/components/WordDetailDrawer.tsx, /src/components/CurriculumRoadmap.tsx, /src/components/SentenceBuilder.tsx (x4)
+
+
+
+
+
+
+
+
+
+2:58:50 AM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/SettingsPanel.tsx, /src/components/UserProfilePanel.tsx, /src/components/AchievementsPanel.tsx, /src/components/SetupScreen.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/VocabCard.tsx, /src/components/WordDetailDrawer.tsx, /src/components/CurriculumRoadmap.tsx, /src/components/SentenceBuilder.tsx (x5)
+
+
+
+
+
+
+
+
+
+2:58:50 AM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/SettingsPanel.tsx, /src/components/UserProfilePanel.tsx, /src/components/AchievementsPanel.tsx, /src/components/SetupScreen.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/VocabCard.tsx, /src/components/WordDetailDrawer.tsx, /src/components/CurriculumRoadmap.tsx, /src/components/SentenceBuilder.tsx (x6)
+
+
+
+
+
+
+
+
+
+2:59:00 AM [vite] (client) hmr update /src/components/CurriculumRoadmap.tsx
+
+
+
+
+
+
+
+
+
+2:59:12 AM [vite] (client) hmr update /src/components/Dashboard.tsx
+
+
+
+
+
+
+
+
+
+2:59:12 AM [vite] (client) hmr update /src/components/Dashboard.tsx (x2)
+
+
+
+
+
+
+
+
+
+2:59:12 AM [vite] (client) hmr update /src/components/Dashboard.tsx (x3)
+
+
+
+
+
+
+
+
+
+2:59:26 AM [vite] (client) hmr update /src/components/MasteryGrid.tsx
+
+
+
+
+
+
+
+
+
+2:59:26 AM [vite] (client) hmr update /src/components/MasteryGrid.tsx (x2)
+
+
+
+
+
+
+
+
+
+3:09:35 AM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/SettingsPanel.tsx, /src/components/UserProfilePanel.tsx, /src/components/AchievementsPanel.tsx, /src/components/SetupScreen.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/VocabCard.tsx, /src/components/WordDetailDrawer.tsx, /src/components/CurriculumRoadmap.tsx, /src/components/SentenceBuilder.tsx
+
+
+
+
+
+
+
+
+
+3:09:42 AM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/SettingsPanel.tsx, /src/components/UserProfilePanel.tsx, /src/components/AchievementsPanel.tsx, /src/components/SetupScreen.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/VocabCard.tsx, /src/components/WordDetailDrawer.tsx, /src/components/CurriculumRoadmap.tsx, /src/components/SentenceBuilder.tsx (x2)
+
+
+
+
+
+
+
+
+
+3:10:03 AM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/SettingsPanel.tsx, /src/components/UserProfilePanel.tsx, /src/components/AchievementsPanel.tsx, /src/components/SetupScreen.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/VocabCard.tsx, /src/components/WordDetailDrawer.tsx, /src/components/CurriculumRoadmap.tsx, /src/components/SentenceBuilder.tsx (x3)
+
+
+
+
+
+
+
+
+
+3:10:09 AM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/SettingsPanel.tsx, /src/components/UserProfilePanel.tsx, /src/components/AchievementsPanel.tsx, /src/components/SetupScreen.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/VocabCard.tsx, /src/components/WordDetailDrawer.tsx, /src/components/CurriculumRoadmap.tsx, /src/components/SentenceBuilder.tsx (x4)
+
+
+
+
+
+
+
+
+
+3:10:14 AM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/SettingsPanel.tsx, /src/components/UserProfilePanel.tsx, /src/components/AchievementsPanel.tsx, /src/components/SetupScreen.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/VocabCard.tsx, /src/components/WordDetailDrawer.tsx, /src/components/CurriculumRoadmap.tsx, /src/components/SentenceBuilder.tsx (x5)
+
+
+
+
+
+
+
+
+
+3:10:23 AM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/SettingsPanel.tsx, /src/components/UserProfilePanel.tsx, /src/components/AchievementsPanel.tsx, /src/components/SetupScreen.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/VocabCard.tsx, /src/components/WordDetailDrawer.tsx, /src/components/CurriculumRoadmap.tsx, /src/components/SentenceBuilder.tsx (x6)
+
+
+
+
+
+
+
+
+
+3:10:36 AM [vite] (client) hmr update /src/components/SentenceBuilder.tsx
+
+
+
+
+
+
+
+
+
+3:11:05 AM [vite] (client) hmr update /src/components/Dashboard.tsx
+
+
+
+
+
+
+
+
+
+3:11:06 AM [vite] (client) hmr update /src/components/Dashboard.tsx (x2)
+
+
+
+
+
+
+
+
+
+3:11:06 AM [vite] (client) hmr update /src/components/Dashboard.tsx (x3)
+
+
+
+
+
+
+
+
+
+3:27:12 AM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/SettingsPanel.tsx, /src/components/UserProfilePanel.tsx, /src/components/AchievementsPanel.tsx, /src/components/SetupScreen.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/VocabCard.tsx, /src/components/WordDetailDrawer.tsx, /src/components/CurriculumRoadmap.tsx, /src/components/SentenceBuilder.tsx
+
+
+
+
+
+
+
+
+
+3:27:12 AM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/SettingsPanel.tsx, /src/components/UserProfilePanel.tsx, /src/components/AchievementsPanel.tsx, /src/components/SetupScreen.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/VocabCard.tsx, /src/components/WordDetailDrawer.tsx, /src/components/CurriculumRoadmap.tsx, /src/components/SentenceBuilder.tsx (x2)
+
+
+
+
+
+
+
+
+
+3:27:20 AM [vite] (client) hmr update /src/components/Dashboard.tsx
+
+
+
+
+
+
+
+
+
+3:27:30 AM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/SettingsPanel.tsx, /src/components/UserProfilePanel.tsx, /src/components/AchievementsPanel.tsx, /src/components/SetupScreen.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/VocabCard.tsx, /src/components/WordDetailDrawer.tsx, /src/components/CurriculumRoadmap.tsx, /src/components/SentenceBuilder.tsx
+
+
+
+
+
+
+
+
+
+3:28:06 AM [vite] (client) hmr update /src/components/CurriculumRoadmap.tsx
+
+
+
+
+
+
+
+
+
+3:28:06 AM [vite] (client) hmr update /src/components/CurriculumRoadmap.tsx (x2)
+
+
+
+
+
+
+
+
+
+3:28:06 AM [vite] (client) hmr update /src/components/CurriculumRoadmap.tsx (x3)
+
+
+
+
+
+
+
+
+
+3:28:07 AM [vite] (client) hmr update /src/components/CurriculumRoadmap.tsx (x4)
+
+
+
+
+
+
+
+
+
+3:28:07 AM [vite] (client) hmr update /src/components/CurriculumRoadmap.tsx (x5)
+
+
+
+
+
+
+
+
+
+3:28:56 AM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/SettingsPanel.tsx, /src/components/UserProfilePanel.tsx, /src/components/AchievementsPanel.tsx, /src/components/SetupScreen.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/VocabCard.tsx, /src/components/WordDetailDrawer.tsx, /src/components/CurriculumRoadmap.tsx, /src/components/SentenceBuilder.tsx, /src/components/NodeDossier.tsx
+
+
+
+
+
+
+
+
+
+3:28:56 AM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/SettingsPanel.tsx, /src/components/UserProfilePanel.tsx, /src/components/AchievementsPanel.tsx, /src/components/SetupScreen.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/VocabCard.tsx, /src/components/WordDetailDrawer.tsx, /src/components/CurriculumRoadmap.tsx, /src/components/SentenceBuilder.tsx, /src/components/NodeDossier.tsx (x2)
+
+
+
+
+
+
+
+
+
+3:29:04 AM [vite] (client) hmr update /src/components/Dashboard.tsx
+
+
+
+
+
+
+
+
+
+3:31:37 AM [vite] (client) hmr update /src/components/CurriculumRoadmap.tsx
+
+
+
+
+
+
+
+
+
+3:31:45 AM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/SettingsPanel.tsx, /src/components/UserProfilePanel.tsx, /src/components/AchievementsPanel.tsx, /src/components/SetupScreen.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/VocabCard.tsx, /src/components/WordDetailDrawer.tsx, /src/components/CurriculumRoadmap.tsx, /src/components/SentenceBuilder.tsx, /src/components/NodeDossier.tsx
+
+
+
+
+
+
+
+
+
+3:31:58 AM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/SettingsPanel.tsx, /src/components/UserProfilePanel.tsx, /src/components/AchievementsPanel.tsx, /src/components/SetupScreen.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/VocabCard.tsx, /src/components/WordDetailDrawer.tsx, /src/components/CurriculumRoadmap.tsx, /src/components/SentenceBuilder.tsx, /src/components/NodeDossier.tsx (x2)
+
+
+
+
+
+
+
+
+
+3:31:58 AM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/SettingsPanel.tsx, /src/components/UserProfilePanel.tsx, /src/components/AchievementsPanel.tsx, /src/components/SetupScreen.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/VocabCard.tsx, /src/components/WordDetailDrawer.tsx, /src/components/CurriculumRoadmap.tsx, /src/components/SentenceBuilder.tsx, /src/components/NodeDossier.tsx (x3)
+
+
+
+
+
+
+
+
+
+3:32:13 AM [vite] (client) hmr update /src/components/NodeDossier.tsx
+
+
+
+
+
+
+
+
+
+3:32:13 AM [vite] (client) hmr update /src/components/NodeDossier.tsx (x2)
+
+
+
+
+
+
+
+
+
+3:32:23 AM [vite] (client) hmr update /src/components/CurriculumRoadmap.tsx
+
+
+
+
+
+
+
+
+
+3:33:29 AM [vite] (client) hmr update /src/App.tsx, /src/components/Dashboard.tsx, /src/components/ChatSession.tsx, /src/components/SettingsPanel.tsx, /src/components/UserProfilePanel.tsx, /src/components/AchievementsPanel.tsx, /src/components/SetupScreen.tsx, /src/components/ProgressSummary.tsx, /src/components/MasteryGrid.tsx, /src/components/PhraseGrid.tsx, /src/components/VocabCard.tsx, /src/components/WordDetailDrawer.tsx, /src/components/CurriculumRoadmap.tsx, /src/components/SentenceBuilder.tsx, /src/components/NodeDossier.tsx
+
+
+
+
+
+
+
+
+
+3:33:44 AM [vite] (client) hmr update /src/components/NodeDossier.tsx
+
+
+
+
+
+
+
+
+
+3:33:48 AM [vite] (client) hmr update /src/components/Dashboard.tsx
+
+
+
+
+
+
+
+
+
+3:33:56 AM [vite] (client) hmr update /src/components/CurriculumRoadmap.tsx
+
+
+
+
+
+
+
+
+
+3:33:56 AM [vite] (client) hmr update /src/components/CurriculumRoadmap.tsx (x2)
+
+
+
+
+
+
+
+
+
+3:33:56 AM [vite] (client) hmr update /src/components/CurriculumRoadmap.tsx (x3)

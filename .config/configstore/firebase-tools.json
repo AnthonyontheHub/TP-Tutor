@@ -1,0 +1,43 @@
+{
+	"motd": {
+		"cloudBuildErrorAfter": 1594252800000,
+		"cloudBuildWarnAfter": 1590019200000,
+		"defaultNode10After": 1594252800000,
+		"minVersion": "3.0.5",
+		"node8DeploysDisabledAfter": 1613390400000,
+		"node8RuntimeDisabledAfter": 1615809600000,
+		"node8WarnAfter": 1600128000000,
+		"fetched": 1777116736166
+	},
+	"gemini": true,
+	"usage": true,
+	"analytics-uuid": "3ceca3f1-cd95-4cd1-a8fd-58c142827a5c",
+	"user": {
+		"iss": "accounts.google.com",
+		"azp": "563584335869-fgrhgmd47bqnekij5i8b5pr03ho849e6.apps.googleusercontent.com",
+		"aud": "563584335869-fgrhgmd47bqnekij5i8b5pr03ho849e6.apps.googleusercontent.com",
+		"sub": "118043840820508161405",
+		"email": "anthony.guera@gmail.com",
+		"email_verified": true,
+		"at_hash": "__6RFGCnAj4tufR_RWFCnw",
+		"iat": 1777118444,
+		"exp": 1777122044
+	},
+	"tokens": {
+		"expires_at": 1777125111008,
+		"refresh_token": "1//01YUn1Z48mqb9CgYIARAAGAESNwF-L9Irqgh41JSiiHyGvzOz6g5aeHsdNj4MzqJ5yRpfU6fH2ZWFETkVlQ86rZafs6wAJgTK364",
+		"scopes": [],
+		"access_token": "ya29.a0AQvPyIOUoVTdyblS9Is2Pzc38wP8TUDW1fF-otToA6GImlBzF78wYlITJ4vNGvQEQJv9v0nMbZ7RiGih2yxtBdUMq5n7zvkLGOMHaoG_nZc5Y_5dKiql75kIF_yOu7aAj-EOrZlv6Es4IqjolydSJIdsefm9DbspVCl2KvqXfxfdSODFK-W4whqkUXQmQ_ysKqeOFgK8vBxfaCgYKAb8SARUSFQHGX2MicuH6LjdaWsUrmWVjKsD-XQ0211",
+		"expires_in": 3599,
+		"scope": "https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/userinfo.email openid https://www.googleapis.com/auth/cloudplatformprojects.readonly https://www.googleapis.com/auth/firebase",
+		"token_type": "Bearer",
+		"id_token": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjE5Y2FhZWNkZThmNDg1ZThmNTkzOGY0OGFiYTBjZTdhMzU4MWYwMjciLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiYXpwIjoiNTYzNTg0MzM1ODY5LWZncmhnbWQ0N2JxbmVraWo1aThiNXByMDNobzg0OWU2LmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwiYXVkIjoiNTYzNTg0MzM1ODY5LWZncmhnbWQ0N2JxbmVraWo1aThiNXByMDNobzg0OWU2LmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwic3ViIjoiMTE4MDQzODQwODIwNTA4MTYxNDA1IiwiZW1haWwiOiJhbnRob255Lmd1ZXJhQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhdF9oYXNoIjoieFhQUy11c1NoTTJTRl9DQ1FDSjVLdyIsImlhdCI6MTc3NzEyMTUxMywiZXhwIjoxNzc3MTI1MTEzfQ.ME4yTXbvDl2E4S-nVYEvzMapRoa_2z-49SVAky5bCVxrP11AdA6FbzzNy6_rPyk4GOkyOViZ9HKvb_jj2fb4_Er9JaeZUUjh9yjGpDsD4TFoHNYXILR8dKsgeAjH9ynmbCFT4CBCCpICq9EmPMTv993Q3i8GF8Bf31h_5JTSRLyIcNaq_xfKgFeoARwscoCVvnh8qQpXtQuvMvEHN1yiehTxgguUVOLVujQ7QLhBhGDGRvfugVycxKxloc0xKSMFIwU7h_EcsARYciIZ_-GZJGCAqM7UYCzVwYitR_ZuYUB_FCTsa2oxh1n0z7bRgFLiY9q9sJg-rFp8brZucAfrfQ"
+	},
+	"loginScopes": [
+		"email",
+		"openid",
+		"https://www.googleapis.com/auth/cloudplatformprojects.readonly",
+		"https://www.googleapis.com/auth/firebase",
+		"https://www.googleapis.com/auth/cloud-platform"
+	]
+}

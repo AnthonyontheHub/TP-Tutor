@@ -1,0 +1,3 @@
+{
+  "output": "/* Vite default styles cleared — global styles live in index.css */\n"
+}
