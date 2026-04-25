@@ -19,7 +19,7 @@ export type VocabContentEntry = Pick<VocabWord,
   'examples' | 
   'collocations' | 
   'relatedWordIds' | 
-  'boundaryNotes' | 
+
   'etymology' | 
   'mnemonic' | 
   'culturalNotes' | 
