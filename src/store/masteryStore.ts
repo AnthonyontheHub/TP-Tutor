@@ -93,6 +93,7 @@ interface MasteryState {
   currentStreak: number;
   lastActiveDate: string;
   hasCompletedSetup: boolean;
+  currentPositionNodeId: string;
   selectedWords: string[];
   lessonFilter: string[] | null;
   // Dashboard settings
@@ -123,6 +124,7 @@ export const useMasteryStore = create<MasteryStore>()(
       currentStreak: 0,
       lastActiveDate: '',
       hasCompletedSetup: false,
+      currentPositionNodeId: 'phi_sim',
       selectedWords: [],
       lessonFilter: null,
       widgetDensity: 'Expanded',
@@ -157,7 +159,14 @@ export const useMasteryStore = create<MasteryStore>()(
               return { ...node, status: newStatus };
             })
           }));
-          return { levels: newLevels };
+
+          // Update currentPositionNodeId to the first active/mastered but not yet hardened node?
+          // Actually user said: "The current stop is highlighted and clickable."
+          // So the first non-mastered node that is active.
+          const allNodes = newLevels.flatMap(l => l.nodes);
+          const firstActive = allNodes.find(n => n.status === 'active')?.id || state.currentPositionNodeId;
+
+          return { levels: newLevels, currentPositionNodeId: firstActive };
         });
       },
 
@@ -510,14 +519,14 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       syncToCloud: async (explicitUserId) => {
-        const { vocabulary, levels, lastUpdated, studentName, profile, lore, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, widgetDensity, fogOfWar, showCircuitPaths } = get();
+        const { vocabulary, levels, lastUpdated, studentName, profile, lore, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, widgetDensity, fogOfWar, showCircuitPaths } = get();
         const targetId = explicitUserId || userId;
         if (!targetId || targetId === 'guest_user') return;
 
         try {
           await setDoc(doc(db, 'users', targetId), {
             vocabulary, levels, lastUpdated, studentName, profile, lore, profileImage,
-            savedPhrases, currentStreak, lastActiveDate, hasCompletedSetup,
+            savedPhrases, currentStreak, lastActiveDate, hasCompletedSetup, currentPositionNodeId,
             widgetDensity, fogOfWar, showCircuitPaths
           }, { merge: true });
         } catch (err) {
@@ -601,6 +610,7 @@ export const useMasteryStore = create<MasteryStore>()(
             currentStreak: data.currentStreak || 0,
             lastActiveDate: data.lastActiveDate || '',
             hasCompletedSetup: data.hasCompletedSetup || false,
+            currentPositionNodeId: data.currentPositionNodeId || 'phi_sim',
             widgetDensity: data.widgetDensity || 'Expanded',
             fogOfWar: data.fogOfWar || 'Visible',
             showCircuitPaths: data.showCircuitPaths !== undefined ? data.showCircuitPaths : true,

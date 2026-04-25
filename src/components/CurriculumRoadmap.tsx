@@ -1,5 +1,5 @@
 /* src/components/CurriculumRoadmap.tsx */
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import NodeDossier from './NodeDossier';
@@ -12,8 +12,13 @@ interface Props {
 }
 
 export default function CurriculumRoadmap({ onSetActiveView, onAskLina, isSandboxMode }: Props) {
-  const { levels, vocabulary, setLessonFilter } = useMasteryStore();
+  const { levels, vocabulary, currentPositionNodeId } = useMasteryStore();
   const [selectedNode, setSelectedNode] = useState<CurriculumNode | null>(null);
+
+  // Flatten all nodes into a single sequence for the winding path
+  const allNodes = useMemo(() => {
+    return levels.flatMap(level => level.nodes);
+  }, [levels]);
 
   const calculateNodeMastery = (requiredVocabIds: string[], requiredGrammarIds: string[]) => {
     const allIds = [...requiredVocabIds, ...requiredGrammarIds];
@@ -40,8 +45,29 @@ export default function CurriculumRoadmap({ onSetActiveView, onAskLina, isSandbo
     setSelectedNode(node);
   };
 
+  // Helper to get winding offset (Duolingo style)
+  const getWindingOffset = (index: number) => {
+    const cycle = index % 4;
+    switch (cycle) {
+      case 0: return '0%';
+      case 1: return '25%';
+      case 2: return '0%';
+      case 3: return '-25%';
+      default: return '0%';
+    }
+  };
+
   return (
-    <div className="roadmap-container" style={{ padding: '20px 0', paddingBottom: '100px', position: 'relative' }}>
+    <div className="roadmap-container" style={{ 
+      padding: '40px 0', 
+      paddingBottom: '150px', 
+      position: 'relative',
+      maxWidth: '600px',
+      margin: '0 auto',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center'
+    }}>
       <AnimatePresence>
         {selectedNode && (
           <NodeDossier 
@@ -54,124 +80,112 @@ export default function CurriculumRoadmap({ onSetActiveView, onAskLina, isSandbo
         )}
       </AnimatePresence>
 
-      <h1 style={{ color: 'var(--gold)', fontWeight: 900, marginBottom: '24px', fontSize: '1.4rem', letterSpacing: '0.05em' }}>NEURAL PATHWAY ROADMAP</h1>
+      <header style={{ textAlign: 'center', marginBottom: '60px' }}>
+        <h1 style={{ color: 'var(--gold)', fontWeight: 900, fontSize: '1.2rem', letterSpacing: '0.2em', margin: 0 }}>NEURAL PATHWAY</h1>
+        <p style={{ color: '#666', fontSize: '0.7rem', fontWeight: 800, marginTop: '8px' }}>SEQUENTIAL MASTERY MAP</p>
+      </header>
       
-      {levels.map((level, sectorIdx) => (
-        <div key={level.id} style={{ marginBottom: '40px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-            <div style={{ 
-              background: 'var(--gold)', 
-              color: 'black', 
-              width: '24px', 
-              height: '24px', 
-              borderRadius: '50%', 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center',
-              fontWeight: 900,
-              fontSize: '0.8rem'
-            }}>
-              {sectorIdx + 1}
+      <div style={{ position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '40px' }}>
+        {/* SVG Path Connector (Optional decoration) */}
+        <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, pointerEvents: 'none' }}>
+           {/* We can add a winding line here if needed */}
+        </svg>
+
+        {allNodes.map((node, index) => {
+          const mastery = calculateNodeMastery(node.requiredVocabIds || [], node.requiredGrammarIds || []);
+          const isLocked = node.status === 'locked';
+          const isMastered = node.status === 'mastered';
+          const isActive = node.status === 'active';
+          const isCurrent = node.id === currentPositionNodeId;
+
+          const masteryColor = getMasteryColor(mastery);
+          const xOffset = getWindingOffset(index);
+
+          return (
+            <div 
+              key={node.id} 
+              style={{ 
+                position: 'relative', 
+                zIndex: 1, 
+                left: xOffset,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center'
+              }}
+            >
+              <motion.button
+                whileHover={isLocked ? {} : { scale: 1.1 }}
+                whileTap={isLocked ? {} : { scale: 0.9 }}
+                onClick={() => !isLocked && handleNodeClick(node)}
+                disabled={isLocked}
+                style={{
+                  width: isCurrent ? '80px' : '64px',
+                  height: isCurrent ? '80px' : '64px',
+                  borderRadius: '50%',
+                  background: isLocked ? '#222' : (isMastered ? 'var(--gold)' : '#333'),
+                  border: isCurrent ? '4px solid white' : `2px solid ${isLocked ? '#333' : 'var(--gold)'}`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: isLocked ? 'default' : 'pointer',
+                  boxShadow: isCurrent ? '0 0 20px var(--gold)' : 'none',
+                  position: 'relative'
+                }}
+              >
+                {isLocked ? (
+                  <span style={{ fontSize: '1.2rem', opacity: 0.3 }}>🔒</span>
+                ) : (
+                  <span style={{ fontSize: '1.5rem', filter: isMastered ? 'none' : 'grayscale(1)' }}>
+                    {node.type === 'Checkpoint' ? '🏁' : (node.type === 'Drill' ? '⚡' : '🧠')}
+                  </span>
+                )}
+
+                {/* Mastery Ring */}
+                {!isLocked && (
+                  <svg style={{ position: 'absolute', inset: -6, width: 'calc(100% + 12px)', height: 'calc(100% + 12px)', transform: 'rotate(-90deg)' }}>
+                    <circle 
+                      cx="50%" cy="50%" r="48%" 
+                      fill="none" 
+                      stroke={masteryColor} 
+                      strokeWidth="3" 
+                      strokeDasharray="100 100" 
+                      strokeDashoffset={100 - (mastery / 10)}
+                      strokeLinecap="round"
+                      style={{ transition: 'stroke-dashoffset 1s ease-out' }}
+                    />
+                  </svg>
+                )}
+              </motion.button>
+
+              <div style={{ 
+                marginTop: '12px', 
+                textAlign: 'center', 
+                width: '120px',
+                opacity: isLocked ? 0.4 : 1
+              }}>
+                <div style={{ 
+                  fontSize: '0.65rem', 
+                  fontWeight: 900, 
+                  color: isCurrent ? 'white' : '#888',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em'
+                }}>
+                  {node.title}
+                </div>
+                {isMastered && (
+                  <div style={{ fontSize: '0.5rem', color: 'var(--green)', fontWeight: 800, marginTop: '2px' }}>COMPLETE</div>
+                )}
+                {isActive && !isCurrent && (
+                  <div style={{ fontSize: '0.5rem', color: 'var(--gold)', fontWeight: 800, marginTop: '2px' }}>READY</div>
+                )}
+                {isCurrent && (
+                  <div style={{ fontSize: '0.5rem', color: 'var(--gold)', fontWeight: 800, marginTop: '2px' }}>CURRENT</div>
+                )}
+              </div>
             </div>
-            <h2 style={{ fontSize: '1rem', color: 'white', fontWeight: 800, margin: 0 }}>
-              {level.title.toUpperCase()}
-            </h2>
-          </div>
-
-          <div style={{ display: 'grid', gap: '12px' }}>
-            {level.nodes.map(node => {
-              const mastery = calculateNodeMastery(node.requiredVocabIds, node.requiredGrammarIds);
-              const masteryColor = getMasteryColor(mastery);
-              const isLocked = node.status === 'locked';
-              const isMastered = node.status === 'mastered';
-              
-              return (
-                <motion.div 
-                  key={node.id}
-                  whileHover={isLocked ? {} : { scale: 1.01 }}
-                  whileTap={isLocked ? {} : { scale: 0.98 }}
-                  onClick={() => !isLocked && handleNodeClick(node)}
-                  style={{ 
-                    padding: '16px', 
-                    background: isLocked ? 'rgba(255,255,255,0.01)' : 'rgba(255,255,255,0.03)', 
-                    border: `1px solid ${isLocked ? '#222' : (mastery > 200 ? masteryColor : 'var(--border)')}`, 
-                    borderRadius: '8px',
-                    boxShadow: (!isLocked && mastery > 200) ? `0 0 15px ${masteryColor}22` : 'none',
-                    cursor: isLocked ? 'not-allowed' : 'pointer',
-                    opacity: isLocked ? 0.5 : 1,
-                    position: 'relative',
-                    overflow: 'hidden'
-                  }}
-                >
-                  {isLocked && (
-                    <div style={{
-                      position: 'absolute',
-                      top: '8px',
-                      right: '8px',
-                      fontSize: '0.6rem',
-                      background: '#222',
-                      color: '#666',
-                      padding: '2px 6px',
-                      borderRadius: '4px',
-                      fontWeight: 900,
-                      letterSpacing: '0.05em'
-                    }}>
-                      LOCKED
-                    </div>
-                  )}
-
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                    <div style={{ flex: 1 }}>
-                      <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: '0 0 4px 0', color: isLocked ? '#666' : 'white' }}>{node.title}</h3>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div style={{ width: '100px', height: '4px', background: '#222', borderRadius: '2px', overflow: 'hidden' }}>
-                          <div style={{ width: `${mastery/10}%`, height: '100%', background: isLocked ? '#333' : masteryColor }} />
-                        </div>
-                        <span style={{ fontSize: '0.65rem', color: isLocked ? '#444' : masteryColor, fontWeight: 800 }}>
-                          {isMastered ? '100%' : `${Math.round(mastery/10)}%`} MASTERY
-                        </span>
-                      </div>
-                    </div>
-                    
-                    {!isLocked && (
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); onAskLina(`toki jan Lina! I'm working on the lesson "${node.title}". Can you give me a status report based on my current scores and a quick practice drill?`); }}
-                        style={{
-                          background: 'rgba(251, 191, 36, 0.1)',
-                          border: '1px solid var(--gold)',
-                          color: 'var(--gold)',
-                          borderRadius: '4px',
-                          padding: '6px 10px',
-                          fontSize: '0.6rem',
-                          fontWeight: 900,
-                          cursor: 'pointer'
-                        }}
-                      >
-                        CONSULT LINA
-                      </button>
-                    )}
-                  </div>
-
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                    {[...node.requiredVocabIds, ...node.requiredGrammarIds].map(id => (
-                      <span key={id} style={{ 
-                        fontSize: '0.55rem', 
-                        background: 'rgba(255,255,255,0.05)', 
-                        padding: '2px 6px', 
-                        borderRadius: '2px', 
-                        color: isLocked ? '#333' : '#888',
-                        border: `1px solid ${isLocked ? '#222' : 'rgba(255,255,255,0.1)'}`
-                      }}>
-                        {id.replace('particle_', '').toUpperCase()}
-                      </span>
-                    ))}
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
-      ))}
+          );
+        })}
+      </div>
     </div>
   );
 }
