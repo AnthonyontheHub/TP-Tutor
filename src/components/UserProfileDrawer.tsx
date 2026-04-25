@@ -1,5 +1,6 @@
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
+import { useAuthStore } from '../store/authStore';
 
 interface Props {
   isOpen: boolean;
@@ -8,6 +9,7 @@ interface Props {
 
 export default function UserProfileDrawer({ isOpen, onClose }: Props) {
   const { studentName, currentStreak, savedPhrases, getStatusSummary } = useMasteryStore();
+  const { logout } = useAuthStore();
   const dragControls = useDragControls();
 
   const summary = getStatusSummary();
@@ -76,6 +78,30 @@ export default function UserProfileDrawer({ isOpen, onClose }: Props) {
               <div style={{ fontSize: '0.85rem', color: '#aaa', marginBottom: '4px' }}>Saved Phrases</div>
               <div style={{ fontSize: '1.8rem', color: '#fff', fontWeight: 'bold' }}>{savedPhrases.length} <span style={{ fontSize: '1rem', color: '#888' }}>Phrases</span></div>
             </div>
+
+            <button 
+              onClick={() => {
+                useMasteryStore.getState().clearLocalData();
+                logout();
+                onClose();
+              }}
+              style={{
+                marginTop: '12px',
+                padding: '14px',
+                background: 'transparent',
+                color: '#ef4444',
+                border: '1px solid #7f1d1d',
+                borderRadius: '12px',
+                fontWeight: 700,
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                transition: 'background 0.15s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = '#1f0000'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+            >
+              Sign Out
+            </button>
           </div>
         </motion.div>
       )}

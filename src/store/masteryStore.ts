@@ -2,7 +2,7 @@
 import { db } from '../services/firebase';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { doc, setDoc, onSnapshot } from 'firebase/firestore';
+import { doc, setDoc, onSnapshot, getDoc } from 'firebase/firestore';
 import type { Unsubscribe } from 'firebase/firestore';
 import type { MasteryStatus, VocabWord, StatusSummary, SavedPhrase } from '../types/mastery';
 import { scoreToStatus, STATUS_MIDPOINT } from '../types/mastery';
@@ -48,13 +48,15 @@ interface MasteryActions {
   resetAsNewUser: () => void;
   randomizeVocab: () => void;
   masterAllVocab: () => void;
-  syncFromCloud: () => Unsubscribe | void;
-  syncToCloud: () => Promise<void>;
+  clearLocalData: () => void;
+  syncFromCloud: (userId: string, initialName?: string, initialProfileImage?: string) => Promise<Unsubscribe | void>;
+  syncToCloud: (userId?: string) => Promise<void>;
   getStatusSummary: () => StatusSummary & { xp: number; level: number; rankTitle: string };
   setActiveLesson: (curriculumId: string, moduleId: string) => void;
 }
 
 interface MasteryState {
+  userId: string | null;
   studentName: string;
   profileImage: string;
   lastUpdated: string;
@@ -73,18 +75,10 @@ type MasteryStore = MasteryState & MasteryActions;
 const XP_MAP = { not_started: 0, introduced: 10, practicing: 25, confident: 50, mastered: 100 };
 const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
 
-const getUserId = () => {
-  let userId = localStorage.getItem('tp_tutor_user_id');
-  if (!userId) {
-    userId = crypto.randomUUID();
-    localStorage.setItem('tp_tutor_user_id', userId);
-  }
-  return userId;
-};
-
 export const useMasteryStore = create<MasteryStore>()(
   persist(
     (set, get) => ({
+      userId: null,
       studentName: 'Anthony',
       profileImage: '',
       lastUpdated: '',
@@ -220,6 +214,21 @@ export const useMasteryStore = create<MasteryStore>()(
         void get().syncToCloud();
       },
 
+      clearLocalData: () => {
+        set({
+          userId: null,
+          studentName: 'Anthony',
+          profileImage: '',
+          savedPhrases: [],
+          currentStreak: 0,
+          lastActiveDate: '',
+          vocabulary: INITIAL_VOCABULARY,
+          concepts: initialConcepts,
+          activeCurriculumId: null,
+          activeModuleId: null,
+        });
+      },
+
       setLastUpdated: (date) => set({ lastUpdated: date }),
 
       getStatusSummary: () => {
@@ -239,22 +248,49 @@ export const useMasteryStore = create<MasteryStore>()(
       setActiveLesson: (curriculumId, moduleId) =>
         set({ activeCurriculumId: curriculumId, activeModuleId: moduleId }),
 
-      syncToCloud: async () => {
-        const { vocabulary, concepts, lastUpdated, studentName, profileImage, savedPhrases, currentStreak, lastActiveDate } = get();
+      syncToCloud: async (explicitUserId) => {
+        const { vocabulary, concepts, lastUpdated, studentName, profileImage, savedPhrases, currentStreak, lastActiveDate, userId } = get();
+        const targetId = explicitUserId || userId;
+        if (!targetId) return;
+
         try {
-          const userId = getUserId();
-          await setDoc(doc(db, 'users', userId), {
+          await setDoc(doc(db, 'users', targetId), {
             vocabulary, concepts, lastUpdated, studentName, profileImage,
             savedPhrases, currentStreak, lastActiveDate,
-          });
+          }, { merge: true });
         } catch (err) {
           console.error('Firebase Sync Error:', err);
         }
       },
 
-      syncFromCloud: () => {
-        const userId = getUserId();
-        return onSnapshot(doc(db, 'users', userId), (snapshot) => {
+      syncFromCloud: async (uid: string, initialName?: string, initialProfileImage?: string) => {
+        set({ userId: uid });
+        const userDocRef = doc(db, 'users', uid);
+        
+        try {
+          const docSnap = await getDoc(userDocRef);
+          
+          if (!docSnap.exists()) {
+            // New user or no cloud data
+            if (initialName && (get().studentName === 'Anthony' || !get().studentName)) {
+              set({ studentName: initialName });
+            }
+            if (initialProfileImage && !get().profileImage) {
+              set({ profileImage: initialProfileImage });
+            }
+
+            const { vocabulary } = get();
+            const isFresh = vocabulary.every(w => w.status === 'not_started');
+            if (!isFresh) {
+              console.log('Migrating local progress to Firestore...');
+              await get().syncToCloud(uid);
+            }
+          }
+        } catch (err) {
+          console.error('Error checking for migration:', err);
+        }
+
+        return onSnapshot(userDocRef, (snapshot) => {
           if (!snapshot.exists()) return;
           const data = snapshot.data();
 
@@ -283,6 +319,13 @@ export const useMasteryStore = create<MasteryStore>()(
         });
       },
     }),
-    { name: 'tp-tutor-mastery' }
+    { 
+      name: 'tp-tutor-mastery',
+      partialize: (state) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { userId, ...rest } = state;
+        return rest;
+      }
+    }
   )
 );
