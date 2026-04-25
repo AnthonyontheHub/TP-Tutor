@@ -38,8 +38,8 @@ export default function LiveTile({ children, size, status, variant, onClick }: P
       style={{
         width,
         height,
-        background: COLORS[status],
-        border: `1px solid ${variant === 'grammar' ? 'var(--gold)' : BORDERS[status]}`,
+        background: STATUS_BG[status],
+        border: `1px solid ${variant === 'grammar' ? 'var(--gold)' : STATUS_COLOR[status]}`,
         borderRadius: '4px',
         overflow: 'hidden',
         position: 'relative',

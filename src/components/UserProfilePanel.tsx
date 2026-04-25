@@ -61,6 +61,19 @@ export default function UserProfilePanel({ onClose }: Props) {
   const [zipInput, setZipInput] = useState(profile.zip || '');
   const [isLookupLoading, setIsLookupLoading] = useState(false);
 
+  const handleAddLore = () => {
+    if (!loreDetail.trim()) return;
+    addLore(loreCategory, loreDetail);
+    setLoreDetail('');
+  };
+
+  const handleSwitchProfile = () => {
+    if (!switchName.trim()) return;
+    switchProfile(switchName);
+    setSwitchName('');
+    onClose();
+  };
+
   const summary = getStatusSummary();
   const totalLearned = summary.introduced + summary.practicing + summary.confident + summary.mastered;
 

@@ -14,7 +14,7 @@ const LoginPage: React.FC = () => {
       justifyContent: 'center',
       padding: '20px',
       background: 'var(--bg)',
-      backgroundimage: 'radial-gradient(circle at center, rgba(255,191,0,0.05) 0%, transparent 70%)',
+      backgroundImage: 'radial-gradient(circle at center, rgba(255,191,0,0.05) 0%, transparent 70%)',
       color: 'var(--text)',
       textAlign: 'center'
     }}>

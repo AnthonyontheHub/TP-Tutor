@@ -29,7 +29,7 @@ export function buildOfflineTranslation(selectedWords: string[], vocabulary: Voc
 
 // Helper to stringify user context for prompts
 export function stringifyUserContext(profile: UserProfile, lore: LoreEntry[]): string {
-  const profileStr = `Name: ${profile.name}, Age: ${profile.age}, Location: ${profile.location}, Sex: ${profile.sex}`;
+  const profileStr = `Name: ${profile.name}, Age: ${profile.age}, Location: ${profile.locationString}, Sex: ${profile.sex}`;
   const loreStr = lore.map(l => `[${l.category}]: ${l.detail}`).join('; ');
   return `${profileStr}. Lore: ${loreStr}`;
 }
