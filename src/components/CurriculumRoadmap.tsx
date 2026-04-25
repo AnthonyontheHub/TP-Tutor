@@ -12,13 +12,13 @@ interface Props {
 }
 
 export default function CurriculumRoadmap({ onSetActiveView, onAskLina, isSandboxMode }: Props) {
-  const { levels, vocabulary, currentPositionNodeId } = useMasteryStore();
+  const { curriculums, vocabulary, currentPositionNodeId } = useMasteryStore();
   const [selectedNode, setSelectedNode] = useState<CurriculumNode | null>(null);
 
   // Flatten all nodes into a single sequence for the winding path
   const allNodes = useMemo(() => {
-    return levels.flatMap(level => level.nodes);
-  }, [levels]);
+    return curriculums.flatMap(level => level.nodes);
+  }, [curriculums]);
 
   const calculateNodeMastery = (requiredVocabIds: string[], requiredGrammarIds: string[]) => {
     const allIds = [...requiredVocabIds, ...requiredGrammarIds];

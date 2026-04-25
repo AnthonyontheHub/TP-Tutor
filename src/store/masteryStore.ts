@@ -12,9 +12,12 @@ import type {
 import { scoreToStatus, STATUS_MIDPOINT } from '../types/mastery';
 import { initialMasteryMap } from '../data/initialMasteryMap';
 import { curriculumRoadmap } from '../data/curriculum';
+import { vocabContent } from '../data/vocabContent';
 
 function toFullVocabWord(v: { word: string; status: MasteryStatus; type: 'word' | 'grammar'; sessionNotes: string; frequencyRank?: number }): VocabWord {
   const score = STATUS_MIDPOINT[v.status];
+  const staticData = vocabContent[v.word] || {};
+
   return {
     id: v.word,
     word: v.word,
@@ -32,7 +35,26 @@ function toFullVocabWord(v: { word: string; status: MasteryStatus; type: 'word' 
     lastReviewed: new Date().toISOString(),
     scoreHistory: [],
     hardened: false,
-    isBleeding: false
+    isBleeding: false,
+
+    // Hydrate static fields from vocabContent
+    phonetic: staticData.phonetic || '',
+    syllables: staticData.syllables || [],
+    anchor: staticData.anchor || '',
+    semanticCluster: staticData.semanticCluster || [],
+    connotation: staticData.connotation || 'neutral',
+    roles: staticData.roles || [],
+    examples: staticData.examples || [],
+    collocations: staticData.collocations || [],
+    relatedWordIds: staticData.relatedWordIds || [],
+    boundaryNotes: staticData.boundaryNotes || [],
+    etymology: staticData.etymology || '',
+    mnemonic: staticData.mnemonic || '',
+    userMnemonic: '',
+    culturalNotes: staticData.culturalNotes || '',
+    avoidWhen: staticData.avoidWhen || '',
+    rolesMastered: {},
+    userNotes: ''
   };
 }
 
@@ -89,7 +111,7 @@ interface MasteryState {
   profileImage: string;
   lastUpdated: string;
   vocabulary: VocabWord[];
-  levels: CurriculumLevel[];
+  curriculums: CurriculumLevel[];
   savedPhrases: (string | SavedPhrase)[];
   currentStreak: number;
   lastActiveDate: string;
@@ -122,7 +144,7 @@ export const useMasteryStore = create<MasteryStore>()(
       profileImage: '',
       lastUpdated: '',
       vocabulary: mappedVocabulary,
-      levels: curriculumRoadmap,
+      curriculums: curriculumRoadmap,
       savedPhrases: [],
       currentStreak: 0,
       lastActiveDate: '',
@@ -141,7 +163,7 @@ export const useMasteryStore = create<MasteryStore>()(
         set((state) => {
           let lastNodeMastery = 1000; // Book 1 starts unlocked
 
-          const newLevels = state.levels.map((level, lIdx) => ({
+          const newCurriculums = state.curriculums.map((level, lIdx) => ({
             ...level,
             nodes: level.nodes.map((node, nIdx) => {
               const allReqs = [...node.requiredVocabIds, ...node.requiredGrammarIds];
@@ -167,10 +189,10 @@ export const useMasteryStore = create<MasteryStore>()(
           // Update currentPositionNodeId to the first active/mastered but not yet hardened node?
           // Actually user said: "The current stop is highlighted and clickable."
           // So the first non-mastered node that is active.
-          const allNodes = newLevels.flatMap(l => l.nodes);
+          const allNodes = newCurriculums.flatMap(l => l.nodes);
           const firstActive = allNodes.find(n => n.status === 'active')?.id || state.currentPositionNodeId;
 
-          return { levels: newLevels, currentPositionNodeId: firstActive };
+          return { curriculums: newCurriculums, currentPositionNodeId: firstActive };
         });
       },
 
@@ -326,7 +348,7 @@ export const useMasteryStore = create<MasteryStore>()(
 
       updateNodeStatus: (nodeId, status) => {
         set((state) => ({
-          levels: state.levels.map(l => ({
+          curriculums: state.curriculums.map(l => ({
             ...l,
             nodes: l.nodes.map(n => n.id === nodeId ? { ...n, status } : n)
           }))
@@ -427,7 +449,7 @@ export const useMasteryStore = create<MasteryStore>()(
           currentStreak: 0,
           lastActiveDate: '',
           vocabulary: mappedVocabulary,
-          levels: curriculumRoadmap,
+          curriculums: curriculumRoadmap,
           currentPositionNodeId: 'phi_sim',
           hasCompletedSetup: false,
         });
@@ -440,7 +462,7 @@ export const useMasteryStore = create<MasteryStore>()(
           profile: { name: '', age: '', location: '', sex: '', history: [] },
           lore: [],
           profileImage: '',
-          levels: curriculumRoadmap,
+          curriculums: curriculumRoadmap,
           currentPositionNodeId: 'phi_sim',
           hasCompletedSetup: false,
         });
@@ -461,7 +483,7 @@ export const useMasteryStore = create<MasteryStore>()(
       masterAllVocab: () => {
         set((state) => ({
           vocabulary: state.vocabulary.map(w => ({ ...w, baseScore: 975, confidenceScore: 975, status: 'mastered' as MasteryStatus })),
-          levels: state.levels.map(level => ({
+          curriculums: state.curriculums.map(level => ({
             ...level,
             nodes: level.nodes.map(node => ({ ...node, status: 'mastered' as const }))
           }))
@@ -482,7 +504,7 @@ export const useMasteryStore = create<MasteryStore>()(
           currentStreak: 0,
           lastActiveDate: '',
           vocabulary: mappedVocabulary,
-          levels: curriculumRoadmap,
+          curriculums: curriculumRoadmap,
           hasCompletedSetup: false,
         });
       },
@@ -540,7 +562,7 @@ export const useMasteryStore = create<MasteryStore>()(
           currentStreak: 0,
           lastActiveDate: '',
           vocabulary: mappedVocabulary,
-          levels: curriculumRoadmap,
+          curriculums: curriculumRoadmap,
           hasCompletedSetup: false,
           currentPositionNodeId: 'phi_sim',
           isMainProfile: false,
@@ -548,7 +570,7 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       syncToCloud: async (explicitUserId) => {
-        const { vocabulary, levels, lastUpdated, studentName, profile, lore, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, isMainProfile, widgetDensity, fogOfWar, showCircuitPaths } = get();
+        const { vocabulary, curriculums, lastUpdated, studentName, profile, lore, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, isMainProfile, widgetDensity, fogOfWar, showCircuitPaths } = get();
         const targetId = explicitUserId || userId;
         
         // Prevent sync for guest users and any non-main profile (Sandbox mode)
@@ -558,8 +580,21 @@ export const useMasteryStore = create<MasteryStore>()(
         if (localStorage.getItem('tp_sandbox_mode') === 'true') return;
 
         try {
+          // Strip static content before sending to Firestore
+          const partialVocab = vocabulary.map(w => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { 
+              phonetic, syllables, anchor, semanticCluster, connotation, 
+              roles, examples, collocations, relatedWordIds, boundaryNotes, 
+              etymology, mnemonic, culturalNotes, avoidWhen, 
+              ...dynamicData 
+            } = w;
+            return dynamicData;
+          });
+
           await setDoc(doc(db, 'users', targetId), {
-            vocabulary, levels, lastUpdated, studentName, profile, lore, profileImage,
+            vocabulary: partialVocab,
+            curriculums, lastUpdated, studentName, profile, lore, profileImage,
             savedPhrases, currentStreak, lastActiveDate, hasCompletedSetup, currentPositionNodeId, isMainProfile,
             widgetDensity, fogOfWar, showCircuitPaths
           }, { merge: true });
@@ -603,6 +638,7 @@ export const useMasteryStore = create<MasteryStore>()(
           const vocabulary = (data.vocabulary || mappedVocabulary).map(
             (w: any) => {
               const base = mappedVocabulary.find(iv => iv.word === w.word);
+              const staticData = vocabContent[w.word] || {};
               const useCount = typeof w.useCount === 'number' ? w.useCount : 0;
               const frequencyRank = typeof w.frequencyRank === 'number' ? w.frequencyRank : (base?.frequencyRank ?? 999);
               const type = w.type || (base?.type ?? 'word');
@@ -627,14 +663,36 @@ export const useMasteryStore = create<MasteryStore>()(
                 type,
                 partOfSpeechScores: w.partOfSpeechScores || { noun: 0, verb: 0, modifier: 0 },
                 lastReviewed: w.lastReviewed || new Date().toISOString(),
-                scoreHistory: w.scoreHistory || []
+                scoreHistory: w.scoreHistory || [],
+
+                // Always hydrate from ground truth in code
+                phonetic: staticData.phonetic || '',
+                syllables: staticData.syllables || [],
+                anchor: staticData.anchor || '',
+                semanticCluster: staticData.semanticCluster || [],
+                connotation: staticData.connotation || 'neutral',
+                roles: staticData.roles || [],
+                examples: staticData.examples || [],
+                collocations: staticData.collocations || [],
+                relatedWordIds: staticData.relatedWordIds || [],
+                boundaryNotes: staticData.boundaryNotes || [],
+                etymology: staticData.etymology || '',
+                mnemonic: staticData.mnemonic || '',
+                // User fields should remain as loaded from data
+                userMnemonic: w.userMnemonic || '',
+                userNotes: w.userNotes || '',
+                culturalNotes: staticData.culturalNotes || '',
+                avoidWhen: staticData.avoidWhen || '',
+                rolesMastered: w.rolesMastered || {},
+                hardened: !!w.hardened,
+                isBleeding: !!w.isBleeding
               };
             }
           );
 
           // Merge static curriculum content (richContent, etc.) with stored status
-          const mergedLevels = curriculumRoadmap.map(staticLevel => {
-            const storedLevel = (data.levels || []).find((l: any) => l.id === staticLevel.id);
+          const mergedCurriculums = curriculumRoadmap.map(staticLevel => {
+            const storedLevel = (data.curriculums || []).find((l: any) => l.id === staticLevel.id);
             return {
               ...staticLevel,
               nodes: staticLevel.nodes.map(staticNode => {
@@ -649,7 +707,7 @@ export const useMasteryStore = create<MasteryStore>()(
 
           set({
             vocabulary,
-            levels: mergedLevels,
+            curriculums: mergedCurriculums,
             lastUpdated: data.lastUpdated || '',
             studentName: data.studentName || 'Anthony',
             profile: data.profile || { name: data.studentName || 'Anthony', age: '', location: '', sex: '' },
@@ -679,8 +737,8 @@ export const useMasteryStore = create<MasteryStore>()(
       onRehydrateStorage: () => (state) => {
         if (state) {
           // Merge static content on rehydration
-          const mergedLevels = curriculumRoadmap.map(staticLevel => {
-            const storedLevel = (state.levels || []).find((l: any) => l.id === staticLevel.id);
+          const mergedCurriculums = curriculumRoadmap.map(staticLevel => {
+            const storedLevel = (state.curriculums || []).find((l: any) => l.id === staticLevel.id);
             return {
               ...staticLevel,
               nodes: staticLevel.nodes.map(staticNode => {
@@ -692,7 +750,7 @@ export const useMasteryStore = create<MasteryStore>()(
               })
             };
           });
-          state.levels = mergedLevels;
+          state.curriculums = mergedCurriculums;
           state.refreshCurriculumStatus();
         }
       }

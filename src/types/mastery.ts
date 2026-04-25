@@ -114,6 +114,52 @@ export interface PartOfSpeechScores {
   modifier: number;
 }
 
+// ─── New Linguistic & Teaching Types ────────────────────────────────────────
+
+export type PosRole = 'noun' | 'verb' | 'modifier' | 'preverb' | 'preposition' | 'particle' | 'interjection';
+
+export type ExampleTier = 'simple' | 'intermediate' | 'advanced' | 'philosophical';
+
+export type Connotation = 'positive' | 'negative' | 'neutral' | 'contextual';
+
+export interface PosRoleEntry {
+  role: PosRole;
+  definition: string;
+  example: {
+    tp: string;
+    en: string;
+    highlight: string;
+  };
+  notes?: string;
+}
+
+export interface ExampleSentence {
+  tier: ExampleTier;
+  tp: string;
+  en: string;
+  highlight: string;
+  notes?: string;
+}
+
+export interface Collocation {
+  phrase: string;
+  translation: string;
+  wordIds: string[];
+}
+
+export interface BoundaryNote {
+  doesNotCover: string;
+  useInstead: string;
+  explanation: string;
+}
+
+export interface TeachingObjective {
+  wordId: string;
+  roles: PosRole[];
+  commonErrors: string[];
+  focusExampleTier: ExampleTier;
+}
+
 // ─── Grammar Concepts ─────────────────────────────────────────────────────────
 
 export interface GrammarConcept {
@@ -164,6 +210,25 @@ export interface VocabWord {
   scoreHistory: ScoreHistoryEntry[];
   hardened: boolean;
   isBleeding: boolean;
+
+  // Extensions
+  phonetic: string;
+  syllables: string[];
+  anchor: string;
+  semanticCluster: string[];
+  connotation: Connotation;
+  roles: PosRoleEntry[];
+  examples: ExampleSentence[];
+  collocations: Collocation[];
+  relatedWordIds: string[];
+  boundaryNotes: BoundaryNote[];
+  etymology: string;
+  mnemonic: string;
+  userMnemonic?: string;
+  culturalNotes?: string;
+  avoidWhen?: string;
+  rolesMastered: Partial<Record<PosRole, boolean>>;
+  userNotes?: string;
 }
 
 // ─── Curriculum ──────────────────────────────────────────────────────────────

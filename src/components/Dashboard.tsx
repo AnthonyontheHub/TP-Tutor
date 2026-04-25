@@ -20,7 +20,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   isSandboxMode: boolean;
   setIsSandboxMode: (val: boolean) => void;
 }) {
-  const { studentName, currentStreak, vocabulary, savedPhrases, reviewVibe, setReviewVibe, selectedWords, setSelectedWords, savePhrase, lessonFilter, setLessonFilter, calculateDecay, checkAssessments, hardenWord } = useMasteryStore();
+  const { studentName, currentStreak, vocabulary, curriculums, savedPhrases, reviewVibe, setReviewVibe, selectedWords, setSelectedWords, savePhrase, lessonFilter, setLessonFilter, calculateDecay, checkAssessments, hardenWord } = useMasteryStore();
 
   const [activeView, setActiveView] = useState<DashboardView>('vocab');
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
@@ -125,11 +125,11 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   const getActiveStyle = (p: AppPanel) => activePanels.includes(p) ? { borderColor: 'var(--gold)', color: 'var(--gold)', boxShadow: '0 0 10px var(--gold-glow)' } : {};
 
   const roadmapProgress = useMemo(() => {
-    const allNodes = (levels || []).flatMap(l => l.nodes);
+    const allNodes = (curriculums || []).flatMap(l => l.nodes);
     if (allNodes.length === 0) return 0;
     const mastered = allNodes.filter(n => n.status === 'mastered').length;
     return Math.round((mastered / allNodes.length) * 100);
-  }, [levels]);
+  }, [curriculums]);
 
   return (
     <div className="dashboard">
