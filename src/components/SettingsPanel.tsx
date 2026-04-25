@@ -7,10 +7,12 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
   setIsSandboxMode: (val: boolean) => void;
 }) {
   const { 
-    resetAsNewUser, masterAllVocab, randomizeVocab
+    resetAsNewUser, masterAllVocab, randomizeVocab, studentName
   } = useMasteryStore();
 
   if (!isOpen) return null;
+
+  const isMainUser = studentName?.toLowerCase() === 'anthony';
 
   return (
     <div style={{ padding: '40px', background: 'var(--surface-opaque)', height: '100%', overflowY: 'auto' }}>
@@ -20,11 +22,17 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
         <h2 style={{ fontSize: '0.8rem', fontWeight: 900, opacity: 0.5, marginBottom: '20px' }}>DEVELOPER PROTOCOLS</h2>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px' }}>
           <button 
-            onClick={() => setIsSandboxMode(!isSandboxMode)} 
+            onClick={() => isMainUser && setIsSandboxMode(!isSandboxMode)} 
+            disabled={!isMainUser}
             className="btn-settings" 
-            style={{ color: isSandboxMode ? 'var(--gold)' : 'white' }}
+            style={{ 
+              color: isSandboxMode ? 'var(--gold)' : 'white',
+              opacity: isMainUser ? 1 : 0.5,
+              cursor: isMainUser ? 'pointer' : 'not-allowed'
+            }}
           >
             SANDBOX MODE: {isSandboxMode ? 'ACTIVE' : 'OFFLINE'}
+            {!isMainUser && ' (ENFORCED)'}
           </button>
           <button onClick={randomizeVocab} className="btn-settings">RANDOMIZE NEURAL SYNC</button>
           <button onClick={masterAllVocab} className="btn-settings">FORCE TOTAL MASTERY</button>

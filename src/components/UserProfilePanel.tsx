@@ -52,11 +52,12 @@ function EditableField({
 }
 
 export default function UserProfilePanel({ onClose }: Props) {
-  const { profile, updateProfile, lore, addLore, deleteLore, currentStreak, savedPhrases, getStatusSummary, clearLocalData } = useMasteryStore();
+  const { profile, updateProfile, lore, addLore, deleteLore, currentStreak, savedPhrases, getStatusSummary, clearLocalData, switchProfile } = useMasteryStore();
   const { logout, setUser, signIn, isGuest, user } = useAuthStore();
 
   const [loreCategory, setLoreCategory] = useState<LoreCategory>('Work');
   const [loreDetail, setLoreDetail] = useState('');
+  const [switchName, setSwitchName] = useState('');
 
   const summary = getStatusSummary();
   const totalLearned = summary.introduced + summary.practicing + summary.confident + summary.mastered;
@@ -65,6 +66,12 @@ export default function UserProfilePanel({ onClose }: Props) {
     if (!loreDetail.trim()) return;
     addLore(loreCategory, loreDetail);
     setLoreDetail('');
+  };
+
+  const handleSwitchProfile = () => {
+    if (!switchName.trim()) return;
+    switchProfile(switchName.trim());
+    setSwitchName('');
   };
 
   return (
@@ -93,6 +100,27 @@ export default function UserProfilePanel({ onClose }: Props) {
           </div>
           <h2 style={{ margin: 0, color: 'white', fontSize: '1.6rem', fontWeight: 900, textTransform: 'uppercase' }}>{profile.name || 'Student'}</h2>
           <div style={{ color: 'var(--gold)', fontSize: '0.7rem', marginTop: '4px', fontWeight: 900, letterSpacing: '0.1em' }}>Neural Link: {isGuest ? 'LOCAL ONLY' : 'CLOUD SYNC ACTIVE'}</div>
+        </div>
+
+        <div className="glass-panel" style={{ marginBottom: '32px' }}>
+          <h3 className="section-title" style={{ fontSize: '0.6rem' }}>Switch Profile</h3>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <input 
+              type="text" 
+              value={switchName}
+              onChange={(e) => setSwitchName(e.target.value)}
+              placeholder="Enter name to switch..."
+              className="settings-input"
+              style={{ flex: 1, marginBottom: 0, padding: '8px', fontSize: '0.85rem' }}
+              onKeyDown={(e) => e.key === 'Enter' && handleSwitchProfile()}
+            />
+            <button 
+              onClick={handleSwitchProfile}
+              style={{ background: 'var(--gold)', color: '#000', border: 'none', borderRadius: '2px', padding: '0 12px', fontWeight: 900, fontSize: '0.7rem', cursor: 'pointer' }}
+            >
+              SWITCH
+            </button>
+          </div>
         </div>
 
         {isGuest && (

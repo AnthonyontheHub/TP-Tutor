@@ -77,6 +77,7 @@ interface MasteryActions {
   calculateDecay: () => void;
   hardenWord: (wordId: string) => void;
   checkAssessments: (onTrigger: (word: VocabWord) => void) => void;
+  switchProfile: (name: string) => void;
 }
 
 interface MasteryState {
@@ -525,10 +526,29 @@ export const useMasteryStore = create<MasteryStore>()(
         return { ...summary, level, rankTitle };
       },
 
+      switchProfile: (name: string) => {
+        set({
+          studentName: name,
+          profile: { name, age: '', location: '', sex: '', history: [] },
+          lore: [],
+          reviewVibe: 'chill',
+          profileImage: '',
+          savedPhrases: [],
+          currentStreak: 0,
+          lastActiveDate: '',
+          vocabulary: mappedVocabulary,
+          levels: curriculumRoadmap,
+          hasCompletedSetup: false,
+          currentPositionNodeId: 'phi_sim',
+        });
+      },
+
       syncToCloud: async (explicitUserId) => {
         const { vocabulary, levels, lastUpdated, studentName, profile, lore, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, widgetDensity, fogOfWar, showCircuitPaths } = get();
         const targetId = explicitUserId || userId;
-        if (!targetId || targetId === 'guest_user') return;
+        
+        // Prevent sync for guest users and any non-main profile (Sandbox mode)
+        if (!targetId || targetId === 'guest_user' || (studentName && studentName.toLowerCase() !== 'anthony')) return;
 
         try {
           await setDoc(doc(db, 'users', targetId), {
