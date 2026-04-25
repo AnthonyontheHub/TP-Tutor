@@ -73,7 +73,8 @@ const LoginPage: React.FC = () => {
             gap: '12px',
             cursor: loading ? 'not-allowed' : 'pointer',
             opacity: loading ? 0.7 : 1,
-            transition: 'transform 0.1s ease'
+            transition: 'transform 0.1s ease',
+            marginBottom: '12px'
           }}
         >
           <svg width="20" height="20" viewBox="0 0 24 24">
@@ -85,8 +86,25 @@ const LoginPage: React.FC = () => {
           {loading ? 'Connecting...' : 'Sign in with Google'}
         </button>
 
+        <button
+          onClick={() => useAuthStore.getState().skipSignIn()}
+          disabled={loading}
+          style={{
+            background: 'transparent',
+            color: 'var(--text-muted)',
+            border: 'none',
+            fontSize: '0.9rem',
+            fontWeight: 600,
+            cursor: 'pointer',
+            padding: '8px',
+            textDecoration: 'underline'
+          }}
+        >
+          Skip for now (Guest Mode)
+        </button>
+
         <p style={{ marginTop: '24px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-          Your progress will be synced to the cloud automatically.
+          Sign in to sync your progress to the cloud. Guest progress is stored locally.
         </p>
       </motion.div>
     </div>

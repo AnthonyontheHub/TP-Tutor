@@ -269,7 +269,7 @@ export const useMasteryStore = create<MasteryStore>()(
       syncToCloud: async (explicitUserId) => {
         const { vocabulary, concepts, lastUpdated, studentName, profile, lore, profileImage, savedPhrases, currentStreak, lastActiveDate, userId } = get();
         const targetId = explicitUserId || userId;
-        if (!targetId) return;
+        if (!targetId || targetId === 'guest_user') return;
 
         try {
           await setDoc(doc(db, 'users', targetId), {
@@ -283,6 +283,8 @@ export const useMasteryStore = create<MasteryStore>()(
 
       syncFromCloud: async (uid: string, initialName?: string, initialProfileImage?: string) => {
         set({ userId: uid });
+        if (uid === 'guest_user') return;
+        
         const userDocRef = doc(db, 'users', uid);
         
         try {

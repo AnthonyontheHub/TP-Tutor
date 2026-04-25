@@ -11,15 +11,18 @@ import {
 
 interface AuthState {
   user: User | null;
+  isGuest: boolean;
   loading: boolean;
   error: string | null;
   signIn: () => Promise<void>;
+  skipSignIn: () => void;
   logout: () => Promise<void>;
   setUser: (user: User | null) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
+  isGuest: false,
   loading: true,
   error: null,
   signIn: async () => {
@@ -48,9 +51,18 @@ export const useAuthStore = create<AuthState>((set) => ({
       }
     }
   },
+  skipSignIn: () => {
+    const guestUser = {
+      uid: 'guest_user',
+      displayName: 'Guest Student',
+      photoURL: null,
+    } as User;
+    set({ user: guestUser, isGuest: true, loading: false });
+  },
   logout: async () => {
     try {
       await signOut(auth);
+      set({ user: null, isGuest: false });
     } catch (error) {
       console.error('Error signing out:', error);
     }
