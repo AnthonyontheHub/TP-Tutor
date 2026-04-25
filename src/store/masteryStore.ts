@@ -145,9 +145,9 @@ export const useMasteryStore = create<MasteryStore>()(
               
               const avgScore = vocabReqs.length > 0 
                 ? vocabReqs.reduce((acc, v) => acc + v.baseScore, 0) / vocabReqs.length 
-                : 0;
+                : lastNodeMastery; // Default to last node's mastery if no reqs
 
-              const isMastered = vocabReqs.length > 0 && vocabReqs.every(v => v.status === 'mastered');
+              const isMastered = (vocabReqs.length > 0 && vocabReqs.every(v => v.status === 'mastered')) || (vocabReqs.length === 0 && lastNodeMastery >= 950);
               const isUnlocked = lastNodeMastery > 700 || (lIdx === 0 && nIdx === 0);
               
               let newStatus: NodeStatus = 'locked';
@@ -453,7 +453,11 @@ export const useMasteryStore = create<MasteryStore>()(
 
       masterAllVocab: () => {
         set((state) => ({
-          vocabulary: state.vocabulary.map(w => ({ ...w, baseScore: 975, confidenceScore: 975, status: 'mastered' as MasteryStatus }))
+          vocabulary: state.vocabulary.map(w => ({ ...w, baseScore: 975, confidenceScore: 975, status: 'mastered' as MasteryStatus })),
+          levels: state.levels.map(level => ({
+            ...level,
+            nodes: level.nodes.map(node => ({ ...node, status: 'mastered' as const }))
+          }))
         }));
         get().refreshCurriculumStatus();
         void get().syncToCloud();
