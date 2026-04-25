@@ -52,7 +52,6 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
 
   const vocabulary          = useMasteryStore(s => s.vocabulary);
   const updateVocabStatus   = useMasteryStore(s => s.updateVocabStatus);
-  const updateConceptStatus = useMasteryStore(s => s.updateConceptStatus);
   const setLastUpdated      = useMasteryStore(s => s.setLastUpdated);
   const studentName         = useMasteryStore(s => s.studentName);
   const profile             = useMasteryStore(s => s.profile);
@@ -117,7 +116,7 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
     if (deltas.length === 0 || isSandboxMode) { onEndSession(); return; }
     for (const change of deltas) {
       if (change.type === 'vocab') updateVocabStatus(change.id, change.newStatus);
-      else updateConceptStatus(change.id, change.newStatus);
+      else updateVocabStatus(change.id, change.newStatus);
     }
     setLastUpdated(new Date().toLocaleDateString());
     const key = resolveApiKey();
@@ -150,9 +149,7 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
     try {
       const key = resolveApiKey(overrideKey);
       const state = useMasteryStore.getState();
-      const activeCurriculum = state.activeCurriculumId ? state.curriculums.find(c => c.id === state.activeCurriculumId) : null;
-      const activeModule = activeCurriculum && state.activeModuleId ? activeCurriculum.modules.find(m => m.id === state.activeModuleId) : null;
-      const sys = buildSystemPrompt(state.vocabulary, state.concepts, state.studentName, JSON.stringify(state.lore), activeCurriculum?.title, activeModule?.title);
+      const sys = buildSystemPrompt(state.vocabulary, [], state.studentName, JSON.stringify(state.lore));
       const windowedHistory = historyRef.current.slice(-HISTORY_WINDOW);
       let full = '';
       for await (const chunk of streamCompletion(key, sys, windowedHistory)) {

@@ -96,7 +96,6 @@ interface MasteryActions {
   removeWordFromSelection: (word: string) => void;
   toggleWordSelection: (word: string) => void;
   setLessonFilter: (wordIds: string[] | null) => void;
-  calculateDecay: () => void;
   hardenWord: (wordId: string) => void;
   checkAssessments: (onTrigger: (word: VocabWord) => void) => void;
   switchProfile: (name: string) => void;
@@ -441,7 +440,7 @@ export const useMasteryStore = create<MasteryStore>()(
       resetAsNewUser: () => {
         set({
           studentName: '',
-          profile: { name: '', age: '', location: '', sex: '', history: [] },
+          profile: { name: '', age: '', locationString: '', sex: '', history: [] },
           lore: [],
           reviewVibe: 'chill',
           profileImage: '',
@@ -459,7 +458,7 @@ export const useMasteryStore = create<MasteryStore>()(
       resetProfileAndRunSetup: () => {
         set({
           studentName: '',
-          profile: { name: '', age: '', location: '', sex: '', history: [] },
+          profile: { name: '', age: '', locationString: '', sex: '', history: [] },
           lore: [],
           profileImage: '',
           curriculums: curriculumRoadmap,
@@ -496,7 +495,7 @@ export const useMasteryStore = create<MasteryStore>()(
         set({
           userId: null,
           studentName: 'Anthony',
-          profile: { name: 'Anthony', age: '', location: '', sex: '' },
+          profile: { name: 'Anthony', age: '', locationString: '', sex: '', history: [] },
           lore: [],
           reviewVibe: 'chill',
           profileImage: '',
@@ -710,7 +709,7 @@ export const useMasteryStore = create<MasteryStore>()(
             curriculums: mergedCurriculums,
             lastUpdated: data.lastUpdated || '',
             studentName: data.studentName || 'Anthony',
-            profile: data.profile || { name: data.studentName || 'Anthony', age: '', location: '', sex: '' },
+            profile: data.profile || { name: data.studentName || 'Anthony', age: '', locationString: '', sex: '', history: [] },
             lore: data.lore || [],
             profileImage: data.profileImage || '',
             savedPhrases: data.savedPhrases || [],
