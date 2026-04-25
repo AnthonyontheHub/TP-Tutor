@@ -1,12 +1,17 @@
 /* src/components/Dashboard.tsx */
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import ProgressSummary from './ProgressSummary';
 import MasteryGrid from './MasteryGrid';
 import PhraseGrid from './PhraseGrid';
+import CurriculumRoadmap from './CurriculumRoadmap';
+import SentenceBuilder from './SentenceBuilder';
+import { fetchQuickTranslation, resolveApiKey, buildOfflineTranslation } from '../services/linaService';
 import type { MasteryStatus } from '../types/mastery';
 import type { AppPanel } from '../App';
+import { motion, AnimatePresence } from 'framer-motion';
 
+export type DashboardView = 'vocab' | 'roadmap' | 'phrasebook';
 
 export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSandboxMode, setIsSandboxMode }: {
   onTogglePanel: (p: AppPanel) => void;
@@ -15,21 +20,59 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   isSandboxMode: boolean;
   setIsSandboxMode: (val: boolean) => void;
 }) {
-  const { studentName, currentStreak, vocabulary, savedPhrases, reviewVibe, setReviewVibe } = useMasteryStore();
+  const { studentName, currentStreak, vocabulary, savedPhrases, reviewVibe, setReviewVibe, selectedWords, setSelectedWords, savePhrase } = useMasteryStore();
 
+  const [activeView, setActiveView] = useState<DashboardView>('vocab');
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
-  const [viewMode, setViewMode] = useState<'grid' | 'phrasebook'>('grid');
   const [posFilter, setPosFilter] = useState('All');
   const [sortMode, setSortMode] = useState<string>('alphabetical');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [focusPhraseId, setFocusPhraseId] = useState<string | null>(null);
+
+  // Translation & Builder State
+  const [translation, setTranslation] = useState<string | null>(null);
+  const [isAutoTranslating, setIsAutoTranslating] = useState(false);
+  const [savedConfirm, setSavedConfirm] = useState(false);
+  const confirmTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    setTranslation(null);
+    setIsAutoTranslating(false);
+    if (confirmTimer.current) { clearTimeout(confirmTimer.current); confirmTimer.current = null; }
+    setSavedConfirm(false);
+
+    if (selectedWords.length === 0) return;
+
+    if (isSandboxMode) {
+      setTranslation(buildOfflineTranslation(selectedWords, vocabulary));
+      return;
+    }
+
+    const apiKey = resolveApiKey();
+    if (!apiKey) {
+      setTranslation(buildOfflineTranslation(selectedWords, vocabulary));
+      return;
+    }
+
+    setIsAutoTranslating(true);
+    let active = true;
+    const timer = setTimeout(async () => {
+      const transResult = await fetchQuickTranslation(apiKey, selectedWords.join(' '));
+      if (active) {
+        setTranslation(transResult ?? buildOfflineTranslation(selectedWords, vocabulary));
+        setIsAutoTranslating(false);
+      }
+    }, 900);
+
+    return () => { active = false; clearTimeout(timer); setIsAutoTranslating(false); };
+  }, [selectedWords, isSandboxMode, vocabulary]);
 
   const handleDailyReview = () => {
     let targetWords: string[] = [];
     if (reviewVibe === 'chill') {
       targetWords = vocabulary
         .filter(w => w.status === 'confident' || w.status === 'mastered')
-        .sort((a, b) => b.confidenceScore - a.confidenceScore)
+        .sort((a, b) => b.baseScore - a.baseScore)
         .slice(0, 8)
         .map(w => w.word);
     } else {
@@ -49,14 +92,27 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
 
   const handleSaved = (phraseId: string) => {
     setFocusPhraseId(phraseId);
-    setViewMode('phrasebook');
+    setActiveView('phrasebook');
+  };
+
+  const handleSaveSentence = () => {
+    const sentence = selectedWords.join(' ');
+    savePhrase({ id: sentence, tp: sentence, en: translation ?? '', notes: '' });
+    if (confirmTimer.current) clearTimeout(confirmTimer.current);
+    setSavedConfirm(true);
+    confirmTimer.current = setTimeout(() => {
+      setSavedConfirm(false);
+      confirmTimer.current = null;
+      setSelectedWords([]);
+    }, 800);
   };
 
   const getActiveStyle = (p: AppPanel) => activePanels.includes(p) ? { borderColor: 'var(--gold)', color: 'var(--gold)', boxShadow: '0 0 10px var(--gold-glow)' } : {};
 
   return (
     <div className="dashboard">
-      <header className="dashboard__header">
+      {/* Row 1: Mastery Counters */}
+      <header className="dashboard__header" style={{ marginBottom: '8px' }}>
         <div className="dashboard__header-left">
           <h1 className="dashboard__title">TOKI PONA</h1>
           <button 
@@ -84,97 +140,147 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
       </header>
 
       <main className="dashboard__main">
-        {/* 1. Top Status Bar: The master counter */}
         <ProgressSummary activeFilter={activeFilter} onFilterClick={setActiveFilter} />
         
-        {/* 2. Action Row & 3. Roadmap Integration */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
+        {/* Row 2: Review Controls */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
           <div className="mobile-action-row" style={{ display: 'flex', gap: '8px' }}>
             <button onClick={handleDailyReview} className="btn-review" style={{ flex: 1, marginBottom: 0 }}>
               ⚡ START DAILY REVIEW
             </button>
-            <button 
-              onClick={() => onTogglePanel('roadmap')} 
-              className="btn-review" 
-              style={{ 
-                flex: 1,
-                background: 'var(--surface)', 
-                color: 'var(--gold)', 
-                border: '1px solid var(--border)',
-                boxShadow: 'none',
-                marginBottom: 0
-              }}
-            >
-              🗺️ ROADMAP
-            </button>
-          </div>
-          
-          <div style={{ display: 'flex', background: 'var(--surface)', borderRadius: '4px', padding: '4px', border: '1px solid var(--border)' }}>
-            <button 
-              onClick={() => setReviewVibe('chill')}
-              style={{ flex: 1, border: 'none', background: reviewVibe === 'chill' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'chill' ? 'black' : '#666', borderRadius: '2px', padding: '6px 12px', fontSize: '0.65rem', fontWeight: 900, cursor: 'pointer' }}
-            >
-              CHILL MODE
-            </button>
-            <button 
-              onClick={() => setReviewVibe('deep')}
-              style={{ flex: 1, border: 'none', background: reviewVibe === 'deep' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'deep' ? 'black' : '#666', borderRadius: '2px', padding: '6px 12px', fontSize: '0.65rem', fontWeight: 900, cursor: 'pointer' }}
-            >
-              DEEP MODE
-            </button>
-          </div>
-        </div>
-
-        {/* 4. Tabbed Navigation */}
-        <div className="dashboard__view-toggle">
-          <button onClick={() => setViewMode('grid')} className={`btn-toggle ${viewMode === 'grid' ? 'active' : ''}`}>VOCAB GRID</button>
-          <button onClick={() => setViewMode('phrasebook')} className={`btn-toggle ${viewMode === 'phrasebook' ? 'active' : ''}`}>PHRASEBOOK</button>
-        </div>
-
-        {viewMode === 'grid' ? (
-          <>
-            <div className="grid-toolbar">
-              <select value={posFilter} onChange={(e) => setPosFilter(e.target.value)} className="sort-select">
-                <option value="All">All Parts of Speech</option>
-                <option value="noun">Noun</option>
-                <option value="verb">Verb</option>
-                <option value="adjective">Adjective</option>
-                <option value="adverb">Adverb</option>
-                <option value="number">Number</option>
-                <option value="phrase">Phrase</option>
-              </select>
+            <div style={{ display: 'flex', background: 'var(--surface)', borderRadius: '4px', padding: '4px', border: '1px solid var(--border)', flex: 1 }}>
+              <button 
+                onClick={() => setReviewVibe('chill')}
+                style={{ flex: 1, border: 'none', background: reviewVibe === 'chill' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'chill' ? 'black' : '#666', borderRadius: '2px', padding: '6px 8px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
+              >
+                CHILL
+              </button>
+              <button 
+                onClick={() => setReviewVibe('deep')}
+                style={{ flex: 1, border: 'none', background: reviewVibe === 'deep' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'deep' ? 'black' : '#666', borderRadius: '2px', padding: '6px 8px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
+              >
+                DEEP
+              </button>
             </div>
-            {/* 5. Standard Vocab Grid */}
-            <MasteryGrid
-              onAskLina={onAskLina}
-              onSaved={handleSaved}
-              isSandboxMode={isSandboxMode}
-              activeFilter={activeFilter}
-              sortMode={sortMode}
-              sortDirection={sortDirection}
-              posFilter={posFilter}
-              setSortMode={setSortMode}
-              setSortDirection={setSortDirection}
-              setPosFilter={setPosFilter}
-            />
-          </>
-        ) : (
-          <div style={{ padding: '20px 0' }}>
-            <PhraseGrid
-              onAskLina={onAskLina}
-              activeFilter={activeFilter}
-              selectedWords={[]}
-              focusPhraseId={focusPhraseId}
-              clearFocusPhrase={() => setFocusPhraseId(null)}
-            />
-            <h3 className="section-title" style={{ marginTop: '30px', marginBottom: '15px' }}>SAVED PHRASES</h3>
-            {savedPhrases.length === 0 ? <p style={{ color: '#888' }}>No phrases saved yet.</p> : savedPhrases.map((p, i) => (
-              <div key={i} className="glass-panel" style={{ borderLeft: '4px solid var(--green)', marginBottom: '10px' }}>
-                {typeof p === 'string' ? p : p.tp}
-              </div>
-            ))}
           </div>
+        </div>
+
+        {/* Row 3: 3-Way Navigation Switcher */}
+        <div className="dashboard__view-toggle" style={{ 
+          marginBottom: '16px', 
+          display: 'grid', 
+          gridTemplateColumns: '1fr 1fr 1fr', 
+          gap: '4px', 
+          padding: '4px', 
+          background: 'var(--surface)', 
+          borderRadius: '4px', 
+          border: '1px solid var(--border)' 
+        }}>
+          <button 
+            onClick={() => setActiveView('vocab')} 
+            className={`btn-toggle ${activeView === 'vocab' ? 'active' : ''}`}
+            style={{ fontSize: '0.65rem', padding: '10px 4px', margin: 0, width: '100%', background: activeView === 'vocab' ? 'var(--gold)' : 'transparent', color: activeView === 'vocab' ? 'black' : 'inherit' }}
+          >
+            VOCAB
+          </button>
+          <button 
+            onClick={() => setActiveView('roadmap')} 
+            className={`btn-toggle ${activeView === 'roadmap' ? 'active' : ''}`}
+            style={{ fontSize: '0.65rem', padding: '10px 4px', margin: 0, width: '100%', background: activeView === 'roadmap' ? 'var(--gold)' : 'transparent', color: activeView === 'roadmap' ? 'black' : 'inherit' }}
+          >
+            ROADMAP
+          </button>
+          <button 
+            onClick={() => setActiveView('phrasebook')} 
+            className={`btn-toggle ${activeView === 'phrasebook' ? 'active' : ''}`}
+            style={{ fontSize: '0.65rem', padding: '10px 4px', margin: 0, width: '100%', background: activeView === 'phrasebook' ? 'var(--gold)' : 'transparent', color: activeView === 'phrasebook' ? 'black' : 'inherit' }}
+          >
+            PHRASEBOOK
+          </button>
+        </div>
+
+        {/* Row 4: Filter Bar (Only visible when activeView === 'vocab') */}
+        {activeView === 'vocab' && (
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }} 
+            animate={{ opacity: 1, y: 0 }}
+            className="grid-toolbar"
+          >
+            <select value={posFilter} onChange={(e) => setPosFilter(e.target.value)} className="sort-select">
+              <option value="All">All Parts of Speech</option>
+              <option value="noun">Noun</option>
+              <option value="verb">Verb</option>
+              <option value="adjective">Adjective</option>
+              <option value="adverb">Adverb</option>
+              <option value="number">Number</option>
+              <option value="phrase">Phrase</option>
+            </select>
+          </motion.div>
         )}
+
+        {/* Main Viewport */}
+        <div className="dashboard__content-area" style={{ position: 'relative', minHeight: '400px' }}>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeView}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.2 }}
+            >
+              {activeView === 'vocab' && (
+                <MasteryGrid
+                  onAskLina={onAskLina}
+                  isSandboxMode={isSandboxMode}
+                  activeFilter={activeFilter}
+                  sortMode={sortMode}
+                  sortDirection={sortDirection}
+                  posFilter={posFilter}
+                  setSortMode={setSortMode}
+                  setSortDirection={setSortDirection}
+                  setPosFilter={setPosFilter}
+                />
+              )}
+              {activeView === 'roadmap' && (
+                <CurriculumRoadmap />
+              )}
+              {activeView === 'phrasebook' && (
+                <div style={{ padding: '0' }}>
+                  <PhraseGrid
+                    onAskLina={onAskLina}
+                    activeFilter={activeFilter}
+                    selectedWords={[]}
+                    focusPhraseId={focusPhraseId}
+                    clearFocusPhrase={() => setFocusPhraseId(null)}
+                  />
+                  <h3 className="section-title" style={{ marginTop: '30px', marginBottom: '15px' }}>SAVED PHRASES</h3>
+                  {savedPhrases.length === 0 ? (
+                    <p style={{ color: '#888' }}>No phrases saved yet.</p>
+                  ) : (
+                    savedPhrases.map((p, i) => (
+                      <div key={i} className="glass-panel" style={{ borderLeft: '4px solid var(--green)', marginBottom: '10px' }}>
+                        {typeof p === 'string' ? p : p.tp}
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        <SentenceBuilder 
+          translation={translation}
+          isAutoTranslating={isAutoTranslating}
+          onSave={handleSaveSentence}
+          onPractice={(s) => { onAskLina(`toki jan Lina! Let's practice this: "${s}"`); setSelectedWords([]); }}
+          onExplain={(s) => { onAskLina(`toki jan Lina! Can you explain the grammar of this phrase: "${s}"?`); setSelectedWords([]); }}
+          onRemoveLast={() => {
+            const newWords = [...selectedWords];
+            newWords.pop();
+            setSelectedWords(newWords);
+          }}
+        />
       </main>
     </div>
   );

@@ -1,15 +1,12 @@
 /* src/components/MasteryGrid.tsx */
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import VocabCard from './VocabCard';
 import WordDetailDrawer from './WordDetailDrawer';
-import SentenceBuilder from './SentenceBuilder';
-import { fetchSentenceSuggestions, fetchQuickTranslation, resolveApiKey, buildOfflineTranslation, stringifyUserContext } from '../services/linaService';
 import type { MasteryStatus, VocabWord } from '../types/mastery';
 
 interface Props {
   onAskLina: (p: string) => void;
-  onSaved?: (phraseId: string) => void;
   isSandboxMode: boolean;
   activeFilter: MasteryStatus | null;
   sortMode: string;
@@ -25,97 +22,26 @@ const STATUS_RANK: Record<MasteryStatus, number> = {
 };
 
 export default function MasteryGrid({
-  onAskLina, onSaved, isSandboxMode, activeFilter, sortMode, sortDirection, posFilter,
+  onAskLina, isSandboxMode, activeFilter, sortMode, sortDirection, posFilter,
   setSortMode, setSortDirection, setPosFilter
 }: Props) {
-  const { vocabulary, savePhrase, profile, lore } = useMasteryStore();
-  const [selectedWords, setSelectedWords] = useState<string[]>([]);
+  const { vocabulary, selectedWords, addWordToSelection, removeWordFromSelection, setSelectedWords } = useMasteryStore();
   const [drawerId, setDrawerId] = useState<string | null>(null);
-  const [magneticSuggestions, setMagneticSuggestions] = useState<string[]>([]);
-  const [translation, setTranslation] = useState<string | null>(null);
-  const [isAutoTranslating, setIsAutoTranslating] = useState(false);
-  const [savedConfirm, setSavedConfirm] = useState(false);
-
-  const confirmTimer  = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    setTranslation(null);
-    setIsAutoTranslating(false);
-    if (confirmTimer.current) { clearTimeout(confirmTimer.current); confirmTimer.current = null; }
-    setSavedConfirm(false);
-
-    if (selectedWords.length === 0) { setMagneticSuggestions([]); return; }
-
-    if (isSandboxMode) {
-      setTranslation(buildOfflineTranslation(selectedWords, vocabulary));
-      setMagneticSuggestions([]);
-      return;
-    }
-
-    const apiKey = resolveApiKey();
-    if (!apiKey) {
-      setTranslation(buildOfflineTranslation(selectedWords, vocabulary));
-      setMagneticSuggestions([]);
-      return;
-    }
-
-    setIsAutoTranslating(true);
-    let active = true;
-    const timer = setTimeout(async () => {
-      const uniqueWords = [...new Set(selectedWords)];
-      const userContext = stringifyUserContext(profile, lore);
-      const [transResult, suggResults] = await Promise.all([
-        fetchQuickTranslation(apiKey, selectedWords.join(' ')),
-        selectedWords.length >= 2
-          ? fetchSentenceSuggestions(apiKey, uniqueWords, userContext)
-          : Promise.resolve([]),
-      ]);
-      if (active) {
-        setTranslation(transResult ?? buildOfflineTranslation(selectedWords, vocabulary));
-        setMagneticSuggestions(suggResults);
-        setIsAutoTranslating(false);
-      }
-    }, 900);
-
-    return () => { active = false; clearTimeout(timer); setIsAutoTranslating(false); };
-  }, [selectedWords, isSandboxMode, profile, lore, vocabulary]);
 
   const handleCardClick = (word: VocabWord) => {
     if (selectedWords.length === 0) {
       setDrawerId(word.id);
     } else {
       if (selectedWords.includes(word.word)) {
-        const firstIndex = selectedWords.indexOf(word.word);
-        if (firstIndex !== -1) {
-          const newSelected = [...selectedWords];
-          newSelected.splice(firstIndex, 1);
-          setSelectedWords(newSelected);
-        }
+        removeWordFromSelection(word.word);
       } else {
-        setSelectedWords(prev => [...prev, word.word]);
+        addWordToSelection(word.word);
       }
     }
   };
 
   const handleCardLongPress = (word: VocabWord) => {
-    if (selectedWords.length === 0) {
-      setSelectedWords([word.word]);
-    } else {
-      setSelectedWords(prev => [...prev, word.word]);
-    }
-  };
-
-  const handleSave = () => {
-    const sentence = selectedWords.join(' ');
-    savePhrase({ id: sentence, tp: sentence, en: translation ?? '', notes: '' });
-    if (confirmTimer.current) clearTimeout(confirmTimer.current);
-    setSavedConfirm(true);
-    confirmTimer.current = setTimeout(() => {
-      setSavedConfirm(false);
-      confirmTimer.current = null;
-      setSelectedWords([]);
-      onSaved?.(sentence);
-    }, 800);
+    addWordToSelection(word.word);
   };
 
   const displayed = vocabulary
@@ -169,7 +95,6 @@ export default function MasteryGrid({
         {displayed.map((word) => {
           const positions: number[] = [];
           selectedWords.forEach((w, i) => { if (w === word.word) positions.push(i + 1); });
-          const isSelected = positions.length > 0;
           const isFilterDimmed = activeFilter && word.status !== activeFilter;
 
           return (
@@ -231,18 +156,6 @@ export default function MasteryGrid({
           );
         })}
       </div>
-
-      <SentenceBuilder 
-        selectedWords={selectedWords}
-        vocabulary={vocabulary}
-        translation={translation}
-        isAutoTranslating={isAutoTranslating}
-        onClear={() => setSelectedWords([])}
-        onSave={handleSave}
-        onPractice={(s) => { onAskLina(`toki jan Lina! Let's practice this: "${s}"`); setSelectedWords([]); }}
-        onExplain={(s) => { onAskLina(`toki jan Lina! Can you explain the grammar of this phrase: "${s}"?`); setSelectedWords([]); }}
-        onRemoveLast={() => setSelectedWords(prev => prev.slice(0, -1))}
-      />
 
       <WordDetailDrawer
         isOpen={!!drawerId}

@@ -14,7 +14,7 @@ import ChatSession from './components/ChatSession';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
-export type AppPanel = 'profile' | 'settings' | 'instructions' | 'achievements' | 'chat' | 'roadmap';
+export type AppPanel = 'profile' | 'settings' | 'instructions' | 'achievements' | 'chat';
 
 export default function App() {
   const { user, loading } = useAuthStore();
@@ -88,7 +88,6 @@ export default function App() {
              {panel === 'achievements' && <AchievementsPanel onClose={() => togglePanel('achievements')} />}
              {panel === 'instructions' && <InstructionsPanel isOpen={true} onClose={() => togglePanel('instructions')} />}
              {panel === 'chat' && <ChatSession isActive={true} onEndSession={() => togglePanel('chat')} isSandboxMode={isSandboxMode} />}
-             {panel === 'roadmap' && <RoadmapModal onClose={() => togglePanel('roadmap')} />}
           </ModalWrapper>
         ))}
       </AnimatePresence>
@@ -117,28 +116,5 @@ function ModalWrapper({ children, onClose }: { children: React.ReactNode, onClos
         {children}
       </motion.div>
     </motion.div>
-  );
-}
-
-function RoadmapModal({ onClose }: { onClose: () => void }) {
-  const { levels } = useMasteryStore();
-  return (
-    <div style={{ padding: '40px', background: 'var(--surface-opaque)', height: '100%', overflowY: 'auto' }}>
-      <h1 style={{ color: 'var(--gold)', fontWeight: 900, marginBottom: '20px' }}>NEURAL PATHWAY ROADMAP</h1>
-      {levels.map(level => (
-        <div key={level.id} style={{ marginBottom: '30px' }}>
-          <h2 style={{ fontSize: '1rem', borderBottom: '1px solid var(--border)', paddingBottom: '10px', marginBottom: '15px' }}>{level.title}</h2>
-          <div style={{ display: 'grid', gap: '10px' }}>
-            {level.nodes.map(m => (
-              <div key={m.id} style={{ padding: '15px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: '4px', display: 'flex', justifyContent: 'space-between' }}>
-                <span>{m.title}</span>
-                <span style={{ color: m.status === 'active' ? 'var(--gold)' : 'inherit', fontWeight: 800 }}>{m.status.toUpperCase()}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
-      <button onClick={onClose} className="btn-review" style={{ marginTop: '20px' }}>CLOSE ROADMAP</button>
-    </div>
   );
 }

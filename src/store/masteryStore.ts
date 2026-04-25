@@ -66,6 +66,9 @@ interface MasteryActions {
   setWidgetDensity: (val: 'Compact' | 'Expanded') => void;
   setFogOfWar: (val: 'Strict' | 'Visible') => void;
   setShowCircuitPaths: (val: boolean) => void;
+  setSelectedWords: (words: string[]) => void;
+  addWordToSelection: (word: string) => void;
+  removeWordFromSelection: (word: string) => void;
 }
 
 interface MasteryState {
@@ -82,6 +85,7 @@ interface MasteryState {
   currentStreak: number;
   lastActiveDate: string;
   hasCompletedSetup: boolean;
+  selectedWords: string[];
   // Dashboard settings
   widgetDensity: 'Compact' | 'Expanded';
   fogOfWar: 'Strict' | 'Visible';
@@ -110,6 +114,7 @@ export const useMasteryStore = create<MasteryStore>()(
       currentStreak: 0,
       lastActiveDate: '',
       hasCompletedSetup: false,
+      selectedWords: [],
       widgetDensity: 'Expanded',
       fogOfWar: 'Visible',
       showCircuitPaths: true,
@@ -419,6 +424,16 @@ export const useMasteryStore = create<MasteryStore>()(
       setWidgetDensity: (val) => { set({ widgetDensity: val }); void get().syncToCloud(); },
       setFogOfWar: (val) => { set({ fogOfWar: val }); void get().syncToCloud(); },
       setShowCircuitPaths: (val) => { set({ showCircuitPaths: val }); void get().syncToCloud(); },
+
+      setSelectedWords: (words) => set({ selectedWords: words }),
+      addWordToSelection: (word) => set((state) => ({ selectedWords: [...state.selectedWords, word] })),
+      removeWordFromSelection: (word) => set((state) => {
+        const index = state.selectedWords.indexOf(word);
+        if (index === -1) return state;
+        const newSelected = [...state.selectedWords];
+        newSelected.splice(index, 1);
+        return { selectedWords: newSelected };
+      }),
 
       getStatusSummary: () => {
         const { vocabulary } = get();

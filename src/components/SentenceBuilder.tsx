@@ -2,30 +2,26 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { VocabWord } from '../types/mastery';
+import { useMasteryStore } from '../store/masteryStore';
 
 interface SentenceBuilderProps {
-  selectedWords: string[];
-  vocabulary: VocabWord[];
-  translation: string | null;
-  isAutoTranslating: boolean;
-  onClear: () => void;
   onSave: () => void;
   onPractice: (sentence: string) => void;
   onExplain: (sentence: string) => void;
   onRemoveLast: () => void;
+  translation: string | null;
+  isAutoTranslating: boolean;
 }
 
 export default function SentenceBuilder({
-  selectedWords,
-  vocabulary,
-  translation,
-  isAutoTranslating,
-  onClear,
   onSave,
   onPractice,
   onExplain,
-  onRemoveLast
+  onRemoveLast,
+  translation,
+  isAutoTranslating
 }: SentenceBuilderProps) {
+  const { selectedWords, vocabulary, setSelectedWords } = useMasteryStore();
   const sentence = selectedWords.join(' ');
   const hasSelection = selectedWords.length > 0;
 
@@ -155,7 +151,7 @@ export default function SentenceBuilder({
             </button>
 
             <button
-              onClick={onClear}
+              onClick={() => setSelectedWords([])}
               className="btn-review"
               style={{
                 margin: 0,
