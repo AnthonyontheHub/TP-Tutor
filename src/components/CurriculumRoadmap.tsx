@@ -47,6 +47,7 @@ export default function CurriculumRoadmap({ onSetActiveView, onAskLina }: Props)
             node={selectedNode} 
             onBack={() => setSelectedNode(null)} 
             onAskLina={onAskLina}
+            onSetActiveView={onSetActiveView}
           />
         )}
       </AnimatePresence>
@@ -79,50 +80,74 @@ export default function CurriculumRoadmap({ onSetActiveView, onAskLina }: Props)
             {level.nodes.map(node => {
               const mastery = calculateNodeMastery(node.requiredVocabIds, node.requiredGrammarIds);
               const masteryColor = getMasteryColor(mastery);
+              const isLocked = node.status === 'locked';
+              const isMastered = node.status === 'mastered';
               
               return (
                 <motion.div 
                   key={node.id}
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => handleNodeClick(node)}
+                  whileHover={isLocked ? {} : { scale: 1.01 }}
+                  whileTap={isLocked ? {} : { scale: 0.98 }}
+                  onClick={() => !isLocked && handleNodeClick(node)}
                   style={{ 
                     padding: '16px', 
-                    background: 'rgba(255,255,255,0.03)', 
-                    border: `1px solid ${mastery > 200 ? masteryColor : 'var(--border)'}`, 
+                    background: isLocked ? 'rgba(255,255,255,0.01)' : 'rgba(255,255,255,0.03)', 
+                    border: `1px solid ${isLocked ? '#222' : (mastery > 200 ? masteryColor : 'var(--border)')}`, 
                     borderRadius: '8px',
-                    boxShadow: mastery > 200 ? `0 0 15px ${masteryColor}22` : 'none',
-                    cursor: 'pointer'
+                    boxShadow: (!isLocked && mastery > 200) ? `0 0 15px ${masteryColor}22` : 'none',
+                    cursor: isLocked ? 'not-allowed' : 'pointer',
+                    opacity: isLocked ? 0.5 : 1,
+                    position: 'relative',
+                    overflow: 'hidden'
                   }}
                 >
+                  {isLocked && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '8px',
+                      right: '8px',
+                      fontSize: '0.6rem',
+                      background: '#222',
+                      color: '#666',
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      fontWeight: 900,
+                      letterSpacing: '0.05em'
+                    }}>
+                      LOCKED
+                    </div>
+                  )}
+
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                    <div 
-                      style={{ flex: 1 }}
-                    >
-                      <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: '0 0 4px 0', color: 'white' }}>{node.title}</h3>
+                    <div style={{ flex: 1 }}>
+                      <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: '0 0 4px 0', color: isLocked ? '#666' : 'white' }}>{node.title}</h3>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <div style={{ width: '100px', height: '4px', background: '#222', borderRadius: '2px', overflow: 'hidden' }}>
-                          <div style={{ width: `${mastery/10}%`, height: '100%', background: masteryColor }} />
+                          <div style={{ width: `${mastery/10}%`, height: '100%', background: isLocked ? '#333' : masteryColor }} />
                         </div>
-                        <span style={{ fontSize: '0.65rem', color: masteryColor, fontWeight: 800 }}>{Math.round(mastery/10)}% MASTERY</span>
+                        <span style={{ fontSize: '0.65rem', color: isLocked ? '#444' : masteryColor, fontWeight: 800 }}>
+                          {isMastered ? '100%' : `${Math.round(mastery/10)}%`} MASTERY
+                        </span>
                       </div>
                     </div>
                     
-                    <button 
-                      onClick={() => onAskLina(`toki jan Lina! I'm working on the lesson "${node.title}". Can you give me a status report based on my current scores and a quick practice drill?`)}
-                      style={{
-                        background: 'rgba(251, 191, 36, 0.1)',
-                        border: '1px solid var(--gold)',
-                        color: 'var(--gold)',
-                        borderRadius: '4px',
-                        padding: '6px 10px',
-                        fontSize: '0.6rem',
-                        fontWeight: 900,
-                        cursor: 'pointer'
-                      }}
-                    >
-                      CONSULT LINA
-                    </button>
+                    {!isLocked && (
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); onAskLina(`toki jan Lina! I'm working on the lesson "${node.title}". Can you give me a status report based on my current scores and a quick practice drill?`); }}
+                        style={{
+                          background: 'rgba(251, 191, 36, 0.1)',
+                          border: '1px solid var(--gold)',
+                          color: 'var(--gold)',
+                          borderRadius: '4px',
+                          padding: '6px 10px',
+                          fontSize: '0.6rem',
+                          fontWeight: 900,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        CONSULT LINA
+                      </button>
+                    )}
                   </div>
 
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
@@ -132,8 +157,8 @@ export default function CurriculumRoadmap({ onSetActiveView, onAskLina }: Props)
                         background: 'rgba(255,255,255,0.05)', 
                         padding: '2px 6px', 
                         borderRadius: '2px', 
-                        color: '#888',
-                        border: '1px solid rgba(255,255,255,0.1)'
+                        color: isLocked ? '#333' : '#888',
+                        border: `1px solid ${isLocked ? '#222' : 'rgba(255,255,255,0.1)'}`
                       }}>
                         {id.replace('particle_', '').toUpperCase()}
                       </span>

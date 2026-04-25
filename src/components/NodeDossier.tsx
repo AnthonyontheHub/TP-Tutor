@@ -8,6 +8,7 @@ interface Props {
   node: CurriculumNode;
   onBack: () => void;
   onAskLina: (p: string) => void;
+  onSetActiveView: (view: 'vocab' | 'roadmap' | 'phrasebook') => void;
 }
 
 export default function NodeDossier({ node, onBack, onAskLina }: Props) {
@@ -24,6 +25,12 @@ export default function NodeDossier({ node, onBack, onAskLina }: Props) {
   };
 
   const mastery = calculateMastery();
+
+  const handleStudyInGrid = () => {
+    setLessonFilter([...node.requiredVocabIds, ...node.requiredGrammarIds]);
+    onSetActiveView('vocab');
+    onBack();
+  };
 
   return (
     <motion.div 
@@ -62,12 +69,26 @@ export default function NodeDossier({ node, onBack, onAskLina }: Props) {
         
         <h1 style={{ color: 'white', fontWeight: 900, fontSize: '1.5rem', marginBottom: '8px' }}>{node.title.toUpperCase()}</h1>
         
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
           <div style={{ flex: 1, height: '6px', background: '#222', borderRadius: '3px', overflow: 'hidden' }}>
             <div style={{ width: `${mastery}%`, height: '100%', background: 'var(--gold)' }} />
           </div>
           <span style={{ fontSize: '0.7rem', color: 'var(--gold)', fontWeight: 900 }}>{mastery}% MASTERY</span>
         </div>
+
+        <button 
+          onClick={handleStudyInGrid}
+          className="btn-review"
+          style={{ 
+            background: 'rgba(255,255,255,0.05)', 
+            border: '1px solid rgba(255,255,255,0.1)', 
+            padding: '8px 16px',
+            fontSize: '0.7rem',
+            margin: 0
+          }}
+        >
+          🔍 STUDY THESE WORDS IN GRID
+        </button>
       </header>
 
       <div className="dossier-body" style={{ flex: 1, overflowY: 'auto', marginBottom: '24px' }}>

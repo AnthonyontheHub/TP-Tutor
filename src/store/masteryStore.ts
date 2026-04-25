@@ -594,6 +594,7 @@ export const useMasteryStore = create<MasteryStore>()(
             fogOfWar: data.fogOfWar || 'Visible',
             showCircuitPaths: data.showCircuitPaths !== undefined ? data.showCircuitPaths : true,
           });
+          get().refreshCurriculumStatus();
         });
       },
     }),

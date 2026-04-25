@@ -15,7 +15,7 @@ export const curriculumRoadmap: CurriculumLevel[] = [
       },
       { 
         id: "subject_predicate", 
-        title: "Subject + Predicate", 
+        title: "Subjects and Predicates", 
         requiredVocabIds: ["mi", "sina", "pona", "ike", "li"], 
         requiredGrammarIds: ["particle_li"],
         status: 'locked',
