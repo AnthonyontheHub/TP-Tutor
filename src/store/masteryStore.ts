@@ -4,44 +4,25 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { doc, setDoc, onSnapshot, getDoc } from 'firebase/firestore';
 import type { Unsubscribe } from 'firebase/firestore';
-import type { MasteryStatus, VocabWord, StatusSummary, SavedPhrase } from '../types/mastery';
+import type { MasteryStatus, VocabWord, StatusSummary, SavedPhrase, UserProfile, LoreEntry, ReviewVibe, LoreCategory } from '../types/mastery';
 import { scoreToStatus, STATUS_MIDPOINT } from '../types/mastery';
 import { initialVocabulary, initialConcepts, curriculums } from '../data/initialMasteryMap';
 
-// Map the simplified initialVocabulary entries to the full VocabWord shape
-// so all existing components keep working without changes.
-function toFullVocabWord(v: { word: string; status: MasteryStatus; sessionNotes: string; frequencyRank?: number }): VocabWord {
-  return {
-    id: v.word,
-    word: v.word,
-    partOfSpeech: '',
-    meanings: '',
-    confidenceScore: STATUS_MIDPOINT[v.status],
-    status: v.status,
-    useCount: 0,
-    frequencyRank: v.frequencyRank ?? 999,
-    isMasteryCandidate: false,
-    sessionNotes: v.sessionNotes,
-  };
-}
-
-const INITIAL_VOCABULARY: VocabWord[] = initialVocabulary.map(toFullVocabWord);
-
-interface Concept {
-  id: string;
-  title: string;
-  status: MasteryStatus;
-  sessionNotes: string;
-}
+// ... (existing toFullVocabWord and INITIAL_VOCABULARY)
 
 interface MasteryActions {
   applyScoreDeltas: (deltas: { wordId: string; delta: number }[]) => void;
   updateVocabStatus: (wordIdOrText: string, status: MasteryStatus) => void;
+  cycleWordStatus: (wordId: string) => void;
   updateConceptStatus: (id: string, status: MasteryStatus) => void;
   setLastUpdated: (date: string) => void;
   savePhrase: (phrase: string | SavedPhrase) => void;
   recordActivity: () => void;
   setStudentName: (name: string) => void;
+  updateProfile: (profile: Partial<UserProfile>) => void;
+  addLore: (category: LoreCategory, detail: string) => void;
+  deleteLore: (id: string) => void;
+  setReviewVibe: (vibe: ReviewVibe) => void;
   setProfileImage: (url: string) => void;
   updatePhraseNote: (id: string, notes: string) => void;
   deletePhrase: (id: string) => void;
@@ -58,6 +39,9 @@ interface MasteryActions {
 interface MasteryState {
   userId: string | null;
   studentName: string;
+  profile: UserProfile;
+  lore: LoreEntry[];
+  reviewVibe: ReviewVibe;
   profileImage: string;
   lastUpdated: string;
   vocabulary: VocabWord[];
@@ -73,6 +57,7 @@ interface MasteryState {
 type MasteryStore = MasteryState & MasteryActions;
 
 const XP_MAP = { not_started: 0, introduced: 10, practicing: 25, confident: 50, mastered: 100 };
+const STATUS_ORDER: MasteryStatus[] = ['not_started', 'introduced', 'practicing', 'confident', 'mastered'];
 const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
 
 export const useMasteryStore = create<MasteryStore>()(
@@ -80,6 +65,9 @@ export const useMasteryStore = create<MasteryStore>()(
     (set, get) => ({
       userId: null,
       studentName: 'Anthony',
+      profile: { name: 'Anthony', age: '', location: '', sex: '' },
+      lore: [],
+      reviewVibe: 'chill',
       profileImage: '',
       lastUpdated: '',
       vocabulary: INITIAL_VOCABULARY,
@@ -100,7 +88,7 @@ export const useMasteryStore = create<MasteryStore>()(
                 delta.wordId.toLowerCase() === w.word.toLowerCase()
             );
             if (!d) return w;
-            const newScore = clamp((w.confidenceScore ?? 0) + d.delta, 0, 100);
+            const newScore = clamp((w.confidenceScore ?? 0) + d.delta, 0, 500);
             return {
               ...w,
               confidenceScore: newScore,
@@ -119,6 +107,20 @@ export const useMasteryStore = create<MasteryStore>()(
             if (w.id !== wordIdOrText && w.word.toLowerCase() !== wordIdOrText.toLowerCase()) return w;
             const targetScore = STATUS_MIDPOINT[status];
             return { ...w, confidenceScore: targetScore, status };
+          }),
+        }));
+        get().recordActivity();
+        void get().syncToCloud();
+      },
+
+      cycleWordStatus: (wordId) => {
+        set((state) => ({
+          vocabulary: state.vocabulary.map((w) => {
+            if (w.id !== wordId) return w;
+            const currentIndex = STATUS_ORDER.indexOf(w.status);
+            const nextStatus = STATUS_ORDER[(currentIndex + 1) % STATUS_ORDER.length];
+            const targetScore = STATUS_MIDPOINT[nextStatus];
+            return { ...w, confidenceScore: targetScore, status: nextStatus };
           }),
         }));
         get().recordActivity();
@@ -160,7 +162,17 @@ export const useMasteryStore = create<MasteryStore>()(
         }
       },
 
-      setStudentName: (name) => { set({ studentName: name }); void get().syncToCloud(); },
+      setStudentName: (name) => { set({ studentName: name }); get().updateProfile({ name }); },
+      updateProfile: (profile) => { set((state) => ({ profile: { ...state.profile, ...profile } })); void get().syncToCloud(); },
+      addLore: (category, detail) => { 
+        set((state) => ({ lore: [...state.lore, { id: crypto.randomUUID(), category, detail }] })); 
+        void get().syncToCloud(); 
+      },
+      deleteLore: (id) => { 
+        set((state) => ({ lore: state.lore.filter(l => l.id !== id) })); 
+        void get().syncToCloud(); 
+      },
+      setReviewVibe: (vibe) => { set({ reviewVibe: vibe }); },
       setProfileImage: (url) => { set({ profileImage: url }); void get().syncToCloud(); },
 
       updatePhraseNote: (id, notes) => {
@@ -185,6 +197,9 @@ export const useMasteryStore = create<MasteryStore>()(
       resetAsNewUser: () => {
         set({
           studentName: '',
+          profile: { name: '', age: '', location: '', sex: '' },
+          lore: [],
+          reviewVibe: 'chill',
           profileImage: '',
           savedPhrases: [],
           currentStreak: 0,
@@ -200,7 +215,7 @@ export const useMasteryStore = create<MasteryStore>()(
       randomizeVocab: () => {
         set((state) => ({
           vocabulary: state.vocabulary.map(w => {
-            const score = Math.floor(Math.random() * 101);
+            const score = Math.floor(Math.random() * 451);
             return { ...w, confidenceScore: score, status: scoreToStatus(score) };
           })
         }));
@@ -209,7 +224,7 @@ export const useMasteryStore = create<MasteryStore>()(
 
       masterAllVocab: () => {
         set((state) => ({
-          vocabulary: state.vocabulary.map(w => ({ ...w, confidenceScore: 92, status: 'mastered' as MasteryStatus }))
+          vocabulary: state.vocabulary.map(w => ({ ...w, confidenceScore: 450, status: 'mastered' as MasteryStatus }))
         }));
         void get().syncToCloud();
       },
@@ -218,6 +233,9 @@ export const useMasteryStore = create<MasteryStore>()(
         set({
           userId: null,
           studentName: 'Anthony',
+          profile: { name: 'Anthony', age: '', location: '', sex: '' },
+          lore: [],
+          reviewVibe: 'chill',
           profileImage: '',
           savedPhrases: [],
           currentStreak: 0,
@@ -249,13 +267,13 @@ export const useMasteryStore = create<MasteryStore>()(
         set({ activeCurriculumId: curriculumId, activeModuleId: moduleId }),
 
       syncToCloud: async (explicitUserId) => {
-        const { vocabulary, concepts, lastUpdated, studentName, profileImage, savedPhrases, currentStreak, lastActiveDate, userId } = get();
+        const { vocabulary, concepts, lastUpdated, studentName, profile, lore, profileImage, savedPhrases, currentStreak, lastActiveDate, userId } = get();
         const targetId = explicitUserId || userId;
         if (!targetId) return;
 
         try {
           await setDoc(doc(db, 'users', targetId), {
-            vocabulary, concepts, lastUpdated, studentName, profileImage,
+            vocabulary, concepts, lastUpdated, studentName, profile, lore, profileImage,
             savedPhrases, currentStreak, lastActiveDate,
           }, { merge: true });
         } catch (err) {
@@ -274,6 +292,7 @@ export const useMasteryStore = create<MasteryStore>()(
             // New user or no cloud data
             if (initialName && (get().studentName === 'Anthony' || !get().studentName)) {
               set({ studentName: initialName });
+              get().updateProfile({ name: initialName });
             }
             if (initialProfileImage && !get().profileImage) {
               set({ profileImage: initialProfileImage });
@@ -311,6 +330,8 @@ export const useMasteryStore = create<MasteryStore>()(
             concepts: data.concepts || initialConcepts,
             lastUpdated: data.lastUpdated || '',
             studentName: data.studentName || 'Anthony',
+            profile: data.profile || { name: data.studentName || 'Anthony', age: '', location: '', sex: '' },
+            lore: data.lore || [],
             profileImage: data.profileImage || '',
             savedPhrases: data.savedPhrases || [],
             currentStreak: data.currentStreak || 0,

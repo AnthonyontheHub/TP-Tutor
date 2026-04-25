@@ -38,7 +38,7 @@ const LoginPage: React.FC = () => {
           fontSize: '1rem',
           lineHeight: '1.5'
         }}>
-          Master toki pona with AI-powered immersion and progress tracking.
+          Master toki pona with jan Lina's immersion and progress tracking.
         </p>
 
         {error && (

@@ -1,13 +1,16 @@
 /* src/components/VocabCard.tsx */
+import { useRef } from 'react';
 import type { VocabWord, MasteryStatus } from '../types/mastery';
+import { useMasteryStore } from '../store/masteryStore';
+import { soundService } from '../services/soundService';
 
 // Tier boundaries matching scoreToStatus() thresholds.
 const TIER_RANGES: Record<MasteryStatus, [number, number]> = {
-  not_started: [0,  19],
-  introduced:  [20, 39],
-  practicing:  [40, 64],
-  confident:   [65, 84],
-  mastered:    [85, 100],
+  not_started: [0,  0],
+  introduced:  [1, 50],
+  practicing:  [51, 150],
+  confident:   [151, 400],
+  mastered:    [401, 500],
 };
 
 const RING_COLOR: Record<MasteryStatus, string> = {
@@ -21,66 +24,106 @@ const RING_COLOR: Record<MasteryStatus, string> = {
 // How far through the current tier the score is, as a 0–1 fraction.
 function progressWithinTier(score: number, status: MasteryStatus): number {
   const [lo, hi] = TIER_RANGES[status];
+  if (hi === lo) return 1;
   return Math.min(1, Math.max(0, (score - lo) / (hi - lo)));
 }
 
-export default function VocabCard({ word }: { word: VocabWord }) {
+interface Props {
+  word: VocabWord;
+  onLongPress?: (word: VocabWord) => void;
+  onClick?: (word: VocabWord) => void;
+}
+
+export default function VocabCard({ word, onLongPress, onClick }: Props) {
+  const { cycleWordStatus } = useMasteryStore();
   const score  = word.confidenceScore ?? 0;
   const status = word.status;
   const color  = RING_COLOR[status];
   const fill   = progressWithinTier(score, status);
 
-  // SVG ring geometry — sits flush with the card's border edge.
-  // The ring radius equals half the card, minus half the stroke so it
-  // doesn't overflow. We use a fixed viewport and let CSS size the element.
-  const size   = 100;          // SVG viewport units
-  const stroke = 3;
-  const r      = (size - stroke) / 2;
-  const circ   = 2 * Math.PI * r;
-  const dash   = circ * fill;  // filled arc length
-  const gap    = circ - dash;  // empty arc length
+  const lastTapRef = useRef<number>(0);
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isLongPress = useRef(false);
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    isLongPress.current = false;
+    longPressTimer.current = setTimeout(() => {
+      isLongPress.current = true;
+      soundService.playBlip(523.25, 'sine', 0.05);
+      onLongPress?.(word);
+    }, 500);
+  };
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+
+    if (isLongPress.current) {
+      isLongPress.current = false;
+      return;
+    }
+
+    const now = Date.now();
+    if (now - lastTapRef.current < 300) {
+      // Secret Double Tap
+      cycleWordStatus(word.id);
+      lastTapRef.current = 0;
+    } else {
+      lastTapRef.current = now;
+      onClick?.(word);
+    }
+  };
+
+  const handlePointerCancel = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  };
 
   return (
     <div
       className={`vocab-card vocab-card--${status}`}
-      style={{ pointerEvents: 'none', position: 'relative' }}
+      style={{ position: 'relative', touchAction: 'none' }}
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerCancel}
     >
-      {/* Confidence ring — absolutely positioned, border layer only */}
+      {/* Confidence ring */}
       <svg
         aria-hidden
         style={{
           position:  'absolute',
-          inset:     -1,            // sits exactly on the 1px border edge
+          inset:     -1,
           width:     'calc(100% + 2px)',
           height:    'calc(100% + 2px)',
           borderRadius: '8px',
           overflow:  'visible',
           pointerEvents: 'none',
         }}
-        viewBox={`0 0 ${size} ${size}`}
+        viewBox={`0 0 100 100`}
         preserveAspectRatio="none"
       >
-        {/* Track (full ring, very faint) */}
         <rect
-          x={stroke / 2} y={stroke / 2}
-          width={size - stroke} height={size - stroke}
+          x={1.5} y={1.5}
+          width={97} height={97}
           rx={8} ry={8}
           fill="none"
           stroke={color}
-          strokeWidth={stroke}
+          strokeWidth={3}
           strokeOpacity={0.15}
         />
-        {/* Progress arc — uses a circle with dasharray so the fill sweeps
-            around the perimeter. We rotate -90° so it starts at the top. */}
         <circle
-          cx={size / 2} cy={size / 2} r={r}
+          cx={50} cy={50} r={48.5}
           fill="none"
           stroke={color}
-          strokeWidth={stroke}
+          strokeWidth={3}
           strokeOpacity={0.85}
           strokeLinecap="round"
-          strokeDasharray={`${dash} ${gap}`}
-          transform={`rotate(-90 ${size / 2} ${size / 2})`}
+          strokeDasharray={`${2 * Math.PI * 48.5 * fill} ${2 * Math.PI * 48.5 * (1 - fill)}`}
+          transform={`rotate(-90 50 50)`}
           style={{ transition: 'stroke-dasharray 0.4s ease' }}
         />
       </svg>

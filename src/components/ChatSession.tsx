@@ -146,11 +146,15 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
         ? activeCurriculum.modules.find(m => m.id === state.activeModuleId)
         : null;
       const sys = buildSystemPrompt(
-        state.vocabulary, state.concepts, state.studentName,
+        state.vocabulary, state.concepts, state.studentName, state.bio,
         activeCurriculum?.title, activeModule?.title
       );
       const windowedHistory = historyRef.current.slice(-HISTORY_WINDOW);
       let full = '';
+
+      if (messages.length === 0 && !txt.startsWith('toki jan Lina!')) {
+        // Optional: auto-prefix first message
+      }
 
       for await (const chunk of streamCompletion(key, sys, windowedHistory)) {
         full += chunk;
@@ -216,14 +220,14 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
               <div style={{ flex: 1, overflowY: 'auto', padding: '0 20px 20px' }}>
                 {!isSandboxMode && !resolveApiKey() && (
                   <div style={{ color: '#ff6b6b', textAlign: 'center', marginBottom: '20px' }}>
-                    Please set your API Key in Settings to chat with Lina.
+                    Please set your API Key in Settings to chat with jan Lina.
                   </div>
                 )}
 
                 {messages.map((msg) => (
                   <div key={msg.id} style={{ marginBottom: '20px', textAlign: msg.role === 'user' ? 'right' : 'left' }}>
                     <div style={{ color: '#888', fontSize: '0.7rem', marginBottom: '4px', fontWeight: 'bold' }}>
-                      {msg.role === 'assistant' ? 'LINA' : 'YOU'}
+                      {msg.role === 'assistant' ? 'JAN LINA' : 'YOU'}
                     </div>
                     <div style={{ background: msg.role === 'assistant' ? '#1a1a1a' : '#3b82f6', padding: '12px', borderRadius: '12px', color: 'white', display: 'inline-block', textAlign: 'left', maxWidth: '85%', fontSize: '0.95rem', lineHeight: '1.4' }}>
                       {msg.displayContent || (isLoading && msg.role === 'assistant' ? '...' : '')}

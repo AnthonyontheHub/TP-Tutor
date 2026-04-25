@@ -9,15 +9,18 @@ import UserProfileDrawer from './UserProfileDrawer';
 import SetupScreen from './SetupScreen';
 import type { MasteryStatus } from '../types/mastery';
 
+import Instructions from './Instructions';
+
 export default function Dashboard({ onStartSession, onAskLina, isSandboxMode, setIsSandboxMode }: {
   onStartSession: () => void;
   onAskLina: (p: string) => void;
   isSandboxMode: boolean;
   setIsSandboxMode: (val: boolean) => void;
 }) {
-  const { studentName, currentStreak, vocabulary, savedPhrases } = useMasteryStore();
+  const { studentName, currentStreak, vocabulary, savedPhrases, reviewVibe, setReviewVibe } = useMasteryStore();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'phrasebook'>('grid');
@@ -29,26 +32,30 @@ export default function Dashboard({ onStartSession, onAskLina, isSandboxMode, se
   if (!studentName || studentName === 'Student') return <SetupScreen />;
 
   const handleDailyReview = () => {
-    const practicingWords = vocabulary
-      .filter(w => w.status === 'practicing')
-      .sort((a, b) => a.confidenceScore - b.confidenceScore) // lowest scores first
-      .slice(0, 6)
-      .map(w => `${w.word} (score: ${w.confidenceScore})`);
-    const introducedWords = vocabulary
-      .filter(w => w.status === 'introduced')
-      .slice(0, 4)
-      .map(w => w.word);
+    let targetWords: string[] = [];
 
-    if (practicingWords.length === 0 && introducedWords.length === 0) {
-      onAskLina(`toki Lina! I have no words to review right now — either I haven't started yet or everything is mastered. What should we work on?`);
+    if (reviewVibe === 'chill') {
+      // Prioritize confident and mastered words for a light review
+      targetWords = vocabulary
+        .filter(w => w.status === 'confident' || w.status === 'mastered')
+        .sort((a, b) => b.confidenceScore - a.confidenceScore)
+        .slice(0, 8)
+        .map(w => w.word);
+    } else {
+      // Deep mode: prioritize Introduced or Not Started
+      targetWords = vocabulary
+        .filter(w => w.status === 'introduced' || w.status === 'not_started')
+        .sort((a, b) => (a.frequencyRank ?? 999) - (b.frequencyRank ?? 999))
+        .slice(0, 6)
+        .map(w => w.word);
+    }
+
+    if (targetWords.length === 0) {
+      onAskLina(`toki jan Lina! I'm in ${reviewVibe} mode but I have no words that fit that criteria. What should we work on instead?`);
       return;
     }
 
-    const parts: string[] = [];
-    if (practicingWords.length > 0) parts.push(`Practicing (lowest scores first): ${practicingWords.join(', ')}`);
-    if (introducedWords.length > 0) parts.push(`Introduced (need more practice): ${introducedWords.join(', ')}`);
-
-    onAskLina(`toki Lina! Let's do a daily review. Please follow the 3-phase lesson structure.\n\n${parts.join('\n')}\n\nStart with Phase 1 — warm up my practicing words.`);
+    onAskLina(`toki jan Lina! Let's do a daily review in **${reviewVibe.toUpperCase()}** mode. Focus on these words: ${targetWords.join(', ')}. Please follow the standard 3-phase lesson structure.`);
   };
 
   // Called by MasteryGrid after saving a phrase — switch to phrasebook and open note editor.
@@ -66,6 +73,7 @@ export default function Dashboard({ onStartSession, onAskLina, isSandboxMode, se
         </div>
         <div className="dashboard__header-right">
           {currentStreak > 0 && <div className="dashboard__streak">🔥 {currentStreak}</div>}
+          <button onClick={() => setIsHelpOpen(true)} className="dashboard__icon-btn">?</button>
           <button onClick={onStartSession} className="dashboard__icon-btn">💬</button>
           <button onClick={() => setIsSettingsOpen(true)} className="dashboard__icon-btn">⚙️</button>
         </div>
@@ -73,7 +81,48 @@ export default function Dashboard({ onStartSession, onAskLina, isSandboxMode, se
 
       <main className="dashboard__main">
         <ProgressSummary activeFilter={activeFilter} onFilterClick={setActiveFilter} />
-        <button onClick={handleDailyReview} className="btn-review">⚡ START DAILY REVIEW</button>
+        
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+          <button 
+            onClick={handleDailyReview} 
+            className="btn-review" 
+            style={{ flex: 1, marginBottom: 0 }}
+          >
+            ⚡ START DAILY REVIEW
+          </button>
+          <div style={{ display: 'flex', background: '#111', borderRadius: '10px', padding: '4px', border: '1px solid #222' }}>
+            <button 
+              onClick={() => setReviewVibe('chill')}
+              style={{ 
+                border: 'none', 
+                background: reviewVibe === 'chill' ? '#3b82f6' : 'transparent', 
+                color: reviewVibe === 'chill' ? 'white' : '#666',
+                borderRadius: '6px',
+                padding: '0 12px',
+                fontSize: '0.65rem',
+                fontWeight: 800,
+                cursor: 'pointer'
+              }}
+            >
+              CHILL
+            </button>
+            <button 
+              onClick={() => setReviewVibe('deep')}
+              style={{ 
+                border: 'none', 
+                background: reviewVibe === 'deep' ? '#ec4899' : 'transparent', 
+                color: reviewVibe === 'deep' ? 'white' : '#666',
+                borderRadius: '6px',
+                padding: '0 12px',
+                fontSize: '0.65rem',
+                fontWeight: 800,
+                cursor: 'pointer'
+              }}
+            >
+              DEEP
+            </button>
+          </div>
+        </div>
 
         <div className="dashboard__view-toggle">
           <button onClick={() => setViewMode('grid')} className={`btn-toggle ${viewMode === 'grid' ? 'active' : ''}`}>VOCAB GRID</button>
@@ -136,6 +185,7 @@ export default function Dashboard({ onStartSession, onAskLina, isSandboxMode, se
 
       <SettingsDrawer isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} />
       <UserProfileDrawer isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
+      <Instructions isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
     </div>
   );
 }

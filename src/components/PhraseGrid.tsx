@@ -76,27 +76,43 @@ export default function PhraseGrid({ onAskLina, activeFilter, selectedWords, foc
         {selectedWords.length > 0 ? `SUGGESTED COMBINATIONS` : 'PRACTICE PHRASES'}
       </h2>
       <div style={{ display: 'grid', gap: '12px', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))' }}>
-        {filtered.map((p) => (
-          <div key={p.id} style={{ background: p.isSaved ? '#0f172a' : '#111', padding: '16px', borderRadius: '8px', border: p.isSaved ? '1px solid #3b82f6' : '1px solid #333' }}>
-            <div onClick={() => onAskLina(`Let's practice: "${p.tp}"`)} style={{ cursor: 'pointer' }}>
-              <div style={{ fontWeight: 'bold', fontSize: '1.05rem', color: p.isSaved ? '#60a5fa' : '#fff' }}>{p.tp} {p.isSaved && '*'}</div>
-              <div style={{ fontSize: '0.8rem', color: p.isSaved ? '#94a3b8' : '#777', fontStyle: 'italic' }}>{p.en}</div>
-            </div>
-            {p.isSaved && (
-              <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #1e293b' }}>
-                {p.notes && <div style={{ fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '8px', padding: '6px', background: '#1e293b', borderRadius: '4px' }}>📝 {p.notes}</div>}
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <button onClick={() => { setEditingId(p.id); setNoteInput(p.notes); }} className="btn-toggle" style={{ padding: '4px 8px', fontSize: '0.65rem', width: 'auto' }}>
-                    {p.notes ? 'EDIT NOTE' : '+ NOTE'}
-                  </button>
-                  <button onClick={() => { if(window.confirm('Delete this saved phrase?')) deletePhrase(p.id); }} className="btn-toggle" style={{ padding: '4px 8px', fontSize: '0.65rem', width: 'auto', background: '#7f1d1d' }}>
-                    DELETE
-                  </button>
+        {filtered.map((p) => {
+          const words = p.tp.split(' ');
+          return (
+            <div key={p.id} style={{ background: p.isSaved ? '#0f172a' : '#111', padding: '16px', borderRadius: '8px', border: p.isSaved ? '1px solid #3b82f6' : '1px solid #333' }}>
+              <div onClick={() => onAskLina(`toki jan Lina! Let's practice: "${p.tp}"`)} style={{ cursor: 'pointer' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '8px' }}>
+                  {words.map((w, idx) => {
+                    const cleanW = clean(w);
+                    const vocab = vocabulary.find(v => v.word === cleanW);
+                    const meaning = vocab?.meanings?.split(',')[0].trim() || '';
+                    return (
+                      <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <div style={{ fontSize: '0.55rem', color: '#666', textTransform: 'uppercase', fontWeight: 700, marginBottom: '1px' }}>{meaning}</div>
+                        <div style={{ fontWeight: 'bold', fontSize: '1.05rem', color: p.isSaved ? '#60a5fa' : '#fff' }}>{w}</div>
+                      </div>
+                    );
+                  })}
+                  {p.isSaved && <span style={{ color: '#60a5fa', fontWeight: 'bold', marginLeft: '4px' }}>*</span>}
                 </div>
+                <div style={{ fontSize: '0.8rem', color: p.isSaved ? '#94a3b8' : '#777', fontStyle: 'italic' }}>{p.en}</div>
               </div>
-            )}
-          </div>
-        ))}
+              {p.isSaved && (
+                <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #1e293b' }}>
+                  {p.notes && <div style={{ fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '8px', padding: '6px', background: '#1e293b', borderRadius: '4px' }}>📝 {p.notes}</div>}
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button onClick={() => { setEditingId(p.id); setNoteInput(p.notes); }} className="btn-toggle" style={{ padding: '4px 8px', fontSize: '0.65rem', width: 'auto' }}>
+                      {p.notes ? 'EDIT NOTE' : '+ NOTE'}
+                    </button>
+                    <button onClick={() => { if(window.confirm('Delete this saved phrase?')) deletePhrase(p.id); }} className="btn-toggle" style={{ padding: '4px 8px', fontSize: '0.65rem', width: 'auto', background: '#7f1d1d' }}>
+                      DELETE
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       {editingId && (

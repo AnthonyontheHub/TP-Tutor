@@ -23,51 +23,71 @@ export const STATUS_META: Record<
   introduced: {
     emoji: '🔵',
     label: 'Introduced',
-    meaning: 'Concept has been presented but not yet practiced or tested.',
+    meaning: 'The word is new to you (0-50 pts).',
   },
   practicing: {
     emoji: '🟡',
     label: 'Practicing',
-    meaning: 'Actively working on it; some errors or hesitation still present.',
+    meaning: "You're using it, but it's not fluid yet (51-150 pts).",
   },
   confident: {
     emoji: '🟢',
     label: 'Confident',
-    meaning: 'Consistently correct with some conscious effort.',
+    meaning: 'You know it well in most contexts (151-400 pts).',
   },
   mastered: {
     emoji: '✅',
     label: 'Mastered',
     meaning:
-      'Fully automatic — confirmed correct across multiple sessions. Set by mutual agreement.',
+      'The word is now part of your "mental map" (400+ pts).',
   },
 };
 
 // ─── Score → Status derivation ────────────────────────────────────────────────
 // Status is derived from confidenceScore; it is never stored independently.
-//   0–19  → not_started
-//  20–39  → introduced
-//  40–64  → practicing
-//  65–84  → confident
-//  85–100 → mastered
+// New thresholds per Requirement 5:
+//  0      → not_started (usually 0)
+//  1–50   → introduced
+//  51–150 → practicing
+//  151–400→ confident
+//  401+   → mastered
 
 export function scoreToStatus(score: number): MasteryStatus {
-  if (score >= 85) return 'mastered';
-  if (score >= 65) return 'confident';
-  if (score >= 40) return 'practicing';
-  if (score >= 20) return 'introduced';
+  if (score > 400) return 'mastered';
+  if (score > 150) return 'confident';
+  if (score > 50) return 'practicing';
+  if (score > 0) return 'introduced';
   return 'not_started';
 }
 
 // Midpoint of each tier's range — used to seed confidenceScore when reading
 // legacy cloud data that only has a status field.
 export const STATUS_MIDPOINT: Record<MasteryStatus, number> = {
-  not_started: 9,
-  introduced:  29,
-  practicing:  52,
-  confident:   74,
-  mastered:    92,
+  not_started: 0,
+  introduced:  25,
+  practicing:  100,
+  confident:   275,
+  mastered:    450,
 };
+
+// ─── Lore & Profile ──────────────────────────────────────────────────────────
+
+export type LoreCategory = 'Work' | 'Hobbies' | 'Pets' | 'Projects' | 'Lifestyle';
+
+export interface LoreEntry {
+  id: string;
+  category: LoreCategory;
+  detail: string;
+}
+
+export interface UserProfile {
+  name: string;
+  age: string;
+  location: string;
+  sex: string;
+}
+
+export type ReviewVibe = 'chill' | 'deep';
 
 // ─── Grammar Concepts ─────────────────────────────────────────────────────────
 

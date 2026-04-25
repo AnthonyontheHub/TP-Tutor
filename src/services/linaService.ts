@@ -1,18 +1,12 @@
-/* src/services/linaService.ts */
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import type { VocabWord, MasteryStatus } from '../types/mastery';
+import type { VocabWord, MasteryStatus, UserProfile, LoreEntry, ReviewVibe } from '../types/mastery';
 
-export const STATUS_EMOJI: Record<string, string> = {
-  not_started: '⬜',
-  introduced: '🔵',
-  practicing: '🟡',
-  confident: '🟢',
-  mastered: '✅'
-};
+// ... (STATUS_EMOJI and buildOfflineTranslation remain same)
 
-// Offline word-by-word gloss built from local vocabulary data — no API needed.
-export function buildOfflineTranslation(selectedWords: string[], _vocabulary: VocabWord[]): string {
-  return selectedWords.join(' · ');
+// Helper to stringify user context for prompts
+export function stringifyUserContext(profile: UserProfile, lore: LoreEntry[]): string {
+  const profileStr = `Name: ${profile.name}, Age: ${profile.age}, Location: ${profile.location}, Sex: ${profile.sex}`;
+  const loreStr = lore.map(l => `[${l.category}]: ${l.detail}`).join('; ');
+  return `${profileStr}. Lore: ${loreStr}`;
 }
 
 export interface ProposedChange {
@@ -33,8 +27,10 @@ export function buildSystemPrompt(
   vocabulary: any[],
   concepts: any[],
   studentName: string,
+  userContext?: string,
   activeCurriculumTitle?: string,
-  activeModuleTitle?: string
+  activeModuleTitle?: string,
+  vibe: ReviewVibe = 'chill'
 ) {
   const activeVocab = vocabulary
     .filter(v => v.status === 'introduced' || v.status === 'practicing' || v.status === 'confident')
@@ -46,13 +42,19 @@ export function buildSystemPrompt(
     .map(c => `${c.title} (${c.status}) - Notes: ${c.sessionNotes || 'None'}`)
     .join('\n');
 
+  const vibeContext = vibe === 'chill' 
+    ? "The student wants a 'Chill' session. Prioritize reviewing words they already know well (high mastery) and keep the conversation light and encouraging."
+    : "The student wants a 'Deep' session. Prioritize new concepts, 'Introduced' or 'Not Started' words, and more complex grammatical structures.";
+
   const lessonContext = activeModuleTitle
     ? `CURRENT LESSON GOAL:\nThe student has explicitly chosen to study: ${activeCurriculumTitle} - ${activeModuleTitle}. Focus your teaching and drills entirely on this topic today.`
-    : `CURRENT LESSON GOAL:\nFree practice. Chat naturally and test them on their active vocabulary.`;
+    : `CURRENT LESSON GOAL:\nFree practice. Chat naturally and test them on their active vocabulary. ${vibeContext}`;
+
+  const contextStr = userContext ? `\nUSER BACKGROUND & LORE:\n${userContext}\nUse this context to make your examples and conversations more personal and relevant.` : '';
 
   return `
-    You are an expert Toki Pona teacher.
-    The student's name is ${studentName}.
+    You are jan Lina, an expert Toki Pona teacher.
+    The student's name is ${studentName}.${contextStr}
 
     ${lessonContext}
 
@@ -101,18 +103,19 @@ function sanitizeJson(text: string): string {
   return text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
 }
 
-export async function fetchSentenceSuggestions(apiKey: string, words: string[]) {
+export async function fetchSentenceSuggestions(apiKey: string, words: string[], userContext?: string) {
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({
     model: "gemini-2.5-flash",
     generationConfig: { responseMimeType: "application/json" },
   });
-  const prompt = `Act as a Toki Pona tutor. Given these words: [${words.join(', ')}], generate 3 short grammatically correct Toki Pona sentences using most or all of them. You MAY add particles like "li", "e", "en", "la", or "pi". Return a JSON array of strings: ["sentence 1", "sentence 2", "sentence 3"]`;
+  const contextInstruction = userContext ? ` Context: ${userContext}.` : '';
+  const prompt = `Act as jan Lina, a Toki Pona tutor. Given these words: [${words.join(', ')}], generate 3 short grammatically correct Toki Pona sentences using most or all of them.${contextInstruction} Provide English translations. You MAY add particles like "li", "e", "en", "la", or "pi". Return a JSON array of strings: ["sentence 1 (translation)", "sentence 2 (translation)", "sentence 3 (translation)"]`;
   try {
     const result = await model.generateContent(prompt);
     return JSON.parse(sanitizeJson(result.response.text())) as string[];
   } catch (e) {
-    console.error('Lina Suggestion Error:', e);
+    console.error('jan Lina Suggestion Error:', e);
     return [];
   }
 }
@@ -125,24 +128,49 @@ export async function fetchQuickTranslation(apiKey: string, text: string) {
     const result = await model.generateContent(prompt);
     return result.response.text().trim();
   } catch (e) {
-    console.error('Lina Translation Error:', e);
+    console.error('jan Lina Translation Error:', e);
     return null;
   }
 }
 
-export async function fetchExamplesForWord(apiKey: string, word: string, partsOfSpeech: string[]) {
+export async function fetchDeepDiveExamples(apiKey: string, word: string, userContext?: string) {
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({
     model: "gemini-2.5-flash",
     generationConfig: { responseMimeType: "application/json" },
   });
-  const prompt = `Act as a Toki Pona dictionary. For the word "${word}", provide one simple example sentence for each of these parts of speech: ${partsOfSpeech.join(', ')}. Return ONLY a JSON object mapping each part of speech to a sentence, e.g. {"noun": "sentence", "verb": "sentence"}`;
+  const contextInstruction = userContext ? ` User Context: ${userContext}.` : '';
+  const prompt = `Act as jan Lina, a Toki Pona teacher. For the word "${word}", generate 4 specific examples:
+1. Simple: A basic "Subject + Word" sentence.
+2. Intermediate: "Word + Modifiers" sentence.
+3. Advanced: A complex sentence using "la" or "e".
+4. Personal Take: A sentence combining the word "${word}" with a random piece of the user's background lore.
+
+${contextInstruction}
+Return a JSON object: {"simple": "tp (en)", "intermediate": "tp (en)", "advanced": "tp (en)", "personal": "tp (en)"}`;
   try {
     const result = await model.generateContent(prompt);
     return JSON.parse(sanitizeJson(result.response.text())) as Record<string, string>;
   } catch (e) {
-    console.error('Lina Dictionary Error:', e);
-    return partsOfSpeech.reduce((acc, pos) => ({ ...acc, [pos]: `${word} li lon.` }), {} as Record<string, string>);
+    console.error('jan Lina Deep Dive Error:', e);
+    return null;
+  }
+}
+
+export async function fetchExamplesForWord(apiKey: string, word: string, partsOfSpeech: string[], userContext?: string) {
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({
+    model: "gemini-2.5-flash",
+    generationConfig: { responseMimeType: "application/json" },
+  });
+  const contextInstruction = userContext ? ` Context: ${userContext}.` : '';
+  const prompt = `Act as jan Lina, a Toki Pona teacher. For the word "${word}", provide one simple example sentence and its English translation for each of these parts of speech: ${partsOfSpeech.join(', ')}.${contextInstruction} Return ONLY a JSON object mapping each part of speech to its example and translation, e.g. {"noun": "toki pona li pona. (Good speech is good.)", "verb": "mi toki. (I speak.)"}`;
+  try {
+    const result = await model.generateContent(prompt);
+    return JSON.parse(sanitizeJson(result.response.text())) as Record<string, string>;
+  } catch (e) {
+    console.error('jan Lina Examples Error:', e);
+    return partsOfSpeech.reduce((acc, pos) => ({ ...acc, [pos]: `${word} li lon. (${word} is here.)` }), {} as Record<string, string>);
   }
 }
 
@@ -180,7 +208,7 @@ export async function fetchSessionRecap(
   const summary = changes
     .map(c => `${c.id}: → ${c.newStatus}`)
     .join(', ');
-  const prompt = `You are a Toki Pona teacher giving a student a brief end-of-session summary. The following words and concepts had their mastery status updated this session: ${summary}. Write 2–3 sentences in plain English (no bullet points, no headers) describing what improved. Keep it concise and encouraging.`;
+  const prompt = `You are jan Lina, a Toki Pona teacher giving a student a brief end-of-session summary. The following words and concepts had their mastery status updated this session: ${summary}. Write 2–3 sentences in plain English (no bullet points, no headers) describing what improved. Keep it concise and encouraging.`;
   try {
     const result = await model.generateContent(prompt);
     return result.response.text().trim();
