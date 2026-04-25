@@ -222,14 +222,4 @@ export default function NodeDossier({ node, onBack, onAskLina, isSandboxMode }: 
     </motion.div>
   );
 }
-      <WordDetailDrawer
-        isOpen={!!drawerId}
-        word={drawerId ? vocabulary.find(v => v.id === drawerId) ?? null : null}
-        onClose={() => setDrawerId(null)}
-        onAskLina={onAskLina}
-        isSandboxMode={isSandboxMode}
-      />
-    </motion.div>
-  );
-}
 

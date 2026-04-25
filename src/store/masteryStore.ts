@@ -424,6 +424,7 @@ export const useMasteryStore = create<MasteryStore>()(
           lastActiveDate: '',
           vocabulary: mappedVocabulary,
           levels: curriculumRoadmap,
+          currentPositionNodeId: 'phi_sim',
           hasCompletedSetup: false,
         });
         void get().syncToCloud();
@@ -435,6 +436,8 @@ export const useMasteryStore = create<MasteryStore>()(
           profile: { name: '', age: '', location: '', sex: '', history: [] },
           lore: [],
           profileImage: '',
+          levels: curriculumRoadmap,
+          currentPositionNodeId: 'phi_sim',
           hasCompletedSetup: false,
         });
         void get().syncToCloud();
@@ -602,9 +605,24 @@ export const useMasteryStore = create<MasteryStore>()(
             }
           );
 
+          // Merge static curriculum content (richContent, etc.) with stored status
+          const mergedLevels = curriculumRoadmap.map(staticLevel => {
+            const storedLevel = (data.levels || []).find((l: any) => l.id === staticLevel.id);
+            return {
+              ...staticLevel,
+              nodes: staticLevel.nodes.map(staticNode => {
+                const storedNode = (storedLevel?.nodes || []).find((n: any) => n.id === staticNode.id);
+                return {
+                  ...staticNode,
+                  status: storedNode?.status || staticNode.status
+                };
+              })
+            };
+          });
+
           set({
             vocabulary,
-            levels: data.levels || curriculumRoadmap,
+            levels: mergedLevels,
             lastUpdated: data.lastUpdated || '',
             studentName: data.studentName || 'Anthony',
             profile: data.profile || { name: data.studentName || 'Anthony', age: '', location: '', sex: '' },
@@ -629,6 +647,26 @@ export const useMasteryStore = create<MasteryStore>()(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { userId, ...rest } = state;
         return rest;
+      },
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          // Merge static content on rehydration
+          const mergedLevels = curriculumRoadmap.map(staticLevel => {
+            const storedLevel = (state.levels || []).find((l: any) => l.id === staticLevel.id);
+            return {
+              ...staticLevel,
+              nodes: staticLevel.nodes.map(staticNode => {
+                const storedNode = (storedLevel?.nodes || []).find((n: any) => n.id === staticNode.id);
+                return {
+                  ...staticNode,
+                  status: storedNode?.status || staticNode.status
+                };
+              })
+            };
+          });
+          state.levels = mergedLevels;
+          state.refreshCurriculumStatus();
+        }
       }
     }
   )
