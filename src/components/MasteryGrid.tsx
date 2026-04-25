@@ -136,7 +136,7 @@ export default function MasteryGrid({
     <div
       className="mastery-grid-container"
       style={{ paddingBottom: selectedWords.length > 0 ? '240px' : undefined }}
-      onClick={() => { if (selectedWords.length > 0) setSelectedWords([]); }}
+      onClick={(e) => { if (e.target === e.currentTarget && selectedWords.length > 0) setSelectedWords([]); }}
     >
       <div className="grid-toolbar">
         <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="sort-select">

@@ -27,11 +27,9 @@ export default function SettingsPanel({ onClose, isSandboxMode, setIsSandboxMode
       exit={{ x: '100%' }}
       transition={{ type: 'spring', damping: 25, stiffness: 200 }}
     >
-      <header className="side-panel-header">
-        <button onClick={onClose} className="btn-back">
-          <span>✕</span> CLOSE
-        </button>
-        <h2 style={{ marginLeft: '16px', fontSize: '0.9rem', fontWeight: 900, letterSpacing: '0.15em', color: 'var(--gold)' }}>SYSTEM CONFIG</h2>
+      <header className="side-panel-header" style={{ justifyContent: 'space-between' }}>
+        <h2 style={{ fontSize: '0.9rem', fontWeight: 900, letterSpacing: '0.15em', color: 'var(--gold)' }}>SYSTEM CONFIG</h2>
+        <button onClick={onClose} className="btn-close-glowing">✕</button>
       </header>
 
       <div className="side-panel-content">

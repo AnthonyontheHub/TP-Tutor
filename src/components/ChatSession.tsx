@@ -173,7 +173,7 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
 
   return (
     <LazyMotion features={domMax}>
-      <motion.div
+      <m.div
         className="side-panel chat-drawer"
         initial={{ x: '100%' }}
         animate={{ x: 0 }}
@@ -182,9 +182,9 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
         onMouseUp={handleTextSelection}
         onTouchEnd={handleTextSelection}
       >
-        <header className="side-panel-header">
-          <button onClick={handleEndSession} className="btn-back"><span>✕</span> CLOSE</button>
-          <h2 style={{ marginLeft: '16px', fontSize: '0.9rem', fontWeight: 900, letterSpacing: '0.15em', color: 'var(--gold)' }}>NEURAL LINK</h2>
+        <header className="side-panel-header" style={{ justifyContent: 'space-between' }}>
+          <h2 style={{ fontSize: '0.9rem', fontWeight: 900, letterSpacing: '0.15em', color: 'var(--gold)' }}>NEURAL LINK</h2>
+          <button onClick={handleEndSession} className="btn-close-glowing">✕</button>
         </header>
 
         {translateBubble && (
@@ -209,7 +209,7 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
           <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && sendToLina(input)} placeholder="Input command..." style={{ flex: 1, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: '2px', padding: '12px', color: 'white', outline: 'none', fontSize: '0.9rem' }} />
           <button onClick={() => sendToLina(input)} disabled={isLoading} style={{ background: 'var(--gold)', border: 'none', borderRadius: '2px', padding: '0 20px', color: 'black', fontWeight: 900, cursor: 'pointer', opacity: isLoading ? 0.6 : 1 }}>{isLoading ? '...' : 'EXEC'}</button>
         </div>
-      </motion.div>
+      </m.div>
     </LazyMotion>
   );
 }

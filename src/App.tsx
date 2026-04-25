@@ -1,5 +1,5 @@
 /* src/App.tsx */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Dashboard from './components/Dashboard';
 import ChatSession from './components/ChatSession';
 import LoginPage from './components/LoginPage';
@@ -13,6 +13,51 @@ import { useAuthStore } from './store/authStore';
 import { AnimatePresence } from 'framer-motion';
 
 export type AppPanel = 'profile' | 'settings' | 'instructions' | 'achievements' | 'chat';
+
+function ResizableWrapper({ 
+  children, 
+  onClose, 
+  initialWidth = 400, 
+  side = 'right' 
+}: { 
+  children: React.ReactNode; 
+  onClose: () => void; 
+  initialWidth?: number;
+  side?: 'left' | 'right';
+}) {
+  const [width, setWidth] = useState(initialWidth);
+  const isResizing = useRef(false);
+
+  const startResizing = useCallback((e: React.PointerEvent) => {
+    isResizing.current = true;
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  }, []);
+
+  const stopResizing = useCallback((e: React.PointerEvent) => {
+    isResizing.current = false;
+    (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+  }, []);
+
+  const resize = useCallback((e: React.PointerEvent) => {
+    if (!isResizing.current) return;
+    const newWidth = side === 'right' 
+      ? window.innerWidth - e.clientX 
+      : e.clientX;
+    setWidth(Math.max(300, Math.min(newWidth, 800)));
+  }, [side]);
+
+  return (
+    <div className="side-panel-wrapper" style={{ width, position: 'relative', height: '100%', flexShrink: 0 }}>
+      <div 
+        className={`resize-handle resize-handle--${side === 'right' ? 'left' : 'right'}`}
+        onPointerDown={startResizing}
+        onPointerUp={stopResizing}
+        onPointerMove={resize}
+      />
+      {children}
+    </div>
+  );
+}
 
 export default function App() {
   const { user, loading } = useAuthStore();
@@ -78,8 +123,19 @@ export default function App() {
 
   if (!user) return <LoginPage />;
 
+  const isProfileOpen = activePanels.includes('profile');
+  const otherPanels = activePanels.filter(p => p !== 'profile');
+
   return (
     <div className="app-container">
+      <AnimatePresence>
+        {isProfileOpen && (
+          <ResizableWrapper key="profile-wrapper" side="left" onClose={() => closePanel('profile')}>
+            <UserProfilePanel isOpen={true} onClose={() => closePanel('profile')} />
+          </ResizableWrapper>
+        )}
+      </AnimatePresence>
+
       <Dashboard
         onTogglePanel={togglePanel}
         activePanels={activePanels}
@@ -90,28 +146,37 @@ export default function App() {
 
       <div className="side-panels-container">
         <AnimatePresence mode="popLayout">
-          {activePanels.map(panel => {
-            if (panel === 'profile') return <UserProfilePanel key="profile" isOpen={true} onClose={() => closePanel('profile')} />;
+          {otherPanels.map(panel => {
             if (panel === 'settings') return (
-              <SettingsPanel 
-                key="settings"
-                isOpen={true} 
-                onClose={() => closePanel('settings')} 
-                isSandboxMode={isSandboxMode} 
-                setIsSandboxMode={setIsSandboxMode} 
-              />
+              <ResizableWrapper key="settings-wrapper" onClose={() => closePanel('settings')}>
+                <SettingsPanel 
+                  isOpen={true} 
+                  onClose={() => closePanel('settings')} 
+                  isSandboxMode={isSandboxMode} 
+                  setIsSandboxMode={setIsSandboxMode} 
+                />
+              </ResizableWrapper>
             );
-            if (panel === 'instructions') return <InstructionsPanel key="instructions" isOpen={true} onClose={() => closePanel('instructions')} />;
-            if (panel === 'achievements') return <AchievementsPanel key="achievements" onClose={() => closePanel('achievements')} />;
+            if (panel === 'instructions') return (
+              <ResizableWrapper key="instructions-wrapper" onClose={() => closePanel('instructions')}>
+                <InstructionsPanel isOpen={true} onClose={() => closePanel('instructions')} />
+              </ResizableWrapper>
+            );
+            if (panel === 'achievements') return (
+              <ResizableWrapper key="achievements-wrapper" onClose={() => closePanel('achievements')}>
+                <AchievementsPanel onClose={() => closePanel('achievements')} />
+              </ResizableWrapper>
+            );
             if (panel === 'chat') return (
-              <ChatSession
-                key="chat"
-                isActive={true}
-                onEndSession={() => closePanel('chat')}
-                pendingPrompt={pendingPrompt}
-                clearPrompt={handleClearPrompt}
-                isSandboxMode={isSandboxMode}
-              />
+              <ResizableWrapper key="chat-wrapper" onClose={() => closePanel('chat')}>
+                <ChatSession
+                  isActive={true}
+                  onEndSession={() => closePanel('chat')}
+                  pendingPrompt={pendingPrompt}
+                  clearPrompt={handleClearPrompt}
+                  isSandboxMode={isSandboxMode}
+                />
+              </ResizableWrapper>
             );
             return null;
           })}

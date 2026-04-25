@@ -10,6 +10,47 @@ interface Props {
   onClose: () => void;
 }
 
+function EditableField({ 
+  label, 
+  value, 
+  onSave 
+}: { 
+  label: string; 
+  value: string; 
+  onSave: (val: string) => void;
+}) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [tempValue, setTempValue] = useState(value);
+
+  if (isEditing) {
+    return (
+      <div className="glass-panel" style={{ padding: '12px' }}>
+        <label className="section-title" style={{ fontSize: '0.55rem' }}>{label}</label>
+        <input 
+          autoFocus
+          type="text" 
+          value={tempValue} 
+          onChange={(e) => setTempValue(e.target.value)}
+          onBlur={() => { setIsEditing(false); onSave(tempValue); }}
+          onKeyDown={(e) => { 
+            if (e.key === 'Enter') { setIsEditing(false); onSave(tempValue); }
+            if (e.key === 'Escape') { setIsEditing(false); setTempValue(value); }
+          }}
+          className="settings-input"
+          style={{ marginBottom: 0, padding: '8px', fontSize: '0.85rem' }}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="glass-panel" style={{ padding: '12px', cursor: 'pointer' }} onClick={() => setIsEditing(true)}>
+      <label className="section-title" style={{ fontSize: '0.55rem' }}>{label}</label>
+      <div style={{ fontSize: '1rem', color: 'white', fontWeight: 700, padding: '4px 0' }}>{value || '---'}</div>
+    </div>
+  );
+}
+
 export default function UserProfilePanel({ onClose }: Props) {
   const { profile, updateProfile, lore, addLore, deleteLore, currentStreak, savedPhrases, getStatusSummary, clearLocalData } = useMasteryStore();
   const { logout, setUser, signIn, isGuest, user } = useAuthStore();
@@ -29,16 +70,14 @@ export default function UserProfilePanel({ onClose }: Props) {
   return (
     <motion.div
       className="side-panel"
-      initial={{ x: '100%' }}
+      initial={{ x: '-100%' }}
       animate={{ x: 0 }}
-      exit={{ x: '100%' }}
+      exit={{ x: '-100%' }}
       transition={{ type: 'spring', damping: 25, stiffness: 200 }}
     >
-      <header className="side-panel-header">
-        <button onClick={onClose} className="btn-back">
-          <span>✕</span> CLOSE
-        </button>
-        <h2 style={{ marginLeft: '16px', fontSize: '0.9rem', fontWeight: 900, letterSpacing: '0.15em', color: 'var(--gold)' }}>USER PROFILE</h2>
+      <header className="side-panel-header" style={{ justifyContent: 'space-between' }}>
+        <h2 style={{ fontSize: '0.9rem', fontWeight: 900, letterSpacing: '0.15em', color: 'var(--gold)' }}>USER PROFILE</h2>
+        <button onClick={onClose} className="btn-close-glowing">✕</button>
       </header>
 
       <div className="side-panel-content">
@@ -69,27 +108,22 @@ export default function UserProfilePanel({ onClose }: Props) {
           </div>
         )}
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '32px' }}>
-          <div className="glass-panel" style={{ padding: '12px' }}>
-            <label className="section-title" style={{ fontSize: '0.55rem' }}>Age</label>
-            <input 
-              type="text" 
-              value={profile.age} 
-              onChange={(e) => updateProfile({ age: e.target.value })}
-              className="settings-input"
-              style={{ marginBottom: 0, padding: '8px', fontSize: '0.85rem' }}
-            />
-          </div>
-          <div className="glass-panel" style={{ padding: '12px' }}>
-            <label className="section-title" style={{ fontSize: '0.55rem' }}>Sex</label>
-            <input 
-              type="text" 
-              value={profile.sex} 
-              onChange={(e) => updateProfile({ sex: e.target.value })}
-              className="settings-input"
-              style={{ marginBottom: 0, padding: '8px', fontSize: '0.85rem' }}
-            />
-          </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', marginBottom: '32px' }}>
+          <EditableField 
+            label="Age" 
+            value={profile.age} 
+            onSave={(val) => updateProfile({ age: val })} 
+          />
+          <EditableField 
+            label="Sex" 
+            value={profile.sex} 
+            onSave={(val) => updateProfile({ sex: val })} 
+          />
+          <EditableField 
+            label="Location" 
+            value={profile.location} 
+            onSave={(val) => updateProfile({ location: val })} 
+          />
         </div>
 
         <div className="glass-panel" style={{ marginBottom: '32px' }}>
