@@ -3,7 +3,15 @@ import { useAuthStore } from '../store/authStore';
 import { motion } from 'framer-motion';
 
 const LoginPage: React.FC = () => {
-  const { signIn, loading, error } = useAuthStore();
+  const { signIn, skipSignIn, loading, error } = useAuthStore();
+
+  // Auto-skip in development
+  React.useEffect(() => {
+    if (import.meta.env.DEV) {
+      console.log('Dev mode: Auto-skipping login');
+      skipSignIn();
+    }
+  }, [skipSignIn]);
 
   return (
     <div className="login-page" style={{

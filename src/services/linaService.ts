@@ -1,6 +1,31 @@
 import type { VocabWord, MasteryStatus, UserProfile, LoreEntry, ReviewVibe } from '../types/mastery';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// ... (STATUS_EMOJI and buildOfflineTranslation remain same)
+// Mapping status to emojis for offline context
+export const STATUS_EMOJI: Record<MasteryStatus, string> = {
+  not_started: '⬜',
+  introduced: '🔵',
+  practicing: '🟡',
+  confident: '🟢',
+  mastered: '✅'
+};
+
+/**
+ * Builds a simple literal translation for offline use or as a fallback.
+ * Joins the primary English meanings of the selected Toki Pona words.
+ */
+export function buildOfflineTranslation(selectedWords: string[], vocabulary: VocabWord[]): string {
+  if (selectedWords.length === 0) return '';
+  return selectedWords
+    .map(word => {
+      const entry = vocabulary.find(v => v.word.toLowerCase() === word.toLowerCase());
+      if (!entry) return `(${word}?)`;
+      // Take the first meaning (before any comma or semicolon)
+      const primaryMeaning = entry.meanings.split(/[;,]/)[0].trim();
+      return primaryMeaning;
+    })
+    .join(' ');
+}
 
 // Helper to stringify user context for prompts
 export function stringifyUserContext(profile: UserProfile, lore: LoreEntry[]): string {
