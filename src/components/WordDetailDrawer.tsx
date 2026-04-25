@@ -27,7 +27,7 @@ const NEXT_COLOR: Record<MasteryStatus, string> = {
   introduced:  'var(--blue)',
   practicing:  'var(--amber)',
   confident:   '#16a34a',
-  mastered:    'var(--cyan)',
+  mastered:    'var(--gold)',
 };
 
 const WORD_EXTRA_DATA: Record<string, { etymology: string, neighbors: string[], compounds: string[] }> = {
@@ -38,7 +38,7 @@ const WORD_EXTRA_DATA: Record<string, { etymology: string, neighbors: string[], 
   'pali': { etymology: 'From Acadian French: palier', neighbors: ['musi (Antonym-ish)', 'awen (Opposite-ish)'], compounds: ['pali pona (good work)', 'ilo pali (tool)'] },
   'jan': { etymology: 'From Cantonese: 人 (jan)', neighbors: ['soweli (Neighbor)', 'ijoa (Neighbor)'], compounds: ['jan pona (friend)', 'jan utala (soldier)'] },
   'moku': { etymology: 'From Japanese: もぐもぐ (mogumogu)', neighbors: ['telo (Neighbor)', 'pan (Neighbor)'], compounds: ['moku pona (good food)', 'moku telo (drink)'] },
-  'sona': { etymology: 'From Georgian: ცოდნა (tsodna)', neighbors: ['nasa (Antonym-ish)', 'kute (Neighbor)'], compounds: ['sona pona (wisdom)', 'jan sona (expert)'] },
+  'sona': { etymology: 'From Georgian: ცოდな (tsodna)', neighbors: ['nasa (Antonym-ish)', 'kute (Neighbor)'], compounds: ['sona pona (wisdom)', 'jan sona (expert)'] },
 };
 
 function tierProgress(score: number, status: MasteryStatus): number {
@@ -84,19 +84,18 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
           >
             <div style={{ marginBottom: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <h2 style={{ fontSize: '3rem', marginBottom: '0', fontWeight: 900, color: 'white', letterSpacing: '-0.02em' }}>{word.word}</h2>
+                <h2 style={{ fontSize: '3rem', marginBottom: '0', fontWeight: 900, color: 'white', letterSpacing: '-0.02em', textTransform: 'uppercase' }}>{word.word}</h2>
                 <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{STATUS_META[word.status].label}</div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{STATUS_META[word.status].label}</div>
                   <div style={{ fontSize: '1.5rem' }}>{STATUS_META[word.status].emoji}</div>
                 </div>
               </div>
-              <div style={{ fontSize: '1.4rem', color: 'var(--cyan)', fontWeight: 700, marginTop: '-5px' }}>{primaryMeaning}</div>
+              <div style={{ fontSize: '1.4rem', color: 'var(--gold)', fontWeight: 700, marginTop: '-5px', textTransform: 'uppercase' }}>{primaryMeaning}</div>
               {extra?.etymology && (
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontStyle: 'italic', marginTop: '6px' }}>{extra.etymology}</div>
               )}
             </div>
 
-            {/* Point Progress */}
             <div style={{ marginBottom: '32px' }}>
               <div className="progress-bar-track" style={{ height: '10px', background: 'rgba(255,255,255,0.05)' }}>
                 <div
@@ -104,15 +103,15 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
                   style={{
                     width: `${tierProgress(word.confidenceScore ?? 0, word.status) * 100}%`,
                     background: NEXT_COLOR[word.status],
-                    boxShadow: `0 0 15px ${NEXT_COLOR[word.status]}66`
+                    boxShadow: `0 0 15px ${NEXT_COLOR[word.status]}44`
                   }}
                 />
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
-                <span style={{ fontSize: '0.75rem', color: 'white', fontWeight: 900 }}>{word.confidenceScore} PTS</span>
+                <span style={{ fontSize: '0.75rem', color: 'white', fontWeight: 900 }}>{word.confidenceScore} NEURAL PTS</span>
                 {word.status !== 'mastered' && (
                   <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700 }}>
-                    {Math.max(0, (NEXT_THRESHOLD[word.status] ?? 0) - (word.confidenceScore ?? 0))} TO {STATUS_META[NEXT_STATUS[word.status]!].label.toUpperCase()}
+                    NEXT SYNC: {STATUS_META[NEXT_STATUS[word.status]!].label.toUpperCase()}
                   </span>
                 )}
               </div>
@@ -120,70 +119,31 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '32px' }}>
               <section className="glass-panel" style={{ padding: '12px' }}>
-                <h3 className="section-title" style={{ fontSize: '0.6rem' }}>Grammar Role</h3>
-                <div style={{ fontSize: '0.85rem', color: 'white', fontWeight: 700 }}>
-                  {word.partOfSpeech.toUpperCase()}
-                </div>
+                <h3 className="section-title" style={{ fontSize: '0.55rem' }}>Grammar</h3>
+                <div style={{ fontSize: '0.8rem', color: 'white', fontWeight: 900 }}>{word.partOfSpeech.toUpperCase()}</div>
               </section>
               <section className="glass-panel" style={{ padding: '12px' }}>
-                <h3 className="section-title" style={{ fontSize: '0.6rem' }}>Neighbors</h3>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                  {extra?.neighbors.slice(0,2).map(n => (
-                    <span key={n} style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{n}</span>
-                  )) || <span style={{ color: '#444', fontSize: '0.65rem' }}>-</span>}
-                </div>
+                <h3 className="section-title" style={{ fontSize: '0.55rem' }}>Neighbors</h3>
+                <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{extra?.neighbors.slice(0,2).join(', ') || '-'}</div>
               </section>
             </div>
 
             <section style={{ marginBottom: '32px' }}>
-              <h3 className="section-title">jan Lina's Examples</h3>
-              <div style={{ display: 'grid', gap: '10px' }}>
+              <h3 className="section-title" style={{ fontSize: '0.6rem' }}>Neural Examples</h3>
+              <div style={{ display: 'grid', gap: '8px' }}>
                 {['Simple', 'Intermediate', 'Advanced'].map((tier) => {
-                  const key = tier.toLowerCase();
-                  const content = deepDive?.[key];
+                  const content = deepDive?.[tier.toLowerCase()];
                   return (
-                    <div key={tier} className="glass-panel" style={{ padding: '12px', borderLeft: `3px solid ${tier === 'Simple' ? 'var(--blue)' : tier === 'Intermediate' ? 'var(--amber)' : 'var(--pink)'}` }}>
-                      <div style={{ fontSize: '0.55rem', fontWeight: 900, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>{tier}</div>
-                      {isLoading ? (
-                        <div style={{ height: '1.2rem', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', width: '80%' }} />
-                      ) : content ? (
-                        <div style={{ fontSize: '0.85rem', color: '#eee', lineHeight: '1.4' }}>{content}</div>
-                      ) : (
-                        <div style={{ fontSize: '0.75rem', color: '#444', fontStyle: 'italic' }}>...</div>
-                      )}
+                    <div key={tier} className="glass-panel" style={{ padding: '10px 15px', borderLeft: `2px solid ${tier === 'Simple' ? 'var(--blue)' : tier === 'Intermediate' ? 'var(--amber)' : 'var(--pink)'}` }}>
+                      <div style={{ fontSize: '0.55rem', fontWeight: 900, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '2px' }}>{tier}</div>
+                      {isLoading ? <div style={{ height: '1.2rem', background: 'rgba(255,255,255,0.03)', borderRadius: '2px', width: '80%' }} /> : <div style={{ fontSize: '0.85rem', color: '#eee', lineHeight: '1.4' }}>{content || '...'}</div>}
                     </div>
                   );
                 })}
               </div>
             </section>
 
-            <section style={{ marginBottom: '32px' }}>
-              <h3 className="section-title">Personal Take</h3>
-              <div className="glass-panel" style={{ border: '1px solid rgba(0, 243, 255, 0.1)', background: 'rgba(0, 243, 255, 0.02)' }}>
-                {isLoading ? (
-                  <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>jan Lina is thinking...</div>
-                ) : deepDive?.personal ? (
-                  <p style={{ color: '#eee', fontSize: '0.9rem', lineHeight: '1.5', margin: 0 }}>{deepDive.personal}</p>
-                ) : (
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontStyle: 'italic', margin: 0 }}>She needs more lore to give a personal take.</p>
-                )}
-              </div>
-            </section>
-
-            <button 
-              onClick={onClose} 
-              className="btn-review" 
-              style={{ 
-                margin: 0, 
-                width: '100%', 
-                background: 'var(--surface-2)', 
-                color: 'white', 
-                boxShadow: 'none',
-                border: '1px solid var(--border)'
-              }}
-            >
-              CLOSE
-            </button>
+            <button onClick={onClose} className="btn-review" style={{ margin: 0, width: '100%', background: 'var(--surface-2)', color: 'white', boxShadow: 'none', border: '1px solid var(--border)' }}>CLOSE TERMINAL</button>
           </motion.div>
         </div>
       )}
