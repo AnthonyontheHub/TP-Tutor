@@ -7,12 +7,12 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
   setIsSandboxMode: (val: boolean) => void;
 }) {
   const { 
-    resetAsNewUser, masterAllVocab, randomizeVocab, studentName
+    resetAsNewUser, masterAllVocab, randomizeVocab, isMainProfile
   } = useMasteryStore();
 
   if (!isOpen) return null;
 
-  const isMainUser = studentName?.toLowerCase() === 'anthony';
+  const isMainUser = isMainProfile;
 
   return (
     <div style={{ padding: '40px', background: 'var(--surface-opaque)', height: '100%', overflowY: 'auto' }}>

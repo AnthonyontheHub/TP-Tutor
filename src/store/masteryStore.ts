@@ -97,6 +97,8 @@ interface MasteryState {
   currentPositionNodeId: string;
   selectedWords: string[];
   lessonFilter: string[] | null;
+  historySynced: boolean;
+  isMainProfile: boolean;
   // Dashboard settings
   widgetDensity: 'Compact' | 'Expanded';
   fogOfWar: 'Strict' | 'Visible';
@@ -129,6 +131,7 @@ export const useMasteryStore = create<MasteryStore>()(
       selectedWords: [],
       lessonFilter: null,
       widgetDensity: 'Expanded',
+      isMainProfile: true,
       fogOfWar: 'Visible',
       showCircuitPaths: true,
 
@@ -540,15 +543,16 @@ export const useMasteryStore = create<MasteryStore>()(
           levels: curriculumRoadmap,
           hasCompletedSetup: false,
           currentPositionNodeId: 'phi_sim',
+          isMainProfile: false,
         });
       },
 
       syncToCloud: async (explicitUserId) => {
-        const { vocabulary, levels, lastUpdated, studentName, profile, lore, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, widgetDensity, fogOfWar, showCircuitPaths } = get();
+        const { vocabulary, levels, lastUpdated, studentName, profile, lore, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, isMainProfile, widgetDensity, fogOfWar, showCircuitPaths } = get();
         const targetId = explicitUserId || userId;
         
         // Prevent sync for guest users and any non-main profile (Sandbox mode)
-        if (!targetId || targetId === 'guest_user' || (studentName && studentName.toLowerCase() !== 'anthony')) return;
+        if (!targetId || targetId === 'guest_user' || !isMainProfile) return;
 
         // NEW: Also check explicit sandbox mode toggle
         if (localStorage.getItem('tp_sandbox_mode') === 'true') return;
@@ -556,7 +560,7 @@ export const useMasteryStore = create<MasteryStore>()(
         try {
           await setDoc(doc(db, 'users', targetId), {
             vocabulary, levels, lastUpdated, studentName, profile, lore, profileImage,
-            savedPhrases, currentStreak, lastActiveDate, hasCompletedSetup, currentPositionNodeId,
+            savedPhrases, currentStreak, lastActiveDate, hasCompletedSetup, currentPositionNodeId, isMainProfile,
             widgetDensity, fogOfWar, showCircuitPaths
           }, { merge: true });
         } catch (err) {
@@ -656,6 +660,7 @@ export const useMasteryStore = create<MasteryStore>()(
             lastActiveDate: data.lastActiveDate || '',
             hasCompletedSetup: data.hasCompletedSetup || false,
             currentPositionNodeId: data.currentPositionNodeId || 'phi_sim',
+            isMainProfile: data.isMainProfile !== undefined ? data.isMainProfile : true,
             widgetDensity: data.widgetDensity || 'Expanded',
             fogOfWar: data.fogOfWar || 'Visible',
             showCircuitPaths: data.showCircuitPaths !== undefined ? data.showCircuitPaths : true,

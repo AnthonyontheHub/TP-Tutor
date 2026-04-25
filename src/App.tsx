@@ -18,7 +18,7 @@ export type AppPanel = 'profile' | 'settings' | 'instructions' | 'achievements' 
 
 export default function App() {
   const { user, loading } = useAuthStore();
-  const { hasCompletedSetup, studentName } = useMasteryStore();
+  const { hasCompletedSetup, isMainProfile } = useMasteryStore();
   
   const [activePanels, setActivePanels] = useState<AppPanel[]>([]);
   const [isSandboxMode, setIsSandboxMode] = useState<boolean>(
@@ -27,13 +27,13 @@ export default function App() {
 
   useEffect(() => {
     // Enforce Sandbox Mode for any profile that is not the main user
-    if (studentName && studentName.toLowerCase() !== 'anthony') {
+    if (!isMainProfile) {
       setIsSandboxMode(true);
       localStorage.setItem('tp_sandbox_mode', 'true');
     } else {
       localStorage.setItem('tp_sandbox_mode', String(isSandboxMode));
     }
-  }, [isSandboxMode, studentName]);
+  }, [isSandboxMode, isMainProfile]);
 
   useEffect(() => {
     if (!user) return;
