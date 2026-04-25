@@ -180,6 +180,7 @@ export default function UserProfileDrawer({ isOpen, onClose }: Props) {
             <button 
               onClick={() => {
                 useMasteryStore.getState().clearLocalData();
+                useAuthStore.getState().setUser(null);
                 logout();
                 onClose();
               }}

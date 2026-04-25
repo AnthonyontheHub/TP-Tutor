@@ -5,6 +5,7 @@ import { useMasteryStore } from '../store/masteryStore';
 import {
   buildSystemPrompt, streamCompletion, stripProposedChanges,
   parseProposedChanges, resolveApiKey, fetchSessionRecap,
+  fetchQuickTranslation
 } from '../services/linaService';
 import type { ProposedChange } from '../services/linaService';
 import type { MasteryStatus } from '../types/mastery';
@@ -42,6 +43,14 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  const [translateBubble, setTranslateBubble] = useState<{
+    text: string;
+    top: number;
+    left: number;
+    result?: string;
+    loading?: boolean;
+  } | null>(null);
+
   const vocabulary          = useMasteryStore(s => s.vocabulary);
   const updateVocabStatus   = useMasteryStore(s => s.updateVocabStatus);
   const updateConceptStatus = useMasteryStore(s => s.updateConceptStatus);
@@ -55,6 +64,53 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
   useEffect(() => {
     if (isActive) messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isActive]);
+
+  useEffect(() => {
+    const handleGlobalClick = () => setTranslateBubble(null);
+    window.addEventListener('mousedown', handleGlobalClick);
+    return () => window.removeEventListener('mousedown', handleGlobalClick);
+  }, []);
+
+  const handleTextSelection = () => {
+    const selection = window.getSelection();
+    if (!selection || selection.isCollapsed) return;
+
+    const text = selection.toString().trim();
+    if (!text) return;
+
+    // Use a small timeout to ensure coordinates are stable
+    setTimeout(() => {
+      try {
+        const range = selection.getRangeAt(0);
+        const rects = range.getClientRects();
+        if (rects.length === 0) return;
+        
+        const lastRect = rects[rects.length - 1];
+        setTranslateBubble({
+          text,
+          top: lastRect.top - 45, // Above selection
+          left: lastRect.left + (lastRect.width / 2)
+        });
+      } catch (err) {
+        console.error('Selection error:', err);
+      }
+    }, 10);
+  };
+
+  const handleTranslateClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!translateBubble || translateBubble.loading) return;
+
+    setTranslateBubble(prev => prev ? { ...prev, loading: true } : null);
+    
+    try {
+      const key = resolveApiKey();
+      const result = await fetchQuickTranslation(key, translateBubble.text);
+      setTranslateBubble(prev => prev ? { ...prev, loading: false, result: result || 'Could not translate.' } : null);
+    } catch (err) {
+      setTranslateBubble(prev => prev ? { ...prev, loading: false, result: 'Error translating.' } : null);
+    }
+  };
 
   useEffect(() => {
     if (!isActive || !pendingPrompt) return;
@@ -202,8 +258,53 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
               dragConstraints={{ top: 0 }}
               onDragEnd={(_, info) => { if (info.offset.y > 150) handleEndSession(); }}
               initial={{ y: '100%' }} animate={{ y: '0%' }} exit={{ y: '100%' }}
+              onMouseUp={handleTextSelection}
+              onTouchEnd={handleTextSelection}
               style={{ position: 'fixed', bottom: 0, left: 0, right: 0, height: '92vh', zIndex: 2000, background: '#111', borderTopLeftRadius: '20px', borderTopRightRadius: '20px', display: 'flex', flexDirection: 'column' }}
             >
+              {/* Floating Translate Bubble */}
+              {translateBubble && (
+                <div
+                  onMouseDown={e => e.stopPropagation()} 
+                  style={{
+                    position: 'fixed',
+                    top: translateBubble.top,
+                    left: translateBubble.left,
+                    transform: 'translateX(-50%)',
+                    zIndex: 3000,
+                    background: '#222',
+                    border: '1px solid #444',
+                    borderRadius: '8px',
+                    padding: '8px 12px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+                    fontSize: '0.8rem',
+                    color: 'white',
+                    minWidth: '100px',
+                    textAlign: 'center'
+                  }}
+                >
+                  {translateBubble.result ? (
+                    <div style={{ lineHeight: '1.4' }}>{translateBubble.result}</div>
+                  ) : (
+                    <button
+                      onClick={handleTranslateClick}
+                      style={{
+                        background: '#3b82f6',
+                        border: 'none',
+                        borderRadius: '4px',
+                        color: 'white',
+                        padding: '4px 8px',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        fontSize: '0.7rem'
+                      }}
+                    >
+                      {translateBubble.loading ? '...' : 'TRANSLATE'}
+                    </button>
+                  )}
+                </div>
+              )}
+
               <div style={{ width: '100%', padding: '16px 0', cursor: 'grab', flexShrink: 0 }}>
                 <div
                   style={{ width: '48px', height: '6px', backgroundColor: '#666', borderRadius: '10px', margin: '0 auto' }}
