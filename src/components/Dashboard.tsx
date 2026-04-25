@@ -153,11 +153,11 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
         
         {/* Row 2: Review Controls */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
-          <div className="mobile-action-row" style={{ display: 'flex', gap: '8px' }}>
-            <button onClick={handleDailyReview} className="btn-review" style={{ flex: 1, marginBottom: 0 }}>
+          <div className="flex flex-col md:flex-row gap-2 w-full">
+            <button onClick={handleDailyReview} className="btn-review w-full" style={{ flex: 1, marginBottom: 0 }}>
               ⚡ START DAILY REVIEW
             </button>
-            <div style={{ display: 'flex', background: 'var(--surface)', borderRadius: '4px', padding: '4px', border: '1px solid var(--border)', flex: 1.5 }}>
+            <div className="w-full" style={{ display: 'flex', background: 'var(--surface)', borderRadius: '4px', padding: '4px', border: '1px solid var(--border)', flex: 1.5 }}>
               <button 
                 onClick={() => setReviewVibe('chill')}
                 style={{ flex: 1, border: 'none', background: reviewVibe === 'chill' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'chill' ? 'black' : '#666', borderRadius: '2px', padding: '6px 4px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
@@ -181,7 +181,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
         </div>
 
         {/* Row 3: 3-Way Navigation Switcher */}
-        <div className="dashboard__view-toggle" style={{ 
+        <div className="dashboard__view-toggle overflow-x-auto hide-scrollbar" style={{ 
           marginBottom: '16px', 
           display: 'grid', 
           gridTemplateColumns: '1fr 1fr 1fr', 
@@ -189,26 +189,27 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
           padding: '4px', 
           background: 'var(--surface)', 
           borderRadius: '4px', 
-          border: '1px solid var(--border)' 
+          border: '1px solid var(--border)',
+          width: '100%'
         }}>
           <button 
             onClick={() => setActiveView('vocab')} 
-            className={`btn-toggle ${activeView === 'vocab' ? 'active' : ''}`}
-            style={{ fontSize: '0.65rem', padding: '10px 4px', margin: 0, width: '100%', background: activeView === 'vocab' ? 'var(--gold)' : 'transparent', color: activeView === 'vocab' ? 'black' : 'inherit' }}
+            className={`btn-toggle text-xs md:text-sm px-2 py-3 ${activeView === 'vocab' ? 'active' : ''}`}
+            style={{ margin: 0, width: '100%', background: activeView === 'vocab' ? 'var(--gold)' : 'transparent', color: activeView === 'vocab' ? 'black' : 'inherit' }}
           >
             VOCAB
           </button>
           <button 
             onClick={() => setActiveView('roadmap')} 
-            className={`btn-toggle ${activeView === 'roadmap' ? 'active' : ''}`}
-            style={{ fontSize: '0.65rem', padding: '10px 4px', margin: 0, width: '100%', background: activeView === 'roadmap' ? 'var(--gold)' : 'transparent', color: activeView === 'roadmap' ? 'black' : 'inherit' }}
+            className={`btn-toggle text-xs md:text-sm px-2 py-3 ${activeView === 'roadmap' ? 'active' : ''}`}
+            style={{ margin: 0, width: '100%', background: activeView === 'roadmap' ? 'var(--gold)' : 'transparent', color: activeView === 'roadmap' ? 'black' : 'inherit' }}
           >
             ROADMAP
           </button>
           <button 
             onClick={() => setActiveView('phrasebook')} 
-            className={`btn-toggle ${activeView === 'phrasebook' ? 'active' : ''}`}
-            style={{ fontSize: '0.65rem', padding: '10px 4px', margin: 0, width: '100%', background: activeView === 'phrasebook' ? 'var(--gold)' : 'transparent', color: activeView === 'phrasebook' ? 'black' : 'inherit' }}
+            className={`btn-toggle text-xs md:text-sm px-2 py-3 ${activeView === 'phrasebook' ? 'active' : ''}`}
+            style={{ margin: 0, width: '100%', background: activeView === 'phrasebook' ? 'var(--gold)' : 'transparent', color: activeView === 'phrasebook' ? 'black' : 'inherit' }}
           >
             PHRASEBOOK
           </button>

@@ -56,7 +56,7 @@ select {
   display: flex;
   height: 100dvh;
   background: var(--bg);
-  overflow-x: auto;
+  overflow-x: hidden;
 }
 
 .dashboard {
@@ -64,11 +64,33 @@ select {
   display: flex;
   flex-direction: column;
   height: 100%;
-  min-width: 600px;
+  width: 100%;
   background: var(--bg);
   background-image: 
     radial-gradient(circle at 0% 0%, rgba(255, 191, 0, 0.02) 0%, transparent 40%),
     radial-gradient(circle at 100% 100%, rgba(255, 191, 0, 0.02) 0%, transparent 40%);
+}
+
+/* Tailwind-like utilities */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.gap-2 { gap: 0.5rem; }
+.w-full { width: 100%; }
+.overflow-x-auto { overflow-x: auto; }
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.text-xs { font-size: 0.75rem; }
+.px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+.py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+
+@media (min-width: 768px) {
+  .md\:flex-row { flex-direction: row; }
+  .md\:text-sm { font-size: 0.875rem; }
 }
 
 .dashboard__header {

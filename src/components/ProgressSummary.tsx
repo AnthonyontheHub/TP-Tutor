@@ -22,7 +22,7 @@ export default function ProgressSummary({ activeFilter, onFilterClick }: Props) 
 
   return (
     <div style={{ background: '#111', borderRadius: '16px', padding: '14px', border: '1px solid #222', marginBottom: '14px' }}>
-      <div className="status-grid-mobile" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '6px' }}>
+      <div className="status-grid-mobile overflow-x-auto hide-scrollbar" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '6px' }}>
         {statusItems.map((item) => {
           const isActive = activeFilter === item.status;
           const isDimmed = activeFilter !== null && !isActive;
