@@ -116,14 +116,17 @@ export interface Chapter {
   concepts: GrammarConcept[];
 }
 
-// ─── Vocabulary ───────────────────────────────────────────────────────────────
+// ─── Vocabulary & Grammar ──────────────────────────────────────────────────
+
+export type ItemType = 'word' | 'grammar';
 
 export interface VocabWord {
   id: string;
   word: string;
   partOfSpeech: string;
   meanings: string;
-  // confidenceScore is the source of truth (0–100).
+  type: ItemType; // Added for Phase 1
+  // confidenceScore is the source of truth (0–500).
   // status is derived from it via scoreToStatus() and kept in sync.
   confidenceScore: number;
   status: MasteryStatus;
@@ -131,6 +134,24 @@ export interface VocabWord {
   frequencyRank: number;
   isMasteryCandidate: boolean;
   sessionNotes: string;
+}
+
+// ─── Curriculum ──────────────────────────────────────────────────────────────
+
+export type NodeStatus = 'locked' | 'active' | 'mastered';
+
+export interface CurriculumNode {
+  id: string;
+  title: string;
+  requiredVocabIds: string[];
+  requiredGrammarIds: string[];
+  status: NodeStatus;
+}
+
+export interface CurriculumLevel {
+  id: string;
+  title: string;
+  nodes: CurriculumNode[];
 }
 
 // ─── Top-level Map ────────────────────────────────────────────────────────────
@@ -147,7 +168,7 @@ export interface MasteryMap {
   profileImage: string;
   curriculumLevel: string;
   lastUpdated: string;
-  chapters: Chapter[];   // index 0 = Introduction
+  levels: CurriculumLevel[];
   vocabulary: VocabWord[];
 
   // NEW FEATURES
@@ -155,6 +176,7 @@ export interface MasteryMap {
   currentStreak: number;
   lastActiveDate: string;
 }
+
 
 
 // ─── Status summary helper type ───────────────────────────────────────────────

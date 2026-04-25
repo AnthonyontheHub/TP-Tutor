@@ -128,8 +128,12 @@ export default function VocabCard({ word, onLongPress, onClick }: Props) {
         />
       </svg>
 
-      <div className="vocab-card__word">{word.word}</div>
-      <div className="vocab-card__pos">{word.partOfSpeech}</div>
+      <div className="vocab-card__word">
+        {word.type === 'grammar' ? word.sessionNotes : word.word}
+      </div>
+      <div className="vocab-card__pos">
+        {word.type === 'grammar' ? 'GRAMMAR' : word.partOfSpeech}
+      </div>
     </div>
   );
 }

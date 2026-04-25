@@ -1,18 +1,19 @@
-/* src/components/MosaicGrid.tsx */
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef } from 'react';
 import { motion, useAnimation, AnimatePresence } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
+import DailyReviewWidget from './widgets/DailyReviewWidget';
+import RoadmapWidget from './widgets/RoadmapWidget';
+import VocabWing from './widgets/VocabWing';
+import PhraseWing from './widgets/PhraseWing';
 import LiveTile from './LiveTile';
-import VocabCard from './VocabCard';
-import PhraseGrid from './PhraseGrid';
-import ProgressSummary from './ProgressSummary';
+
 import UserProfilePanel from './UserProfilePanel';
 import SettingsPanel from './SettingsPanel';
 import InstructionsPanel from './InstructionsPanel';
 import AchievementsPanel from './AchievementsPanel';
 import ChatSession from './ChatSession';
+
 import type { AppPanel } from '../App';
-import type { MasteryStatus, VocabWord } from '../types/mastery';
 
 interface Props {
   onAskLina: (p: string) => void;
@@ -20,55 +21,32 @@ interface Props {
   setIsSandboxMode: (val: boolean) => void;
 }
 
-const GUTTER = 16;
-const TILE_SIZE = 160;
-
 export default function MosaicGrid({ onAskLina, isSandboxMode, setIsSandboxMode }: Props) {
   const controls = useAnimation();
-  const containerRef = useRef<HTMLDivElement>(null);
-  
   const { 
-    studentName, vocabulary, concepts, savedPhrases, 
-    activeCurriculumId, activeModuleId, curriculums,
-    reviewVibe, setReviewVibe
+    vocabulary, levels, reviewVibe, 
+    fogOfWar, showCircuitPaths 
   } = useMasteryStore();
 
   const [expandedTile, setExpandedTile] = useState<AppPanel | 'roadmap' | 'review' | string | null>(null);
 
-  // SNAP ZONES
-  // Center: (0, 0)
-  // Left (Vocab): (100vw, 0) -> we pull the grid right
-  // Right (Phrases): (-100vw, 0) -> we pull the grid left
-  // Bottom (Achievements): (0, -100vh) -> we pull the grid up
-
   const handleDragEnd = (event: any, info: any) => {
-    const { offset } = info;
+    const { offset, velocity } = info;
     const threshold = 150;
 
     let targetX = 0;
-    let targetY = 0;
+    // We start at x: 0 (center spine)
+    // Left Wing (Vocab) is at x: 100vw
+    // Right Wing (Phrases) is at x: -100vw
 
-    if (offset.x > threshold) targetX = window.innerWidth;
-    else if (offset.x < -threshold) targetX = -window.innerWidth;
-
-    if (offset.y < -threshold) targetY = -window.innerHeight;
+    if (offset.x > threshold || velocity.x > 500) targetX = window.innerWidth;
+    else if (offset.x < -threshold || velocity.x < -500) targetX = -window.innerWidth;
 
     controls.start({
       x: targetX,
-      y: targetY,
       transition: { type: 'spring', damping: 25, stiffness: 200 }
     });
   };
-
-  const calculateProgress = () => {
-    const totalItems = vocabulary.length + concepts.length;
-    const masteredItems = vocabulary.filter(v => v.status === 'mastered').length + 
-                         concepts.filter(c => c.status === 'mastered').length;
-    return Math.round((masteredItems / totalItems) * 100);
-  };
-
-  const activeCurriculum = curriculums.find(c => c.id === activeCurriculumId);
-  const progress = calculateProgress();
 
   const handleDailyReview = () => {
     let targetWords: string[] = [];
@@ -94,117 +72,129 @@ export default function MosaicGrid({ onAskLina, isSandboxMode, setIsSandboxMode 
   };
 
   return (
-    <div style={{ width: '100vw', height: '100vh', overflow: 'hidden', position: 'relative', background: '#050505' }}>
+    <div style={{ 
+      width: '100vw', height: '100vh', overflow: 'hidden', 
+      position: 'relative', background: '#020202' 
+    }}>
+      {/* SVG CONNECTIONS (CIRCUIT PATHS) */}
+      {showCircuitPaths && (
+        <svg style={{ position: 'absolute', inset: 0, pointerEvents: 'none', opacity: 0.1, zIndex: 1 }}>
+          <motion.path 
+            d="M -100 500 Q 500 400 1100 500 T 2100 500" 
+            stroke="var(--gold)" 
+            strokeWidth="1" 
+            fill="none"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+          />
+          <motion.circle 
+            r="2" 
+            fill="var(--gold)"
+            animate={{ 
+              offsetDistance: ["0%", "100%"],
+              opacity: [0, 1, 0]
+            }}
+            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+            style={{ offsetPath: "path('M -100 500 Q 500 400 1100 500 T 2100 500')" }}
+          />
+        </svg>
+      )}
+
       <motion.div
-        drag
-        dragConstraints={{ left: -window.innerWidth, right: window.innerWidth, top: -window.innerHeight, bottom: 0 }}
-        dragElastic={0.2}
+        drag="x"
         onDragEnd={handleDragEnd}
         animate={{
           ...controls,
           scale: expandedTile ? 0.95 : 1,
-          opacity: expandedTile ? 0.3 : 1,
-          filter: expandedTile ? 'blur(10px)' : 'blur(0px)'
+          opacity: expandedTile ? 0.4 : 1,
+          filter: expandedTile ? 'blur(4px)' : 'blur(0px)'
         }}
         style={{
           width: '300vw',
-          height: '200vh',
+          height: '100vh',
           position: 'absolute',
           top: 0,
           left: '-100vw',
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr 1fr',
-          gridTemplateRows: '1fr 1fr',
+          display: 'flex',
+          zIndex: 2,
           cursor: 'grab'
         }}
       >
-        {/* LEFT WING: VOCAB GRID */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(6, 1fr)', 
-            gap: GUTTER, 
-            maxHeight: '90vh', 
-            overflowY: 'auto',
-            paddingRight: '20px'
-          }}>
-            <h2 className="section-title" style={{ gridColumn: 'span 6' }}>NEURAL MAP: VOCABULARY</h2>
-            {vocabulary.map(v => (
-              <LiveTile key={v.id} size="1x1" status={v.status}>
-                <VocabCard word={v} />
-              </LiveTile>
-            ))}
-            {concepts.map(c => (
-              <LiveTile key={c.id} size="2x1" status={c.status} variant="grammar">
-                <div style={{ padding: '12px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                  <div style={{ fontSize: '0.6rem', color: 'var(--gold)', fontWeight: 900 }}>CONCEPT</div>
-                  <div style={{ fontWeight: 800, fontSize: '0.9rem' }}>{c.title}</div>
-                </div>
-              </LiveTile>
-            ))}
-          </div>
+        {/* LEFT WING: VOCAB */}
+        <div style={{ width: '100vw', height: '100vh', overflowY: 'auto', display: 'flex', justifyContent: 'center' }}>
+          <VocabWing />
         </div>
 
-        {/* CENTER: CORE TILES */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: GUTTER }}>
-            <LiveTile size="2x1" status="mastered" onClick={handleDailyReview}>
-               <div style={{ padding: '20px', background: 'var(--gold)', color: 'black', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                 <div style={{ fontWeight: 900, fontSize: '1.2rem' }}>DAILY REVIEW</div>
-                 <div style={{ fontSize: '0.7rem', fontWeight: 700 }}>SYNC NEURAL PATHWAYS</div>
+        {/* CENTER SPINE */}
+        <div style={{ 
+          width: '100vw', height: '100vh', overflowY: 'auto', 
+          display: 'flex', flexDirection: 'column', alignItems: 'center',
+          padding: '100px 0', gap: '40px', scrollSnapType: 'y mandatory'
+        }}>
+          <div style={{ scrollSnapAlign: 'center' }}>
+            <DailyReviewWidget onStartReview={handleDailyReview} />
+          </div>
+
+          <div style={{ scrollSnapAlign: 'center' }}>
+            <RoadmapWidget onClick={() => setExpandedTile('roadmap')} />
+          </div>
+
+          {/* CURRICULUM NODES IN SPINE */}
+          <div style={{ width: '100%', maxWidth: '700px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+             {levels.map(level => (
+               <div key={level.id} style={{ opacity: fogOfWar === 'Strict' && level.nodes.every(n => n.status === 'locked') ? 0 : 1 }}>
+                 <h4 style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)', fontWeight: 900, marginBottom: '10px' }}>
+                   {level.title.toUpperCase()}
+                 </h4>
+                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                   {level.nodes.map(node => (
+                     <div 
+                        key={node.id} 
+                        style={{ 
+                          padding: '16px', 
+                          background: node.status === 'mastered' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(255,255,255,0.03)',
+                          border: `1px solid ${node.status === 'active' ? 'var(--gold)' : 'var(--border)'}`,
+                          borderRadius: '6px',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          opacity: node.status === 'locked' ? 0.4 : 1,
+                          filter: node.status === 'locked' && fogOfWar === 'Visible' ? 'grayscale(1)' : 'none'
+                        }}
+                     >
+                       <span style={{ fontWeight: 800 }}>{node.title}</span>
+                       <span style={{ fontSize: '0.7rem', fontWeight: 900, color: node.status === 'active' ? 'var(--gold)' : 'inherit' }}>
+                         {node.status.toUpperCase()}
+                       </span>
+                     </div>
+                   ))}
+                 </div>
                </div>
-            </LiveTile>
-
-            <LiveTile size="2x2" status="practicing" onClick={() => setExpandedTile('roadmap')}>
-              <div style={{ padding: '20px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                <div>
-                  <div style={{ fontSize: '0.7rem', color: 'var(--gold)', fontWeight: 900 }}>CURRICULUM ROADMAP</div>
-                  <div style={{ fontSize: '1.4rem', fontWeight: 900 }}>{activeCurriculum?.title || 'Basics'}</div>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--gold)' }}>{progress}%</div>
-                  <div style={{ fontSize: '0.6rem', fontWeight: 700, opacity: 0.6 }}>COMPLETE</div>
-                </div>
-              </div>
-            </LiveTile>
-
-            <LiveTile size="1x1" status="introduced" onClick={() => setExpandedTile('settings')}>
-              <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem' }}>⚙️</div>
-            </LiveTile>
-            <LiveTile size="1x1" status="confident" onClick={() => setExpandedTile('profile')}>
-              <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem' }}>👤</div>
-            </LiveTile>
-            <LiveTile size="2x1" status="not_started" onClick={() => setExpandedTile('instructions')}>
-              <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '1.5rem' }}>❓</span>
-                <span style={{ fontWeight: 800 }}>PROTOCOLS</span>
-              </div>
-            </LiveTile>
+             ))}
           </div>
-        </div>
 
-        {/* RIGHT WING: PHRASEBOOK */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: GUTTER }}>
-            <h2 className="section-title" style={{ gridColumn: 'span 2' }}>PHRASEBOOK: SAVED LINKAGES</h2>
-            {savedPhrases.slice(0, 4).map((p, i) => (
-              <LiveTile key={i} size="2x1" status="mastered">
-                <div style={{ padding: '12px', fontSize: '0.8rem', fontWeight: 700 }}>
-                  {typeof p === 'string' ? p : p.tp}
+          {/* UTILITY TILES */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', width: '100%', maxWidth: '700px' }}>
+             <LiveTile size="1x1" status="introduced" onClick={() => setExpandedTile('settings')}>
+                <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '2rem' }}>⚙️</span>
+                  <span style={{ fontWeight: 900, fontSize: '0.6rem' }}>SETTINGS</span>
                 </div>
-              </LiveTile>
-            ))}
-          </div>
-        </div>
-
-        {/* BOTTOM LEFT: (EMPTY) */}
-        <div></div>
-
-        {/* BOTTOM CENTER: ACHIEVEMENTS */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: GUTTER }}>
-            <h2 className="section-title" style={{ gridColumn: 'span 2' }}>BREAKTHROUGH LOGS</h2>
-            <LiveTile size="2x1" status="confident" onClick={() => setExpandedTile('achievements')}>
+             </LiveTile>
+             <LiveTile size="1x1" status="confident" onClick={() => setExpandedTile('profile')}>
+                <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '2rem' }}>👤</span>
+                  <span style={{ fontWeight: 900, fontSize: '0.6rem' }}>PROFILE</span>
+                </div>
+             </LiveTile>
+             <LiveTile size="2x1" status="not_started" onClick={() => setExpandedTile('instructions')}>
+                <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+                  <span style={{ fontSize: '1.5rem' }}>❓</span>
+                  <span style={{ fontWeight: 800 }}>PROTOCOLS</span>
+                </div>
+             </LiveTile>
+             <LiveTile size="2x1" status="confident" onClick={() => setExpandedTile('achievements')}>
               <div style={{ padding: '20px', display: 'flex', alignItems: 'center', gap: '15px' }}>
                 <span style={{ fontSize: '2rem' }}>🏆</span>
                 <div>
@@ -216,54 +206,43 @@ export default function MosaicGrid({ onAskLina, isSandboxMode, setIsSandboxMode 
           </div>
         </div>
 
-        {/* BOTTOM RIGHT: (EMPTY) */}
-        <div></div>
+        {/* RIGHT WING: PHRASEBOOK */}
+        <div style={{ width: '100vw', height: '100vh', overflowY: 'auto', display: 'flex', justifyContent: 'center' }}>
+          <PhraseWing />
+        </div>
       </motion.div>
 
+      {/* EXPANDED MODALS (LAYERED DEPTH) */}
       <AnimatePresence>
-        {expandedTile === 'profile' && (
+        {expandedTile && expandedTile !== 'chat' && (
           <ModalWrapper onClose={() => setExpandedTile(null)}>
-            <UserProfilePanel isOpen={true} onClose={() => setExpandedTile(null)} />
-          </ModalWrapper>
-        )}
-        {expandedTile === 'settings' && (
-          <ModalWrapper onClose={() => setExpandedTile(null)}>
-            <SettingsPanel isOpen={true} onClose={() => setExpandedTile(null)} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} />
-          </ModalWrapper>
-        )}
-        {expandedTile === 'achievements' && (
-          <ModalWrapper onClose={() => setExpandedTile(null)}>
-            <AchievementsPanel onClose={() => setExpandedTile(null)} />
-          </ModalWrapper>
-        )}
-        {expandedTile === 'instructions' && (
-          <ModalWrapper onClose={() => setExpandedTile(null)}>
-            <InstructionsPanel isOpen={true} onClose={() => setExpandedTile(null)} />
-          </ModalWrapper>
-        )}
-        {expandedTile === 'roadmap' && (
-          <ModalWrapper onClose={() => setExpandedTile(null)}>
-            <div style={{ padding: '40px', background: 'var(--surface-opaque)', height: '100%', overflowY: 'auto' }}>
-              <h1 style={{ color: 'var(--gold)', fontWeight: 900, marginBottom: '20px' }}>NEURAL PATHWAY ROADMAP</h1>
-              {curriculums.map(c => (
-                <div key={c.id} style={{ marginBottom: '30px' }}>
-                  <h2 style={{ fontSize: '1rem', borderBottom: '1px solid var(--border)', paddingBottom: '10px', marginBottom: '15px' }}>{c.title}</h2>
-                  <div style={{ display: 'grid', gap: '10px' }}>
-                    {c.modules.map(m => (
-                      <div key={m.id} style={{ padding: '15px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: '4px', display: 'flex', justifyContent: 'space-between' }}>
-                        <span>{m.title}</span>
-                        <span style={{ color: 'var(--gold)', fontWeight: 800 }}>LOCKED</span>
+            {expandedTile === 'profile' && <UserProfilePanel isOpen={true} onClose={() => setExpandedTile(null)} />}
+            {expandedTile === 'settings' && <SettingsPanel isOpen={true} onClose={() => setExpandedTile(null)} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} />}
+            {expandedTile === 'achievements' && <AchievementsPanel onClose={() => setExpandedTile(null)} />}
+            {expandedTile === 'instructions' && <InstructionsPanel isOpen={true} onClose={() => setExpandedTile(null)} />}
+            {expandedTile === 'roadmap' && (
+               <div style={{ padding: '40px', background: 'var(--surface-opaque)', height: '100%', overflowY: 'auto' }}>
+                  <h1 style={{ color: 'var(--gold)', fontWeight: 900, marginBottom: '20px' }}>NEURAL PATHWAY ROADMAP</h1>
+                  {levels.map(level => (
+                    <div key={level.id} style={{ marginBottom: '30px' }}>
+                      <h2 style={{ fontSize: '1rem', borderBottom: '1px solid var(--border)', paddingBottom: '10px', marginBottom: '15px' }}>{level.title}</h2>
+                      <div style={{ display: 'grid', gap: '10px' }}>
+                        {level.nodes.map(m => (
+                          <div key={m.id} style={{ padding: '15px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: '4px', display: 'flex', justifyContent: 'space-between' }}>
+                            <span>{m.title}</span>
+                            <span style={{ color: m.status === 'active' ? 'var(--gold)' : 'inherit', fontWeight: 800 }}>{m.status.toUpperCase()}</span>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
+                    </div>
+                  ))}
+               </div>
+            )}
           </ModalWrapper>
         )}
       </AnimatePresence>
 
-      {/* CHAT FAB (ALWAYS ACCESSIBLE) */}
+      {/* CHAT FAB */}
       <button 
         onClick={() => setExpandedTile('chat')}
         style={{
@@ -289,9 +268,9 @@ export default function MosaicGrid({ onAskLina, isSandboxMode, setIsSandboxMode 
 function ModalWrapper({ children, onClose }: { children: React.ReactNode, onClose: () => void }) {
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 20 }}
       style={{
         position: 'fixed', inset: 0, zIndex: 2000,
         background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(20px)',
@@ -300,7 +279,12 @@ function ModalWrapper({ children, onClose }: { children: React.ReactNode, onClos
       }}
       onClick={onClose}
     >
-      <div onClick={e => e.stopPropagation()} style={{ width: '100%', maxWidth: '800px', height: '90vh', overflow: 'hidden', position: 'relative' }}>
+      <div onClick={e => e.stopPropagation()} style={{ 
+        width: '100%', maxWidth: '800px', maxHeight: '90vh', 
+        overflow: 'hidden', position: 'relative',
+        background: '#0a0a0a', border: '1px solid var(--border)',
+        borderRadius: '8px', boxShadow: '0 20px 50px rgba(0,0,0,0.5)'
+      }}>
         {children}
       </div>
     </motion.div>

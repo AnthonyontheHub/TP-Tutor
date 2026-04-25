@@ -1,93 +1,107 @@
-/* src/components/SettingsPanel.tsx */
-import { motion } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
 
-interface Props {
+export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSandboxMode }: {
   isOpen: boolean;
   onClose: () => void;
   isSandboxMode: boolean;
   setIsSandboxMode: (val: boolean) => void;
-}
+}) {
+  const { 
+    widgetDensity, setWidgetDensity,
+    fogOfWar, setFogOfWar,
+    showCircuitPaths, setShowCircuitPaths,
+    resetAsNewUser, masterAllVocab, randomizeVocab
+  } = useMasteryStore();
 
-export default function SettingsPanel({ onClose, isSandboxMode, setIsSandboxMode }: Props) {
-  const { resetProfileAndRunSetup, resetAsNewUser, randomizeVocab, masterAllVocab } = useMasteryStore();
-
-  const handleResetSetup = () => {
-    if (confirm("Clear profile/lore and restart onboarding? Vocabulary progress is preserved. Continue?")) {
-      resetProfileAndRunSetup();
-      onClose();
-    }
-  };
+  if (!isOpen) return null;
 
   return (
-    <motion.div
-      className="side-panel"
-      initial={{ x: '100%' }}
-      animate={{ x: 0 }}
-      exit={{ x: '100%' }}
-      transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-    >
-      <header className="side-panel-header" style={{ justifyContent: 'space-between' }}>
-        <h2 style={{ fontSize: '0.9rem', fontWeight: 900, letterSpacing: '0.15em', color: 'var(--gold)' }}>SYSTEM CONFIG</h2>
-        <button onClick={onClose} className="btn-close-glowing">✕</button>
-      </header>
+    <div style={{ padding: '40px', background: 'var(--surface-opaque)', height: '100%', overflowY: 'auto' }}>
+      <h1 style={{ color: 'var(--gold)', fontWeight: 900, marginBottom: '32px', letterSpacing: '0.1em' }}>SYSTEM CONFIGURATION</h1>
 
-      <div className="side-panel-content">
-        <div className="glass-panel" style={{ marginBottom: '24px' }}>
-          <h3 className="section-title" style={{ fontSize: '0.6rem' }}>Session Protocol</h3>
-          
-          <div className="settings-row" onClick={() => setIsSandboxMode(!isSandboxMode)}>
+      <section style={{ marginBottom: '40px' }}>
+        <h2 style={{ fontSize: '0.8rem', fontWeight: 900, opacity: 0.5, marginBottom: '20px' }}>DASHBOARD VISUALS</h2>
+        
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <div style={{ fontWeight: 700, fontSize: '0.85rem' }}>Sandbox Mode</div>
-              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Local execution only (No API)</div>
+              <div style={{ fontWeight: 800 }}>WIDGET DENSITY</div>
+              <div style={{ fontSize: '0.7rem', opacity: 0.6 }}>Adjust information level on tiles</div>
             </div>
-            <input type="checkbox" checked={isSandboxMode} onChange={() => {}} className="settings-checkbox" />
+            <div style={{ display: 'flex', background: 'var(--surface)', padding: '4px', borderRadius: '4px', border: '1px solid var(--border)' }}>
+              <button 
+                onClick={() => setWidgetDensity('Compact')}
+                style={{ 
+                  border: 'none', background: widgetDensity === 'Compact' ? 'var(--gold)' : 'transparent', 
+                  color: widgetDensity === 'Compact' ? 'black' : 'white', padding: '6px 12px', fontSize: '0.7rem', fontWeight: 800, cursor: 'pointer' 
+                }}
+              >COMPACT</button>
+              <button 
+                onClick={() => setWidgetDensity('Expanded')}
+                style={{ 
+                  border: 'none', background: widgetDensity === 'Expanded' ? 'var(--gold)' : 'transparent', 
+                  color: widgetDensity === 'Expanded' ? 'black' : 'white', padding: '6px 12px', fontSize: '0.7rem', fontWeight: 800, cursor: 'pointer' 
+                }}
+              >EXPANDED</button>
+            </div>
           </div>
 
-          <div style={{ marginTop: '20px' }}>
-            <label className="section-title" style={{ fontSize: '0.55rem' }}>Neural Key (Gemini API)</label>
-            <input 
-              type="password" 
-              placeholder="Paste encrypted key..."
-              className="settings-input"
-              style={{ fontSize: '0.8rem', padding: '10px' }}
-              value={localStorage.getItem('TP_GEMINI_KEY') || ''}
-              onChange={(e) => localStorage.setItem('TP_GEMINI_KEY', e.target.value)}
-            />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <div style={{ fontWeight: 800 }}>FOG OF WAR</div>
+              <div style={{ fontSize: '0.7rem', opacity: 0.6 }}>Visibility of future curriculum nodes</div>
+            </div>
+            <div style={{ display: 'flex', background: 'var(--surface)', padding: '4px', borderRadius: '4px', border: '1px solid var(--border)' }}>
+              <button 
+                onClick={() => setFogOfWar('Strict')}
+                style={{ 
+                  border: 'none', background: fogOfWar === 'Strict' ? 'var(--gold)' : 'transparent', 
+                  color: fogOfWar === 'Strict' ? 'black' : 'white', padding: '6px 12px', fontSize: '0.7rem', fontWeight: 800, cursor: 'pointer' 
+                }}
+              >STRICT</button>
+              <button 
+                onClick={() => setFogOfWar('Visible')}
+                style={{ 
+                  border: 'none', background: fogOfWar === 'Visible' ? 'var(--gold)' : 'transparent', 
+                  color: fogOfWar === 'Visible' ? 'black' : 'white', padding: '6px 12px', fontSize: '0.7rem', fontWeight: 800, cursor: 'pointer' 
+                }}
+              >VISIBLE</button>
+            </div>
           </div>
-        </div>
 
-        <div className="glass-panel" style={{ marginBottom: '24px' }}>
-          <h3 className="section-title" style={{ fontSize: '0.6rem' }}>Onboarding</h3>
-          <button onClick={handleResetSetup} className="btn-settings" style={{ fontSize: '0.75rem', padding: '10px' }}>
-            RE-INITIALIZE SETUP
-          </button>
-        </div>
-
-        <div className="danger-zone" style={{ borderColor: 'rgba(239, 68, 68, 0.1)' }}>
-          <h3 className="section-title" style={{ color: '#ef4444', fontSize: '0.6rem' }}>Terminal Command (Wipe)</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <div style={{ fontWeight: 800 }}>CIRCUIT PATHS</div>
+              <div style={{ fontSize: '0.7rem', opacity: 0.6 }}>Render neural connection streams</div>
+            </div>
             <button 
-              onClick={() => {
-                if (confirm("EXTREME DANGER: Permanent wipe of all progress. Proceed?")) {
-                  resetAsNewUser();
-                  onClose();
-                }
+              onClick={() => setShowCircuitPaths(!showCircuitPaths)}
+              style={{ 
+                border: '1px solid var(--border)', background: showCircuitPaths ? 'var(--gold)' : 'transparent', 
+                color: showCircuitPaths ? 'black' : 'white', padding: '8px 16px', fontSize: '0.7rem', fontWeight: 900, borderRadius: '4px', cursor: 'pointer' 
               }}
-              className="btn-danger"
-              style={{ padding: '10px', fontSize: '0.7rem' }}
             >
-              FULL DATA PURGE
-            </button>
-            <button onClick={() => randomizeVocab()} className="btn-danger" style={{ padding: '10px', fontSize: '0.7rem', color: '#c084fc', borderColor: 'rgba(192, 132, 252, 0.1)' }}>
-              RANDOMIZE NEURAL MAP
-            </button>
-            <button onClick={() => masterAllVocab()} className="btn-danger" style={{ padding: '10px', fontSize: '0.7rem', color: 'var(--gold)', borderColor: 'rgba(255, 191, 0, 0.1)' }}>
-              FORCE FULL MASTERY
+              {showCircuitPaths ? 'ACTIVE' : 'DISABLED'}
             </button>
           </div>
         </div>
-      </div>
-    </motion.div>
+      </section>
+
+      <section style={{ marginBottom: '40px' }}>
+        <h2 style={{ fontSize: '0.8rem', fontWeight: 900, opacity: 0.5, marginBottom: '20px' }}>DEVELOPER PROTOCOLS</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <button onClick={() => setIsSandboxMode(!isSandboxMode)} className="btn-secondary" style={{ borderColor: isSandboxMode ? 'var(--gold)' : 'var(--border)' }}>
+            SANDBOX: {isSandboxMode ? 'ON' : 'OFF'}
+          </button>
+          <button onClick={randomizeVocab} className="btn-secondary">RANDOMIZE SYNC</button>
+          <button onClick={masterAllVocab} className="btn-secondary">FORCE TOTAL MASTERY</button>
+          <button onClick={resetAsNewUser} className="btn-secondary" style={{ color: 'var(--red)', borderColor: 'var(--red)' }}>WIPE NEURAL CACHE</button>
+        </div>
+      </section>
+
+      <button onClick={onClose} className="btn-primary" style={{ width: '100%', marginTop: '20px' }}>
+        CLOSE CONFIGURATION
+      </button>
+    </div>
   );
 }

@@ -4,23 +4,21 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { doc, setDoc, onSnapshot, getDoc } from 'firebase/firestore';
 import type { Unsubscribe } from 'firebase/firestore';
-import type { MasteryStatus, VocabWord, StatusSummary, SavedPhrase, UserProfile, LoreEntry, ReviewVibe, LoreCategory } from '../types/mastery';
+import type { 
+  MasteryStatus, VocabWord, StatusSummary, SavedPhrase, 
+  UserProfile, LoreEntry, ReviewVibe, LoreCategory, 
+  CurriculumLevel, NodeStatus 
+} from '../types/mastery';
 import { scoreToStatus, STATUS_MIDPOINT } from '../types/mastery';
 import { initialMasteryMap } from '../data/initialMasteryMap';
 
-interface Concept {
-  id: string;
-  title: string;
-  status: MasteryStatus;
-  sessionNotes: string;
-}
-
-function toFullVocabWord(v: { word: string; status: MasteryStatus; sessionNotes: string; frequencyRank?: number }): VocabWord {
+function toFullVocabWord(v: { word: string; status: MasteryStatus; type: 'word' | 'grammar'; sessionNotes: string; frequencyRank?: number }): VocabWord {
   return {
     id: v.word,
     word: v.word,
     partOfSpeech: '',
     meanings: '',
+    type: v.type,
     confidenceScore: STATUS_MIDPOINT[v.status],
     status: v.status,
     useCount: 0,
@@ -36,7 +34,6 @@ interface MasteryActions {
   applyScoreDeltas: (deltas: { wordId: string; delta: number }[]) => void;
   updateVocabStatus: (wordIdOrText: string, status: MasteryStatus) => void;
   cycleWordStatus: (wordId: string) => void;
-  updateConceptStatus: (id: string, status: MasteryStatus) => void;
   setLastUpdated: (date: string) => void;
   savePhrase: (phrase: string | SavedPhrase) => void;
   recordActivity: () => void;
@@ -56,8 +53,12 @@ interface MasteryActions {
   syncFromCloud: (userId: string, initialName?: string, initialProfileImage?: string) => Promise<Unsubscribe | void>;
   syncToCloud: (userId?: string) => Promise<void>;
   getStatusSummary: () => StatusSummary & { xp: number; level: number; rankTitle: string };
-  setActiveLesson: (curriculumId: string, moduleId: string) => void;
   setHasCompletedSetup: (val: boolean) => void;
+  updateNodeStatus: (nodeId: string, status: NodeStatus) => void;
+  refreshCurriculumStatus: () => void;
+  setWidgetDensity: (val: 'Compact' | 'Expanded') => void;
+  setFogOfWar: (val: 'Strict' | 'Visible') => void;
+  setShowCircuitPaths: (val: boolean) => void;
 }
 
 interface MasteryState {
@@ -69,14 +70,15 @@ interface MasteryState {
   profileImage: string;
   lastUpdated: string;
   vocabulary: VocabWord[];
-  concepts: Concept[];
-  curriculums: typeof initialMasteryMap.curriculums;
-  activeCurriculumId: string | null;
-  activeModuleId: string | null;
+  levels: CurriculumLevel[];
   savedPhrases: (string | SavedPhrase)[];
   currentStreak: number;
   lastActiveDate: string;
   hasCompletedSetup: boolean;
+  // Dashboard settings
+  widgetDensity: 'Compact' | 'Expanded';
+  fogOfWar: 'Strict' | 'Visible';
+  showCircuitPaths: boolean;
 }
 
 type MasteryStore = MasteryState & MasteryActions;
@@ -96,16 +98,38 @@ export const useMasteryStore = create<MasteryStore>()(
       profileImage: '',
       lastUpdated: '',
       vocabulary: mappedVocabulary,
-      concepts: initialMasteryMap.initialConcepts,
-      curriculums: initialMasteryMap.curriculums,
-      activeCurriculumId: null,
-      activeModuleId: null,
+      levels: initialMasteryMap.roadmap,
       savedPhrases: [],
       currentStreak: 0,
       lastActiveDate: '',
       hasCompletedSetup: false,
+      widgetDensity: 'Expanded',
+      fogOfWar: 'Visible',
+      showCircuitPaths: true,
 
       setHasCompletedSetup: (val) => { set({ hasCompletedSetup: val }); void get().syncToCloud(); },
+
+      refreshCurriculumStatus: () => {
+        set((state) => {
+          const newLevels = state.levels.map(level => ({
+            ...level,
+            nodes: level.nodes.map(node => {
+              const allReqs = [...node.requiredVocabIds, ...node.requiredGrammarIds];
+              const masteryReqs = state.vocabulary.filter(v => allReqs.includes(v.id));
+              
+              const isMastered = masteryReqs.length > 0 && masteryReqs.every(v => v.status === 'mastered');
+              const isActive = masteryReqs.some(v => v.status !== 'not_started') || node.status === 'active';
+              
+              let newStatus: NodeStatus = 'locked';
+              if (isMastered) newStatus = 'mastered';
+              else if (isActive) newStatus = 'active';
+
+              return { ...node, status: newStatus };
+            })
+          }));
+          return { levels: newLevels };
+        });
+      },
 
       applyScoreDeltas: (deltas) => {
         set((state) => ({
@@ -125,6 +149,7 @@ export const useMasteryStore = create<MasteryStore>()(
             };
           }),
         }));
+        get().refreshCurriculumStatus();
         get().recordActivity();
         void get().syncToCloud();
       },
@@ -137,6 +162,7 @@ export const useMasteryStore = create<MasteryStore>()(
             return { ...w, confidenceScore: targetScore, status };
           }),
         }));
+        get().refreshCurriculumStatus();
         get().recordActivity();
         void get().syncToCloud();
       },
@@ -151,15 +177,17 @@ export const useMasteryStore = create<MasteryStore>()(
             return { ...w, confidenceScore: targetScore, status: nextStatus };
           }),
         }));
+        get().refreshCurriculumStatus();
         get().recordActivity();
         void get().syncToCloud();
       },
 
-      updateConceptStatus: (id, status) => {
+      updateNodeStatus: (nodeId, status) => {
         set((state) => ({
-          concepts: state.concepts.map((c) =>
-            c.id === id ? { ...c, status } : c
-          ),
+          levels: state.levels.map(l => ({
+            ...l,
+            nodes: l.nodes.map(n => n.id === nodeId ? { ...n, status } : n)
+          }))
         }));
         void get().syncToCloud();
       },
@@ -257,9 +285,7 @@ export const useMasteryStore = create<MasteryStore>()(
           currentStreak: 0,
           lastActiveDate: '',
           vocabulary: mappedVocabulary,
-          concepts: initialMasteryMap.initialConcepts,
-          activeCurriculumId: null,
-          activeModuleId: null,
+          levels: initialMasteryMap.roadmap,
           hasCompletedSetup: false,
         });
         void get().syncToCloud();
@@ -283,6 +309,7 @@ export const useMasteryStore = create<MasteryStore>()(
             return { ...w, confidenceScore: score, status: scoreToStatus(score) };
           })
         }));
+        get().refreshCurriculumStatus();
         void get().syncToCloud();
       },
 
@@ -290,6 +317,7 @@ export const useMasteryStore = create<MasteryStore>()(
         set((state) => ({
           vocabulary: state.vocabulary.map(w => ({ ...w, confidenceScore: 450, status: 'mastered' as MasteryStatus }))
         }));
+        get().refreshCurriculumStatus();
         void get().syncToCloud();
       },
 
@@ -305,14 +333,16 @@ export const useMasteryStore = create<MasteryStore>()(
           currentStreak: 0,
           lastActiveDate: '',
           vocabulary: mappedVocabulary,
-          concepts: initialMasteryMap.initialConcepts,
-          activeCurriculumId: null,
-          activeModuleId: null,
+          levels: initialMasteryMap.roadmap,
           hasCompletedSetup: false,
         });
       },
 
       setLastUpdated: (date) => set({ lastUpdated: date }),
+
+      setWidgetDensity: (val) => { set({ widgetDensity: val }); void get().syncToCloud(); },
+      setFogOfWar: (val) => { set({ fogOfWar: val }); void get().syncToCloud(); },
+      setShowCircuitPaths: (val) => { set({ showCircuitPaths: val }); void get().syncToCloud(); },
 
       getStatusSummary: () => {
         const { vocabulary } = get();
@@ -328,18 +358,16 @@ export const useMasteryStore = create<MasteryStore>()(
         return { ...summary, level, rankTitle };
       },
 
-      setActiveLesson: (curriculumId, moduleId) =>
-        set({ activeCurriculumId: curriculumId, activeModuleId: moduleId }),
-
       syncToCloud: async (explicitUserId) => {
-        const { vocabulary, concepts, lastUpdated, studentName, profile, lore, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup } = get();
+        const { vocabulary, levels, lastUpdated, studentName, profile, lore, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, widgetDensity, fogOfWar, showCircuitPaths } = get();
         const targetId = explicitUserId || userId;
         if (!targetId || targetId === 'guest_user') return;
 
         try {
           await setDoc(doc(db, 'users', targetId), {
-            vocabulary, concepts, lastUpdated, studentName, profile, lore, profileImage,
-            savedPhrases, currentStreak, lastActiveDate, hasCompletedSetup
+            vocabulary, levels, lastUpdated, studentName, profile, lore, profileImage,
+            savedPhrases, currentStreak, lastActiveDate, hasCompletedSetup,
+            widgetDensity, fogOfWar, showCircuitPaths
           }, { merge: true });
         } catch (err) {
           console.error('Firebase Sync Error:', err);
@@ -356,7 +384,6 @@ export const useMasteryStore = create<MasteryStore>()(
           const docSnap = await getDoc(userDocRef);
           
           if (!docSnap.exists()) {
-            // New user or no cloud data
             if (initialName && (get().studentName === 'Anthony' || !get().studentName)) {
               set({ studentName: initialName });
               get().updateProfile({ name: initialName });
@@ -368,7 +395,6 @@ export const useMasteryStore = create<MasteryStore>()(
             const { vocabulary } = get();
             const isFresh = vocabulary.every(w => w.status === 'not_started');
             if (!isFresh) {
-              console.log('Migrating local progress to Firestore...');
               await get().syncToCloud(uid);
             }
           }
@@ -385,16 +411,17 @@ export const useMasteryStore = create<MasteryStore>()(
               const base = mappedVocabulary.find(iv => iv.word === w.word);
               const useCount = typeof w.useCount === 'number' ? w.useCount : 0;
               const frequencyRank = typeof w.frequencyRank === 'number' ? w.frequencyRank : (base?.frequencyRank ?? 999);
+              const type = w.type || (base?.type ?? 'word');
               
-              if (typeof w.confidenceScore === 'number') return { ...w, useCount, frequencyRank };
+              if (typeof w.confidenceScore === 'number') return { ...w, useCount, frequencyRank, type };
               const status: MasteryStatus = w.status || 'not_started';
-              return { ...w, confidenceScore: STATUS_MIDPOINT[status], useCount, frequencyRank };
+              return { ...w, confidenceScore: STATUS_MIDPOINT[status], useCount, frequencyRank, type };
             }
           );
 
           set({
             vocabulary,
-            concepts: data.concepts || initialMasteryMap.initialConcepts,
+            levels: data.levels || initialMasteryMap.roadmap,
             lastUpdated: data.lastUpdated || '',
             studentName: data.studentName || 'Anthony',
             profile: data.profile || { name: data.studentName || 'Anthony', age: '', location: '', sex: '' },
@@ -404,6 +431,9 @@ export const useMasteryStore = create<MasteryStore>()(
             currentStreak: data.currentStreak || 0,
             lastActiveDate: data.lastActiveDate || '',
             hasCompletedSetup: data.hasCompletedSetup || false,
+            widgetDensity: data.widgetDensity || 'Expanded',
+            fogOfWar: data.fogOfWar || 'Visible',
+            showCircuitPaths: data.showCircuitPaths !== undefined ? data.showCircuitPaths : true,
           });
         });
       },
