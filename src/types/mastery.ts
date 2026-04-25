@@ -44,30 +44,30 @@ export const STATUS_META: Record<
 };
 
 // ─── Score → Status derivation ────────────────────────────────────────────────
-// Status is derived from confidenceScore; it is never stored independently.
-// New thresholds per Requirement 5:
-//  0      → not_started (usually 0)
-//  1–50   → introduced
-//  51–150 → practicing
-//  151–400→ confident
-//  401+   → mastered
+// Status is derived from baseScore (0-1000); it is never stored independently.
+// New thresholds per Lina's Scoring Engine:
+// 0–200 = ⬜ Not Started
+// 201–500 = 🔵 Introduced
+// 501–750 = 🟡 Practicing
+// 751–949 = 🟢 Confident
+// 950–1000 = ✅ Mastered
 
 export function scoreToStatus(score: number): MasteryStatus {
-  if (score > 400) return 'mastered';
-  if (score > 150) return 'confident';
-  if (score > 50) return 'practicing';
-  if (score > 0) return 'introduced';
+  if (score >= 950) return 'mastered';
+  if (score >= 751) return 'confident';
+  if (score >= 501) return 'practicing';
+  if (score >= 201) return 'introduced';
   return 'not_started';
 }
 
-// Midpoint of each tier's range — used to seed confidenceScore when reading
+// Midpoint of each tier's range — used to seed baseScore when reading
 // legacy cloud data that only has a status field.
 export const STATUS_MIDPOINT: Record<MasteryStatus, number> = {
-  not_started: 0,
-  introduced:  25,
-  practicing:  100,
-  confident:   275,
-  mastered:    450,
+  not_started: 100,
+  introduced:  350,
+  practicing:  625,
+  confident:   850,
+  mastered:    975,
 };
 
 // ─── Lore & Profile ──────────────────────────────────────────────────────────
@@ -97,6 +97,20 @@ export interface UserProfile {
 
 export type ReviewVibe = 'chill' | 'deep';
 
+// ─── Scoring Engine Types ─────────────────────────────────────────────────────
+
+export interface ScoreHistoryEntry {
+  date: string;
+  change: number;
+  reason: string;
+}
+
+export interface PartOfSpeechScores {
+  noun: number;
+  verb: number;
+  modifier: number;
+}
+
 // ─── Grammar Concepts ─────────────────────────────────────────────────────────
 
 export interface GrammarConcept {
@@ -104,6 +118,7 @@ export interface GrammarConcept {
   concept: string;
   status: MasteryStatus;
   sessionNotes: string;
+  baseScore?: number;
 }
 
 // ─── Chapters ─────────────────────────────────────────────────────────────────
@@ -125,15 +140,21 @@ export interface VocabWord {
   word: string;
   partOfSpeech: string;
   meanings: string;
-  type: ItemType; // Added for Phase 1
-  // confidenceScore is the source of truth (0–500).
+  type: ItemType; 
+  // baseScore is the source of truth (0–1000).
   // status is derived from it via scoreToStatus() and kept in sync.
-  confidenceScore: number;
+  baseScore: number;
+  confidenceScore: number; // Legacy support
   status: MasteryStatus;
   useCount: number;
   frequencyRank: number;
   isMasteryCandidate: boolean;
   sessionNotes: string;
+
+  // Deep Knowledge Scoring
+  partOfSpeechScores: PartOfSpeechScores;
+  lastReviewed: string; // ISO timestamp
+  scoreHistory: ScoreHistoryEntry[];
 }
 
 // ─── Curriculum ──────────────────────────────────────────────────────────────

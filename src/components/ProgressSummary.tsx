@@ -22,7 +22,7 @@ export default function ProgressSummary({ activeFilter, onFilterClick }: Props) 
 
   return (
     <div style={{ background: '#111', borderRadius: '16px', padding: '14px', border: '1px solid #222', marginBottom: '14px' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '6px' }}>
+      <div className="status-grid-mobile" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '6px' }}>
         {statusItems.map((item) => {
           const isActive = activeFilter === item.status;
           const isDimmed = activeFilter !== null && !isActive;
@@ -32,6 +32,7 @@ export default function ProgressSummary({ activeFilter, onFilterClick }: Props) 
             <button
               key={item.status}
               onClick={() => onFilterClick(isActive ? null : item.status)}
+              className="status-card-mobile"
               style={{
                 background: isActive ? `${item.color}22` : '#0d0d0d',
                 border: isActive ? `2px solid ${item.color}` : `1px solid ${item.color}44`,

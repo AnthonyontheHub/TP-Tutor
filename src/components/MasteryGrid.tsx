@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import VocabCard from './VocabCard';
 import WordDetailDrawer from './WordDetailDrawer';
+import SentenceBuilder from './SentenceBuilder';
 import { fetchSentenceSuggestions, fetchQuickTranslation, resolveApiKey, buildOfflineTranslation, stringifyUserContext } from '../services/linaService';
 import type { MasteryStatus, VocabWord } from '../types/mastery';
 
@@ -83,15 +84,24 @@ export default function MasteryGrid({
     if (selectedWords.length === 0) {
       setDrawerId(word.id);
     } else {
-      setSelectedWords(prev => [...prev, word.word]);
+      if (selectedWords.includes(word.word)) {
+        const firstIndex = selectedWords.indexOf(word.word);
+        if (firstIndex !== -1) {
+          const newSelected = [...selectedWords];
+          newSelected.splice(firstIndex, 1);
+          setSelectedWords(newSelected);
+        }
+      } else {
+        setSelectedWords(prev => [...prev, word.word]);
+      }
     }
   };
 
   const handleCardLongPress = (word: VocabWord) => {
-    if (selectedWords.length > 0) {
-      setSelectedWords(prev => [...prev, word.word]);
+    if (selectedWords.length === 0) {
+      setSelectedWords([word.word]);
     } else {
-      setDrawerId(word.id);
+      setSelectedWords(prev => [...prev, word.word]);
     }
   };
 
@@ -135,7 +145,7 @@ export default function MasteryGrid({
   return (
     <div
       className="mastery-grid-container"
-      style={{ paddingBottom: selectedWords.length > 0 ? '240px' : undefined }}
+      style={{ paddingBottom: selectedWords.length > 0 ? '280px' : undefined }}
       onClick={(e) => { if (e.target === e.currentTarget && selectedWords.length > 0) setSelectedWords([]); }}
     >
       <div className="grid-toolbar">
@@ -168,7 +178,7 @@ export default function MasteryGrid({
               className="grid-item-wrapper"
               style={{
                 position: 'relative',
-                opacity: (selectedWords.length > 0 && !isSelected) || isFilterDimmed ? 0.3 : 1,
+                opacity: isFilterDimmed ? 0.3 : 1,
                 cursor: 'pointer',
                 transition: 'opacity 0.25s ease',
               }}
@@ -183,31 +193,33 @@ export default function MasteryGrid({
               {positions.length > 0 && (
                 <div style={{
                   position: 'absolute',
-                  top: 3,
-                  right: 3,
+                  top: -6,
+                  right: -6,
                   display: 'flex',
                   flexWrap: 'wrap',
                   gap: '2px',
                   justifyContent: 'flex-end',
                   maxWidth: '64px',
                   pointerEvents: 'none',
+                  zIndex: 10
                 }}>
                   {positions.map(pos => (
                     <span
                       key={pos}
                       style={{
-                        background: '#3b82f6',
-                        color: 'white',
+                        background: 'var(--gold)',
+                        color: 'black',
                         borderRadius: '50%',
-                        width: '16px',
-                        height: '16px',
-                        fontSize: '0.58rem',
-                        fontWeight: 800,
+                        width: '18px',
+                        height: '18px',
+                        fontSize: '0.65rem',
+                        fontWeight: 900,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         lineHeight: 1,
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.6)',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.5)',
+                        border: '1px solid black'
                       }}
                     >
                       {pos}
@@ -220,81 +232,17 @@ export default function MasteryGrid({
         })}
       </div>
 
-      {selectedWords.length > 0 && (
-        <div className="builder-panel" onClick={(e) => e.stopPropagation()}>
-          <div className="builder-content">
-            <div style={{
-              minHeight: '20px',
-              color: isAutoTranslating ? '#444' : '#64748b',
-              fontSize: '0.78rem',
-              fontStyle: 'italic',
-              marginBottom: '12px',
-              letterSpacing: '0.01em',
-            }}>
-              {isAutoTranslating ? '· · ·' : (translation ?? '')}
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '10px', gap: '8px' }}>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', flex: 1 }}>
-                {selectedWords.map((w, idx) => {
-                  const vocab = vocabulary.find(v => v.word === w);
-                  const meaning = vocab?.meanings?.split(',')[0].trim() || '';
-                  return (
-                    <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                      <div style={{ fontSize: '0.6rem', color: '#888', textTransform: 'uppercase', fontWeight: 700, marginBottom: '2px' }}>{meaning}</div>
-                      <div style={{ color: 'white', fontSize: '1.2rem', fontWeight: 'bold' }}>{w}</div>
-                    </div>
-                  );
-                })}
-              </div>
-              <button
-                onClick={() => setSelectedWords(prev => prev.slice(0, -1))}
-                className="btn-toggle"
-                style={{ flex: 'none', width: '34px', height: '34px', padding: 0, fontSize: '0.9rem', marginBottom: '4px' }}
-                title="Remove last word"
-              >⌫</button>
-            </div>
-
-            {magneticSuggestions.length > 0 && (
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
-                {magneticSuggestions.map((s, i) => (
-                  <button
-                    key={i}
-                    className="suggestion-pill"
-                    onClick={() => { onAskLina(`Let's practice this: "${s}"`); setSelectedWords([]); }}
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
-              <button
-                onClick={() => { onAskLina(`toki jan Lina! Let's work on: "${selectedWords.join(' ')}" — is this correct Toki Pona?`); setSelectedWords([]); }}
-                className="btn-review"
-                style={{ margin: 0, fontSize: '0.72rem', padding: '10px 4px' }}
-              >
-                ASK JAN LINA
-              </button>
-              <button
-                onClick={() => setSelectedWords([])}
-                className="btn-review"
-                style={{ margin: 0, fontSize: '0.72rem', padding: '10px 4px', background: '#374151' }}
-              >
-                CLEAR
-              </button>
-              <button
-                onClick={handleSave}
-                className="btn-review"
-                style={{ margin: 0, fontSize: '0.72rem', padding: '10px 4px', background: savedConfirm ? '#10b981' : undefined }}
-              >
-                {savedConfirm ? 'SAVED ✓' : 'SAVE'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <SentenceBuilder 
+        selectedWords={selectedWords}
+        vocabulary={vocabulary}
+        translation={translation}
+        isAutoTranslating={isAutoTranslating}
+        onClear={() => setSelectedWords([])}
+        onSave={handleSave}
+        onPractice={(s) => { onAskLina(`toki jan Lina! Let's practice this: "${s}"`); setSelectedWords([]); }}
+        onExplain={(s) => { onAskLina(`toki jan Lina! Can you explain the grammar of this phrase: "${s}"?`); setSelectedWords([]); }}
+        onRemoveLast={() => setSelectedWords(prev => prev.slice(0, -1))}
+      />
 
       <WordDetailDrawer
         isOpen={!!drawerId}

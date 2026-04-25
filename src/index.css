@@ -495,3 +495,53 @@ button:active { transform: scale(0.96); }
 
 .neon-text-gold { color: var(--gold); text-shadow: 0 0 10px rgba(255, 191, 0, 0.3); }
 .neon-border-gold { border-color: var(--gold); box-shadow: 0 0 15px rgba(255, 191, 0, 0.1); }
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+  .dashboard {
+    padding: 12px 12px 80px;
+  }
+  
+  .dashboard__header {
+    margin-bottom: 12px;
+  }
+  
+  .dashboard__title {
+    font-size: 1.2rem;
+  }
+
+  .status-grid-mobile {
+    display: flex !important;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    gap: 8px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    grid-template-columns: none !important;
+  }
+  
+  .status-grid-mobile::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .status-card-mobile {
+    flex: 0 0 75px;
+    padding: 6px 4px !important;
+    min-width: 75px;
+  }
+
+  .mobile-action-row {
+    flex-direction: row !important;
+    gap: 6px !important;
+  }
+  
+  .mobile-action-row button {
+    font-size: 0.65rem !important;
+    padding: 10px 4px !important;
+  }
+
+  .btn-review {
+    padding: 12px 10px;
+    font-size: 0.75rem;
+  }
+}

@@ -89,38 +89,40 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
         
         {/* 2. Action Row & 3. Roadmap Integration */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div className="mobile-action-row" style={{ display: 'flex', gap: '8px' }}>
             <button onClick={handleDailyReview} className="btn-review" style={{ flex: 1, marginBottom: 0 }}>
               ⚡ START DAILY REVIEW
             </button>
-            <div style={{ display: 'flex', background: 'var(--surface)', borderRadius: '4px', padding: '4px', border: '1px solid var(--border)' }}>
-              <button 
-                onClick={() => setReviewVibe('chill')}
-                style={{ border: 'none', background: reviewVibe === 'chill' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'chill' ? 'black' : '#666', borderRadius: '2px', padding: '0 12px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
-              >
-                CHILL
-              </button>
-              <button 
-                onClick={() => setReviewVibe('deep')}
-                style={{ border: 'none', background: reviewVibe === 'deep' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'deep' ? 'black' : '#666', borderRadius: '2px', padding: '0 12px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
-              >
-                DEEP
-              </button>
-            </div>
+            <button 
+              onClick={() => onTogglePanel('roadmap')} 
+              className="btn-review" 
+              style={{ 
+                flex: 1,
+                background: 'var(--surface)', 
+                color: 'var(--gold)', 
+                border: '1px solid var(--border)',
+                boxShadow: 'none',
+                marginBottom: 0
+              }}
+            >
+              🗺️ ROADMAP
+            </button>
           </div>
           
-          <button 
-            onClick={() => onTogglePanel('roadmap')} 
-            className="btn-review" 
-            style={{ 
-              background: 'var(--surface)', 
-              color: 'var(--gold)', 
-              border: '1px solid var(--border)',
-              boxShadow: 'none'
-            }}
-          >
-            🗺️ VIEW CURRICULUM ROADMAP
-          </button>
+          <div style={{ display: 'flex', background: 'var(--surface)', borderRadius: '4px', padding: '4px', border: '1px solid var(--border)' }}>
+            <button 
+              onClick={() => setReviewVibe('chill')}
+              style={{ flex: 1, border: 'none', background: reviewVibe === 'chill' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'chill' ? 'black' : '#666', borderRadius: '2px', padding: '6px 12px', fontSize: '0.65rem', fontWeight: 900, cursor: 'pointer' }}
+            >
+              CHILL MODE
+            </button>
+            <button 
+              onClick={() => setReviewVibe('deep')}
+              style={{ flex: 1, border: 'none', background: reviewVibe === 'deep' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'deep' ? 'black' : '#666', borderRadius: '2px', padding: '6px 12px', fontSize: '0.65rem', fontWeight: 900, cursor: 'pointer' }}
+            >
+              DEEP MODE
+            </button>
+          </div>
         </div>
 
         {/* 4. Tabbed Navigation */}

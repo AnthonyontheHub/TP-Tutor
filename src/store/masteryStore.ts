@@ -13,24 +13,31 @@ import { scoreToStatus, STATUS_MIDPOINT } from '../types/mastery';
 import { initialMasteryMap } from '../data/initialMasteryMap';
 
 function toFullVocabWord(v: { word: string; status: MasteryStatus; type: 'word' | 'grammar'; sessionNotes: string; frequencyRank?: number }): VocabWord {
+  const score = STATUS_MIDPOINT[v.status];
   return {
     id: v.word,
     word: v.word,
     partOfSpeech: '',
     meanings: '',
     type: v.type,
-    confidenceScore: STATUS_MIDPOINT[v.status],
+    baseScore: score,
+    confidenceScore: score,
     status: v.status,
     useCount: 0,
     frequencyRank: v.frequencyRank ?? 999,
     isMasteryCandidate: false,
     sessionNotes: v.sessionNotes,
+    partOfSpeechScores: { noun: 0, verb: 0, modifier: 0 },
+    lastReviewed: new Date().toISOString(),
+    scoreHistory: []
   };
 }
 
 const mappedVocabulary: VocabWord[] = initialMasteryMap.initialVocabulary.map(toFullVocabWord);
 
 interface MasteryActions {
+  applyScoreUpdate: (nodeId: string, points: number, context: string) => void;
+  calculateDecay: () => void;
   applyScoreDeltas: (deltas: { wordId: string; delta: number }[]) => void;
   updateVocabStatus: (wordIdOrText: string, status: MasteryStatus) => void;
   cycleWordStatus: (wordId: string) => void;
@@ -131,7 +138,55 @@ export const useMasteryStore = create<MasteryStore>()(
         });
       },
 
+      applyScoreUpdate: (nodeId, points, context) => {
+        const now = new Date().toISOString();
+        set((state) => ({
+          vocabulary: state.vocabulary.map((w) => {
+            if (w.id !== nodeId && w.word.toLowerCase() !== nodeId.toLowerCase()) return w;
+            const newScore = clamp(w.baseScore + points, 0, 1000);
+            const historyEntry = { date: now, change: points, reason: context };
+            return {
+              ...w,
+              baseScore: newScore,
+              confidenceScore: newScore, // Keep legacy in sync
+              status: scoreToStatus(newScore),
+              lastReviewed: now,
+              scoreHistory: [historyEntry, ...(w.scoreHistory || [])].slice(0, 5),
+              useCount: w.useCount + 1
+            };
+          })
+        }));
+        get().refreshCurriculumStatus();
+        get().recordActivity();
+        void get().syncToCloud();
+      },
+
+      calculateDecay: () => {
+        const now = new Date();
+        const FORTY_EIGHT_HOURS = 48 * 60 * 60 * 1000;
+        set((state) => ({
+          vocabulary: state.vocabulary.map((w) => {
+            const last = new Date(w.lastReviewed || 0).getTime();
+            if (now.getTime() - last > FORTY_EIGHT_HOURS) {
+              const decayAmount = -15; // Lina's gentle decay
+              const newScore = clamp(w.baseScore - 15, 0, 1000);
+              if (newScore === w.baseScore) return w;
+              return {
+                ...w,
+                baseScore: newScore,
+                confidenceScore: newScore,
+                status: scoreToStatus(newScore),
+                scoreHistory: [{ date: now.toISOString(), change: decayAmount, reason: 'decay' }, ...(w.scoreHistory || [])].slice(0, 5)
+              };
+            }
+            return w;
+          })
+        }));
+        void get().syncToCloud();
+      },
+
       applyScoreDeltas: (deltas) => {
+        const now = new Date().toISOString();
         set((state) => ({
           vocabulary: state.vocabulary.map((w) => {
             const d = deltas.find(
@@ -140,12 +195,15 @@ export const useMasteryStore = create<MasteryStore>()(
                 delta.wordId.toLowerCase() === w.word.toLowerCase()
             );
             if (!d) return w;
-            const newScore = clamp((w.confidenceScore ?? 0) + d.delta, 0, 500);
+            const newScore = clamp((w.baseScore ?? 0) + d.delta, 0, 1000);
             return {
               ...w,
+              baseScore: newScore,
               confidenceScore: newScore,
               status: scoreToStatus(newScore),
               useCount: (w.useCount ?? 0) + 1,
+              lastReviewed: now,
+              scoreHistory: [{ date: now, change: d.delta, reason: 'manual_delta' }, ...(w.scoreHistory || [])].slice(0, 5)
             };
           }),
         }));
@@ -155,11 +213,20 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       updateVocabStatus: (wordIdOrText, status) => {
+        const now = new Date().toISOString();
         set((state) => ({
           vocabulary: state.vocabulary.map((w) => {
             if (w.id !== wordIdOrText && w.word.toLowerCase() !== wordIdOrText.toLowerCase()) return w;
             const targetScore = STATUS_MIDPOINT[status];
-            return { ...w, confidenceScore: targetScore, status };
+            const diff = targetScore - (w.baseScore || 0);
+            return { 
+              ...w, 
+              baseScore: targetScore, 
+              confidenceScore: targetScore, 
+              status,
+              lastReviewed: now,
+              scoreHistory: [{ date: now, change: diff, reason: 'status_override' }, ...(w.scoreHistory || [])].slice(0, 5)
+            };
           }),
         }));
         get().refreshCurriculumStatus();
@@ -168,13 +235,22 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       cycleWordStatus: (wordId) => {
+        const now = new Date().toISOString();
         set((state) => ({
           vocabulary: state.vocabulary.map((w) => {
             if (w.id !== wordId) return w;
             const currentIndex = STATUS_ORDER.indexOf(w.status);
             const nextStatus = STATUS_ORDER[(currentIndex + 1) % STATUS_ORDER.length];
             const targetScore = STATUS_MIDPOINT[nextStatus];
-            return { ...w, confidenceScore: targetScore, status: nextStatus };
+            const diff = targetScore - (w.baseScore || 0);
+            return { 
+              ...w, 
+              baseScore: targetScore, 
+              confidenceScore: targetScore, 
+              status: nextStatus,
+              lastReviewed: now,
+              scoreHistory: [{ date: now, change: diff, reason: 'status_cycle' }, ...(w.scoreHistory || [])].slice(0, 5)
+            };
           }),
         }));
         get().refreshCurriculumStatus();
@@ -305,8 +381,8 @@ export const useMasteryStore = create<MasteryStore>()(
       randomizeVocab: () => {
         set((state) => ({
           vocabulary: state.vocabulary.map(w => {
-            const score = Math.floor(Math.random() * 451);
-            return { ...w, confidenceScore: score, status: scoreToStatus(score) };
+            const score = Math.floor(Math.random() * 1001);
+            return { ...w, baseScore: score, confidenceScore: score, status: scoreToStatus(score) };
           })
         }));
         get().refreshCurriculumStatus();
@@ -315,7 +391,7 @@ export const useMasteryStore = create<MasteryStore>()(
 
       masterAllVocab: () => {
         set((state) => ({
-          vocabulary: state.vocabulary.map(w => ({ ...w, confidenceScore: 450, status: 'mastered' as MasteryStatus }))
+          vocabulary: state.vocabulary.map(w => ({ ...w, baseScore: 975, confidenceScore: 975, status: 'mastered' as MasteryStatus }))
         }));
         get().refreshCurriculumStatus();
         void get().syncToCloud();
@@ -413,9 +489,28 @@ export const useMasteryStore = create<MasteryStore>()(
               const frequencyRank = typeof w.frequencyRank === 'number' ? w.frequencyRank : (base?.frequencyRank ?? 999);
               const type = w.type || (base?.type ?? 'word');
               
-              if (typeof w.confidenceScore === 'number') return { ...w, useCount, frequencyRank, type };
-              const status: MasteryStatus = w.status || 'not_started';
-              return { ...w, confidenceScore: STATUS_MIDPOINT[status], useCount, frequencyRank, type };
+              // Handle Migration to baseScore (0-1000)
+              let baseScore = w.baseScore;
+              if (baseScore === undefined) {
+                // If we only have confidenceScore (0-500), map it
+                if (typeof w.confidenceScore === 'number') {
+                  baseScore = w.confidenceScore * 2;
+                } else {
+                  baseScore = STATUS_MIDPOINT[w.status as MasteryStatus || 'not_started'];
+                }
+              }
+
+              return { 
+                ...w, 
+                baseScore,
+                confidenceScore: baseScore, // sync legacy
+                useCount, 
+                frequencyRank, 
+                type,
+                partOfSpeechScores: w.partOfSpeechScores || { noun: 0, verb: 0, modifier: 0 },
+                lastReviewed: w.lastReviewed || new Date().toISOString(),
+                scoreHistory: w.scoreHistory || []
+              };
             }
           );
 

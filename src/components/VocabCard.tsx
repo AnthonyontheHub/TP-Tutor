@@ -14,17 +14,34 @@ export default function VocabCard({ word, onLongPress, onClick }: Props) {
   const { cycleWordStatus } = useMasteryStore();
   const status = word.status;
 
-  const lastTapRef = useRef<number>(0);
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const isLongPress = useRef(false);
+  const startPos = useRef<{ x: number, y: number } | null>(null);
+  const hasMovedSignificant = useRef(false);
 
   const handlePointerDown = (e: React.PointerEvent) => {
-    isLongPress.current = false;
+    startPos.current = { x: e.clientX, y: e.clientY };
+    hasMovedSignificant.current = false;
+
     longPressTimer.current = setTimeout(() => {
-      isLongPress.current = true;
-      soundService.playBlip(523.25, 'sine', 0.05);
-      onLongPress?.(word);
-    }, 500);
+      if (!hasMovedSignificant.current) {
+        soundService.playBlip(523.25, 'sine', 0.05);
+        onLongPress?.(word);
+        startPos.current = null; // Mark as handled
+      }
+    }, 600);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!startPos.current) return;
+    const dx = Math.abs(e.clientX - startPos.current.x);
+    const dy = Math.abs(e.clientY - startPos.current.y);
+    if (dx > 10 || dy > 10) {
+      hasMovedSignificant.current = true;
+      if (longPressTimer.current) {
+        clearTimeout(longPressTimer.current);
+        longPressTimer.current = null;
+      }
+    }
   };
 
   const handlePointerUp = (e: React.PointerEvent) => {
@@ -33,20 +50,11 @@ export default function VocabCard({ word, onLongPress, onClick }: Props) {
       longPressTimer.current = null;
     }
 
-    if (isLongPress.current) {
-      isLongPress.current = false;
-      return;
-    }
-
-    const now = Date.now();
-    if (now - lastTapRef.current < 300) {
-      // Secret Double Tap
-      cycleWordStatus(word.id);
-      lastTapRef.current = 0;
-    } else {
-      lastTapRef.current = now;
+    if (startPos.current && !hasMovedSignificant.current) {
       onClick?.(word);
     }
+    
+    startPos.current = null;
   };
 
   const handlePointerCancel = () => {
@@ -54,6 +62,7 @@ export default function VocabCard({ word, onLongPress, onClick }: Props) {
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
     }
+    startPos.current = null;
   };
 
   return (
@@ -61,6 +70,7 @@ export default function VocabCard({ word, onLongPress, onClick }: Props) {
       className={`vocab-card vocab-card--${status}`}
       style={{ touchAction: 'none' }}
       onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerCancel}
     >
