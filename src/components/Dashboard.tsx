@@ -52,7 +52,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
     setViewMode('phrasebook');
   };
 
-  const getActiveStyle = (p: AppPanel) => activePanels.includes(p) ? { borderColor: 'var(--gold)', color: 'var(--gold)' } : {};
+  const getActiveStyle = (p: AppPanel) => activePanels.includes(p) ? { borderColor: 'var(--gold)', color: 'var(--gold)', boxShadow: '0 0 10px var(--gold-glow)' } : {};
 
   return (
     <div className="dashboard">
@@ -84,28 +84,46 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
       </header>
 
       <main className="dashboard__main">
+        {/* 1. Top Status Bar: The master counter */}
         <ProgressSummary activeFilter={activeFilter} onFilterClick={setActiveFilter} />
         
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-          <button onClick={handleDailyReview} className="btn-review" style={{ flex: 1, marginBottom: 0 }}>
-            ⚡ START DAILY REVIEW
-          </button>
-          <div style={{ display: 'flex', background: 'var(--surface)', borderRadius: '4px', padding: '4px', border: '1px solid var(--border)' }}>
-            <button 
-              onClick={() => setReviewVibe('chill')}
-              style={{ border: 'none', background: reviewVibe === 'chill' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'chill' ? 'black' : '#666', borderRadius: '2px', padding: '0 12px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
-            >
-              CHILL
+        {/* 2. Action Row & 3. Roadmap Integration */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button onClick={handleDailyReview} className="btn-review" style={{ flex: 1, marginBottom: 0 }}>
+              ⚡ START DAILY REVIEW
             </button>
-            <button 
-              onClick={() => setReviewVibe('deep')}
-              style={{ border: 'none', background: reviewVibe === 'deep' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'deep' ? 'black' : '#666', borderRadius: '2px', padding: '0 12px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
-            >
-              DEEP
-            </button>
+            <div style={{ display: 'flex', background: 'var(--surface)', borderRadius: '4px', padding: '4px', border: '1px solid var(--border)' }}>
+              <button 
+                onClick={() => setReviewVibe('chill')}
+                style={{ border: 'none', background: reviewVibe === 'chill' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'chill' ? 'black' : '#666', borderRadius: '2px', padding: '0 12px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
+              >
+                CHILL
+              </button>
+              <button 
+                onClick={() => setReviewVibe('deep')}
+                style={{ border: 'none', background: reviewVibe === 'deep' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'deep' ? 'black' : '#666', borderRadius: '2px', padding: '0 12px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
+              >
+                DEEP
+              </button>
+            </div>
           </div>
+          
+          <button 
+            onClick={() => onTogglePanel('roadmap')} 
+            className="btn-review" 
+            style={{ 
+              background: 'var(--surface)', 
+              color: 'var(--gold)', 
+              border: '1px solid var(--border)',
+              boxShadow: 'none'
+            }}
+          >
+            🗺️ VIEW CURRICULUM ROADMAP
+          </button>
         </div>
 
+        {/* 4. Tabbed Navigation */}
         <div className="dashboard__view-toggle">
           <button onClick={() => setViewMode('grid')} className={`btn-toggle ${viewMode === 'grid' ? 'active' : ''}`}>VOCAB GRID</button>
           <button onClick={() => setViewMode('phrasebook')} className={`btn-toggle ${viewMode === 'phrasebook' ? 'active' : ''}`}>PHRASEBOOK</button>
@@ -124,6 +142,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
                 <option value="phrase">Phrase</option>
               </select>
             </div>
+            {/* 5. Standard Vocab Grid */}
             <MasteryGrid
               onAskLina={onAskLina}
               onSaved={handleSaved}
