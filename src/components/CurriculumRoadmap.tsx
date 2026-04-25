@@ -34,10 +34,10 @@ export default function CurriculumRoadmap({ onSetActiveView, onAskLina, isSandbo
   };
 
   const getMasteryColor = (score: number) => {
-    if (score >= 950) return 'var(--green)';
-    if (score >= 751) return '#22c55e'; // Confident
-    if (score >= 501) return 'var(--gold)'; // Practicing
-    if (score >= 201) return '#3b82f6'; // Introduced
+    if (score >= 950) return '#22c55e'; // Mastered: Bright Green
+    if (score >= 751) return '#eab308'; // Confident: Yellow
+    if (score >= 501) return '#3b82f6'; // Practicing: Blue
+    if (score >= 201) return '#a855f7'; // Introduced: Purple
     return '#444'; // Not started
   };
 

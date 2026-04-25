@@ -387,12 +387,12 @@ select {
   background: rgba(255, 191, 0, 0.05);
 }
 
-/* DO NOT ALTER STATUS COLORS per requirement */
+/* Mastery Status Colors */
 .vocab-card--not_started  { border-left: 3px solid #374151; }
-.vocab-card--introduced   { border-left: 3px solid var(--blue); }
-.vocab-card--practicing   { border-left: 3px solid var(--amber); }
-.vocab-card--confident    { border-left: 3px solid #16a34a; }
-.vocab-card--mastered     { border-left: 3px solid var(--cyan); }
+.vocab-card--introduced   { border-left: 3px solid #a855f7; } /* Purple */
+.vocab-card--practicing   { border-left: 3px solid #3b82f6; } /* Blue */
+.vocab-card--confident    { border-left: 3px solid #eab308; } /* Yellow */
+.vocab-card--mastered     { border-left: 3px solid #22c55e; } /* Bright Green */
 
 .vocab-card__word {
   font-weight: 800;

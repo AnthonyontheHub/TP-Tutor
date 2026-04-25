@@ -10,19 +10,19 @@ interface Props {
   onClick?: () => void;
 }
 
-const COLORS: Record<MasteryStatus, string> = {
+const STATUS_BG: Record<MasteryStatus, string> = {
   not_started: 'rgba(55, 65, 81, 0.4)',
-  introduced:  'rgba(29, 78, 216, 0.4)',
-  practicing:  'rgba(146, 64, 14, 0.4)',
-  confident:   'rgba(22, 163, 74, 0.4)',
+  introduced:  'rgba(168, 85, 247, 0.4)',
+  practicing:  'rgba(59, 130, 246, 0.4)',
+  confident:   'rgba(234, 179, 8, 0.4)',
   mastered:    'rgba(34, 197, 94, 0.4)',
 };
 
-const BORDERS: Record<MasteryStatus, string> = {
-  not_started: 'rgba(55, 65, 81, 0.6)',
-  introduced:  'rgba(29, 78, 216, 0.8)',
-  practicing:  'rgba(146, 64, 14, 0.8)',
-  confident:   'rgba(22, 163, 74, 0.8)',
+const STATUS_COLOR: Record<MasteryStatus, string> = {
+  not_started: '#374151',
+  introduced:  'rgba(168, 85, 247, 0.8)',
+  practicing:  'rgba(59, 130, 246, 0.8)',
+  confident:   'rgba(234, 179, 8, 0.8)',
   mastered:    'rgba(34, 197, 94, 0.8)',
 };
 
