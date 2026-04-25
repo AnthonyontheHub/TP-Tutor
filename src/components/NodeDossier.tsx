@@ -1,18 +1,21 @@
 /* src/components/NodeDossier.tsx */
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
 import type { CurriculumNode, VocabWord } from '../types/mastery';
+import VocabCard from './VocabCard';
+import WordDetailDrawer from './WordDetailDrawer';
 
 interface Props {
   node: CurriculumNode;
   onBack: () => void;
   onAskLina: (p: string) => void;
-  onSetActiveView: (view: 'vocab' | 'roadmap' | 'phrasebook') => void;
+  isSandboxMode: boolean;
 }
 
-export default function NodeDossier({ node, onBack, onAskLina }: Props) {
-  const { vocabulary } = useMasteryStore();
+export default function NodeDossier({ node, onBack, onAskLina, isSandboxMode }: Props) {
+  const { vocabulary, addWordToSelection, removeWordFromSelection, selectedWords } = useMasteryStore();
+  const [drawerId, setDrawerId] = useState<string | null>(null);
 
   const calculateMastery = () => {
     const allIds = [...node.requiredVocabIds, ...node.requiredGrammarIds];
@@ -26,11 +29,28 @@ export default function NodeDossier({ node, onBack, onAskLina }: Props) {
 
   const mastery = calculateMastery();
 
-  const handleStudyInGrid = () => {
-    setLessonFilter([...node.requiredVocabIds, ...node.requiredGrammarIds]);
-    onSetActiveView('vocab');
-    onBack();
+  const handleCardClick = (word: VocabWord) => {
+    if (selectedWords.length === 0) {
+      setDrawerId(word.id);
+    } else {
+      if (selectedWords.includes(word.word)) {
+        removeWordFromSelection(word.word);
+      } else {
+        addWordToSelection(word.word);
+      }
+    }
   };
+
+  const handleCardLongPress = (word: VocabWord) => {
+    addWordToSelection(word.word);
+  };
+
+  const nodeWords = vocabulary.filter(v => 
+    node.requiredVocabIds.includes(v.id) || 
+    node.requiredVocabIds.includes(v.word) ||
+    node.requiredGrammarIds.includes(v.id) ||
+    node.requiredGrammarIds.includes(v.word)
+  );
 
   return (
     <motion.div 
@@ -45,10 +65,11 @@ export default function NodeDossier({ node, onBack, onAskLina }: Props) {
         zIndex: 50,
         display: 'flex',
         flexDirection: 'column',
-        padding: '20px'
+        padding: '20px',
+        overflowY: 'auto'
       }}
     >
-      <header style={{ marginBottom: '24px' }}>
+      <header style={{ marginBottom: '24px', flexShrink: 0 }}>
         <button 
           onClick={onBack}
           style={{ 
@@ -61,7 +82,8 @@ export default function NodeDossier({ node, onBack, onAskLina }: Props) {
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            marginBottom: '16px'
+            marginBottom: '16px',
+            padding: 0
           }}
         >
           ← BACK TO ROADMAP
@@ -69,29 +91,15 @@ export default function NodeDossier({ node, onBack, onAskLina }: Props) {
         
         <h1 style={{ color: 'white', fontWeight: 900, fontSize: '1.5rem', marginBottom: '8px' }}>{node.title.toUpperCase()}</h1>
         
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{ flex: 1, height: '6px', background: '#222', borderRadius: '3px', overflow: 'hidden' }}>
             <div style={{ width: `${mastery}%`, height: '100%', background: 'var(--gold)' }} />
           </div>
           <span style={{ fontSize: '0.7rem', color: 'var(--gold)', fontWeight: 900 }}>{mastery}% MASTERY</span>
         </div>
-
-        <button 
-          onClick={handleStudyInGrid}
-          className="btn-review"
-          style={{ 
-            background: 'rgba(255,255,255,0.05)', 
-            border: '1px solid rgba(255,255,255,0.1)', 
-            padding: '8px 16px',
-            fontSize: '0.7rem',
-            margin: 0
-          }}
-        >
-          🔍 STUDY THESE WORDS IN GRID
-        </button>
       </header>
 
-      <div className="dossier-body" style={{ flex: 1, overflowY: 'auto', marginBottom: '24px' }}>
+      <div className="dossier-body" style={{ flex: 1, marginBottom: '24px' }}>
         {node.richContent?.map((block, i) => (
           <div key={i} style={{ marginBottom: '20px' }}>
             {block.type === 'text' && (
@@ -123,24 +131,55 @@ export default function NodeDossier({ node, onBack, onAskLina }: Props) {
         {!node.richContent && <p style={{ color: '#666', fontStyle: 'italic' }}>Detailed dossier content pending decryption...</p>}
       </div>
 
-      <footer style={{ borderTop: '1px solid #222', paddingTop: '20px' }}>
-        <h4 style={{ color: '#888', fontSize: '0.7rem', fontWeight: 800, marginBottom: '12px' }}>REQUIRED VOCABULARY</h4>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '20px' }}>
-          {[...node.requiredVocabIds, ...node.requiredGrammarIds].map(id => {
-            const vocab = vocabulary.find(v => v.id === id || v.word === id);
+      <footer style={{ borderTop: '1px solid #222', paddingTop: '20px', flexShrink: 0 }}>
+        <h4 style={{ color: '#888', fontSize: '0.7rem', fontWeight: 800, marginBottom: '12px' }}>THE SANDBOX</h4>
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', 
+          gap: '8px', 
+          marginBottom: '20px' 
+        }}>
+          {nodeWords.map(word => {
+            const positions: number[] = [];
+            selectedWords.forEach((w, i) => { if (w === word.word) positions.push(i + 1); });
+            
             return (
-              <div key={id} style={{ 
-                background: 'rgba(255,255,255,0.05)', 
-                border: '1px solid #333', 
-                borderRadius: '4px',
-                padding: '8px 12px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                minWidth: '60px'
-              }}>
-                <span style={{ color: 'white', fontWeight: 800, fontSize: '1rem' }}>{vocab?.word || id}</span>
-                <span style={{ color: '#666', fontSize: '0.55rem' }}>{vocab?.meanings?.split(',')[0] || '???'}</span>
+              <div key={word.id} style={{ position: 'relative' }}>
+                <VocabCard 
+                  word={word} 
+                  onClick={handleCardClick}
+                  onLongPress={handleCardLongPress}
+                />
+                {positions.length > 0 && (
+                  <div style={{
+                    position: 'absolute',
+                    top: -4,
+                    right: -4,
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '2px',
+                    justifyContent: 'flex-end',
+                    maxWidth: '40px',
+                    pointerEvents: 'none',
+                    zIndex: 10
+                  }}>
+                    {positions.map(pos => (
+                      <span key={pos} style={{
+                        background: 'var(--gold)',
+                        color: 'black',
+                        borderRadius: '50%',
+                        width: '14px',
+                        height: '14px',
+                        fontSize: '0.5rem',
+                        fontWeight: 900,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        border: '1px solid black'
+                      }}>{pos}</span>
+                    ))}
+                  </div>
+                )}
               </div>
             );
           })}
@@ -154,6 +193,14 @@ export default function NodeDossier({ node, onBack, onAskLina }: Props) {
           ✨ CONSULT JAN LINA
         </button>
       </footer>
+
+      <WordDetailDrawer
+        isOpen={!!drawerId}
+        word={drawerId ? vocabulary.find(v => v.id === drawerId) ?? null : null}
+        onClose={() => setDrawerId(null)}
+        onAskLina={onAskLina}
+        isSandboxMode={isSandboxMode}
+      />
     </motion.div>
   );
 }

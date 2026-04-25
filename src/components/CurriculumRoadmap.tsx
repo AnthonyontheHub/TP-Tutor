@@ -8,9 +8,10 @@ import type { CurriculumNode } from '../types/mastery';
 interface Props {
   onSetActiveView: (view: 'vocab' | 'roadmap' | 'phrasebook') => void;
   onAskLina: (p: string) => void;
+  isSandboxMode: boolean;
 }
 
-export default function CurriculumRoadmap({ onSetActiveView, onAskLina }: Props) {
+export default function CurriculumRoadmap({ onSetActiveView, onAskLina, isSandboxMode }: Props) {
   const { levels, vocabulary, setLessonFilter } = useMasteryStore();
   const [selectedNode, setSelectedNode] = useState<CurriculumNode | null>(null);
 
@@ -48,6 +49,7 @@ export default function CurriculumRoadmap({ onSetActiveView, onAskLina }: Props)
             onBack={() => setSelectedNode(null)} 
             onAskLina={onAskLina}
             onSetActiveView={onSetActiveView}
+            isSandboxMode={isSandboxMode}
           />
         )}
       </AnimatePresence>

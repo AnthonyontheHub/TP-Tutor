@@ -8,15 +8,20 @@ export const curriculumRoadmap: CurriculumLevel[] = [
     nodes: [
       { 
         id: "phonology", 
-        title: "Phonology", 
-        requiredVocabIds: ["a", "mu", "toki", "pona"], 
+        title: "The Sound of Reality (Phonology)", 
+        requiredVocabIds: [], 
         requiredGrammarIds: [],
-        status: 'active'
+        status: 'active',
+        richContent: [
+          { type: 'text', content: "Filtering the noise into fourteen universal sounds." },
+          { type: 'structural', content: "The (C)V(N) Syllable Equation: Every syllable follows a strict pattern of an optional consonant, a vowel, and an optional closing 'n'." },
+          { type: 'callout', content: "The Rhythm Rule: Stress always falls on the initial syllable of every word. This creates the 'pulse' of the language." }
+        ]
       },
       { 
         id: "subject_predicate", 
-        title: "Subjects and Predicates", 
-        requiredVocabIds: ["mi", "sina", "pona", "ike", "li"], 
+        title: "Simple Existence (Subject + Predicate)", 
+        requiredVocabIds: ["mi", "sina", "ona", "li", "pona", "ike"], 
         requiredGrammarIds: ["particle_li"],
         status: 'locked',
         richContent: [
@@ -27,57 +32,51 @@ export const curriculumRoadmap: CurriculumLevel[] = [
       },
       { 
         id: "direct_objects", 
-        title: "Direct Objects", 
+        title: "The Object of Desire (Direct Objects)", 
         requiredVocabIds: ["moku", "pana", "lukin", "e"], 
         requiredGrammarIds: ["particle_e"],
-        status: 'locked'
+        status: 'locked',
+        richContent: [
+          { type: 'text', content: "Action requires a target. 'e' is the arrow." },
+          { type: 'structural', content: "The Targeting System: [Verb] + e + [Object]. The particle 'e' tells the listener exactly what is being acted upon." },
+          { type: 'callout', content: "The Double Arrow Rule: You can have multiple 'e' particles to act on multiple targets in a single sentence." }
+        ]
       },
       { 
         id: "modifiers", 
-        title: "Modifiers", 
+        title: "The Art of Describing (Modifiers)", 
         requiredVocabIds: ["suli", "lili", "jelo", "laso"], 
         requiredGrammarIds: [],
-        status: 'locked'
+        status: 'locked',
+        richContent: [
+          { type: 'text', content: "Nouns are fluid; context is everything. Describe what it does, not just what it is." },
+          { type: 'structural', content: "The Law of Succession: Adjectives and modifiers always follow the word they describe. [Head] + [Modifier]." },
+          { type: 'callout', content: "Contextual Fluidity: A single word like 'suli' can mean big, long, tall, important, or adult depending on what it follows." }
+        ]
       },
       { 
         id: "prepositions", 
-        title: "Prepositions", 
+        title: "Space and Time (Prepositions)", 
         requiredVocabIds: ["lon", "tawa", "tan"], 
         requiredGrammarIds: [],
-        status: 'locked'
+        status: 'locked',
+        richContent: [
+          { type: 'text', content: "Grounding abstract thoughts into the physical reality of the present moment." },
+          { type: 'structural', content: "Location as Logic: [Verb] + [Preposition] + [Place]. Prepositions can also function as the main predicate of a sentence." },
+          { type: 'callout', content: "Temporal Mapping: Expressing time in Toki Pona is often done by treating it as a physical location (e.g., 'tenpo ni' = this time/place)." }
+        ]
       },
       { 
         id: "pi_pivot", 
-        title: "The 'pi' Pivot", 
-        requiredVocabIds: ["pi", "ilo", "kasi", "tomo"], 
+        title: "The 'pi' Pivot (Complex Grouping)", 
+        requiredVocabIds: ["pi"], 
         requiredGrammarIds: ["particle_pi"],
-        status: 'locked'
-      }
-    ]
-  },
-  {
-    id: "book_2",
-    title: "Book 2: pona sona (Intermediate)",
-    nodes: [
-      { 
-        id: "compounds", 
-        title: "Compound Concepts", 
-        requiredVocabIds: ["jan", "ma", "seli", "telo", "suno"], 
-        requiredGrammarIds: [],
-        status: 'locked'
-      }
-    ]
-  },
-  {
-    id: "book_3",
-    title: "Book 3: Advanced Guide (Fluency)",
-    nodes: [
-      { 
-        id: "speed_nasin", 
-        title: "Speed Nasin", 
-        requiredVocabIds: ["la", "tenpo", "pini", "open", "sin"], 
-        requiredGrammarIds: ["particle_la"],
-        status: 'locked'
+        status: 'locked',
+        richContent: [
+          { type: 'text', content: "Resisting the gravity of natural languages. Fluency is simplifying your thoughts." },
+          { type: 'structural', content: "The Rule of Two: 'pi' is used to group two or more modifiers together before they apply to the head word." },
+          { type: 'callout', content: "The Anti-Of Rule: Do not translate 'pi' as the English 'of'. It is a separator for grouping, not a possessive marker." }
+        ]
       }
     ]
   }

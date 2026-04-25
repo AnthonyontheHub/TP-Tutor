@@ -284,7 +284,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
                 />
               )}
               {activeView === 'roadmap' && (
-                <CurriculumRoadmap onSetActiveView={setActiveView} onAskLina={onAskLina} />
+                <CurriculumRoadmap onSetActiveView={setActiveView} onAskLina={onAskLina} isSandboxMode={isSandboxMode} />
               )}
               {activeView === 'phrasebook' && (
                 <div style={{ padding: '0' }}>
