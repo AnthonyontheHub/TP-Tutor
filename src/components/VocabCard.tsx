@@ -15,18 +15,24 @@ export default function VocabCard({ word, onLongPress, onClick }: Props) {
   const status = word.status;
 
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastTapRef = useRef<number>(0);
   const startPos = useRef<{ x: number, y: number } | null>(null);
   const hasMovedSignificant = useRef(false);
+  const isLongPressActive = useRef(false);
 
   const handlePointerDown = (e: React.PointerEvent) => {
+    // Only handle primary pointer (usually finger or left mouse)
+    if (!e.isPrimary) return;
+    
     startPos.current = { x: e.clientX, y: e.clientY };
     hasMovedSignificant.current = false;
+    isLongPressActive.current = false;
 
     longPressTimer.current = setTimeout(() => {
       if (!hasMovedSignificant.current) {
+        isLongPressActive.current = true;
         soundService.playBlip(523.25, 'sine', 0.05);
         onLongPress?.(word);
-        startPos.current = null; // Mark as handled
       }
     }, 600);
   };
@@ -50,8 +56,26 @@ export default function VocabCard({ word, onLongPress, onClick }: Props) {
       longPressTimer.current = null;
     }
 
+    // If it was a long press, we've already handled it.
+    if (isLongPressActive.current) {
+      startPos.current = null;
+      return;
+    }
+
+    // If we didn't move significantly, it's a tap or double-tap.
     if (startPos.current && !hasMovedSignificant.current) {
-      onClick?.(word);
+      const now = Date.now();
+      const DOUBLE_TAP_DELAY = 300;
+      
+      if (now - lastTapRef.current < DOUBLE_TAP_DELAY) {
+        // Double Tap -> Cycle status
+        cycleWordStatus(word.id);
+        lastTapRef.current = 0; // Reset
+      } else {
+        // Single Tap -> Trigger onClick (drawer or selection)
+        lastTapRef.current = now;
+        onClick?.(word);
+      }
     }
     
     startPos.current = null;
@@ -63,6 +87,7 @@ export default function VocabCard({ word, onLongPress, onClick }: Props) {
       longPressTimer.current = null;
     }
     startPos.current = null;
+    isLongPressActive.current = false;
   };
 
   return (
