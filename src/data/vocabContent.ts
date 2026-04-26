@@ -1,13 +1,4 @@
-import { 
-  VocabWord, 
-  PosRole, 
-  ExampleTier, 
-  Connotation, 
-  PosRoleEntry, 
-  ExampleSentence, 
-  Collocation, 
-  BoundaryNote 
-} from '../types/mastery';
+import type { VocabWord } from '../types/mastery';
 
 export type VocabContentEntry = Pick<VocabWord, 
   'anchor' | 

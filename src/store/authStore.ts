@@ -80,20 +80,14 @@ getRedirectResult(auth).catch((error) => {
   console.error('Error getting redirect result:', error.code, error.message);
 });
 
-// Initialize auth state listener
+// Initialize auth state listener.
+// We only update the auth store's user state here. App.tsx is responsible for
+// kicking off (and tearing down) the Firestore subscription via syncFromCloud
+// so that the unsubscribe handle isn't dropped on the floor — duplicating the
+// call here previously created leaked listeners.
+// We also do NOT clearLocalData on null: this listener fires once on app load
+// before the user has had a chance to sign in, which would silently wipe
+// persisted local/guest data. Explicit logout() handles that case.
 onAuthStateChanged(auth, (user) => {
-  // First, update the auth store's user state
-  useAuthStore.getState().setUser(user); 
-
-  if (user) {
-    // If user is logged in, sync mastery store with their UID
-    console.log(`Firebase auth state changed: User logged in - ${user.uid}`);
-    useMasteryStore.getState().syncFromCloud(user.uid);
-  } else {
-    // If logged out, reset mastery store to a guest/null state
-    console.log('Firebase auth state changed: User logged out');
-    useMasteryStore.getState().clearLocalData(); // Clears vocabulary, profile, etc.
-    // The userId in masteryStore should also reflect no logged-in user.
-    // Assuming clearLocalData() resets state to its initial values, including userId: null.
-  }
+  useAuthStore.getState().setUser(user);
 });

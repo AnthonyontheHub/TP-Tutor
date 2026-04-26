@@ -126,24 +126,6 @@ export default function UserProfilePanel({ onClose }: Props) {
     }
   };
 
-  const handleAddLore = () => {
-    if (loreDetail.trim()) {
-      addLore({ category: loreCategory, detail: loreDetail });
-      setLoreDetail('');
-    }
-  };
-
-  const handleSwitchProfile = () => {
-    if (switchName.trim()) {
-      switchProfile(switchName);
-      setSwitchName('');
-    }
-  };
-
-  // --- Added console.log for debugging ---
-  console.log("UserProfilePanel - Current user state:", user);
-  // ------------------------------------
-
   return (
     <motion.div
       className="side-panel"

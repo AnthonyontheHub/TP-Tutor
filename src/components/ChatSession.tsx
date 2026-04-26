@@ -5,10 +5,9 @@ import { useMasteryStore } from '../store/masteryStore';
 import {
   buildSystemPrompt, streamCompletion, stripProposedChanges,
   parseProposedChanges, resolveApiKey, fetchSessionRecap,
-  fetchQuickTranslation
+  fetchQuickTranslation, stringifyUserContext
 } from '../services/linaService';
 import type { ProposedChange } from '../services/linaService';
-import type { MasteryStatus } from '../types/mastery';
 
 interface Props {
   onEndSession: () => void;
@@ -25,14 +24,6 @@ interface ChatMessage {
   raw?: string;
   proposedChanges?: ProposedChange[];
 }
-
-const STATUS_EMOJI: Record<MasteryStatus, string> = {
-  not_started: '⬜',
-  introduced:  '🔵',
-  practicing:  '🟡',
-  confident:   '🟢',
-  mastered:    '✅',
-};
 
 const HISTORY_WINDOW = 10;
 const SANDBOX_RESPONSE = '[SANDBOX MODE]: o toki! I am in offline testing mode. No API tokens are being used right now.';
@@ -109,14 +100,23 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
     const key = resolveApiKey();
     if (key || isSandboxMode) { sendToLina(pendingPrompt, key); }
     clearPrompt?.();
-  }, [isActive, pendingPrompt]);
+    // sendToLina is intentionally omitted: it's a stable in-component closure
+    // recreated each render and including it would re-fire on every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isActive, pendingPrompt, isSandboxMode, clearPrompt]);
 
   async function handleEndSession() {
     const deltas = sessionDeltasRef.current;
     if (deltas.length === 0 || isSandboxMode) { onEndSession(); return; }
     for (const change of deltas) {
-      if (change.type === 'vocab') updateVocabStatus(change.id, change.newStatus);
-      else updateVocabStatus(change.id, change.newStatus);
+      if (change.type === 'vocab') {
+        updateVocabStatus(change.id, change.newStatus);
+      } else {
+        // Concept-level mastery isn't tracked in the vocab store yet; surface
+        // it for debugging instead of silently funneling it through the vocab
+        // updater (which would no-op on a non-matching id).
+        console.warn('Concept status update not yet supported:', change.id, '→', change.newStatus);
+      }
     }
     setLastUpdated(new Date().toLocaleDateString());
     const key = resolveApiKey();
@@ -149,7 +149,8 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
     try {
       const key = resolveApiKey(overrideKey);
       const state = useMasteryStore.getState();
-      const sys = buildSystemPrompt(state.vocabulary, [], state.studentName, JSON.stringify(state.lore));
+      const userContext = stringifyUserContext(state.profile, state.lore);
+      const sys = buildSystemPrompt(state.vocabulary, [], state.studentName, userContext);
       const windowedHistory = historyRef.current.slice(-HISTORY_WINDOW);
       let full = '';
       for await (const chunk of streamCompletion(key, sys, windowedHistory)) {
@@ -234,7 +235,7 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
             <div key={msg.id} style={{ marginBottom: '24px', textAlign: msg.role === 'user' ? 'right' : 'left' }}>
               <div style={{ color: 'var(--gold)', fontSize: '0.6rem', marginBottom: '4px', fontWeight: 900, letterSpacing: '0.1em' }}>{msg.role === 'assistant' ? 'LINA' : 'USER'}</div>
               <div style={{ background: msg.role === 'assistant' ? 'rgba(255,255,255,0.03)' : 'rgba(255, 191, 0, 0.1)', padding: '12px', borderRadius: '2px', border: '1px solid var(--border)', color: 'white', display: 'inline-block', textAlign: 'left', maxWidth: '90%', fontSize: '0.9rem', lineHeight: '1.5' }}>{msg.displayContent || (isLoading && msg.role === 'assistant' ? '...' : '')}</div>
-              {msg.proposedChanges && msg.proposedChanges.map((c, i) => <div key={i} style={{ marginTop: '4px', fontSize: '0.65rem', color: 'var(--gold)', fontWeight: 700 }}>+ CALIBRATING: {c.id} → {c.newStatus}</div>)}
+              {msg.proposedChanges && msg.proposedChanges.map((c) => <div key={`${c.type}_${c.id}`} style={{ marginTop: '4px', fontSize: '0.65rem', color: 'var(--gold)', fontWeight: 700 }}>+ CALIBRATING: {c.id} → {c.newStatus}</div>)}
             </div>
           ))}
           <div ref={messagesEndRef} />

@@ -20,7 +20,7 @@ export default function SetupScreen() {
   const handleFinish = () => {
     if (name.trim()) {
       setStudentName(name.trim());
-      updateProfile({ age, sex, location });
+      updateProfile({ age, sex, locationString: location });
       if (tempImg) setProfileImage(tempImg);
       setHasCompletedSetup(true);
     }
