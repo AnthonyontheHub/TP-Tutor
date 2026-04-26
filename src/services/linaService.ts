@@ -1,7 +1,7 @@
 import type { VocabWord, MasteryStatus, UserProfile, LoreEntry, ReviewVibe } from '../types/mastery';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const GEMINI_MODEL = "gemini-2.5-flash";
+const GEMINI_MODEL = "gemini-1.5-flash";
 
 // Mapping status to emojis for offline context
 export const STATUS_EMOJI: Record<MasteryStatus, string> = {

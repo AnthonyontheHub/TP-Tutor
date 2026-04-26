@@ -143,7 +143,9 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
               </div>
             </section>
 
-            <button onClick={onClose} className="btn-review" style={{ margin: 0, width: '100%', background: 'var(--surface-2)', color: 'white', boxShadow: 'none', border: '1px solid var(--border)' }}>CLOSE TERMINAL</button>
+            <button onClick={onClose} style={{ position: 'absolute', top: '16px', right: '16px', background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: '1.5rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', padding: 0 }} aria-label="Close">
+              &times;
+            </button>
           </motion.div>
         </div>
       )}
