@@ -91,12 +91,15 @@ interface MasteryActions {
   setWidgetDensity: (val: 'Compact' | 'Expanded') => void;
   setFogOfWar: (val: 'Strict' | 'Visible') => void;
   setShowCircuitPaths: (val: boolean) => void;
+  setKnowledgeCheckFrequency: (freq: 'daily' | 'session' | 'never') => void;
+  setLastKnowledgeCheckDate: (date: string) => void;
   setSelectedWords: (words: string[]) => void;
   addWordToSelection: (word: string) => void;
   removeWordFromSelection: (word: string) => void;
   toggleWordSelection: (word: string) => void;
   setLessonFilter: (wordIds: string[] | null) => void;
   hardenWord: (wordId: string) => void;
+  clearAllSavedPhrases: () => void;
   checkAssessments: (onTrigger: (word: VocabWord) => void) => void;
   switchProfile: (name: string) => void;
 }
@@ -124,6 +127,8 @@ interface MasteryState {
   widgetDensity: 'Compact' | 'Expanded';
   fogOfWar: 'Strict' | 'Visible';
   showCircuitPaths: boolean;
+  knowledgeCheckFrequency: 'daily' | 'session' | 'never';
+  lastKnowledgeCheckDate: string;
 }
 
 type MasteryStore = MasteryState & MasteryActions;
@@ -155,6 +160,8 @@ export const useMasteryStore = create<MasteryStore>()(
       isMainProfile: true,
       fogOfWar: 'Visible',
       showCircuitPaths: true,
+      knowledgeCheckFrequency: 'daily',
+      lastKnowledgeCheckDate: '',
       cloudSynced: false,
 
       setHasCompletedSetup: (val) => { set({ hasCompletedSetup: val }); void get().syncToCloud(); },
@@ -262,6 +269,11 @@ export const useMasteryStore = create<MasteryStore>()(
         set(state => ({
           vocabulary: state.vocabulary.map(w => (w.id === wordId || w.word === wordId) ? { ...w, hardened: true, baseScore: 1000, status: 'mastered' } : w)
         }));
+        void get().syncToCloud();
+      },
+
+      clearAllSavedPhrases: () => {
+        set({ savedPhrases: [] });
         void get().syncToCloud();
       },
 
@@ -514,6 +526,8 @@ export const useMasteryStore = create<MasteryStore>()(
       setWidgetDensity: (val) => { set({ widgetDensity: val }); void get().syncToCloud(); },
       setFogOfWar: (val) => { set({ fogOfWar: val }); void get().syncToCloud(); },
       setShowCircuitPaths: (val) => { set({ showCircuitPaths: val }); void get().syncToCloud(); },
+      setKnowledgeCheckFrequency: (freq) => { set({ knowledgeCheckFrequency: freq }); void get().syncToCloud(); },
+      setLastKnowledgeCheckDate: (date) => { set({ lastKnowledgeCheckDate: date }); void get().syncToCloud(); },
 
       setSelectedWords: (words) => set({ selectedWords: words }),
       addWordToSelection: (word) => set((state) => ({ selectedWords: [...state.selectedWords, word] })),
@@ -570,7 +584,7 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       syncToCloud: async (explicitUserId) => {
-        const { vocabulary, curriculums, lastUpdated, studentName, profile, lore, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, isMainProfile, widgetDensity, fogOfWar, showCircuitPaths, cloudSynced } = get();
+        const { vocabulary, curriculums, lastUpdated, studentName, profile, lore, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, isMainProfile, widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, cloudSynced } = get();
         const targetId = explicitUserId || userId;
 
         // Block premature syncs before cloud data has loaded — prevents stale
@@ -600,7 +614,7 @@ export const useMasteryStore = create<MasteryStore>()(
             vocabulary: partialVocab,
             curriculums, lastUpdated, studentName, profile, lore, profileImage,
             savedPhrases, currentStreak, lastActiveDate, hasCompletedSetup, currentPositionNodeId, isMainProfile,
-            widgetDensity, fogOfWar, showCircuitPaths
+            widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate
           }, { merge: true });
         } catch (err) {
           console.error('Firebase Sync Error:', err);
@@ -780,6 +794,8 @@ export const useMasteryStore = create<MasteryStore>()(
             widgetDensity: data.widgetDensity || 'Expanded',
             fogOfWar: data.fogOfWar || 'Visible',
             showCircuitPaths: data.showCircuitPaths !== undefined ? data.showCircuitPaths : true,
+            knowledgeCheckFrequency: data.knowledgeCheckFrequency || 'daily',
+            lastKnowledgeCheckDate: data.lastKnowledgeCheckDate || '',
           };
 
           if (data.studentName) update.studentName = data.studentName;

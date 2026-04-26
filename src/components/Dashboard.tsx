@@ -20,7 +20,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   isSandboxMode: boolean;
   setIsSandboxMode: (val: boolean) => void;
 }) {
-  const { studentName, currentStreak, vocabulary, curriculums, savedPhrases, reviewVibe, setReviewVibe, selectedWords, setSelectedWords, savePhrase, lessonFilter, setLessonFilter, calculateDecay, checkAssessments, hardenWord } = useMasteryStore();
+  const { studentName, currentStreak, vocabulary, curriculums, savedPhrases, reviewVibe, setReviewVibe, selectedWords, setSelectedWords, savePhrase, lessonFilter, setLessonFilter, calculateDecay, checkAssessments, hardenWord, knowledgeCheckFrequency, lastKnowledgeCheckDate, setLastKnowledgeCheckDate } = useMasteryStore();
 
   const [activeView, setActiveView] = useState<DashboardView>('vocab');
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
@@ -29,6 +29,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [focusPhraseId, setFocusPhraseId] = useState<string | null>(null);
   const [assessmentWord, setAssessmentWord] = useState<VocabWord | null>(null);
+  const [hasShownCheck, setHasShownCheck] = useState(false);
 
   // Translation & Builder State
   const [translation, setTranslation] = useState<string | null>(null);
@@ -41,10 +42,18 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   useEffect(() => {
     calculateDecay();
     const interval = setInterval(() => {
-      checkAssessments((word) => setAssessmentWord(word));
+      if (knowledgeCheckFrequency === 'never') return;
+      if (knowledgeCheckFrequency === 'daily' && lastKnowledgeCheckDate === new Date().toDateString()) return;
+      if (knowledgeCheckFrequency === 'session' && hasShownCheck) return;
+
+      checkAssessments((word) => {
+        setAssessmentWord(word);
+        setHasShownCheck(true);
+        setLastKnowledgeCheckDate(new Date().toDateString());
+      });
     }, 60000); // Check every minute
     return () => clearInterval(interval);
-  }, []);
+  }, [knowledgeCheckFrequency, lastKnowledgeCheckDate, hasShownCheck, checkAssessments, setLastKnowledgeCheckDate, calculateDecay]);
 
   useEffect(() => {
     setTranslation(null);
@@ -397,8 +406,15 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
                 <h2 style={{ color: 'var(--gold)', marginBottom: '10px' }}>KNOWLEDGE CHECK</h2>
                 <p>Lina wants to verify your mastery of <strong>{assessmentWord.word}</strong>.</p>
                 <div style={{ margin: '20px 0', display: 'grid', gap: '10px' }}>
-                   <button onClick={() => { onAskLina(`Lina, I'm ready for the Knowledge Check on "${assessmentWord.word}". Give me 3 questions.`); setAssessmentWord(null); }} className="btn-review">START QUIZ</button>
-                   <button onClick={() => setAssessmentWord(null)} style={{ background: 'none', border: 'none', color: '#666', fontSize: '0.8rem' }}>MAYBE LATER</button>
+                   <button onClick={() => { 
+                     onAskLina(`Lina, I'm ready for the Knowledge Check on "${assessmentWord.word}". Give me 3 questions.`); 
+                     setAssessmentWord(null); 
+                     setLastKnowledgeCheckDate(new Date().toDateString());
+                   }} className="btn-review">START QUIZ</button>
+                   <button onClick={() => { 
+                     setAssessmentWord(null); 
+                     setLastKnowledgeCheckDate(new Date().toDateString());
+                   }} style={{ background: 'none', border: 'none', color: '#666', fontSize: '0.8rem' }}>MAYBE LATER</button>
                 </div>
               </motion.div>
             </div>
