@@ -43,7 +43,7 @@ export default function MasteryGrid({
   const displayed = vocabulary
     .filter(w => {
       const passesLesson = !lessonFilter || lessonFilter.includes(w.id) || lessonFilter.includes(w.word);
-      const passesPos = posFilter === 'All' || w.partOfSpeech === posFilter;
+      const passesPos = posFilter === 'All' || w.partOfSpeech.toLowerCase() === posFilter.toLowerCase();
       return passesLesson && passesPos;
     })
     .sort((a, b) => {

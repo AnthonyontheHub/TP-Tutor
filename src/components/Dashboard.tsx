@@ -257,12 +257,10 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
           >
             <select value={posFilter} onChange={(e) => { setPosFilter(e.target.value); setLessonFilter(null); }} className="sort-select">
               <option value="All">All Parts of Speech</option>
-              <option value="noun">Noun</option>
-              <option value="verb">Verb</option>
-              <option value="adjective">Adjective</option>
-              <option value="adverb">Adverb</option>
-              <option value="number">Number</option>
-              <option value="phrase">Phrase</option>
+              <option value="Noun">Noun</option>
+              <option value="Verb">Verb</option>
+              <option value="Modifier">Modifier</option>
+              <option value="Particle">Particle</option>
             </select>
           </motion.div>
         )}
