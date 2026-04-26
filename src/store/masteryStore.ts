@@ -731,6 +731,7 @@ export const useMasteryStore = create<MasteryStore>()(
                 useCount, 
                 frequencyRank, 
                 type,
+                partOfSpeech: w.partOfSpeech || (base?.partOfSpeech ?? ''),
                 partOfSpeechScores: w.partOfSpeechScores || { noun: 0, verb: 0, modifier: 0 },
                 lastReviewed: w.lastReviewed || new Date().toISOString(),
                 scoreHistory: w.scoreHistory || [],

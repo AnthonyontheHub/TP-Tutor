@@ -149,9 +149,31 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
           <button 
             onClick={() => onTogglePanel('profile')} 
             className="dashboard__profile-trigger"
-            style={getActiveStyle('profile')}
+            style={{ 
+              ...getActiveStyle('profile'),
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '4px 12px 4px 4px',
+              borderRadius: '20px'
+            }}
           >
-            {profileImage ? <img src={profileImage} className="profile-image-icon" /> : '👤'} {studentName?.toUpperCase() || 'STUDENT'}
+            {profileImage ? (
+              <img 
+                src={profileImage} 
+                alt="Profile"
+                style={{ 
+                  width: '32px', 
+                  height: '32px', 
+                  borderRadius: '50%', 
+                  objectFit: 'cover',
+                  border: '1px solid rgba(255,255,255,0.1)'
+                }} 
+              />
+            ) : (
+              <span style={{ fontSize: '1.2rem', marginLeft: '4px' }}>👤</span>
+            )} 
+            <span style={{ fontSize: '0.75rem', fontWeight: 900 }}>{studentName?.toUpperCase() || 'STUDENT'}</span>
           </button>
           
           {/* Roadmap Progress Indicator */}

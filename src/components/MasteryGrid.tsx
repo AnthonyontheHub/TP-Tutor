@@ -89,9 +89,11 @@ export default function MasteryGrid({
             <option value="All">All Parts of Speech</option>
             <option value="Noun">Nouns</option>
             <option value="Verb">Verbs</option>
-            <option value="Modifier">Modifiers</option>
+            <option value="Adjective">Adjectives</option>
             <option value="Particle">Particles</option>
             <option value="Preposition">Prepositions</option>
+            <option value="Pronoun">Pronouns</option>
+            <option value="Number">Numbers</option>
           </select>
         </div>
         <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="sort-select">
