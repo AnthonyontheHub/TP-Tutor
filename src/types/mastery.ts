@@ -21,17 +21,17 @@ export const STATUS_META: Record<
     meaning: 'Concept has not yet been introduced.',
   },
   introduced: {
-    emoji: '🔵',
+    emoji: '🟣',
     label: 'Introduced',
     meaning: 'The word is new to you (0-50 pts).',
   },
   practicing: {
-    emoji: '🟡',
+    emoji: '🔵',
     label: 'Practicing',
     meaning: "You're using it, but it's not fluid yet (51-150 pts).",
   },
   confident: {
-    emoji: '🟢',
+    emoji: '🟡',
     label: 'Confident',
     meaning: 'You know it well in most contexts (151-400 pts).',
   },
@@ -47,9 +47,9 @@ export const STATUS_META: Record<
 // Status is derived from baseScore (0-1000); it is never stored independently.
 // New thresholds per Lina's Scoring Engine:
 // 0–200 = ⬜ Not Started
-// 201–500 = 🔵 Introduced
-// 501–750 = 🟡 Practicing
-// 751–949 = 🟢 Confident
+// 201–500 = 🟣 Introduced
+// 501–750 = 🔵 Practicing
+// 751–949 = 🟡 Confident
 // 950–1000 = ✅ Mastered
 
 export function scoreToStatus(score: number): MasteryStatus {
@@ -88,13 +88,11 @@ export interface ProgressSnapshot {
 }
 
 export interface UserProfile {
-  name: string;
-  age: string;
-  locationString: string;
-  zip?: string;
-  city?: string;
-  state?: string;
-  sex: string;
+  firstName: string;
+  lastName: string;
+  tokiPonaName?: string;
+  difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
+  interests?: string[];
   history: ProgressSnapshot[];
 }
 
@@ -288,3 +286,4 @@ export interface MasteryMap {
 // ─── Status summary helper type ───────────────────────────────────────────────
 
 export type StatusSummary = Record<MasteryStatus, number>;
+

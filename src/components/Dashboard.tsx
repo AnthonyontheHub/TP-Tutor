@@ -20,7 +20,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   isSandboxMode: boolean;
   setIsSandboxMode: (val: boolean) => void;
 }) {
-  const { studentName, currentStreak, vocabulary, curriculums, savedPhrases, reviewVibe, setReviewVibe, selectedWords, setSelectedWords, savePhrase, lessonFilter, setLessonFilter, calculateDecay, checkAssessments, hardenWord, knowledgeCheckFrequency, lastKnowledgeCheckDate, setLastKnowledgeCheckDate } = useMasteryStore();
+  const { studentName, profileImage, currentStreak, vocabulary, curriculums, savedPhrases, reviewVibe, setReviewVibe, selectedWords, setSelectedWords, savePhrase, lessonFilter, setLessonFilter, calculateDecay, checkAssessments, hardenWord, knowledgeCheckFrequency, lastKnowledgeCheckDate, setLastKnowledgeCheckDate } = useMasteryStore();
 
   const [activeView, setActiveView] = useState<DashboardView>('vocab');
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
@@ -151,7 +151,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
             className="dashboard__profile-trigger"
             style={getActiveStyle('profile')}
           >
-            👤 {studentName?.toUpperCase() || 'STUDENT'}
+            {profileImage ? <img src={profileImage} className="profile-image-icon" /> : '👤'} {studentName?.toUpperCase() || 'STUDENT'}
           </button>
           
           {/* Roadmap Progress Indicator */}

@@ -388,7 +388,7 @@ select {
 }
 
 /* Mastery Status Colors */
-.vocab-card--not_started  { border-left: 3px solid #374151; }
+.vocab-card--not_started  { border-left: 3px solid #6b7280; } /* Gray */
 .vocab-card--introduced   { border-left: 3px solid #a855f7; } /* Purple */
 .vocab-card--practicing   { border-left: 3px solid #3b82f6; } /* Blue */
 .vocab-card--confident    { border-left: 3px solid #eab308; } /* Yellow */

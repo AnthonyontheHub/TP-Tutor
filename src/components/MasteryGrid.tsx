@@ -43,7 +43,7 @@ export default function MasteryGrid({
   const displayed = vocabulary
     .filter(w => {
       const passesLesson = !lessonFilter || lessonFilter.includes(w.id) || lessonFilter.includes(w.word);
-      const passesPos = posFilter === 'All' || w.partOfSpeech.toLowerCase().includes(posFilter.toLowerCase());
+      const passesPos = posFilter === 'All' || w.partOfSpeech === posFilter;
       return passesLesson && passesPos;
     })
     .sort((a, b) => {
@@ -71,7 +71,10 @@ export default function MasteryGrid({
   return (
     <div
       className="mastery-grid-container"
-      style={{ paddingBottom: selectedWords.length > 0 ? '280px' : undefined }}
+      style={{ 
+        paddingBottom: selectedWords.length > 0 ? '280px' : undefined,
+        touchAction: 'pan-y' 
+      }}
       onClick={(e) => { if (e.target === e.currentTarget && selectedWords.length > 0) setSelectedWords([]); }}
     >
       <div className="grid-toolbar">
@@ -91,7 +94,7 @@ export default function MasteryGrid({
         </button>
       </div>
 
-      <div className="mastery-grid__cards">
+      <div className="mastery-grid__cards" style={{ pointerEvents: 'auto' }}>
         {displayed.map((word) => {
           const positions: number[] = [];
           selectedWords.forEach((w, i) => { if (w === word.word) positions.push(i + 1); });
@@ -106,6 +109,7 @@ export default function MasteryGrid({
                 opacity: isFilterDimmed ? 0.3 : 1,
                 cursor: 'pointer',
                 transition: 'opacity 0.25s ease',
+                touchAction: 'pan-y'
               }}
               onClick={(e) => e.stopPropagation()}
             >

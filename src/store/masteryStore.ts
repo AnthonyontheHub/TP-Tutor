@@ -142,7 +142,7 @@ export const useMasteryStore = create<MasteryStore>()(
     (set, get) => ({
       userId: null,
       studentName: 'Anthony',
-      profile: { name: 'Anthony', age: '', locationString: '', sex: '', history: [] },
+      profile: { firstName: 'Anthony', lastName: '', tokiPonaName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
       lore: [],
       reviewVibe: 'chill',
       profileImage: '',
@@ -418,7 +418,7 @@ export const useMasteryStore = create<MasteryStore>()(
         }
       },
 
-      setStudentName: (name) => { set({ studentName: name }); get().updateProfile({ name }); },
+      setStudentName: (name) => { set({ studentName: name }); get().updateProfile({ firstName: name }); },
       updateProfile: (profile) => { set((state) => ({ profile: { ...state.profile, ...profile } })); void get().syncToCloud(); },
       addLore: (category, detail) => { 
         set((state) => ({ lore: [...state.lore, { id: crypto.randomUUID(), category, detail }] })); 
@@ -453,7 +453,7 @@ export const useMasteryStore = create<MasteryStore>()(
       resetAsNewUser: () => {
         set({
           studentName: '',
-          profile: { name: '', age: '', locationString: '', sex: '', history: [] },
+          profile: { firstName: '', lastName: '', tokiPonaName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
           lore: [],
           reviewVibe: 'chill',
           profileImage: '',
@@ -471,7 +471,7 @@ export const useMasteryStore = create<MasteryStore>()(
       resetProfileAndRunSetup: () => {
         set({
           studentName: '',
-          profile: { name: '', age: '', locationString: '', sex: '', history: [] },
+          profile: { firstName: '', lastName: '', tokiPonaName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
           lore: [],
           profileImage: '',
           curriculums: curriculumRoadmap,
@@ -508,7 +508,7 @@ export const useMasteryStore = create<MasteryStore>()(
         set({
           userId: null,
           studentName: 'Anthony',
-          profile: { name: 'Anthony', age: '', locationString: '', sex: '', history: [] },
+          profile: { firstName: 'Anthony', lastName: '', tokiPonaName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
           lore: [],
           reviewVibe: 'chill',
           profileImage: '',
@@ -568,7 +568,7 @@ export const useMasteryStore = create<MasteryStore>()(
       switchProfile: (name: string) => {
         set({
           studentName: name,
-          profile: { name, age: '', locationString: '', sex: '', history: [] },
+          profile: { firstName: name, lastName: '', tokiPonaName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
           lore: [],
           reviewVibe: 'chill',
           profileImage: '',
@@ -640,7 +640,7 @@ export const useMasteryStore = create<MasteryStore>()(
               // Local data belongs to a different user — start fresh for this account
               set({
                 studentName: initialName,
-                profile: { name: initialName, age: '', locationString: '', sex: '', history: [] },
+                profile: { firstName: initialName, lastName: '', tokiPonaName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
                 lore: [],
                 profileImage: initialProfileImage || '',
                 savedPhrases: [],
@@ -654,7 +654,7 @@ export const useMasteryStore = create<MasteryStore>()(
             } else {
               if (initialName && (localName === 'Anthony' || !localName)) {
                 set({ studentName: initialName });
-                get().updateProfile({ name: initialName });
+                get().updateProfile({ firstName: initialName });
               }
               if (initialProfileImage && !get().profileImage) {
                 set({ profileImage: initialProfileImage });
@@ -689,7 +689,7 @@ export const useMasteryStore = create<MasteryStore>()(
           if (nameMismatch && allVocabMastered) {
             set({
               studentName: initialName,
-              profile: { name: initialName, age: '', locationString: '', sex: '', history: [] },
+              profile: { firstName: initialName, lastName: '', tokiPonaName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
               lore: [],
               profileImage: initialProfileImage || '',
               savedPhrases: [],
