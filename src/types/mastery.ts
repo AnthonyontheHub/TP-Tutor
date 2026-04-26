@@ -148,9 +148,10 @@ export interface Collocation {
 }
 
 export interface BoundaryNote {
-  doesNotCover: string;
-  useInstead: string;
-  explanation: string;
+  id: string;
+  wordId: string;
+  note: string;
+  timestamp: string;
 }
 
 export interface TeachingObjective {

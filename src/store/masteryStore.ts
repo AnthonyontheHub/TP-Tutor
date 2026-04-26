@@ -160,7 +160,7 @@ export const useMasteryStore = create<MasteryStore>()(
       isMainProfile: true,
       fogOfWar: 'Visible',
       showCircuitPaths: true,
-      knowledgeCheckFrequency: 'daily',
+      knowledgeCheckFrequency: 'session',
       lastKnowledgeCheckDate: '',
       cloudSynced: false,
 
@@ -794,7 +794,7 @@ export const useMasteryStore = create<MasteryStore>()(
             widgetDensity: data.widgetDensity || 'Expanded',
             fogOfWar: data.fogOfWar || 'Visible',
             showCircuitPaths: data.showCircuitPaths !== undefined ? data.showCircuitPaths : true,
-            knowledgeCheckFrequency: data.knowledgeCheckFrequency || 'daily',
+            knowledgeCheckFrequency: data.knowledgeCheckFrequency || 'session',
             lastKnowledgeCheckDate: data.lastKnowledgeCheckDate || '',
           };
 
