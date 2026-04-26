@@ -13,10 +13,10 @@ export default function ProgressSummary({ activeFilter, onFilterClick }: Props) 
   const summary = getStatusSummary();
 
   const statusItems: { status: MasteryStatus; label: string; emoji: string; color: string; glow: string }[] = [
-    { status: 'not_started', label: 'PENDING',    emoji: '⬜', color: '#374151', glow: 'rgba(55,65,81,0.4)'    },
-    { status: 'introduced',  label: 'INTRODUCED',  emoji: '🔵', color: '#a855f7', glow: 'rgba(168,85,247,0.6)'  },
-    { status: 'practicing',  label: 'PRACTICING',  emoji: '🟡', color: '#3b82f6', glow: 'rgba(59,130,246,0.6)'  },
-    { status: 'confident',   label: 'CONFIDENT',   emoji: '🟢', color: '#eab308', glow: 'rgba(234,179,8,0.6)'   },
+    { status: 'not_started', label: 'PENDING',    emoji: '⬜', color: '#ffffff', glow: 'rgba(255,255,255,0.4)' },
+    { status: 'introduced',  label: 'INTRODUCED',  emoji: '🟣', color: '#a855f7', glow: 'rgba(168,85,247,0.6)'  },
+    { status: 'practicing',  label: 'PRACTICING',  emoji: '🔵', color: '#3b82f6', glow: 'rgba(59,130,246,0.6)'  },
+    { status: 'confident',   label: 'CONFIDENT',   emoji: '🟡', color: '#f59e0b', glow: 'rgba(245,158,11,0.6)'   },
     { status: 'mastered',    label: 'MASTERED',    emoji: '✅', color: '#22c55e', glow: 'rgba(34,197,94,0.65)'  },
   ];
   return (

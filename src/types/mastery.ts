@@ -17,27 +17,27 @@ export const STATUS_META: Record<
 > = {
   not_started: {
     emoji: '⬜',
-    label: 'Not Started',
+    label: 'PENDING',
     meaning: 'Concept has not yet been introduced.',
   },
   introduced: {
     emoji: '🟣',
-    label: 'Introduced',
+    label: 'INTRODUCED',
     meaning: 'The word is new to you (0-50 pts).',
   },
   practicing: {
     emoji: '🔵',
-    label: 'Practicing',
+    label: 'PRACTICING',
     meaning: "You're using it, but it's not fluid yet (51-150 pts).",
   },
   confident: {
     emoji: '🟡',
-    label: 'Confident',
+    label: 'CONFIDENT',
     meaning: 'You know it well in most contexts (151-400 pts).',
   },
   mastered: {
     emoji: '✅',
-    label: 'Mastered',
+    label: 'MASTERED',
     meaning:
       'The word is now part of your "mental map" (400+ pts).',
   },

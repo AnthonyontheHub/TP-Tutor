@@ -23,11 +23,11 @@ const NEXT_THRESHOLD: Partial<Record<MasteryStatus, number>> = {
   not_started: 201, introduced: 501, practicing: 751, confident: 950,
 };
 const NEXT_COLOR: Record<MasteryStatus, string> = {
-  not_started: '#374151',
-  introduced:  '#a855f7', // Purple
-  practicing:  '#3b82f6', // Blue
-  confident:   '#eab308', // Yellow
-  mastered:    '#22c55e', // Bright Green
+  not_started: '#a855f7',
+  introduced:  '#3b82f6',
+  practicing:  '#f59e0b',
+  confident:   '#22c55e',
+  mastered:    '#22c55e',
 };
 
 const WORD_EXTRA_DATA: Record<string, { etymology: string, neighbors: string[], compounds: string[] }> = {

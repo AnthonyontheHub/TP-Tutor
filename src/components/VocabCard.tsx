@@ -12,10 +12,18 @@ interface Props {
 
 const STATUS_ICONS: Record<MasteryStatus, string> = {
   not_started: '⬜',
-  introduced: '🔵',
-  practicing: '🟡',
-  confident: '🟢',
+  introduced: '🟣',
+  practicing: '🔵',
+  confident: '🟡',
   mastered: '✅',
+};
+
+const RING_COLOR: Record<MasteryStatus, string> = {
+  not_started: '#ffffff',
+  introduced: '#a855f7',
+  practicing: '#3b82f6',
+  confident: '#f59e0b',
+  mastered: '#22c55e',
 };
 
 export default function VocabCard({ word, onLongPress, onClick }: Props) {
@@ -92,7 +100,7 @@ export default function VocabCard({ word, onLongPress, onClick }: Props) {
   return (
     <div
       className={`vocab-card vocab-card--${status}`}
-      style={{ touchAction: 'none' }}
+      style={{ touchAction: 'none', borderLeftColor: RING_COLOR[status] }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
