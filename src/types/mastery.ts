@@ -91,7 +91,6 @@ export interface UserProfile {
   firstName: string;
   lastName: string;
   tpName: string;
-  tokiPonaName?: string;
   difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
   interests?: string[];
   history: ProgressSnapshot[];

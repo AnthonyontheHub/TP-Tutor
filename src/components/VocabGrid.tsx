@@ -64,12 +64,12 @@ export default function VocabGrid({
               style={{ position: 'relative' }}
               onClick={(e) => e.stopPropagation()}
             >
-              <VocabCard 
-                word={word} 
+              <VocabCard
+                word={word}
                 onClick={handleCardClick}
                 onLongPress={handleCardLongPress}
+                isSandboxMode={isSandboxMode}
               />
-
               {positions.length > 0 && (
                 <div style={{
                   position: 'absolute',

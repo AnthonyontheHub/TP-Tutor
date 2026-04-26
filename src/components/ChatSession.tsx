@@ -32,6 +32,7 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
   const [chatContext, setChatContext] = useState<'GENERAL' | 'DAILY REVIEW' | 'GRAMMAR CHECK'>('GENERAL');
 
   const [translateBubble, setTranslateBubble] = useState<{
@@ -48,6 +49,8 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
   const studentName         = useMasteryStore(s => s.studentName);
   const profile             = useMasteryStore(s => s.profile);
   const lore                = useMasteryStore(s => s.lore);
+
+  const displayName = profile.tpName || profile.tokiPonaName || studentName || 'ANTHONY';
 
   const messagesEndRef  = useRef<HTMLDivElement>(null);
   const historyRef      = useRef<{ role: 'user' | 'assistant'; content: string }[]>([]);
@@ -106,12 +109,55 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
     historyRef.current = [];
     sessionDeltasRef.current = [];
     const key = resolveApiKey();
-    if (key || isSandboxMode) { sendToLina(pendingPrompt, key); }
+    
+    // PROACTIVE INITIALIZATION:
+    // If it's a command-like prompt, treat it as hidden context and trigger jan Lina
+    const isProactive = low.includes('daily review') || low.includes('ready for the knowledge check') || low.includes('deep-dive');
+    
+    if (isProactive) {
+      triggerProactiveGreeting(pendingPrompt, key);
+    } else {
+      if (key || isSandboxMode) { sendToLina(pendingPrompt, key); }
+    }
+    
     clearPrompt?.();
-    // sendToLina is intentionally omitted: it's a stable in-component closure
-    // recreated each render and including it would re-fire on every render.
+    setIsMinimized(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActive, pendingPrompt, isSandboxMode, clearPrompt]);
+
+  async function triggerProactiveGreeting(context: string, overrideKey?: string) {
+    if (!isSandboxMode && !resolveApiKey(overrideKey)) return;
+    setIsLoading(true);
+    const assistantId = crypto.randomUUID();
+    setMessages([{ id: assistantId, role: 'assistant', displayContent: '· · ·', raw: '' }]);
+    
+    if (isSandboxMode) {
+      setMessages([{ id: assistantId, role: 'assistant', displayContent: SANDBOX_RESPONSE, raw: SANDBOX_RESPONSE }]);
+      historyRef.current.push({ role: 'assistant', content: SANDBOX_RESPONSE });
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const key = resolveApiKey(overrideKey);
+      const state = useMasteryStore.getState();
+      const userContext = stringifyUserContext(state.profile, state.lore);
+      const sys = buildSystemPrompt(state.vocabulary, [], displayName, userContext);
+      
+      // Hidden trigger message
+      const triggerMsg = `[SYSTEM: Start the session now based on this context: ${context}. Greet the student and proceed naturally.]`;
+      let full = '';
+      for await (const chunk of streamCompletion(key, sys, [{ role: 'user', content: triggerMsg }])) {
+        full += chunk;
+        setMessages(prev => prev.map(msg => msg.id === assistantId ? { ...msg, displayContent: stripProposedChanges(full), raw: full } : msg));
+      }
+      historyRef.current.push({ role: 'user', content: triggerMsg });
+      historyRef.current.push({ role: 'assistant', content: full });
+    } catch (e) {
+      console.error(e);
+      setMessages([{ id: assistantId, role: 'assistant', displayContent: "pakala!" }]);
+    } finally { setIsLoading(false); }
+  }
 
   async function handleEndSession() {
     const deltas = sessionDeltasRef.current;
@@ -182,7 +228,7 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
       <m.div
         className="chat-drawer"
         initial={{ x: '100%' }}
-        animate={{ x: 0 }}
+        animate={{ x: 0, height: isMinimized ? 'var(--header-height)' : '100%' }}
         exit={{ x: '100%' }}
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
         onMouseUp={handleTextSelection}
@@ -190,13 +236,15 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
         style={{
           width: '100%',
           maxWidth: '500px',
-          height: '100%',
           background: 'var(--surface-opaque)',
           display: 'flex',
           flexDirection: 'column',
-          position: 'relative',
+          position: 'fixed',
+          bottom: 0,
+          right: 0,
           boxShadow: '-10px 0 30px rgba(0,0,0,0.5)',
-          borderLeft: '1px solid var(--border)'
+          borderLeft: '1px solid var(--border)',
+          zIndex: 1000
         }}
       >
         <header style={{ 
@@ -210,25 +258,33 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
           backdropFilter: 'var(--glass)'
         }}>
           <h2 style={{ fontSize: '0.8rem', fontWeight: 900, letterSpacing: '0.2em', color: 'var(--gold)', margin: 0 }}>{chatContext === 'GENERAL' ? 'jan LINA LINK' : chatContext}</h2>
-          <button 
-            onClick={handleEndSession} 
-            style={{ 
-              background: 'none', 
-              border: 'none', 
-              color: 'var(--gold)', 
-              fontSize: '1.2rem', 
-              cursor: 'pointer',
-              padding: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'transform 0.2s'
-            }}
-            onMouseOver={e => e.currentTarget.style.transform = 'scale(1.1)'}
-            onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
-          >
-            ✕
-          </button>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button 
+              onClick={() => setIsMinimized(!isMinimized)}
+              style={{ background: 'none', border: 'none', color: 'var(--gold)', fontSize: '0.8rem', cursor: 'pointer', fontWeight: 900 }}
+            >
+              {isMinimized ? 'EXPAND' : 'MINIMIZE'}
+            </button>
+            <button 
+              onClick={handleEndSession} 
+              style={{ 
+                background: 'none', 
+                border: 'none', 
+                color: 'var(--gold)', 
+                fontSize: '1.2rem', 
+                cursor: 'pointer',
+                padding: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'transform 0.2s'
+              }}
+              onMouseOver={e => e.currentTarget.style.transform = 'scale(1.1)'}
+              onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
+            >
+              ✕
+            </button>
+          </div>
         </header>
 
         {translateBubble && (
@@ -237,19 +293,19 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
           </div>
         )}
 
-        <div style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '20px', display: isMinimized ? 'none' : 'block' }}>
           {isSandboxMode && <div style={{ marginBottom: '12px', padding: '8px', border: '1px solid var(--gold)', borderRadius: '2px', fontSize: '0.7rem', color: 'var(--gold)', textAlign: 'center' }}>OFFLINE PROTOCOL ACTIVE</div>}
           {messages.map((msg) => (
             <div key={msg.id} style={{ marginBottom: '24px', textAlign: msg.role === 'user' ? 'right' : 'left' }}>
-              <div style={{ color: 'var(--gold)', fontSize: '0.6rem', marginBottom: '4px', fontWeight: 900, letterSpacing: '0.1em' }}>{msg.role === 'assistant' ? 'jan LINA' : (studentName?.toUpperCase() || 'ANTHONY')}</div>
-              <div style={{ background: msg.role === 'assistant' ? 'rgba(255,255,255,0.03)' : 'rgba(255, 191, 0, 0.1)', padding: '12px', borderRadius: '2px', border: '1px solid var(--border)', color: 'white', display: 'inline-block', textAlign: 'left', maxWidth: '90%', fontSize: '0.9rem', lineHeight: '1.5' }}>{msg.displayContent || (isLoading && msg.role === 'assistant' ? '...' : '')}</div>
+              <div style={{ color: 'var(--gold)', fontSize: '0.6rem', marginBottom: '4px', fontWeight: 900, letterSpacing: '0.1em' }}>{msg.role === 'assistant' ? 'jan LINA' : (displayName.toUpperCase())}</div>
+              <div style={{ background: msg.role === 'assistant' ? 'rgba(255,255,255,0.03)' : 'rgba(255, 191, 0, 0.1)', padding: '12px', borderRadius: '2px', border: '1px solid var(--border)', color: 'white', display: 'inline-block', textAlign: 'left', maxWidth: '90%', fontSize: '0.9rem', lineHeight: '1.5' }}>{msg.displayContent || (isLoading && msg.role === 'assistant' ? '· · ·' : '')}</div>
               {msg.proposedChanges && msg.proposedChanges.map((c) => <div key={`${c.type}_${c.id}`} style={{ marginTop: '4px', fontSize: '0.65rem', color: 'var(--gold)', fontWeight: 700 }}>+ CALIBRATING: {c.id} → {c.newStatus}</div>)}
             </div>
           ))}
           <div ref={messagesEndRef} />
         </div>
 
-        <div style={{ padding: '16px', background: 'rgba(5,5,5,0.5)', borderTop: '1px solid var(--border)', display: 'flex', gap: '8px' }}>
+        <div style={{ padding: '16px', background: 'rgba(5,5,5,0.5)', borderTop: '1px solid var(--border)', display: isMinimized ? 'none' : 'flex', gap: '8px' }}>
           <input 
             value={input} 
             onChange={(e) => setInput(e.target.value)} 

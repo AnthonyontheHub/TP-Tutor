@@ -10,11 +10,12 @@ import UserProfilePanel from './components/UserProfilePanel';
 import SettingsPanel from './components/SettingsPanel';
 import InstructionsPanel from './components/InstructionsPanel';
 import AchievementsPanel from './components/AchievementsPanel';
+import LogbookPanel from './components/LogbookPanel';
 import ChatSession from './components/ChatSession';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
-export type AppPanel = 'profile' | 'settings' | 'instructions' | 'achievements' | 'chat';
+export type AppPanel = 'profile' | 'settings' | 'instructions' | 'achievements' | 'chat' | 'logbook';
 
 export default function App() {
   const { user, loading } = useAuthStore();
@@ -96,23 +97,27 @@ export default function App() {
       />
 
       <AnimatePresence>
-        {activePanels.map(panel => (
+        {activePanels.filter(p => p !== 'chat').map(panel => (
           <ModalWrapper key={panel} onClose={() => togglePanel(panel)}>
              {panel === 'profile' && <UserProfilePanel isOpen={true} onClose={() => togglePanel('profile')} />}
-             {panel === 'settings' && <SettingsPanel isOpen={true} onClose={() => togglePanel('settings')} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} />}
+             {panel === 'settings' && <SettingsPanel isOpen={true} onClose={() => togglePanel('settings')} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} onOpenLogbook={() => togglePanel('logbook')} />}
              {panel === 'achievements' && <AchievementsPanel onClose={() => togglePanel('achievements')} />}
              {panel === 'instructions' && <InstructionsPanel isOpen={true} onClose={() => togglePanel('instructions')} />}
-             {panel === 'chat' && (
-               <ChatSession 
-                 isActive={true} 
-                 onEndSession={() => togglePanel('chat')} 
-                 isSandboxMode={isSandboxMode} 
-                 pendingPrompt={pendingPrompt}
-                 clearPrompt={() => setPendingPrompt(null)}
-               />
-             )}
+             {panel === 'logbook' && <LogbookPanel onClose={() => togglePanel('logbook')} />}
           </ModalWrapper>
         ))}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {activePanels.includes('chat') && (
+          <ChatSession 
+            isActive={true} 
+            onEndSession={() => togglePanel('chat')} 
+            isSandboxMode={isSandboxMode} 
+            pendingPrompt={pendingPrompt}
+            clearPrompt={() => setPendingPrompt(null)}
+          />
+        )}
       </AnimatePresence>
 
       {!hasCompletedSetup && <SetupScreen />}

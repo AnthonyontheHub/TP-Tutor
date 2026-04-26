@@ -133,7 +133,8 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
               <div style={{ display: 'grid', gap: '8px' }}>
                 {['Simple', 'Intermediate', 'Advanced', 'Personal'].map((tier) => {
                   const content = deepDive?.[tier.toLowerCase()];
-                  const label = tier === 'Personal' ? `${studentName?.toUpperCase() || 'ANTHONY'}'S LORE` : tier;
+                  const name = profile.tpName || studentName || 'ANTHONY';
+                  const label = tier === 'Personal' ? `${name.toUpperCase()}'S LORE` : tier;
                   const borderCol = tier === 'Simple' ? 'var(--blue)' : 
                                     tier === 'Intermediate' ? 'var(--amber)' : 
                                     tier === 'Advanced' ? 'var(--pink)' : 

@@ -13,6 +13,7 @@ import { scoreToStatus, STATUS_MIDPOINT } from '../types/mastery';
 import { initialMasteryMap } from '../data/initialMasteryMap';
 import { curriculumRoadmap } from '../data/curriculum';
 import { vocabContent } from '../data/vocabContent';
+import { TOKI_PONA_DICTIONARY } from '../data/tokiPonaDictionary';
 
 function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: MasteryStatus; type: 'word' | 'grammar'; sessionNotes: string; frequencyRank?: number }): VocabWord {
   const score = STATUS_MIDPOINT[v.status];
@@ -22,7 +23,7 @@ function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: Maste
     id: v.word,
     word: v.word,
     partOfSpeech: v.partOfSpeech || '',
-    meanings: '',
+    meanings: TOKI_PONA_DICTIONARY[v.word.toLowerCase()] || '',
     type: v.type,
     baseScore: score,
     confidenceScore: score,
@@ -142,7 +143,7 @@ export const useMasteryStore = create<MasteryStore>()(
     (set, get) => ({
       userId: null,
       studentName: 'Anthony',
-      profile: { firstName: 'Anthony', lastName: '', tokiPonaName: '', tpName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
+      profile: { firstName: 'Anthony', lastName: '', tpName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
       lore: [],
       reviewVibe: 'chill',
       profileImage: '',
@@ -335,6 +336,7 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       cycleWordStatus: (wordId) => {
+        if (localStorage.getItem('tp_sandbox_mode') !== 'true') return;
         const now = new Date().toISOString();
         set((state) => ({
           vocabulary: state.vocabulary.map((w) => {
@@ -453,7 +455,7 @@ export const useMasteryStore = create<MasteryStore>()(
       resetAsNewUser: () => {
         set({
           studentName: '',
-          profile: { firstName: '', lastName: '', tokiPonaName: '', tpName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
+          profile: { firstName: '', lastName: '', tpName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
           lore: [],
           reviewVibe: 'chill',
           profileImage: '',
@@ -471,7 +473,7 @@ export const useMasteryStore = create<MasteryStore>()(
       resetProfileAndRunSetup: () => {
         set({
           studentName: '',
-          profile: { firstName: '', lastName: '', tokiPonaName: '', tpName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
+          profile: { firstName: '', lastName: '', tpName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
           lore: [],
           profileImage: '',
           curriculums: curriculumRoadmap,
@@ -482,6 +484,7 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       randomizeVocab: () => {
+        if (localStorage.getItem('tp_sandbox_mode') !== 'true') return;
         set((state) => ({
           vocabulary: state.vocabulary.map(w => {
             const score = Math.floor(Math.random() * 1001);
@@ -493,6 +496,7 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       masterAllVocab: () => {
+        if (localStorage.getItem('tp_sandbox_mode') !== 'true') return;
         set((state) => ({
           vocabulary: state.vocabulary.map(w => ({ ...w, baseScore: 975, confidenceScore: 975, status: 'mastered' as MasteryStatus })),
           curriculums: state.curriculums.map(level => ({
@@ -508,7 +512,7 @@ export const useMasteryStore = create<MasteryStore>()(
         set({
           userId: null,
           studentName: 'Anthony',
-          profile: { firstName: 'Anthony', lastName: '', tokiPonaName: '', tpName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
+          profile: { firstName: 'Anthony', lastName: '', tpName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
           lore: [],
           reviewVibe: 'chill',
           profileImage: '',
@@ -568,7 +572,7 @@ export const useMasteryStore = create<MasteryStore>()(
       switchProfile: (name: string) => {
         set({
           studentName: name,
-          profile: { firstName: name, lastName: '', tokiPonaName: '', tpName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
+          profile: { firstName: name, lastName: '', tpName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
           lore: [],
           reviewVibe: 'chill',
           profileImage: '',
@@ -640,7 +644,7 @@ export const useMasteryStore = create<MasteryStore>()(
               // Local data belongs to a different user — start fresh for this account
               set({
                 studentName: initialName,
-                profile: { firstName: initialName, lastName: '', tokiPonaName: '', tpName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
+                profile: { firstName: initialName, lastName: '', tpName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
                 lore: [],
                 profileImage: initialProfileImage || '',
                 savedPhrases: [],
@@ -689,7 +693,7 @@ export const useMasteryStore = create<MasteryStore>()(
           if (nameMismatch && allVocabMastered) {
             set({
               studentName: initialName,
-              profile: { firstName: initialName, lastName: '', tokiPonaName: '', tpName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
+              profile: { firstName: initialName, lastName: '', tpName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
               lore: [],
               profileImage: initialProfileImage || '',
               savedPhrases: [],

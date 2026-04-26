@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import { useAuthStore } from '../store/authStore';
 
-export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSandboxMode }: {
+export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSandboxMode, onOpenLogbook }: {
   isOpen: boolean;
   onClose: () => void;
   isSandboxMode: boolean;
   setIsSandboxMode: (val: boolean) => void;
+  onOpenLogbook: () => void;
 }) {
   const { 
     resetAsNewUser, masterAllVocab, randomizeVocab, isMainProfile,
@@ -66,59 +67,19 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
     }
   };
 
-  const logbookEntries = vocabulary.filter(v => v.sessionNotes);
-
   return (
     <div style={{ padding: '40px', background: 'var(--surface-opaque)', height: '100%', overflowY: 'auto' }}>
       <h1 style={{ color: 'var(--gold)', fontWeight: 900, marginBottom: '32px', letterSpacing: '0.1em' }}>SETTINGS</h1>
 
       <section style={{ marginBottom: '40px' }}>
         <h2 style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--gold)', letterSpacing: '0.15em', marginBottom: '20px', opacity: 0.8 }}>TEACHER'S LOGBOOK</h2>
-        <div style={{ 
-          background: '#111', 
-          borderRadius: '12px', 
-          border: '1px solid #222', 
-          padding: '24px',
-          maxHeight: '400px',
-          overflowY: 'auto'
-        }} className="hide-scrollbar">
-          {logbookEntries.length === 0 ? (
-            <p style={{ fontSize: '0.85rem', color: '#555', textAlign: 'center', py: '20px' }}>jan Lina has not recorded any private notes yet.</p>
-          ) : (
-            <div style={{ display: 'grid', gap: '12px' }}>
-              {logbookEntries.map(v => (
-                <div key={v.id} style={{ 
-                  background: '#1a1a1a', 
-                  borderRadius: '8px', 
-                  border: '1px solid #333', 
-                  padding: '16px',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                }}>
-                  <div style={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'baseline',
-                    marginBottom: '8px',
-                    borderBottom: '1px solid #222',
-                    paddingBottom: '8px'
-                  }}>
-                    <span style={{ fontSize: '0.8rem', fontWeight: 900, color: 'var(--gold)', textTransform: 'uppercase' }}>{v.word}</span>
-                    <span style={{ fontSize: '0.6rem', fontWeight: 700, color: '#666' }}>CALIBRATION NOTE</span>
-                  </div>
-                  <div style={{ 
-                    fontSize: '0.9rem', 
-                    color: '#ccc', 
-                    lineHeight: '1.6',
-                    letterSpacing: '0.01em',
-                    fontWeight: 400
-                  }}>
-                    {v.sessionNotes}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <button 
+          onClick={onOpenLogbook}
+          className="btn-review"
+          style={{ width: '100%', background: '#111', border: '1px solid #222', color: 'var(--gold)' }}
+        >
+          VIEW TEACHER'S LOGBOOK
+        </button>
       </section>
 
       <section style={{ marginBottom: '40px' }}>

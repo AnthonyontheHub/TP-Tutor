@@ -150,6 +150,7 @@ export default function MasteryGrid({
                   word={word} 
                   onClick={handleCardClick}
                   onLongPress={handleCardLongPress}
+                  isSandboxMode={isSandboxMode}
                 />
 
                 {positions.length > 0 && (
@@ -239,7 +240,7 @@ export default function MasteryGrid({
                       {word.type === 'grammar' ? 'GRAMMAR' : word.partOfSpeech}
                     </td>
                     <td style={{ padding: '12px 16px', color: '#ccc', fontWeight: 700 }}>
-                      {word.meanings}
+                      {word.meanings.split(/[;,]/)[0].trim()}
                     </td>
                     <td style={{ padding: '12px 16px', color: '#666', fontSize: '0.75rem', fontStyle: 'italic' }}>
                       {word.sessionNotes || '-'}

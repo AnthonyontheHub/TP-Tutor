@@ -8,6 +8,7 @@ interface Props {
   word: VocabWord;
   onLongPress?: (word: VocabWord) => void;
   onClick?: (word: VocabWord) => void;
+  isSandboxMode: boolean;
 }
 
 const STATUS_ICONS: Record<MasteryStatus, string> = {
@@ -26,7 +27,7 @@ const RING_COLOR: Record<MasteryStatus, string> = {
   mastered: '#22c55e',
 };
 
-export default function VocabCard({ word, onLongPress, onClick }: Props) {
+export default function VocabCard({ word, onLongPress, onClick, isSandboxMode }: Props) {
   const { cycleWordStatus } = useMasteryStore();
   const status = word.status;
 
@@ -37,6 +38,7 @@ export default function VocabCard({ word, onLongPress, onClick }: Props) {
 
   const handleStatusClick = (e: React.MouseEvent | React.PointerEvent) => {
     e.stopPropagation();
+    if (!isSandboxMode) return;
     soundService.playBlip(600, 'sine', 0.05);
     cycleWordStatus(word.id);
   };

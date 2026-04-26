@@ -174,7 +174,7 @@ export default function UserProfilePanel({ onClose }: Props) {
             {isEditing ? (
               <>
                 <div className="field">
-                  <label>TP Name</label>
+                  <label>Toki Pona Name</label>
                   <input type="text" value={editableProfile.tpName || ''} onChange={(e) => handleFieldChange('tpName', e.target.value)} />
                 </div>
                 <div className="field">
@@ -192,7 +192,7 @@ export default function UserProfilePanel({ onClose }: Props) {
               </>
             ) : (
               <div style={{ color: '#ccc', fontSize: '0.9rem', lineHeight: '1.5' }}>
-                <p><strong>TP Name:</strong> {profile.tpName || 'Not set'}</p>
+                <p><strong>Toki Pona Name:</strong> {profile.tpName || 'Not set'}</p>
                 <p><strong>Age:</strong> {profile.age || 'Not provided'}</p>
                 <p><strong>Sex:</strong> {profile.sex || 'Not provided'}</p>
                 <p><strong>Location:</strong> {profile.locationString || 'Not provided'}</p>
@@ -250,10 +250,6 @@ export default function UserProfilePanel({ onClose }: Props) {
             {isEditing ? (
               <>
                 <div className="field">
-                  <label>toki pona Name</label>
-                  <input type="text" value={editableProfile.tokiPonaName || ''} onChange={(e) => handleFieldChange('tokiPonaName', e.target.value)} />
-                </div>
-                <div className="field">
                   <label>Difficulty</label>
                   <select value={editableProfile.difficulty || 'Beginner'} onChange={(e) => handleFieldChange('difficulty', e.target.value)}>
                     <option>Beginner</option>
@@ -268,7 +264,6 @@ export default function UserProfilePanel({ onClose }: Props) {
               </>
             ) : (
               <div style={{ color: '#ccc', fontSize: '0.9rem', lineHeight: '1.5' }}>
-                <p><strong>toki pona Name:</strong> {profile.tokiPonaName || 'Not set'}</p>
                 <p><strong>Difficulty:</strong> {profile.difficulty || 'Beginner'}</p>
                 <p><strong>Interests:</strong> {(profile.interests || []).join(', ') || 'None listed'}</p>
               </div>
