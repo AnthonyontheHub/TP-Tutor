@@ -4,6 +4,7 @@ import { useMasteryStore } from '../store/masteryStore';
 import VocabCard from './VocabCard';
 import WordDetailDrawer from './WordDetailDrawer';
 import type { MasteryStatus, VocabWord } from '../types/mastery';
+import { STATUS_META } from '../types/mastery';
 
 interface Props {
   onAskLina: (p: string) => void;
@@ -28,6 +29,7 @@ export default function MasteryGrid({
   const { vocabulary, selectedWords, toggleWordSelection, setSelectedWords, lessonFilter } = useMasteryStore();
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [selectedPOS, setSelectedPOS] = useState('All');
+  const [viewMode, setViewMode] = useState<'card' | 'table'>('card');
 
   const handleCardClick = (word: VocabWord) => {
     if (selectedWords.length === 0) {
@@ -114,74 +116,140 @@ export default function MasteryGrid({
         >
           {sortDirection === 'asc' ? '↑' : '↓'}
         </button>
+        <button
+          onClick={() => setViewMode(prev => prev === 'card' ? 'table' : 'card')}
+          className="btn-toggle"
+          style={{ flex: 'none', width: '42px', fontSize: '1rem' }}
+          title={viewMode === 'card' ? 'Switch to Table View' : 'Switch to Card View'}
+        >
+          {viewMode === 'card' ? '📋' : '🎴'}
+        </button>
       </div>
 
-      <div className="mastery-grid__cards" style={{ pointerEvents: 'auto' }}>
-        {displayed.map((word) => {
-          const positions: number[] = [];
-          selectedWords.forEach((w, i) => { if (w === word.word) positions.push(i + 1); });
-          const isFilterDimmed = activeFilter && word.status !== activeFilter;
+      {viewMode === 'card' ? (
+        <div className="mastery-grid__cards" style={{ pointerEvents: 'auto' }}>
+          {displayed.map((word) => {
+            const positions: number[] = [];
+            selectedWords.forEach((w, i) => { if (w === word.word) positions.push(i + 1); });
+            const isFilterDimmed = activeFilter && word.status !== activeFilter;
 
-          return (
-            <div
-              key={word.id}
-              className="grid-item-wrapper"
-              style={{
-                position: 'relative',
-                opacity: isFilterDimmed ? 0.3 : 1,
-                cursor: 'pointer',
-                transition: 'opacity 0.25s ease',
-                touchAction: 'pan-y'
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <VocabCard 
-                word={word} 
-                onClick={handleCardClick}
-                onLongPress={handleCardLongPress}
-              />
+            return (
+              <div
+                key={word.id}
+                className="grid-item-wrapper"
+                style={{
+                  position: 'relative',
+                  opacity: isFilterDimmed ? 0.3 : 1,
+                  cursor: 'pointer',
+                  transition: 'opacity 0.25s ease',
+                  touchAction: 'pan-y'
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <VocabCard 
+                  word={word} 
+                  onClick={handleCardClick}
+                  onLongPress={handleCardLongPress}
+                />
 
-              {positions.length > 0 && (
-                <div style={{
-                  position: 'absolute',
-                  top: -6,
-                  right: -6,
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: '2px',
-                  justifyContent: 'flex-end',
-                  maxWidth: '64px',
-                  pointerEvents: 'none',
-                  zIndex: 10
-                }}>
-                  {positions.map(pos => (
-                    <span
-                      key={pos}
-                      style={{
-                        background: 'var(--gold)',
-                        color: 'black',
-                        borderRadius: '50%',
-                        width: '18px',
-                        height: '18px',
-                        fontSize: '0.65rem',
-                        fontWeight: 900,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        lineHeight: 1,
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.5)',
-                        border: '1px solid black'
-                      }}
-                    >
-                      {pos}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+                {positions.length > 0 && (
+                  <div style={{
+                    position: 'absolute',
+                    top: -6,
+                    right: -6,
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '2px',
+                    justifyContent: 'flex-end',
+                    maxWidth: '64px',
+                    pointerEvents: 'none',
+                    zIndex: 10
+                  }}>
+                    {positions.map(pos => (
+                      <span
+                        key={pos}
+                        style={{
+                          background: 'var(--gold)',
+                          color: 'black',
+                          borderRadius: '50%',
+                          width: '18px',
+                          height: '18px',
+                          fontSize: '0.65rem',
+                          fontWeight: 900,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          lineHeight: 1,
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.5)',
+                          border: '1px solid black'
+                        }}
+                      >
+                        {pos}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="mastery-grid__table-wrapper" style={{ overflowX: 'auto', background: 'rgba(0,0,0,0.2)', borderRadius: '8px', border: '1px solid #222' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+            <thead>
+              <tr style={{ textAlign: 'left', borderBottom: '1px solid #333', color: '#888' }}>
+                <th style={{ padding: '12px 16px' }}>STATUS</th>
+                <th style={{ padding: '12px 16px' }}>WORD</th>
+                <th style={{ padding: '12px 16px' }}>FUNCTION</th>
+                <th style={{ padding: '12px 16px' }}>MEANINGS / NOTES</th>
+              </tr>
+            </thead>
+            <tbody>
+              {displayed.map((word) => {
+                const isFilterDimmed = activeFilter && word.status !== activeFilter;
+                const isSelected = selectedWords.includes(word.word);
+                const posIndex = selectedWords.indexOf(word.word) + 1;
+
+                return (
+                  <tr 
+                    key={word.id}
+                    onClick={() => handleCardClick(word)}
+                    onContextMenu={(e) => { e.preventDefault(); handleCardLongPress(word); }}
+                    style={{ 
+                      cursor: 'pointer',
+                      borderBottom: '1px solid #222',
+                      background: isSelected ? 'rgba(255, 191, 0, 0.1)' : 'transparent',
+                      opacity: isFilterDimmed ? 0.3 : 1,
+                      transition: 'background 0.2s'
+                    }}
+                  >
+                    <td style={{ padding: '12px 16px', textAlign: 'center', fontSize: '1.2rem' }}>
+                      {STATUS_META[word.status].emoji}
+                    </td>
+                    <td style={{ padding: '12px 16px', fontWeight: 900, color: 'white' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        {word.word}
+                        {posIndex > 0 && (
+                           <span style={{ background: 'var(--gold)', color: 'black', borderRadius: '50%', width: '18px', height: '18px', fontSize: '0.65rem', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{posIndex}</span>
+                        )}
+                      </div>
+                    </td>
+                    <td style={{ padding: '12px 16px', color: 'var(--gold)', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase' }}>
+                      {word.type === 'grammar' ? 'GRAMMAR' : word.partOfSpeech}
+                    </td>
+                    <td style={{ padding: '12px 16px', color: '#ccc' }}>
+                      <div style={{ fontWeight: 700, marginBottom: '2px' }}>{word.meanings}</div>
+                      {word.sessionNotes && (
+                        <div style={{ fontSize: '0.75rem', color: '#666', fontStyle: 'italic' }}>{word.sessionNotes}</div>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       <WordDetailDrawer
         isOpen={!!drawerId}

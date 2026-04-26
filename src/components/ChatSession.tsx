@@ -241,7 +241,7 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
           {isSandboxMode && <div style={{ marginBottom: '12px', padding: '8px', border: '1px solid var(--gold)', borderRadius: '2px', fontSize: '0.7rem', color: 'var(--gold)', textAlign: 'center' }}>OFFLINE PROTOCOL ACTIVE</div>}
           {messages.map((msg) => (
             <div key={msg.id} style={{ marginBottom: '24px', textAlign: msg.role === 'user' ? 'right' : 'left' }}>
-              <div style={{ color: 'var(--gold)', fontSize: '0.6rem', marginBottom: '4px', fontWeight: 900, letterSpacing: '0.1em' }}>{msg.role === 'assistant' ? 'jan LINA' : 'ANTHONY'}</div>
+              <div style={{ color: 'var(--gold)', fontSize: '0.6rem', marginBottom: '4px', fontWeight: 900, letterSpacing: '0.1em' }}>{msg.role === 'assistant' ? 'jan LINA' : (studentName?.toUpperCase() || 'ANTHONY')}</div>
               <div style={{ background: msg.role === 'assistant' ? 'rgba(255,255,255,0.03)' : 'rgba(255, 191, 0, 0.1)', padding: '12px', borderRadius: '2px', border: '1px solid var(--border)', color: 'white', display: 'inline-block', textAlign: 'left', maxWidth: '90%', fontSize: '0.9rem', lineHeight: '1.5' }}>{msg.displayContent || (isLoading && msg.role === 'assistant' ? '...' : '')}</div>
               {msg.proposedChanges && msg.proposedChanges.map((c) => <div key={`${c.type}_${c.id}`} style={{ marginTop: '4px', fontSize: '0.65rem', color: 'var(--gold)', fontWeight: 700 }}>+ CALIBRATING: {c.id} → {c.newStatus}</div>)}
             </div>

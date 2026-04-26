@@ -47,7 +47,7 @@ const getCroppedImg = (imageSrc: string, pixelCrop: Area): Promise<string> => {
 };
 
 export default function UserProfilePanel({ onClose }: Props) {
-  const { profile, updateProfile, setProfileImage, profileImage, lore, addLore, deleteLore } = useMasteryStore();
+  const { studentName, profile, updateProfile, setProfileImage, profileImage, lore, addLore, deleteLore } = useMasteryStore();
   const { logout, user, isGuest } = useAuthStore();
   
   const [isEditing, setIsEditing] = useState(false);
@@ -121,7 +121,7 @@ export default function UserProfilePanel({ onClose }: Props) {
       transition={{ type: 'spring', damping: 25, stiffness: 200 }}
     >
       <header className="side-panel-header" style={{ justifyContent: 'space-between' }}>
-        <h2 style={{ fontSize: '0.9rem', fontWeight: 900, letterSpacing: '0.15em', color: 'var(--gold)' }}>ANTHONY PROFILE</h2>
+        <h2 style={{ fontSize: '0.9rem', fontWeight: 900, letterSpacing: '0.15em', color: 'var(--gold)' }}>{studentName?.toUpperCase() || 'ANTHONY'} PROFILE</h2>
         <div>
           {isEditing ? (
             <div className="edit-controls">

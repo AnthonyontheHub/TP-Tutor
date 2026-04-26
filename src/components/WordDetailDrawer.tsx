@@ -48,7 +48,7 @@ function tierProgress(score: number, status: MasteryStatus): number {
 }
 
 export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isSandboxMode }: { isOpen: boolean; word?: VocabWord | null; onClose: () => void; onAskLina: (p: string) => void; isSandboxMode: boolean }) {
-  const { profile, lore } = useMasteryStore();
+  const { studentName, profile, lore } = useMasteryStore();
   const [deepDive, setDeepDive] = useState<Record<string, string> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -133,7 +133,7 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
               <div style={{ display: 'grid', gap: '8px' }}>
                 {['Simple', 'Intermediate', 'Advanced', 'Personal'].map((tier) => {
                   const content = deepDive?.[tier.toLowerCase()];
-                  const label = tier === 'Personal' ? "ANTHONY'S LORE" : tier;
+                  const label = tier === 'Personal' ? `${studentName?.toUpperCase() || 'ANTHONY'}'S LORE` : tier;
                   const borderCol = tier === 'Simple' ? 'var(--blue)' : 
                                     tier === 'Intermediate' ? 'var(--amber)' : 
                                     tier === 'Advanced' ? 'var(--pink)' : 

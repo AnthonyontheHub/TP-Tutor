@@ -22,7 +22,7 @@ const PHRASES = [
 ];
 
 export default function PhraseGrid({ onAskLina, activeFilter, selectedWords, focusPhraseId, clearFocusPhrase }: Props) {
-  const { vocabulary, savedPhrases, updatePhraseNote, deletePhrase } = useMasteryStore();
+  const { studentName, vocabulary, savedPhrases, updatePhraseNote, deletePhrase } = useMasteryStore();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [noteInput, setNoteInput] = useState('');
 
@@ -39,7 +39,7 @@ export default function PhraseGrid({ onAskLina, activeFilter, selectedWords, foc
   }, [focusPhraseId, safeSavedPhrases]);
 
   const normalizedSaved = safeSavedPhrases.map(p => 
-    typeof p === 'string' ? { id: p, tp: p, en: 'Anthony Saved Phrase *', notes: '' } : p
+    typeof p === 'string' ? { id: p, tp: p, en: `${studentName || 'Anthony'} Saved Phrase *`, notes: '' } : p
   );
 
   const combined = [
