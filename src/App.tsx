@@ -22,18 +22,17 @@ export default function App() {
   
   const [activePanels, setActivePanels] = useState<AppPanel[]>([]);
   const [isSandboxMode, setIsSandboxMode] = useState<boolean>(
-    () => localStorage.getItem('tp_sandbox_mode') !== 'false'
+    () => localStorage.getItem('tp_sandbox_mode') === 'true'
   );
 
+  // Enforce Sandbox Mode for any profile that is not the main user
   useEffect(() => {
-    // Enforce Sandbox Mode for any profile that is not the main user
-    if (!isMainProfile) {
-      setIsSandboxMode(true);
-      localStorage.setItem('tp_sandbox_mode', 'true');
-    } else {
-      localStorage.setItem('tp_sandbox_mode', String(isSandboxMode));
-    }
-  }, [isSandboxMode, isMainProfile]);
+    if (!isMainProfile) setIsSandboxMode(true);
+  }, [isMainProfile]);
+
+  useEffect(() => {
+    localStorage.setItem('tp_sandbox_mode', String(isSandboxMode));
+  }, [isSandboxMode]);
 
   useEffect(() => {
     if (!user) return;

@@ -118,7 +118,6 @@ interface MasteryState {
   currentPositionNodeId: string;
   selectedWords: string[];
   lessonFilter: string[] | null;
-  historySynced: boolean;
   isMainProfile: boolean;
   cloudSynced: boolean;
   // Dashboard settings

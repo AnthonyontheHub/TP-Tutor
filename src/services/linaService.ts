@@ -1,6 +1,8 @@
 import type { VocabWord, MasteryStatus, UserProfile, LoreEntry, ReviewVibe } from '../types/mastery';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
+const GEMINI_MODEL = "gemini-2.5-flash";
+
 // Mapping status to emojis for offline context
 export const STATUS_EMOJI: Record<MasteryStatus, string> = {
   not_started: '⬜',
@@ -117,7 +119,7 @@ export async function* streamCompletion(
   history: { role: 'user' | 'assistant'; content: string }[]
 ) {
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash", systemInstruction: systemPrompt });
+  const model = genAI.getGenerativeModel({ model: GEMINI_MODEL, systemInstruction: systemPrompt });
 
   const chat = model.startChat({
     history: history.slice(0, -1).map(h => ({
@@ -139,7 +141,7 @@ function sanitizeJson(text: string): string {
 export async function fetchSentenceSuggestions(apiKey: string, words: string[], userContext?: string) {
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({
-    model: "gemini-2.5-flash",
+    model: GEMINI_MODEL,
     generationConfig: { responseMimeType: "application/json" },
   });
   const contextInstruction = userContext ? ` Context: ${userContext}.` : '';
@@ -155,7 +157,7 @@ export async function fetchSentenceSuggestions(apiKey: string, words: string[], 
 
 export async function fetchQuickTranslation(apiKey: string, text: string) {
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+  const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
   const prompt = `Translate this Toki Pona phrase to English: "${text}". Provide ONLY the direct English translation, no other text, quotes, or explanation.`;
   try {
     const result = await model.generateContent(prompt);
@@ -169,7 +171,7 @@ export async function fetchQuickTranslation(apiKey: string, text: string) {
 export async function fetchDeepDiveExamples(apiKey: string, word: string, userContext?: string) {
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({
-    model: "gemini-2.5-flash",
+    model: GEMINI_MODEL,
     generationConfig: { responseMimeType: "application/json" },
   });
   const contextInstruction = userContext ? ` User Context: ${userContext}.` : '';
@@ -193,7 +195,7 @@ Return a JSON object: {"simple": "tp (en)", "intermediate": "tp (en)", "advanced
 export async function fetchExamplesForWord(apiKey: string, word: string, partsOfSpeech: string[], userContext?: string) {
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({
-    model: "gemini-2.5-flash",
+    model: GEMINI_MODEL,
     generationConfig: { responseMimeType: "application/json" },
   });
   const contextInstruction = userContext ? ` Context: ${userContext}.` : '';
@@ -237,7 +239,7 @@ export async function fetchSessionRecap(
   changes: ProposedChange[]
 ): Promise<string> {
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+  const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
   const summary = changes
     .map(c => `${c.id}: → ${c.newStatus}`)
     .join(', ');
