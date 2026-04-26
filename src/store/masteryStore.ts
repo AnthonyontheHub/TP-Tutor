@@ -102,6 +102,7 @@ interface MasteryActions {
   clearAllSavedPhrases: () => void;
   checkAssessments: (onTrigger: (word: VocabWord) => void) => void;
   switchProfile: (name: string) => void;
+  bulkSyncFromMap: (syncData: { word: string; status: MasteryStatus; notes: string }[]) => void;
 }
 
 interface MasteryState {
@@ -499,6 +500,23 @@ export const useMasteryStore = create<MasteryStore>()(
             ...level,
             nodes: level.nodes.map(node => ({ ...node, status: 'mastered' as const }))
           }))
+        }));
+        get().refreshCurriculumStatus();
+        void get().syncToCloud();
+      },
+
+      bulkSyncFromMap: (syncData) => {
+        set((state) => ({
+          vocabulary: state.vocabulary.map(v => {
+            const match = syncData.find(s => s.word.toLowerCase() === v.word.toLowerCase());
+            if (!match) return v;
+            return {
+              ...v,
+              status: match.status,
+              baseScore: STATUS_MIDPOINT[match.status],
+              sessionNotes: match.notes
+            };
+          })
         }));
         get().refreshCurriculumStatus();
         void get().syncToCloud();
