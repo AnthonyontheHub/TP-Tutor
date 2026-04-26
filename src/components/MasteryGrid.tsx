@@ -201,7 +201,8 @@ export default function MasteryGrid({
                 <th style={{ padding: '12px 16px' }}>STATUS</th>
                 <th style={{ padding: '12px 16px' }}>WORD</th>
                 <th style={{ padding: '12px 16px' }}>FUNCTION</th>
-                <th style={{ padding: '12px 16px' }}>MEANINGS / NOTES</th>
+                <th style={{ padding: '12px 16px' }}>MEANINGS</th>
+                <th style={{ padding: '12px 16px' }}>SESSION NOTES</th>
               </tr>
             </thead>
             <tbody>
@@ -237,11 +238,11 @@ export default function MasteryGrid({
                     <td style={{ padding: '12px 16px', color: 'var(--gold)', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase' }}>
                       {word.type === 'grammar' ? 'GRAMMAR' : word.partOfSpeech}
                     </td>
-                    <td style={{ padding: '12px 16px', color: '#ccc' }}>
-                      <div style={{ fontWeight: 700, marginBottom: '2px' }}>{word.meanings}</div>
-                      {word.sessionNotes && (
-                        <div style={{ fontSize: '0.75rem', color: '#666', fontStyle: 'italic' }}>{word.sessionNotes}</div>
-                      )}
+                    <td style={{ padding: '12px 16px', color: '#ccc', fontWeight: 700 }}>
+                      {word.meanings}
+                    </td>
+                    <td style={{ padding: '12px 16px', color: '#666', fontSize: '0.75rem', fontStyle: 'italic' }}>
+                      {word.sessionNotes || '-'}
                     </td>
                   </tr>
                 );
