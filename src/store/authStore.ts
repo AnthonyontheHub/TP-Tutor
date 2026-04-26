@@ -87,7 +87,11 @@ getRedirectResult(auth).catch((error) => {
 // call here previously created leaked listeners.
 // We also do NOT clearLocalData on null: this listener fires once on app load
 // before the user has had a chance to sign in, which would silently wipe
-// persisted local/guest data. Explicit logout() handles that case.
+// persisted local/guest data. Explicit logout() still clears.
+// Finally, if we're already in Guest mode (no real Firebase session, just an
+// in-memory guestUser), ignore the null Firebase event so we don't kick the
+// user back to the login screen mid-session — that produced a login loop.
 onAuthStateChanged(auth, (user) => {
+  if (user === null && useAuthStore.getState().isGuest) return;
   useAuthStore.getState().setUser(user);
 });

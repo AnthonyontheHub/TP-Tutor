@@ -761,15 +761,16 @@ export const useMasteryStore = create<MasteryStore>()(
             };
           });
 
-          set({
+          // Build the patch incrementally so empty/missing fields in the
+          // cloud doc don't clobber local state (e.g. a fresh Firestore doc
+          // would otherwise reset studentName back to "Anthony" and wipe the
+          // profileImage on every snapshot).
+          const update: Partial<MasteryState> = {
             cloudSynced: true,
             vocabulary,
             curriculums: mergedCurriculums,
             lastUpdated: data.lastUpdated || '',
-            studentName: data.studentName || 'Anthony',
-            profile: data.profile || { name: data.studentName || 'Anthony', age: '', locationString: '', sex: '', history: [] },
             lore: data.lore || [],
-            profileImage: data.profileImage || '',
             savedPhrases: data.savedPhrases || [],
             currentStreak: data.currentStreak || 0,
             lastActiveDate: data.lastActiveDate || '',
@@ -779,7 +780,13 @@ export const useMasteryStore = create<MasteryStore>()(
             widgetDensity: data.widgetDensity || 'Expanded',
             fogOfWar: data.fogOfWar || 'Visible',
             showCircuitPaths: data.showCircuitPaths !== undefined ? data.showCircuitPaths : true,
-          });
+          };
+
+          if (data.studentName) update.studentName = data.studentName;
+          if (data.profileImage) update.profileImage = data.profileImage;
+          if (data.profile) update.profile = data.profile;
+
+          set(update);
           get().refreshCurriculumStatus();
         });
       },

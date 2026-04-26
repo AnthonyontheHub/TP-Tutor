@@ -36,16 +36,26 @@ export default function App() {
 
   useEffect(() => {
     if (!user) return;
-    let unsubscribe: any;
-    const setupSync = async () => {
-      unsubscribe = await useMasteryStore.getState().syncFromCloud(
-        user.uid, 
+    let cancelled = false;
+    let unsubscribe: (() => void) | null = null;
+
+    (async () => {
+      const result = await useMasteryStore.getState().syncFromCloud(
+        user.uid,
         user.displayName || undefined,
         user.photoURL || undefined
       );
+      if (typeof result !== 'function') return;
+      // If the component unmounted (or user changed) before syncFromCloud
+      // resolved, tear the listener down immediately — otherwise it leaks.
+      if (cancelled) result();
+      else unsubscribe = result;
+    })();
+
+    return () => {
+      cancelled = true;
+      if (unsubscribe) unsubscribe();
     };
-    setupSync();
-    return () => { if (typeof unsubscribe === 'function') unsubscribe(); };
   }, [user]);
 
   const togglePanel = useCallback((panel: AppPanel) => {
