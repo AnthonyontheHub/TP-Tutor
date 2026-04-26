@@ -80,7 +80,6 @@ export default function MasteryGrid({
     >
       <div className="grid-toolbar">
         <div className="flex items-center gap-4 mb-6">
-          <label className="font-bold text-gray-700">Filter by Type:</label>
           <select 
             value={selectedPOS} 
             onChange={(e) => setSelectedPOS(e.target.value)}
@@ -96,7 +95,12 @@ export default function MasteryGrid({
             <option value="Number">Numbers</option>
           </select>
         </div>
-        <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="sort-select">
+        <select 
+          value={sortMode} 
+          onChange={(e) => setSortMode(e.target.value)} 
+          className="sort-select"
+          style={{ background: '#111', border: '1px solid #222', borderRadius: '10px', color: 'white', padding: '8px' }}
+        >
           <option value="alphabetical">A → Z</option>
           <option value="status">Mastery Level</option>
           <option value="length">Word Length</option>

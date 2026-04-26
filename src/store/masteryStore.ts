@@ -142,7 +142,7 @@ export const useMasteryStore = create<MasteryStore>()(
     (set, get) => ({
       userId: null,
       studentName: 'Anthony',
-      profile: { firstName: 'Anthony', lastName: '', tokiPonaName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
+      profile: { firstName: 'Anthony', lastName: '', tokiPonaName: '', tpName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
       lore: [],
       reviewVibe: 'chill',
       profileImage: '',
@@ -453,7 +453,7 @@ export const useMasteryStore = create<MasteryStore>()(
       resetAsNewUser: () => {
         set({
           studentName: '',
-          profile: { firstName: '', lastName: '', tokiPonaName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
+          profile: { firstName: '', lastName: '', tokiPonaName: '', tpName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
           lore: [],
           reviewVibe: 'chill',
           profileImage: '',
@@ -471,7 +471,7 @@ export const useMasteryStore = create<MasteryStore>()(
       resetProfileAndRunSetup: () => {
         set({
           studentName: '',
-          profile: { firstName: '', lastName: '', tokiPonaName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
+          profile: { firstName: '', lastName: '', tokiPonaName: '', tpName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
           lore: [],
           profileImage: '',
           curriculums: curriculumRoadmap,
@@ -508,7 +508,7 @@ export const useMasteryStore = create<MasteryStore>()(
         set({
           userId: null,
           studentName: 'Anthony',
-          profile: { firstName: 'Anthony', lastName: '', tokiPonaName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
+          profile: { firstName: 'Anthony', lastName: '', tokiPonaName: '', tpName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
           lore: [],
           reviewVibe: 'chill',
           profileImage: '',
@@ -568,7 +568,7 @@ export const useMasteryStore = create<MasteryStore>()(
       switchProfile: (name: string) => {
         set({
           studentName: name,
-          profile: { firstName: name, lastName: '', tokiPonaName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
+          profile: { firstName: name, lastName: '', tokiPonaName: '', tpName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
           lore: [],
           reviewVibe: 'chill',
           profileImage: '',
@@ -640,7 +640,7 @@ export const useMasteryStore = create<MasteryStore>()(
               // Local data belongs to a different user — start fresh for this account
               set({
                 studentName: initialName,
-                profile: { firstName: initialName, lastName: '', tokiPonaName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
+                profile: { firstName: initialName, lastName: '', tokiPonaName: '', tpName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
                 lore: [],
                 profileImage: initialProfileImage || '',
                 savedPhrases: [],
@@ -689,7 +689,7 @@ export const useMasteryStore = create<MasteryStore>()(
           if (nameMismatch && allVocabMastered) {
             set({
               studentName: initialName,
-              profile: { firstName: initialName, lastName: '', tokiPonaName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
+              profile: { firstName: initialName, lastName: '', tokiPonaName: '', tpName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
               lore: [],
               profileImage: initialProfileImage || '',
               savedPhrases: [],

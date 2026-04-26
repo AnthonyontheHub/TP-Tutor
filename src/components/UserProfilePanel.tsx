@@ -174,6 +174,10 @@ export default function UserProfilePanel({ onClose }: Props) {
             {isEditing ? (
               <>
                 <div className="field">
+                  <label>TP Name</label>
+                  <input type="text" value={editableProfile.tpName || ''} onChange={(e) => handleFieldChange('tpName', e.target.value)} />
+                </div>
+                <div className="field">
                   <label>Age</label>
                   <input type="text" value={editableProfile.age || ''} onChange={(e) => handleFieldChange('age', e.target.value)} />
                 </div>
@@ -188,6 +192,7 @@ export default function UserProfilePanel({ onClose }: Props) {
               </>
             ) : (
               <div style={{ color: '#ccc', fontSize: '0.9rem', lineHeight: '1.5' }}>
+                <p><strong>TP Name:</strong> {profile.tpName || 'Not set'}</p>
                 <p><strong>Age:</strong> {profile.age || 'Not provided'}</p>
                 <p><strong>Sex:</strong> {profile.sex || 'Not provided'}</p>
                 <p><strong>Location:</strong> {profile.locationString || 'Not provided'}</p>

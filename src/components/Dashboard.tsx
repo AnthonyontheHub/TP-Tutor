@@ -20,7 +20,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   isSandboxMode: boolean;
   setIsSandboxMode: (val: boolean) => void;
 }) {
-  const { studentName, profileImage, currentStreak, vocabulary, curriculums, savedPhrases, reviewVibe, setReviewVibe, selectedWords, setSelectedWords, savePhrase, lessonFilter, setLessonFilter, calculateDecay, checkAssessments, hardenWord, knowledgeCheckFrequency, lastKnowledgeCheckDate, setLastKnowledgeCheckDate } = useMasteryStore();
+  const { studentName, profile, profileImage, currentStreak, vocabulary, curriculums, savedPhrases, reviewVibe, setReviewVibe, selectedWords, setSelectedWords, savePhrase, lessonFilter, setLessonFilter, calculateDecay, checkAssessments, hardenWord, knowledgeCheckFrequency, lastKnowledgeCheckDate, setLastKnowledgeCheckDate } = useMasteryStore();
 
   const [activeView, setActiveView] = useState<DashboardView>('vocab');
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
@@ -173,7 +173,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
             ) : (
               <span style={{ fontSize: '1.2rem', marginLeft: '4px' }}>👤</span>
             )} 
-            <span style={{ fontSize: '0.75rem', fontWeight: 900 }}>{studentName?.toUpperCase() || 'STUDENT'}</span>
+            <span style={{ fontSize: '0.75rem', fontWeight: 900 }}>{(profile?.tpName || studentName)?.toUpperCase() || 'STUDENT'}</span>
           </button>
           
           {/* Roadmap Progress Indicator */}
