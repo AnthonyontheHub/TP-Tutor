@@ -47,7 +47,7 @@ const getCroppedImg = (imageSrc: string, pixelCrop: Area): Promise<string> => {
 };
 
 export default function UserProfilePanel({ onClose }: Props) {
-  const { profile, updateProfile, setProfileImage, profileImage } = useMasteryStore();
+  const { profile, updateProfile, setProfileImage, profileImage, lore, addLore, deleteLore } = useMasteryStore();
   const { logout, user, isGuest } = useAuthStore();
   
   const [isEditing, setIsEditing] = useState(false);
@@ -57,14 +57,22 @@ export default function UserProfilePanel({ onClose }: Props) {
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
+  const [loreInput, setLoreInput] = useState('');
+  const [loreCategory, setLoreCategory] = useState<'Work' | 'Hobbies' | 'Pets' | 'Projects' | 'Lifestyle'>('Work');
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (imageSrc && croppedAreaPixels) {
+      const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
+      setProfileImage(croppedImage);
+      setImageSrc(null);
+    }
     updateProfile(editableProfile);
     setIsEditing(false);
   };
 
   const handleCancel = () => {
     setEditableProfile(profile);
+    setImageSrc(null);
     setIsEditing(false);
   };
 
@@ -90,12 +98,10 @@ export default function UserProfilePanel({ onClose }: Props) {
     }
   };
 
-  const saveCroppedImage = async () => {
-    if (imageSrc && croppedAreaPixels) {
-      const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
-      setProfileImage(croppedImage);
-      setImageSrc(null);
-    }
+  const handleAddLore = () => {
+    if (!loreInput.trim()) return;
+    addLore(loreCategory, loreInput.trim());
+    setLoreInput('');
   };
 
   const handleGoogleSignIn = async () => {
@@ -130,8 +136,8 @@ export default function UserProfilePanel({ onClose }: Props) {
       </header>
 
       <div className="side-panel-content" style={{ touchAction: 'pan-y' }}>
-        {imageSrc && (
-          <div className="crop-container">
+        {isEditing && imageSrc && (
+          <div className="crop-container" style={{ position: 'relative', height: '200px', marginBottom: '20px' }}>
             <Cropper
               image={imageSrc}
               crop={crop}
@@ -141,22 +147,20 @@ export default function UserProfilePanel({ onClose }: Props) {
               onZoomChange={setZoom}
               onCropComplete={onCropComplete}
             />
-            <div className="crop-controls">
-              <button onClick={saveCroppedImage}>Save Photo</button>
-              <button onClick={() => setImageSrc(null)}>Cancel</button>
-            </div>
           </div>
         )}
 
         <div style={{ marginBottom: '32px', textAlign: 'center' }}>
           <div className="profile-image-container">
             <div className="profile-image">
-              {profileImage ? <img src={profileImage} alt="Profile" /> : '👤'}
+              {(isEditing && imageSrc) ? null : (profileImage ? <img src={profileImage} alt="Profile" /> : <span style={{fontSize: '3rem'}}>👤</span>)}
             </div>
-            <label className="profile-image-upload">
-              📷
-              <input type="file" hidden accept="image/*" onChange={handlePhotoUpload} />
-            </label>
+            {isEditing && (
+              <label className="profile-image-upload" style={{ cursor: 'pointer', background: 'var(--gold)', color: 'black', padding: '4px 8px', borderRadius: '4px', marginTop: '8px', display: 'inline-block', fontWeight: 'bold' }}>
+                Change Photo
+                <input type="file" hidden accept="image/*" onChange={handlePhotoUpload} />
+              </label>
+            )}
           </div>
           <h1 className="profile-name">{profile.firstName} {profile.lastName}</h1>
           <div style={{ color: 'var(--gold)', fontSize: '0.6rem', fontWeight: 900, letterSpacing: '0.1em', opacity: 0.8 }}>
@@ -165,33 +169,115 @@ export default function UserProfilePanel({ onClose }: Props) {
         </div>
 
         <div className="profile-section">
-          <h3 className="section-title">Learning Profile</h3>
+          <h3 className="section-title">Personal Details</h3>
           <div className="profile-fields">
-            <div className="field">
-              <label>toki pona Name</label>
-              <input type="text" value={editableProfile.tokiPonaName || ''} onChange={(e) => handleFieldChange('tokiPonaName', e.target.value)} disabled={!isEditing} />
-            </div>
-            <div className="field">
-              <label>Difficulty</label>
-              <select value={editableProfile.difficulty || 'Beginner'} onChange={(e) => handleFieldChange('difficulty', e.target.value)} disabled={!isEditing}>
-                <option>Beginner</option>
-                <option>Intermediate</option>
-                <option>Advanced</option>
-              </select>
-            </div>
-            <div className="field">
-              <label>Interests</label>
-              <input type="text" value={(editableProfile.interests || []).join(', ')} onChange={(e) => handleFieldChange('interests', e.target.value.split(',').map(s => s.trim()))} disabled={!isEditing} placeholder="e.g., philosophy, coding, art" />
-            </div>
+            {isEditing ? (
+              <>
+                <div className="field">
+                  <label>Age</label>
+                  <input type="text" value={editableProfile.age || ''} onChange={(e) => handleFieldChange('age', e.target.value)} />
+                </div>
+                <div className="field">
+                  <label>Sex</label>
+                  <input type="text" value={editableProfile.sex || ''} onChange={(e) => handleFieldChange('sex', e.target.value)} />
+                </div>
+                <div className="field">
+                  <label>Location</label>
+                  <input type="text" value={editableProfile.locationString || ''} onChange={(e) => handleFieldChange('locationString', e.target.value)} />
+                </div>
+              </>
+            ) : (
+              <div style={{ color: '#ccc', fontSize: '0.9rem', lineHeight: '1.5' }}>
+                <p><strong>Age:</strong> {profile.age || 'Not provided'}</p>
+                <p><strong>Sex:</strong> {profile.sex || 'Not provided'}</p>
+                <p><strong>Location:</strong> {profile.locationString || 'Not provided'}</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="profile-section" style={{ border: '1px solid var(--gold)', borderRadius: '8px', padding: '16px', marginBottom: '24px' }}>
+          <h3 className="section-title" style={{ color: 'var(--gold)' }}>Lore Builder</h3>
+          <p style={{ fontSize: '0.8rem', color: '#888', marginBottom: '12px' }}>
+            Add personal details to help Lina contextualize your learning.
+          </p>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
+            {lore.map((l) => (
+              <div key={l.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.05)', padding: '8px', borderRadius: '4px' }}>
+                <div>
+                  <span style={{ fontSize: '0.7rem', color: 'var(--gold)', fontWeight: 'bold', marginRight: '8px' }}>[{l.category}]</span>
+                  <span style={{ fontSize: '0.9rem', color: 'white' }}>{l.detail}</span>
+                </div>
+                <button onClick={() => deleteLore(l.id)} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }}>✕</button>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+            <select 
+              value={loreCategory} 
+              onChange={(e) => setLoreCategory(e.target.value as any)}
+              style={{ padding: '8px', background: '#111', color: 'white', border: '1px solid #333', borderRadius: '4px' }}
+            >
+              <option value="Work">Work</option>
+              <option value="Hobbies">Hobbies</option>
+              <option value="Pets">Pets</option>
+              <option value="Projects">Projects</option>
+              <option value="Lifestyle">Lifestyle</option>
+            </select>
+            <input 
+              type="text" 
+              value={loreInput} 
+              onChange={(e) => setLoreInput(e.target.value)} 
+              placeholder="e.g. I have a dog named Rex"
+              style={{ flex: 1, padding: '8px', background: '#111', color: 'white', border: '1px solid #333', borderRadius: '4px' }}
+            />
+            <button onClick={handleAddLore} style={{ padding: '8px 16px', background: 'var(--gold)', color: 'black', border: 'none', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer' }}>
+              Add
+            </button>
           </div>
         </div>
 
         <div className="profile-section">
-          <h3 className="section-title">Personal Details</h3>
+          <h3 className="section-title">Learning Profile</h3>
           <div className="profile-fields">
-            {/* Add Age, Sex, and Location fields here if needed */}
+            {isEditing ? (
+              <>
+                <div className="field">
+                  <label>toki pona Name</label>
+                  <input type="text" value={editableProfile.tokiPonaName || ''} onChange={(e) => handleFieldChange('tokiPonaName', e.target.value)} />
+                </div>
+                <div className="field">
+                  <label>Difficulty</label>
+                  <select value={editableProfile.difficulty || 'Beginner'} onChange={(e) => handleFieldChange('difficulty', e.target.value)}>
+                    <option>Beginner</option>
+                    <option>Intermediate</option>
+                    <option>Advanced</option>
+                  </select>
+                </div>
+                <div className="field">
+                  <label>Interests</label>
+                  <input type="text" value={(editableProfile.interests || []).join(', ')} onChange={(e) => handleFieldChange('interests', e.target.value.split(',').map(s => s.trim()))} placeholder="e.g., philosophy, coding, art" />
+                </div>
+              </>
+            ) : (
+              <div style={{ color: '#ccc', fontSize: '0.9rem', lineHeight: '1.5' }}>
+                <p><strong>toki pona Name:</strong> {profile.tokiPonaName || 'Not set'}</p>
+                <p><strong>Difficulty:</strong> {profile.difficulty || 'Beginner'}</p>
+                <p><strong>Interests:</strong> {(profile.interests || []).join(', ') || 'None listed'}</p>
+              </div>
+            )}
           </div>
         </div>
+
+        {isEditing && (
+          <div style={{ marginTop: '24px' }}>
+            <button onClick={handleSave} style={{ width: '100%', padding: '12px', background: 'var(--gold)', color: 'black', border: 'none', borderRadius: '8px', fontWeight: 900, letterSpacing: '1px' }}>
+              SAVE PROFILE
+            </button>
+          </div>
+        )}
 
       </div>
       <div className="auth-section">

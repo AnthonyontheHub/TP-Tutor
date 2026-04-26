@@ -14,14 +14,14 @@ import { initialMasteryMap } from '../data/initialMasteryMap';
 import { curriculumRoadmap } from '../data/curriculum';
 import { vocabContent } from '../data/vocabContent';
 
-function toFullVocabWord(v: { word: string; status: MasteryStatus; type: 'word' | 'grammar'; sessionNotes: string; frequencyRank?: number }): VocabWord {
+function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: MasteryStatus; type: 'word' | 'grammar'; sessionNotes: string; frequencyRank?: number }): VocabWord {
   const score = STATUS_MIDPOINT[v.status];
   const staticData = vocabContent[v.word] || {};
 
   return {
     id: v.word,
     word: v.word,
-    partOfSpeech: '',
+    partOfSpeech: v.partOfSpeech || '',
     meanings: '',
     type: v.type,
     baseScore: score,

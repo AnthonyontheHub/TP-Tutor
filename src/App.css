@@ -147,3 +147,9 @@
 .pulse {
   animation: pulse 1.5s infinite ease-in-out;
 }
+
+/* Status colors */
+.status-introduced { background-color: #a855f7 !important; }
+.status-practicing { background-color: #3b82f6 !important; }
+.status-confident { background-color: #eab308 !important; }
+.status-mastered { background-color: #22c55e !important; }

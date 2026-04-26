@@ -27,6 +27,7 @@ export default function MasteryGrid({
 }: Props) {
   const { vocabulary, selectedWords, toggleWordSelection, setSelectedWords, lessonFilter } = useMasteryStore();
   const [drawerId, setDrawerId] = useState<string | null>(null);
+  const [selectedPOS, setSelectedPOS] = useState('All');
 
   const handleCardClick = (word: VocabWord) => {
     if (selectedWords.length === 0) {
@@ -41,10 +42,10 @@ export default function MasteryGrid({
   };
 
   const displayed = vocabulary
-    .filter(w => {
-      const passesLesson = !lessonFilter || lessonFilter.includes(w.id) || lessonFilter.includes(w.word);
-      const passesPos = posFilter === 'All' || w.partOfSpeech.toLowerCase() === posFilter.toLowerCase();
-      return passesLesson && passesPos;
+    .filter(item => {
+      const passesLesson = !lessonFilter || lessonFilter.includes(item.id) || lessonFilter.includes(item.word);
+      const matchesPOS = selectedPOS === 'All' || item.partOfSpeech === selectedPOS;
+      return passesLesson && matchesPOS;
     })
     .sort((a, b) => {
       if (sortMode === 'status') {
@@ -78,6 +79,21 @@ export default function MasteryGrid({
       onClick={(e) => { if (e.target === e.currentTarget && selectedWords.length > 0) setSelectedWords([]); }}
     >
       <div className="grid-toolbar">
+        <div className="flex items-center gap-4 mb-6">
+          <label className="font-bold text-gray-700">Filter by Type:</label>
+          <select 
+            value={selectedPOS} 
+            onChange={(e) => setSelectedPOS(e.target.value)}
+            style={{ background: '#111', border: '1px solid #222', borderRadius: '10px', color: 'white', padding: '8px' }}
+          >
+            <option value="All">All Parts of Speech</option>
+            <option value="Noun">Nouns</option>
+            <option value="Verb">Verbs</option>
+            <option value="Modifier">Modifiers</option>
+            <option value="Particle">Particles</option>
+            <option value="Preposition">Prepositions</option>
+          </select>
+        </div>
         <select value={sortMode} onChange={(e) => setSortMode(e.target.value)} className="sort-select">
           <option value="alphabetical">A → Z</option>
           <option value="status">Mastery Level</option>

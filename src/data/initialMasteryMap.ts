@@ -112,7 +112,7 @@ const initialVocabulary = [
   { word: "suwi", partOfSpeech: "Modifier", frequencyRank: 123, status: "not_started" as MasteryStatus, type: 'word' as const, sessionNotes: "" },
   { word: "tan", partOfSpeech: "Particle", frequencyRank: 13, status: "not_started" as MasteryStatus, type: 'word' as const, sessionNotes: "" },
   { word: "taso", partOfSpeech: "Particle", frequencyRank: 16, status: "not_started" as MasteryStatus, type: 'word' as const, sessionNotes: "" },
-  { word: "tawa", partOfSpeech: "Verb", frequencyRank: 26, status: "not_started" as MasteryStatus, type: 'word' as const, sessionNotes: "" },
+  { word: "tawa", partOfSpeech: "Preposition", frequencyRank: 26, status: "not_started" as MasteryStatus, type: 'word' as const, sessionNotes: "" },
   { word: "telo", partOfSpeech: "Noun", frequencyRank: 124, status: "not_started" as MasteryStatus, type: 'word' as const, sessionNotes: "" },
   { word: "tenpo", partOfSpeech: "Noun", frequencyRank: 20, status: "not_started" as MasteryStatus, type: 'word' as const, sessionNotes: "" },
   { word: "toki", partOfSpeech: "Verb", frequencyRank: 8, status: "not_started" as MasteryStatus, type: 'word' as const, sessionNotes: "" },

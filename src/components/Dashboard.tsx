@@ -248,23 +248,6 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
           </button>
         </div>
 
-        {/* Row 4: Filter Bar (Only visible when activeView === 'vocab') */}
-        {activeView === 'vocab' && (
-          <motion.div 
-            initial={{ opacity: 0, y: -10 }} 
-            animate={{ opacity: 1, y: 0 }}
-            className="grid-toolbar"
-          >
-            <select value={posFilter} onChange={(e) => { setPosFilter(e.target.value); setLessonFilter(null); }} className="sort-select">
-              <option value="All">All Parts of Speech</option>
-              <option value="Noun">Noun</option>
-              <option value="Verb">Verb</option>
-              <option value="Modifier">Modifier</option>
-              <option value="Particle">Particle</option>
-            </select>
-          </motion.div>
-        )}
-
         {/* Main Viewport */}
         <div className="dashboard__content-area" style={{ position: 'relative', minHeight: '400px' }}>
           {lessonFilter && (
