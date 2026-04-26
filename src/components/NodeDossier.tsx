@@ -206,7 +206,7 @@ export default function NodeDossier({ node, onBack, onAskLina, isSandboxMode }: 
               PRACTICE WITH JAN LINA
             </button>
             <p style={{ color: '#555', fontSize: '0.65rem', textAlign: 'center', marginTop: '12px', fontWeight: 700, letterSpacing: '0.05em' }}>
-              INITIATE NEURAL LINK FOR INTERACTIVE ASSESSMENT
+              START LESSON WITH jan LINA FOR INTERACTIVE ASSESSMENT
             </p>
           </section>
         </main>

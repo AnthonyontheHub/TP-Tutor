@@ -121,7 +121,7 @@ export default function UserProfilePanel({ onClose }: Props) {
       transition={{ type: 'spring', damping: 25, stiffness: 200 }}
     >
       <header className="side-panel-header" style={{ justifyContent: 'space-between' }}>
-        <h2 style={{ fontSize: '0.9rem', fontWeight: 900, letterSpacing: '0.15em', color: 'var(--gold)' }}>USER PROFILE</h2>
+        <h2 style={{ fontSize: '0.9rem', fontWeight: 900, letterSpacing: '0.15em', color: 'var(--gold)' }}>ANTHONY PROFILE</h2>
         <div>
           {isEditing ? (
             <div className="edit-controls">
@@ -164,7 +164,7 @@ export default function UserProfilePanel({ onClose }: Props) {
           </div>
           <h1 className="profile-name">{profile.firstName} {profile.lastName}</h1>
           <div style={{ color: 'var(--gold)', fontSize: '0.6rem', fontWeight: 900, letterSpacing: '0.1em', opacity: 0.8 }}>
-            NEURAL LINK: {isGuest ? 'LOCAL' : 'CLOUD'}
+            SYNC MODE: {isGuest ? 'LOCAL' : 'CLOUD'}
           </div>
         </div>
 

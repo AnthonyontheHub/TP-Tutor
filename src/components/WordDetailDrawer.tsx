@@ -131,11 +131,17 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
             <section style={{ marginBottom: '32px' }}>
               <h3 className="section-title" style={{ fontSize: '0.6rem' }}>Neural Examples</h3>
               <div style={{ display: 'grid', gap: '8px' }}>
-                {['Simple', 'Intermediate', 'Advanced'].map((tier) => {
+                {['Simple', 'Intermediate', 'Advanced', 'Personal'].map((tier) => {
                   const content = deepDive?.[tier.toLowerCase()];
+                  const label = tier === 'Personal' ? "ANTHONY'S LORE" : tier;
+                  const borderCol = tier === 'Simple' ? 'var(--blue)' : 
+                                    tier === 'Intermediate' ? 'var(--amber)' : 
+                                    tier === 'Advanced' ? 'var(--pink)' : 
+                                    'var(--gold)';
+                  
                   return (
-                    <div key={tier} className="glass-panel" style={{ padding: '10px 15px', borderLeft: `2px solid ${tier === 'Simple' ? 'var(--blue)' : tier === 'Intermediate' ? 'var(--amber)' : 'var(--pink)'}` }}>
-                      <div style={{ fontSize: '0.55rem', fontWeight: 900, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '2px' }}>{tier}</div>
+                    <div key={tier} className="glass-panel" style={{ padding: '10px 15px', borderLeft: `2px solid ${borderCol}` }}>
+                      <div style={{ fontSize: '0.55rem', fontWeight: 900, color: tier === 'Personal' ? 'var(--gold)' : 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '2px' }}>{label}</div>
                       {isLoading ? <div style={{ height: '1.2rem', background: 'rgba(255,255,255,0.03)', borderRadius: '2px', width: '80%' }} /> : <div style={{ fontSize: '0.85rem', color: '#eee', lineHeight: '1.4' }}>{content || '...'}</div>}
                     </div>
                   );

@@ -53,7 +53,7 @@ export default function InstructionsPanel({ onClose }: Props) {
         <section style={{ marginBottom: '40px' }}>
           <h3 className="section-title" style={{ fontSize: '0.6rem' }}>Biographical Sync</h3>
           <div className="glass-panel" style={{ padding: '15px' }}>
-            <p style={{ fontSize: '0.8rem' }}>Neural Link efficiency increases when <strong>Lore</strong> is provided. Lina adapts drills to your specific operational history.</p>
+            <p style={{ fontSize: '0.8rem' }}>Learning efficiency increases when <strong>Lore</strong> is provided. jan Lina adapts drills to your specific operational history.</p>
           </div>
         </section>
       </div>

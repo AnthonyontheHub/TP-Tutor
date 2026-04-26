@@ -434,7 +434,7 @@ export const useMasteryStore = create<MasteryStore>()(
       updatePhraseNote: (id, notes) => {
         set((state) => ({
           savedPhrases: state.savedPhrases.map(p => {
-            if (typeof p === 'string') return p === id ? { id, tp: p, en: 'User Saved Phrase *', notes } : p;
+            if (typeof p === 'string') return p === id ? { id, tp: p, en: 'Anthony Saved Phrase *', notes } : p;
             return p.id === id ? { ...p, notes } : p;
           })
         }));

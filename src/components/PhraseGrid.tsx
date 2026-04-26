@@ -39,7 +39,7 @@ export default function PhraseGrid({ onAskLina, activeFilter, selectedWords, foc
   }, [focusPhraseId, safeSavedPhrases]);
 
   const normalizedSaved = safeSavedPhrases.map(p => 
-    typeof p === 'string' ? { id: p, tp: p, en: 'User Saved Phrase *', notes: '' } : p
+    typeof p === 'string' ? { id: p, tp: p, en: 'Anthony Saved Phrase *', notes: '' } : p
   );
 
   const combined = [

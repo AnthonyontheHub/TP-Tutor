@@ -407,10 +407,10 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
                 style={{ width: '90%', maxWidth: '400px', textAlign: 'center', border: '1px solid var(--gold)' }}
               >
                 <h2 style={{ color: 'var(--gold)', marginBottom: '10px' }}>KNOWLEDGE CHECK</h2>
-                <p>Lina wants to verify your mastery of <strong>{assessmentWord.word}</strong>.</p>
+                <p>jan Lina wants to verify your mastery of <strong>{assessmentWord.word}</strong>.</p>
                 <div style={{ margin: '20px 0', display: 'grid', gap: '10px' }}>
                    <button onClick={() => { 
-                     onAskLina(`Lina, I'm ready for the Knowledge Check on "${assessmentWord.word}". Give me 3 questions.`); 
+                     onAskLina(`jan Lina, I'm ready for the Knowledge Check on "${assessmentWord.word}". Give me 3 questions.`); 
                      setAssessmentWord(null); 
                      setLastKnowledgeCheckDate(new Date().toDateString());
                    }} className="btn-review">START QUIZ</button>

@@ -21,6 +21,7 @@ export default function App() {
   const { hasCompletedSetup, isMainProfile } = useMasteryStore();
   
   const [activePanels, setActivePanels] = useState<AppPanel[]>([]);
+  const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
   const [isSandboxMode, setIsSandboxMode] = useState<boolean>(
     () => localStorage.getItem('tp_sandbox_mode') === 'true'
   );
@@ -65,11 +66,10 @@ export default function App() {
   }, []);
 
   const handleAskLina = useCallback((prompt: string) => {
+    setPendingPrompt(prompt);
     if (!activePanels.includes('chat')) {
       setActivePanels(prev => [...prev, 'chat']);
     }
-    // Logic for pushing prompt to chat can be added here if needed
-    console.log("Asking Lina:", prompt);
   }, [activePanels]);
 
   if (loading) {
@@ -78,7 +78,7 @@ export default function App() {
         height: '100dvh', display: 'flex', alignItems: 'center', 
         justifyContent: 'center', background: 'var(--bg)', color: 'var(--text)' 
       }}>
-        <div style={{ fontWeight: 900, letterSpacing: '0.15em', color: 'var(--gold)' }}>NEURAL LINK ESTABLISHED...</div>
+        <div style={{ fontWeight: 900, letterSpacing: '0.15em', color: 'var(--gold)' }}>jan LINA IS READY...</div>
       </div>
     );
   }
@@ -102,7 +102,15 @@ export default function App() {
              {panel === 'settings' && <SettingsPanel isOpen={true} onClose={() => togglePanel('settings')} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} />}
              {panel === 'achievements' && <AchievementsPanel onClose={() => togglePanel('achievements')} />}
              {panel === 'instructions' && <InstructionsPanel isOpen={true} onClose={() => togglePanel('instructions')} />}
-             {panel === 'chat' && <ChatSession isActive={true} onEndSession={() => togglePanel('chat')} isSandboxMode={isSandboxMode} />}
+             {panel === 'chat' && (
+               <ChatSession 
+                 isActive={true} 
+                 onEndSession={() => togglePanel('chat')} 
+                 isSandboxMode={isSandboxMode} 
+                 pendingPrompt={pendingPrompt}
+                 clearPrompt={() => setPendingPrompt(null)}
+               />
+             )}
           </ModalWrapper>
         ))}
       </AnimatePresence>

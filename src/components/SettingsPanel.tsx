@@ -10,7 +10,8 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
 }) {
   const { 
     resetAsNewUser, masterAllVocab, randomizeVocab, isMainProfile,
-    knowledgeCheckFrequency, setKnowledgeCheckFrequency, clearAllSavedPhrases
+    knowledgeCheckFrequency, setKnowledgeCheckFrequency, clearAllSavedPhrases,
+    vocabulary
   } = useMasteryStore();
   const { logout } = useAuthStore();
 
@@ -68,6 +69,24 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
   return (
     <div style={{ padding: '40px', background: 'var(--surface-opaque)', height: '100%', overflowY: 'auto' }}>
       <h1 style={{ color: 'var(--gold)', fontWeight: 900, marginBottom: '32px', letterSpacing: '0.1em' }}>SETTINGS</h1>
+
+      <section style={{ marginBottom: '40px' }}>
+        <h2 style={{ fontSize: '0.8rem', fontWeight: 900, opacity: 0.5, marginBottom: '20px' }}>TEACHER'S LOGBOOK</h2>
+        <div className="glass-panel" style={{ padding: '20px', maxHeight: '300px', overflowY: 'auto', background: 'rgba(0,0,0,0.2)' }}>
+          {vocabulary.filter(v => v.sessionNotes).length === 0 ? (
+            <p style={{ fontSize: '0.8rem', color: '#666', fontStyle: 'italic' }}>jan Lina has not recorded any private notes in your logbook yet.</p>
+          ) : (
+            <div style={{ display: 'grid', gap: '16px' }}>
+              {vocabulary.filter(v => v.sessionNotes).map(v => (
+                <div key={v.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '12px' }}>
+                  <div style={{ fontSize: '0.7rem', fontWeight: 900, color: 'var(--gold)', textTransform: 'uppercase', marginBottom: '4px' }}>{v.word}</div>
+                  <div style={{ fontSize: '0.85rem', color: '#ccc', lineHeight: '1.4' }}>{v.sessionNotes}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
 
       <section style={{ marginBottom: '40px' }}>
         <h2 style={{ fontSize: '0.8rem', fontWeight: 900, opacity: 0.5, marginBottom: '20px' }}>CORE CONFIGURATION</h2>
