@@ -144,7 +144,6 @@ export default function App() {
         onTogglePanel={togglePanel}
         onAskLina={handleAskLina}
         isSandboxMode={isSandboxMode}
-        setIsSandboxMode={setIsSandboxMode}
         chatCount={chatSessions.length}
       />
 

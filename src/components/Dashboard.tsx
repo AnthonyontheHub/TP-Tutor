@@ -13,12 +13,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export type DashboardView = 'vocab' | 'roadmap' | 'archive';
 
-export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSandboxMode, setIsSandboxMode, chatCount }: {
+export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSandboxMode, chatCount }: {
   onTogglePanel: (p: AppPanel) => void;
   activePanels: AppPanel[];
   onAskLina: (p: string) => void;
   isSandboxMode: boolean;
-  setIsSandboxMode: (val: boolean) => void;
   chatCount: number;
 }) {
   const { studentName, profile, profileImage, currentStreak, vocabulary, curriculums, savedPhrases, reviewVibe, setReviewVibe, selectedWords, setSelectedWords, savePhrase, lessonFilter, setLessonFilter, calculateDecay, checkAssessments, hardenWord, knowledgeCheckFrequency, lastKnowledgeCheckDate, setLastKnowledgeCheckDate } = useMasteryStore();
@@ -229,24 +228,6 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
           </div>
         </div>
         <div className="dashboard__header-right">
-          <button 
-            onClick={() => setIsSandboxMode(!isSandboxMode)} 
-            className="dashboard__icon-btn"
-            style={{ 
-              width: 'auto', 
-              padding: '0 12px', 
-              fontSize: '0.6rem', 
-              fontWeight: 900,
-              background: '#1a1a1a',
-              color: isSandboxMode ? 'var(--gold)' : 'var(--text-muted)',
-              border: '1px solid #333',
-              boxShadow: isSandboxMode ? '0 4px 12px rgba(0,0,0,0.5), 0 0 10px rgba(255, 191, 0, 0.1)' : '0 2px 4px rgba(0,0,0,0.3)',
-              borderRadius: '10px',
-              letterSpacing: '0.05em'
-            }}
-          >
-            {isSandboxMode ? 'SANDBOX ACTIVE' : 'LIVE LINK'}
-          </button>
           {currentStreak > 0 && (
             <div 
               className="dashboard__streak" 
