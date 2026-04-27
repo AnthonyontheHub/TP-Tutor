@@ -387,20 +387,10 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
                   <PhraseGrid
                     onAskLina={onAskLina}
                     activeFilter={activeFilter}
-                    selectedWords={[]}
+                    selectedWords={selectedWords}
                     focusPhraseId={focusPhraseId}
                     clearFocusPhrase={() => setFocusPhraseId(null)}
                   />
-                  <h3 className="section-title" style={{ marginTop: '30px', marginBottom: '15px' }}>SAVED PHRASES</h3>
-                  {savedPhrases.length === 0 ? (
-                    <p style={{ color: '#888' }}>No phrases saved yet.</p>
-                  ) : (
-                    savedPhrases.map((p, i) => (
-                      <div key={i} className="glass-panel" style={{ borderLeft: '4px solid var(--green)', marginBottom: '10px' }}>
-                        {typeof p === 'string' ? p : p.tp}
-                      </div>
-                    ))
-                  )}
                 </div>
               )}
             </motion.div>

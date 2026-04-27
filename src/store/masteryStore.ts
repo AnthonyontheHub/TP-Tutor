@@ -125,6 +125,7 @@ interface MasteryState {
   lessonFilter: string[] | null;
   isMainProfile: boolean;
   cloudSynced: boolean;
+  albums: Album[];
   // Dashboard settings
   widgetDensity: 'Compact' | 'Expanded';
   fogOfWar: 'Strict' | 'Visible';
@@ -165,6 +166,30 @@ export const useMasteryStore = create<MasteryStore>()(
       knowledgeCheckFrequency: 'session',
       lastKnowledgeCheckDate: '',
       cloudSynced: false,
+      albums: [
+        {
+          id: 'utala_kon',
+          title: 'utala kon',
+          songs: [
+            {
+              id: 'jan_pona',
+              title: 'jan pona',
+              blocks: [
+                { type: 'chorus', tp: 'jan pona o, jan pona o.', en: 'O friend, o friend.' },
+                { type: 'verse', tp: 'sina pana e moku pona tawa mi.', en: 'You give good food to me.' }
+              ]
+            },
+            {
+              id: 'toki_pona',
+              title: 'toki pona',
+              blocks: [
+                { type: 'chorus', tp: 'toki pona li toki pona.', en: 'Toki Pona is a good language.' },
+                { type: 'verse', tp: 'mi sona e nimi lili.', en: 'I know few words.' }
+              ]
+            }
+          ]
+        }
+      ],
 
       setHasCompletedSetup: (val) => { set({ hasCompletedSetup: val }); void get().syncToCloud(); },
 
@@ -467,6 +492,7 @@ export const useMasteryStore = create<MasteryStore>()(
           curriculums: curriculumRoadmap,
           currentPositionNodeId: 'phi_sim',
           hasCompletedSetup: false,
+          albums: [],
         });
         void get().syncToCloud();
       },
@@ -480,6 +506,7 @@ export const useMasteryStore = create<MasteryStore>()(
           curriculums: curriculumRoadmap,
           currentPositionNodeId: 'phi_sim',
           hasCompletedSetup: false,
+          albums: [],
         });
         void get().syncToCloud();
       },
@@ -523,6 +550,7 @@ export const useMasteryStore = create<MasteryStore>()(
           vocabulary: mappedVocabulary,
           curriculums: curriculumRoadmap,
           hasCompletedSetup: false,
+          albums: [],
         });
       },
 
@@ -583,6 +611,7 @@ export const useMasteryStore = create<MasteryStore>()(
           vocabulary: mappedVocabulary,
           curriculums: curriculumRoadmap,
           hasCompletedSetup: false,
+          albums: [],
           currentPositionNodeId: 'phi_sim',
           isMainProfile: false,
         });
@@ -596,7 +625,7 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       syncToCloud: async (explicitUserId) => {
-        const { vocabulary, curriculums, lastUpdated, studentName, profile, lore, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, isMainProfile, widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, cloudSynced } = get();
+        const { vocabulary, curriculums, lastUpdated, studentName, profile, lore, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, isMainProfile, widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, cloudSynced, albums } = get();
         const targetId = explicitUserId || userId;
 
         // Block premature syncs before cloud data has loaded — prevents stale
@@ -626,7 +655,7 @@ export const useMasteryStore = create<MasteryStore>()(
             vocabulary: partialVocab,
             curriculums, lastUpdated, studentName, profile, lore, profileImage,
             savedPhrases, currentStreak, lastActiveDate, hasCompletedSetup, currentPositionNodeId, isMainProfile,
-            widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate
+            widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, albums
           }, { merge: true });
         } catch (err) {
           console.error('Firebase Sync Error:', err);
@@ -662,6 +691,7 @@ export const useMasteryStore = create<MasteryStore>()(
                 curriculums: curriculumRoadmap,
                 currentPositionNodeId: 'phi_sim',
                 hasCompletedSetup: false,
+          albums: [],
               });
             } else {
               if (initialName && (localName === 'Anthony' || !localName)) {
@@ -711,6 +741,7 @@ export const useMasteryStore = create<MasteryStore>()(
               curriculums: curriculumRoadmap,
               currentPositionNodeId: 'phi_sim',
               hasCompletedSetup: false,
+          albums: [],
               cloudSynced: true,
             });
             void get().syncToCloud(uid);
@@ -825,6 +856,7 @@ export const useMasteryStore = create<MasteryStore>()(
             showCircuitPaths: data.showCircuitPaths !== undefined ? data.showCircuitPaths : true,
             knowledgeCheckFrequency: data.knowledgeCheckFrequency || 'session',
             lastKnowledgeCheckDate: data.lastKnowledgeCheckDate || '',
+            albums: data.albums || [],
           };
 
           if (data.studentName) update.studentName = data.studentName;

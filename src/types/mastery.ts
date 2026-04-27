@@ -269,6 +269,26 @@ export interface SavedPhrase {
   notes: string;
 }
 
+// ─── Discography ──────────────────────────────────────────────────────────────
+
+export interface SongBlock {
+  type: 'verse' | 'chorus' | 'bridge' | 'outro';
+  tp: string;
+  en: string;
+}
+
+export interface Song {
+  id: string;
+  title: string;
+  blocks: SongBlock[];
+}
+
+export interface Album {
+  id: string;
+  title: string;
+  songs: Song[];
+}
+
 export interface MasteryMap {
   studentName: string;
   profileImage: string;

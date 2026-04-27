@@ -148,7 +148,7 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
           <button 
             onClick={handleReset} 
             className="btn-settings" 
-            style={{ background: '#1a1a1a', border: '1px solid #ef4444', color: '#ef4444' }}
+            style={{ background: '#1a1a1a', border: '1px solid #d4af37', color: '#d4af37' }}
           >
             PURGE NEURAL CACHE
           </button>
