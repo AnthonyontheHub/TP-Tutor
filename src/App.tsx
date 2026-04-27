@@ -22,12 +22,23 @@ export type AppPanel = 'profile' | 'settings' | 'instructions' | 'achievements' 
 export default function App() {
   const { user, loading } = useAuthStore();
   const { hasCompletedSetup, isMainProfile } = useMasteryStore();
-  const { sessions: chatSessions, addSession, removeSession, updateSession } = useChatStore();
+  const rawSessions = useChatStore(s => s.sessions);
+  const { addSession, removeSession, updateSession } = useChatStore();
+
+  const chatSessions = Array.isArray(rawSessions) ? rawSessions : [];
 
   const [activePanels, setActivePanels] = useState<AppPanel[]>([]);
   const [isSandboxMode, setIsSandboxMode] = useState<boolean>(
     () => localStorage.getItem('tp_sandbox_mode') === 'true'
   );
+
+  // Fallback for crypto.randomUUID in non-secure contexts
+  const generateId = () => {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      return crypto.randomUUID();
+    }
+    return Math.random().toString(36).substring(2, 15);
+  };
 
   // Validate localStorage data on mount to fix any corruption
   useEffect(() => {
@@ -55,6 +66,16 @@ export default function App() {
         if (corrupted) {
           localStorage.removeItem('tp-tutor-mastery');
           window.location.reload();
+        }
+      }
+
+      // Also validate chat storage
+      const chatStored = localStorage.getItem('tp-tutor-chats');
+      if (chatStored) {
+        const chatData = JSON.parse(chatStored);
+        if (chatData.state && !Array.isArray(chatData.state.sessions)) {
+           console.warn('Corrupted chat sessions detected, clearing...');
+           localStorage.removeItem('tp-tutor-chats');
         }
       }
     } catch (err) {
@@ -103,7 +124,7 @@ export default function App() {
 
   const handleAskLina = useCallback((prompt: string) => {
     addSession({
-      id: crypto.randomUUID(),
+      id: generateId(),
       title: 'jan LINA LINK',
       isMinimized: false,
       pendingPrompt: prompt,

@@ -1,4 +1,7 @@
 /* src/components/ChatSession.tsx */
+import { useState, useRef, useEffect } from 'react';
+import { m, LazyMotion, domMax } from 'framer-motion';
+import { useMasteryStore } from '../store/masteryStore';
 import { useChatStore } from '../store/chatStore';
 import type { ChatMessage } from '../store/chatStore';
 import {
