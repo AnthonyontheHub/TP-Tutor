@@ -169,22 +169,25 @@ export const useMasteryStore = create<MasteryStore>()(
       cloudSynced: false,
       commonPhrases: {
         "Greetings": [
-          { tp: "toki!", en: "Hello/Hi" },
+          { tp: "toki!", en: "Hello" },
           { tp: "sina pilin seme?", en: "How are you?" },
-          { tp: "mi tawa", en: "Goodbye (I am going)" }
+          { tp: "mi tawa", en: "Goodbye" }
         ],
-        "Social": [
+        "Introductions": [
           { tp: "nimi mi li [X]", en: "My name is [X]" },
           { tp: "sina tan ma seme?", en: "Where are you from?" }
         ],
         "Polite": [
-          { tp: "sina pona", en: "Thank you / You are good" },
-          { tp: "mi pakala", en: "I'm sorry / I messed up" }
+          { tp: "sina pona", en: "Thank you" },
+          { tp: "mi pakala", en: "Sorry" }
         ],
-        "Feelings": [
-          { tp: "mi pilin pona", en: "I feel good" },
-          { tp: "mi pilin ike", en: "I feel bad/sad" },
-          { tp: "mi pilin seli", en: "I feel hot/angry" }
+        "Eating": [
+          { tp: "mi wile moku", en: "I'm hungry" },
+          { tp: "o moku!", en: "Let's eat!" }
+        ],
+        "Emotions": [
+          { tp: "mi pilin pona", en: "I'm happy" },
+          { tp: "mi pilin seli", en: "I'm angry" }
         ]
       },
       albums: [
@@ -193,12 +196,20 @@ export const useMasteryStore = create<MasteryStore>()(
           title: 'utala kon',
           songs: [
             {
-              id: 'nasin_li_ken_ala',
-              title: 'nasin li ken ala',
+              id: 'wawa_kama',
+              title: '01 wawa kama',
               blocks: [
-                { type: 'verse', tp: "mi wile e nasin\nmi wile e lawa\nmi wile e suli\nmi wile e pini", en: "I want a path / I want guidance / I want importance / I want an end" },
+                { type: 'verse', tp: "mi tawa\nmi wawa\nmi kama\nnasin li pini", en: "I go / I am strong / I come / the path is finished" },
+                { type: 'chorus', tp: "ona li lon\nona li pona\npini li kama", en: "It is here / it is good / the end is coming" }
+              ]
+            },
+            {
+              id: 'nasin_li_ken_ala',
+              title: '02 nasin li ken ala',
+              blocks: [
+                { type: 'verse', tp: "mi wile e nasin\nmi wile e lawa\nmi wile e suli\nmi wile e pini\nlawa mi li pakala", en: "I want a path / I want guidance / I want importance / I want an end / my head is broken" },
                 { type: 'chorus', tp: "nasin li ken ala", en: "The path is not possible" },
-                { type: 'verse', tp: "mi pakala e lipu\nmi pakala e sijelo\nmi pakala e kon", en: "I destroyed the paper / I destroyed the body / I destroyed the spirit" }
+                { type: 'verse', tp: "telo loje li seli\ntelo pimeja li lete\nmi pakala e ali", en: "The red liquid is hot / the black liquid is cold / I destroyed everything" }
               ]
             }
           ]

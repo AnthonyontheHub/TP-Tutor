@@ -77,9 +77,9 @@ export function buildSystemPrompt(
   const vibeContext = vibe === 'chill' 
     ? "The student wants a 'Chill' session focusing on **Reviewing personal saved phrases**. Use their known vocabulary to reinforce progress."
     : vibe === 'deep'
-    ? "The student wants a 'Deep' session focusing on **Learning everyday phrases and common expressions**. Introduce and drill standard Toki Pona idioms and daily speech."
+    ? "The student wants a 'Deep' session focusing on **Learning everyday phrases and common expressions** from THE ARCHIVE. Introduce and drill standard Toki Pona idioms and daily speech."
     : vibe === 'intense'
-    ? "The student wants an 'Intense' session focusing on **Mastering song lyrics from the discography**. Use lyrics from their album library to deep-dive into grammar and poetic usage."
+    ? "The student wants an 'Intense' session focusing on **Mastering song lyrics from the discography** in THE ARCHIVE. Use lyrics from their album library to deep-dive into grammar and poetic usage."
     : "The student wants a balanced session. Chat naturally and test them on their active vocabulary.";
 
   const lessonContext = activeModuleTitle

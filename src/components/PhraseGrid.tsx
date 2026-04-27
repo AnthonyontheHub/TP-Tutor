@@ -15,6 +15,10 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
   const { studentName, vocabulary, savedPhrases, updatePhraseNote, deletePhrase, albums, commonPhrases, reviewVibe } = useMasteryStore();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [noteInput, setNoteInput] = useState('');
+  
+  // Nested Discography State
+  const [selectedAlbumId, setSelectedAlbumId] = useState<string | null>(null);
+  const [selectedSongId, setSelectedSongId] = useState<string | null>(null);
 
   const clean = (w: string) => w.toLowerCase().replace(/[.!?,]/g, '');
 
@@ -99,10 +103,10 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
         </div>
       )}
 
-      {/* Tab 2: Everyday Library */}
+      {/* Tab 2: Everyday Archive */}
       {isDeep && (
         <div>
-          <h2 className="section-title" style={{ color: 'var(--gold)', marginBottom: '20px', borderLeft: '4px solid var(--gold)', paddingLeft: '12px' }}>EVERYDAY LIBRARY</h2>
+          <h2 className="section-title" style={{ color: 'var(--gold)', marginBottom: '20px', borderLeft: '4px solid var(--gold)', paddingLeft: '12px' }}>EVERYDAY ARCHIVE</h2>
           <div style={{ display: 'grid', gap: '32px' }}>
             {Object.entries(commonPhrases || {}).map(([cat, phrases]) => {
               const filtered = getFilteredPhrases(phrases);
@@ -129,38 +133,71 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
       {isIntense && (
         <div>
           <h2 className="section-title" style={{ color: 'var(--gold)', marginBottom: '20px', borderLeft: '4px solid var(--gold)', paddingLeft: '12px' }}>DISCOGRAPHY</h2>
-          <div style={{ display: 'grid', gap: '32px' }}>
-            {(albums || []).map((album) => (
-              <div key={album.id}>
-                <h3 style={{ fontSize: '0.8rem', fontWeight: 900, color: 'var(--gold)', letterSpacing: '0.2em', marginBottom: '16px', textTransform: 'uppercase' }}>ALBUM: {album.title}</h3>
-                <div style={{ display: 'grid', gap: '20px' }}>
-                  {album.songs.map((song) => (
-                    <div key={song.id} style={{ background: 'rgba(255,255,255,0.02)', padding: '20px', borderRadius: '12px', border: '1px solid #222' }}>
-                      <h4 style={{ color: 'white', fontSize: '1rem', marginBottom: '12px', borderLeft: '4px solid var(--gold)', paddingLeft: '12px' }}>{song.title}</h4>
-                      <div style={{ display: 'grid', gap: '12px' }}>
+          
+          {!selectedAlbumId ? (
+             <div style={{ display: 'grid', gap: '16px', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))' }}>
+               {(albums || []).map(album => (
+                 <button 
+                  key={album.id}
+                  onClick={() => setSelectedAlbumId(album.id)}
+                  className="glass-panel"
+                  style={{ padding: '24px', textAlign: 'center', cursor: 'pointer', border: '1px solid #333' }}
+                 >
+                   <div style={{ fontSize: '2rem', marginBottom: '12px' }}>💿</div>
+                   <div style={{ fontWeight: 900, color: 'var(--gold)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{album.title}</div>
+                 </button>
+               ))}
+             </div>
+          ) : !selectedSongId ? (
+            <div>
+              <button onClick={() => setSelectedAlbumId(null)} style={{ background: 'none', border: 'none', color: '#666', fontSize: '0.7rem', fontWeight: 900, cursor: 'pointer', marginBottom: '16px' }}>← BACK TO ALBUMS</button>
+              <h3 style={{ fontSize: '0.8rem', fontWeight: 900, color: 'var(--gold)', letterSpacing: '0.2em', marginBottom: '16px', textTransform: 'uppercase' }}>TRACKLIST: {(albums || []).find(a => a.id === selectedAlbumId)?.title}</h3>
+              <div style={{ display: 'grid', gap: '12px' }}>
+                {(albums || []).find(a => a.id === selectedAlbumId)?.songs.map((song) => (
+                  <button 
+                    key={song.id} 
+                    onClick={() => setSelectedSongId(song.id)}
+                    className="glass-panel"
+                    style={{ padding: '16px 24px', textAlign: 'left', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '16px' }}
+                  >
+                    <span style={{ color: '#555', fontWeight: 900, fontSize: '0.8rem' }}>♪</span>
+                    <span style={{ color: 'white', fontWeight: 700 }}>{song.title}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div>
+               <button onClick={() => setSelectedSongId(null)} style={{ background: 'none', border: 'none', color: '#666', fontSize: '0.7rem', fontWeight: 900, cursor: 'pointer', marginBottom: '16px' }}>← BACK TO TRACKLIST</button>
+               {(() => {
+                 const song = (albums || []).find(a => a.id === selectedAlbumId)?.songs.find(s => s.id === selectedSongId);
+                 if (!song) return null;
+                 return (
+                   <div style={{ background: 'rgba(255,255,255,0.02)', padding: '24px', borderRadius: '12px', border: '1px solid #222' }}>
+                     <h4 style={{ color: 'white', fontSize: '1.2rem', marginBottom: '20px', borderLeft: '4px solid var(--gold)', paddingLeft: '16px' }}>{song.title}</h4>
+                     <div style={{ display: 'grid', gap: '16px' }}>
                         {getFilteredPhrases(song.blocks).map((block, bi) => (
-                          <div key={bi} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', background: 'rgba(0,0,0,0.2)', padding: '12px', borderRadius: '8px', border: '1px solid #333' }}>
+                          <div key={bi} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', background: 'rgba(0,0,0,0.2)', padding: '16px', borderRadius: '8px', border: '1px solid #333' }}>
                             <div style={{ flex: 1 }}>
-                              <div style={{ fontSize: '0.55rem', fontWeight: 900, color: 'var(--gold)', textTransform: 'uppercase', marginBottom: '4px' }}>{(block as any).type || 'verse'}</div>
-                              <div style={{ color: '#eee', fontWeight: 700, fontSize: '0.9rem', marginBottom: '2px', whiteSpace: 'pre-wrap' }}>{block.tp}</div>
-                              <div style={{ color: '#666', fontSize: '0.75rem', fontStyle: 'italic' }}>{block.en}</div>
+                              <div style={{ fontSize: '0.6rem', fontWeight: 900, color: 'var(--gold)', textTransform: 'uppercase', marginBottom: '6px' }}>{(block as any).type || 'verse'}</div>
+                              <div style={{ color: '#eee', fontWeight: 700, fontSize: '1rem', marginBottom: '4px', whiteSpace: 'pre-wrap', lineHeight: '1.4' }}>{block.tp}</div>
+                              <div style={{ color: '#666', fontSize: '0.8rem', fontStyle: 'italic' }}>{block.en}</div>
                             </div>
                             <button 
                               onClick={() => onAskLina(`Let's practice this specific phrase/lyric: [${block.tp}]`)}
                               className="btn-toggle"
-                              style={{ padding: '6px 10px', fontSize: '0.6rem', width: 'auto', background: 'rgba(255,255,255,0.05)' }}
+                              style={{ padding: '8px 12px', fontSize: '0.65rem', width: 'auto', background: 'rgba(255,255,255,0.05)' }}
                             >
                               PRACTICE THIS
                             </button>
                           </div>
                         ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
+                     </div>
+                   </div>
+                 );
+               })()}
+            </div>
+          )}
         </div>
       )}
 

@@ -11,7 +11,7 @@ import type { MasteryStatus, VocabWord } from '../types/mastery';
 import type { AppPanel } from '../App';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export type DashboardView = 'vocab' | 'roadmap' | 'phrasebook';
+export type DashboardView = 'vocab' | 'roadmap' | 'archive';
 
 export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSandboxMode, setIsSandboxMode, chatCount }: {
   onTogglePanel: (p: AppPanel) => void;
@@ -91,19 +91,49 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   }, [selectedWords, isSandboxMode, vocabulary]);
 
   const handleDailyReview = () => {
-    if (activeView === 'vocab' || activeView === 'phrasebook') {
+    if (activeView === 'vocab' || activeView === 'archive') {
       let prompt = '';
 
-      if (reviewVibe === 'chill') {
-        prompt = `[SYSTEM: The student has chosen a **CHILL** session. Please focus our practice on **Saved Phrases** today.]`;
-      } else if (reviewVibe === 'deep') {
-        prompt = `[SYSTEM: The student has chosen a **DEEP** session. Please focus our practice on **Everyday Phrases** today.]`;
-      } else if (reviewVibe === 'intense') {
-        prompt = `[SYSTEM: The student has chosen an **INTENSE** session. Please focus our practice on **Lyrics** today.]`;
+      if (activeView === 'archive') {
+        if (reviewVibe === 'chill') {
+          prompt = "Let's practice my saved phrases.";
+        } else if (reviewVibe === 'deep') {
+          prompt = "Set up a roleplay using everyday phrases.";
+        } else if (reviewVibe === 'intense') {
+          prompt = "Let's analyze a random block from my discography.";
+        } else {
+          prompt = "[SYSTEM: Balanced Archive Practice. Pick something random from my saves or library.]";
+        }
       } else {
-        // Balanced review if no vibe (fallback)
-        const targetWords = [...vocabulary].sort(() => 0.5 - Math.random()).slice(0, 8).map(w => w.word);
-        prompt = `[SYSTEM: Balanced Vocab Practice. Mix of all levels: ${targetWords.join(', ')}.]`;
+        if (reviewVibe === 'chill') {
+          const targetWords = vocabulary
+            .filter(w => w.status === 'confident' || w.status === 'mastered')
+            .sort((a, b) => b.baseScore - a.baseScore)
+            .slice(0, 8)
+            .map(w => w.word);
+          prompt = `[SYSTEM: Daily Review in **CHILL** mode. Words: ${targetWords.join(', ')}. Keep it light.]`;
+        } else if (reviewVibe === 'deep') {
+          const targetWords = vocabulary
+            .filter(w => w.status === 'introduced' || w.status === 'not_started')
+            .sort((a, b) => (a.frequencyRank ?? 999) - (b.frequencyRank ?? 999))
+            .slice(0, 6)
+            .map(w => w.word);
+          prompt = `[SYSTEM: Daily Review in **DEEP** mode. Focus on new concepts/words: ${targetWords.join(', ')}. Follow 3-phase structure.]`;
+        } else if (reviewVibe === 'intense') {
+          const targetWords = vocabulary
+            .filter(w => w.status !== 'mastered')
+            .sort((a, b) => {
+              if (a.baseScore !== b.baseScore) return a.baseScore - b.baseScore;
+              return (a.frequencyRank ?? 999) - (b.frequencyRank ?? 999);
+            })
+            .slice(0, 10)
+            .map(w => w.word);
+          prompt = `[SYSTEM: Daily Review in **INTENSE** mode. Target weak points and common words: ${targetWords.join(', ')}. Push the student hard.]`;
+        } else {
+          // Balanced review if no vibe (fallback)
+          const targetWords = [...vocabulary].sort(() => 0.5 - Math.random()).slice(0, 8).map(w => w.word);
+          prompt = `[SYSTEM: Balanced Vocab Practice. Mix of all levels: ${targetWords.join(', ')}.]`;
+        }
       }
 
       onAskLina(prompt);
@@ -246,26 +276,32 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
           <div className="flex flex-col md:flex-row gap-2 w-full">
             <button onClick={handleDailyReview} className="btn-review w-full" style={{ flex: 1, marginBottom: 0 }}>
-              {activeView === 'vocab' ? '⚡ VOCAB PRACTICE' : '🚀 ROADMAP LESSON'}
+              {activeView === 'vocab' ? '⚡ VOCAB PRACTICE' : 
+               activeView === 'archive' ? (
+                 reviewVibe === 'chill' ? '🔄 REFRESH MEMORY' :
+                 reviewVibe === 'deep' ? '🎭 SITUATIONAL DRILL' :
+                 reviewVibe === 'intense' ? '🎤 LYRIC ANALYSIS' :
+                 '⚡ ARCHIVE PRACTICE'
+               ) : '🚀 ROADMAP LESSON'}
             </button>
             <div className="w-full" style={{ display: 'flex', background: 'var(--surface)', borderRadius: '4px', padding: '4px', border: '1px solid var(--border)', flex: 1.5 }}>
               <button 
                 onClick={() => setReviewVibe(reviewVibe === 'chill' ? null : 'chill')}
                 style={{ flex: 1, border: 'none', background: reviewVibe === 'chill' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'chill' ? 'black' : '#666', borderRadius: '2px', padding: '6px 4px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
               >
-                {activeView === 'vocab' ? 'CHILL' : activeView === 'phrasebook' ? 'MY SAVES' : 'NEW CONCEPT'}
+                {activeView === 'vocab' ? 'CHILL' : activeView === 'archive' ? 'MY SAVES' : 'NEW CONCEPT'}
               </button>
               <button 
                 onClick={() => setReviewVibe(reviewVibe === 'deep' ? null : 'deep')}
                 style={{ flex: 1, border: 'none', background: reviewVibe === 'deep' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'deep' ? 'black' : '#666', borderRadius: '2px', padding: '6px 4px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
               >
-                {activeView === 'vocab' ? 'DEEP' : activeView === 'phrasebook' ? 'EVERYDAY' : 'REVIEW'}
+                {activeView === 'vocab' ? 'DEEP' : activeView === 'archive' ? 'EVERYDAY' : 'REVIEW'}
               </button>
               <button 
                 onClick={() => setReviewVibe(reviewVibe === 'intense' ? null : 'intense')}
                 style={{ flex: 1, border: 'none', background: reviewVibe === 'intense' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'intense' ? 'black' : '#666', borderRadius: '2px', padding: '6px 4px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
               >
-                {activeView === 'vocab' ? 'INTENSE' : activeView === 'phrasebook' ? 'DISCOGRAPHY' : 'QUIZ / LEVEL UP'}
+                {activeView === 'vocab' ? 'INTENSE' : activeView === 'archive' ? 'DISCOGRAPHY' : 'QUIZ / LEVEL UP'}
               </button>
             </div>
           </div>
@@ -298,11 +334,11 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
             ROADMAP
           </button>
           <button 
-            onClick={() => setActiveView('phrasebook')} 
-            className={`btn-toggle text-xs md:text-sm px-2 py-3 ${activeView === 'phrasebook' ? 'active' : ''}`}
-            style={{ margin: 0, width: '100%', background: activeView === 'phrasebook' ? 'var(--gold)' : 'transparent', color: activeView === 'phrasebook' ? 'black' : 'inherit' }}
+            onClick={() => setActiveView('archive')} 
+            className={`btn-toggle text-xs md:text-sm px-2 py-3 ${activeView === 'archive' ? 'active' : ''}`}
+            style={{ margin: 0, width: '100%', background: activeView === 'archive' ? 'var(--gold)' : 'transparent', color: activeView === 'archive' ? 'black' : 'inherit' }}
           >
-            PHRASEBOOK
+            THE ARCHIVE
           </button>
         </div>
 
