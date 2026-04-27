@@ -273,19 +273,19 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
             </button>
             <div className="w-full" style={{ display: 'flex', background: 'var(--surface)', borderRadius: '4px', padding: '4px', border: '1px solid var(--border)', flex: 1.5 }}>
               <button 
-                onClick={() => setReviewVibe('chill')}
+                onClick={() => setReviewVibe(reviewVibe === 'chill' ? null : 'chill')}
                 style={{ flex: 1, border: 'none', background: reviewVibe === 'chill' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'chill' ? 'black' : '#666', borderRadius: '2px', padding: '6px 4px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
               >
                 {activeView === 'vocab' ? 'CHILL' : 'NEW CONCEPT'}
               </button>
               <button 
-                onClick={() => setReviewVibe('deep')}
+                onClick={() => setReviewVibe(reviewVibe === 'deep' ? null : 'deep')}
                 style={{ flex: 1, border: 'none', background: reviewVibe === 'deep' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'deep' ? 'black' : '#666', borderRadius: '2px', padding: '6px 4px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
               >
                 {activeView === 'vocab' ? 'DEEP' : 'REVIEW'}
               </button>
               <button 
-                onClick={() => setReviewVibe('intense')}
+                onClick={() => setReviewVibe(reviewVibe === 'intense' ? null : 'intense')}
                 style={{ flex: 1, border: 'none', background: reviewVibe === 'intense' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'intense' ? 'black' : '#666', borderRadius: '2px', padding: '6px 4px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
               >
                 {activeView === 'vocab' ? 'INTENSE' : 'QUIZ / LEVEL UP'}

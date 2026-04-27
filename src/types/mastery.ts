@@ -96,7 +96,7 @@ export interface UserProfile {
   history: ProgressSnapshot[];
 }
 
-export type ReviewVibe = 'chill' | 'deep' | 'intense';
+export type ReviewVibe = 'chill' | 'deep' | 'intense' | 'new_concept' | 'review' | 'quiz' | null;
 
 // ─── Scoring Engine Types ─────────────────────────────────────────────────────
 
