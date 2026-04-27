@@ -7,7 +7,7 @@ import type { ChatMessage } from '../store/chatStore';
 import {
   buildSystemPrompt, streamCompletion, stripProposedChanges,
   parseProposedChanges, resolveApiKey, fetchSessionRecap,
-  fetchQuickTranslation, stringifyUserContext
+  fetchQuickTranslation, stringifyUserContext, detectSessionTitle
 } from '../services/linaService';
 import type { ProposedChange } from '../services/linaService';
 
@@ -109,6 +109,7 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
 
     updateSession(sessionId, { 
       context: newContext,
+      title: detectSessionTitle(pendingPrompt),
       messages: [],
       history: [],
       sessionDeltas: []

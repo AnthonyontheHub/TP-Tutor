@@ -16,6 +16,7 @@ import ChatSession from './components/ChatSession';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { useChatStore } from './store/chatStore';
+import { detectSessionTitle } from './services/linaService';
 
 export type AppPanel = 'profile' | 'settings' | 'instructions' | 'achievements' | 'logbook';
 
@@ -125,7 +126,7 @@ export default function App() {
   const handleAskLina = useCallback((prompt: string) => {
     addSession({
       id: generateId(),
-      title: 'jan LINA LINK',
+      title: detectSessionTitle(prompt),
       isMinimized: false,
       pendingPrompt: prompt,
       messages: [],

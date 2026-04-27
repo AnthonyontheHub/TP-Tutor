@@ -256,6 +256,45 @@ export function parseProposedChanges(text: string): ProposedChange[] | null {
   return changes.length > 0 ? changes : null;
 }
 
+export function detectSessionTitle(prompt: string): string {
+  const low = prompt.toLowerCase();
+  
+  if (prompt.includes('Roadmap Lesson')) {
+    const match = prompt.match(/for "([^"]+)"/);
+    return match ? match[1] : 'Roadmap Lesson';
+  }
+  
+  if (prompt.includes('Daily Review')) {
+    if (prompt.includes('CHILL')) return 'Chill Review';
+    if (prompt.includes('DEEP')) return 'Deep Review';
+    if (prompt.includes('INTENSE')) return 'Intense Review';
+    return 'Daily Review';
+  }
+
+  if (prompt.includes('situational drill')) return 'Situational Drill';
+  if (prompt.includes('lyric analysis')) return 'Lyric Analysis';
+  if (prompt.includes('practice my saved phrases')) return 'My Saves Review';
+  
+  if (prompt.includes('practice this common phrase') || prompt.includes('practice this lyric')) {
+    const match = prompt.match(/\[(.*?)\]/);
+    return match ? match[1] : 'Practice';
+  }
+
+  if (prompt.includes('Practice this sentence')) {
+    const match = prompt.match(/"(.*?)"/);
+    return match ? `Practice: ${match[1]}` : 'Sentence Practice';
+  }
+
+  if (prompt.includes('Explain the grammar')) {
+    const match = prompt.match(/"(.*?)"/);
+    return match ? `Explain: ${match[1]}` : 'Grammar Check';
+  }
+
+  if (prompt.includes('Start a general conversation')) return 'jan LINA LINK';
+
+  return 'jan LINA LINK';
+}
+
 export async function fetchSessionRecap(
   apiKey: string,
   changes: ProposedChange[]
