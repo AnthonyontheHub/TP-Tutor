@@ -125,7 +125,7 @@ interface MasteryState {
   lessonFilter: string[] | null;
   isMainProfile: boolean;
   cloudSynced: boolean;
-  songs: { id: string; title: string; tracks: any[] }[];
+  songs: { id: string; title: string; tracks: { title: string; blocks: { title: string; tp: string; en: string }[] }[] }[];
   commonPhrases: CommonPhrase[];
   // Dashboard settings
   widgetDensity: 'Compact' | 'Expanded';
@@ -183,19 +183,19 @@ export const useMasteryStore = create<MasteryStore>()(
           id: "utala-kon",
           title: "utala kon",
           tracks: [
-            { id: "01", title: "01 wawa kama", blocks: [
+            { title: "01 wawa kama", blocks: [
               { title: "Verse 1", tp: "mi tawa / mi tawa / mi tawa lon nasin", en: "I go / I go / I go on the path" },
               { title: "Chorus", tp: "ona li lon / pini li kama / mi ken ala pini e tawa", en: "It is here / the end is coming / I cannot stop going" }
             ]},
-            { id: "02", title: "02 nasin li ken ala", blocks: [
+            { title: "02 nasin li ken ala", blocks: [
               { title: "Chorus", tp: "nasin li ken ala", en: "The path is not possible" }
             ]},
-            { id: "03", title: "03 pini li kama", blocks: [] },
-            { id: "04", title: "04 toki ike", blocks: [] },
-            { id: "05", title: "05 lukin moli", blocks: [] },
-            { id: "06", title: "06 mi olin e ike", blocks: [] },
-            { id: "07", title: "07 mi awen lon ni", blocks: [] },
-            { id: "08", title: "08 pini ala", blocks: [] }
+            { title: "03 pini li kama", blocks: [] },
+            { title: "04 toki ike", blocks: [] },
+            { title: "05 lukin moli", blocks: [] },
+            { title: "06 mi olin e ike", blocks: [] },
+            { title: "07 mi awen lon ni", blocks: [] },
+            { title: "08 pini ala", blocks: [] }
           ]
         }
       ],
