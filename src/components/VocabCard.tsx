@@ -99,7 +99,12 @@ export default function VocabCard({ word, onLongPress, onClick, isSandboxMode }:
     isLongPressActive.current = false;
   };
 
-  const hasSavedInfo = (word.notes && word.notes.trim() !== '') || (word.customDefinition && word.customDefinition.trim() !== '');
+  const hasSavedInfo = !!(
+    (word.notes && word.notes.trim() !== '') || 
+    (word.customDefinition && word.customDefinition.trim() !== '') ||
+    (word.sessionNotes && word.sessionNotes.trim() !== '') ||
+    (word.userNotes && word.userNotes.trim() !== '')
+  );
 
   return (
     <div
@@ -107,7 +112,7 @@ export default function VocabCard({ word, onLongPress, onClick, isSandboxMode }:
       style={{ 
         touchAction: 'none', 
         borderLeftColor: RING_COLOR[status],
-        boxShadow: hasSavedInfo ? `0 0 15px ${RING_COLOR[status]}66` : undefined
+        boxShadow: hasSavedInfo ? `0 0 20px 2px ${RING_COLOR[status]}88` : undefined
       }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
