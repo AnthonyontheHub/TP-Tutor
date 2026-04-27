@@ -11,7 +11,7 @@ interface Props {
   clearFocusPhrase?: () => void;
 }
 
-export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, clearFocusPhrase }: Props) {
+export default function PhraseGrid({ onAskLina, activeFilter, selectedWords, focusPhraseId, clearFocusPhrase }: Props) {
   const { studentName, vocabulary, savedPhrases, updatePhraseNote, deletePhrase, songs, commonPhrases, reviewVibe } = useMasteryStore();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [noteInput, setNoteInput] = useState('');
@@ -23,6 +23,8 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
   const clean = (w: string) => w.toLowerCase().replace(/[.!?,]/g, '');
 
   const safeSavedPhrases = savedPhrases || [];
+  const safeSongs = Array.isArray(songs) ? songs : [];
+  const safeCommonPhrases = Array.isArray(commonPhrases) ? commonPhrases : [];
 
   useEffect(() => {
     if (focusPhraseId) {
@@ -57,12 +59,12 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
 
   const groupedCommonPhrases = useMemo(() => {
     const groups: Record<string, CommonPhrase[]> = {};
-    (commonPhrases || []).forEach(p => {
+    safeCommonPhrases.forEach(p => {
       if (!groups[p.category]) groups[p.category] = [];
       groups[p.category].push(p);
     });
     return groups;
-  }, [commonPhrases]);
+  }, [safeCommonPhrases]);
 
   const isChill = reviewVibe === 'chill' || reviewVibe === null;
   const isDeep = reviewVibe === 'deep';
@@ -153,7 +155,7 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
           
           {!selectedAlbumId ? (
              <div style={{ display: 'grid', gap: '16px', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))' }}>
-               {(songs || []).map(album => (
+               {safeSongs.map(album => (
                  <button 
                   key={album.id}
                   onClick={() => setSelectedAlbumId(album.id)}
@@ -168,9 +170,9 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
           ) : !selectedTrackTitle ? (
             <div>
               <button onClick={() => setSelectedAlbumId(null)} style={{ background: 'none', border: 'none', color: '#666', fontSize: '0.7rem', fontWeight: 900, cursor: 'pointer', marginBottom: '16px' }}>← BACK TO ALBUMS</button>
-              <h3 style={{ fontSize: '0.8rem', fontWeight: 900, color: 'var(--gold)', letterSpacing: '0.2em', marginBottom: '16px', textTransform: 'uppercase' }}>TRACKLIST: {(songs || []).find(a => a.id === selectedAlbumId)?.title}</h3>
+              <h3 style={{ fontSize: '0.8rem', fontWeight: 900, color: 'var(--gold)', letterSpacing: '0.2em', marginBottom: '16px', textTransform: 'uppercase' }}>TRACKLIST: {safeSongs.find(a => a.id === selectedAlbumId)?.title}</h3>
               <div style={{ display: 'grid', gap: '12px' }}>
-                {(songs || []).find(a => a.id === selectedAlbumId)?.tracks?.map((track: any) => (
+                {safeSongs.find(a => a.id === selectedAlbumId)?.tracks?.map((track: any) => (
                   <button 
                     key={track.title} 
                     onClick={() => setSelectedTrackTitle(track.title)}
@@ -187,7 +189,7 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
             <div>
                <button onClick={() => setSelectedTrackTitle(null)} style={{ background: 'none', border: 'none', color: '#666', fontSize: '0.7rem', fontWeight: 900, cursor: 'pointer', marginBottom: '16px' }}>← BACK TO TRACKLIST</button>
                {(() => {
-                 const album = (songs || []).find(a => a.id === selectedAlbumId);
+                 const album = safeSongs.find(a => a.id === selectedAlbumId);
                  const track = (album?.tracks || []).find((t: any) => t.title === selectedTrackTitle);
                  if (!track) return null;
                  return (
