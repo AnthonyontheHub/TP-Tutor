@@ -289,6 +289,11 @@ export interface Album {
   songs: Song[];
 }
 
+export interface CommonPhrase {
+  tp: string;
+  en: string;
+}
+
 export interface MasteryMap {
   studentName: string;
   profileImage: string;

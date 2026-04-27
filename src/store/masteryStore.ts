@@ -126,6 +126,7 @@ interface MasteryState {
   isMainProfile: boolean;
   cloudSynced: boolean;
   albums: Album[];
+  commonPhrases: Record<string, CommonPhrase[]>;
   // Dashboard settings
   widgetDensity: 'Compact' | 'Expanded';
   fogOfWar: 'Strict' | 'Visible';
@@ -166,25 +167,38 @@ export const useMasteryStore = create<MasteryStore>()(
       knowledgeCheckFrequency: 'session',
       lastKnowledgeCheckDate: '',
       cloudSynced: false,
+      commonPhrases: {
+        "Greetings": [
+          { tp: "toki!", en: "Hello/Hi" },
+          { tp: "sina pilin seme?", en: "How are you?" },
+          { tp: "mi tawa", en: "Goodbye (I am going)" }
+        ],
+        "Social": [
+          { tp: "nimi mi li [X]", en: "My name is [X]" },
+          { tp: "sina tan ma seme?", en: "Where are you from?" }
+        ],
+        "Polite": [
+          { tp: "sina pona", en: "Thank you / You are good" },
+          { tp: "mi pakala", en: "I'm sorry / I messed up" }
+        ],
+        "Feelings": [
+          { tp: "mi pilin pona", en: "I feel good" },
+          { tp: "mi pilin ike", en: "I feel bad/sad" },
+          { tp: "mi pilin seli", en: "I feel hot/angry" }
+        ]
+      },
       albums: [
         {
           id: 'utala_kon',
           title: 'utala kon',
           songs: [
             {
-              id: 'jan_pona',
-              title: 'jan pona',
+              id: 'nasin_li_ken_ala',
+              title: 'nasin li ken ala',
               blocks: [
-                { type: 'chorus', tp: 'jan pona o, jan pona o.', en: 'O friend, o friend.' },
-                { type: 'verse', tp: 'sina pana e moku pona tawa mi.', en: 'You give good food to me.' }
-              ]
-            },
-            {
-              id: 'toki_pona',
-              title: 'toki pona',
-              blocks: [
-                { type: 'chorus', tp: 'toki pona li toki pona.', en: 'Toki Pona is a good language.' },
-                { type: 'verse', tp: 'mi sona e nimi lili.', en: 'I know few words.' }
+                { type: 'verse', tp: "mi wile e nasin\nmi wile e lawa\nmi wile e suli\nmi wile e pini", en: "I want a path / I want guidance / I want importance / I want an end" },
+                { type: 'chorus', tp: "nasin li ken ala", en: "The path is not possible" },
+                { type: 'verse', tp: "mi pakala e lipu\nmi pakala e sijelo\nmi pakala e kon", en: "I destroyed the paper / I destroyed the body / I destroyed the spirit" }
               ]
             }
           ]
@@ -493,6 +507,7 @@ export const useMasteryStore = create<MasteryStore>()(
           currentPositionNodeId: 'phi_sim',
           hasCompletedSetup: false,
           albums: [],
+          commonPhrases: {},
         });
         void get().syncToCloud();
       },
@@ -507,6 +522,7 @@ export const useMasteryStore = create<MasteryStore>()(
           currentPositionNodeId: 'phi_sim',
           hasCompletedSetup: false,
           albums: [],
+          commonPhrases: {},
         });
         void get().syncToCloud();
       },
@@ -551,6 +567,7 @@ export const useMasteryStore = create<MasteryStore>()(
           curriculums: curriculumRoadmap,
           hasCompletedSetup: false,
           albums: [],
+          commonPhrases: {},
         });
       },
 
@@ -612,6 +629,7 @@ export const useMasteryStore = create<MasteryStore>()(
           curriculums: curriculumRoadmap,
           hasCompletedSetup: false,
           albums: [],
+          commonPhrases: {},
           currentPositionNodeId: 'phi_sim',
           isMainProfile: false,
         });
@@ -625,7 +643,7 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       syncToCloud: async (explicitUserId) => {
-        const { vocabulary, curriculums, lastUpdated, studentName, profile, lore, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, isMainProfile, widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, cloudSynced, albums } = get();
+        const { vocabulary, curriculums, lastUpdated, studentName, profile, lore, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, isMainProfile, widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, cloudSynced, albums, commonPhrases } = get();
         const targetId = explicitUserId || userId;
 
         // Block premature syncs before cloud data has loaded — prevents stale
@@ -655,7 +673,7 @@ export const useMasteryStore = create<MasteryStore>()(
             vocabulary: partialVocab,
             curriculums, lastUpdated, studentName, profile, lore, profileImage,
             savedPhrases, currentStreak, lastActiveDate, hasCompletedSetup, currentPositionNodeId, isMainProfile,
-            widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, albums
+            widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, albums, commonPhrases
           }, { merge: true });
         } catch (err) {
           console.error('Firebase Sync Error:', err);
@@ -692,6 +710,7 @@ export const useMasteryStore = create<MasteryStore>()(
                 currentPositionNodeId: 'phi_sim',
                 hasCompletedSetup: false,
           albums: [],
+          commonPhrases: {},
               });
             } else {
               if (initialName && (localName === 'Anthony' || !localName)) {
@@ -742,6 +761,7 @@ export const useMasteryStore = create<MasteryStore>()(
               currentPositionNodeId: 'phi_sim',
               hasCompletedSetup: false,
           albums: [],
+          commonPhrases: {},
               cloudSynced: true,
             });
             void get().syncToCloud(uid);
@@ -857,6 +877,7 @@ export const useMasteryStore = create<MasteryStore>()(
             knowledgeCheckFrequency: data.knowledgeCheckFrequency || 'session',
             lastKnowledgeCheckDate: data.lastKnowledgeCheckDate || '',
             albums: data.albums || [],
+            commonPhrases: data.commonPhrases || {},
           };
 
           if (data.studentName) update.studentName = data.studentName;
