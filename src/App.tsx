@@ -15,21 +15,16 @@ import ChatSession from './components/ChatSession';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
-export type AppPanel = 'profile' | 'settings' | 'instructions' | 'achievements' | 'logbook';
+import { useChatStore } from './store/chatStore';
 
-interface ChatSessionState {
-  id: string;
-  title: string;
-  isMinimized: boolean;
-  pendingPrompt: string | null;
-}
+export type AppPanel = 'profile' | 'settings' | 'instructions' | 'achievements' | 'logbook';
 
 export default function App() {
   const { user, loading } = useAuthStore();
   const { hasCompletedSetup, isMainProfile } = useMasteryStore();
+  const { sessions: chatSessions, addSession, removeSession, updateSession } = useChatStore();
 
   const [activePanels, setActivePanels] = useState<AppPanel[]>([]);
-  const [chatSessions, setChatSessions] = useState<ChatSessionState[]>([]);
   const [isSandboxMode, setIsSandboxMode] = useState<boolean>(
     () => localStorage.getItem('tp_sandbox_mode') === 'true'
   );
@@ -107,21 +102,27 @@ export default function App() {
   }, []);
 
   const handleAskLina = useCallback((prompt: string) => {
-    const newSession: ChatSessionState = {
+    addSession({
       id: crypto.randomUUID(),
       title: 'jan LINA LINK',
       isMinimized: false,
-      pendingPrompt: prompt
-    };
-    setChatSessions(prev => [...prev, newSession]);
-  }, []);
+      pendingPrompt: prompt,
+      messages: [],
+      history: [],
+      sessionDeltas: [],
+      context: 'GENERAL'
+    });
+  }, [addSession]);
 
   const closeChat = (id: string) => {
-    setChatSessions(prev => prev.filter(s => s.id !== id));
+    removeSession(id);
   };
 
   const toggleMinimizeChat = (id: string) => {
-    setChatSessions(prev => prev.map(s => s.id === id ? { ...s, isMinimized: !s.isMinimized } : s));
+    const session = chatSessions.find(s => s.id === id);
+    if (session) {
+      updateSession(id, { isMinimized: !session.isMinimized });
+    }
   };
 
   if (loading) {
@@ -202,26 +203,29 @@ export default function App() {
       </div>
 
       <div className="chat-manager-layer" style={{ pointerEvents: 'none', position: 'fixed', inset: 0, zIndex: 6500 }}>
-        {chatSessions.filter(s => !s.isMinimized).map((session) => (
-          <ChatSession 
-            key={session.id}
-            isActive={true}
-            isMinimized={false}
-            onMinimize={() => toggleMinimizeChat(session.id)}
-            onEndSession={() => closeChat(session.id)} 
-            isSandboxMode={isSandboxMode} 
-            pendingPrompt={session.pendingPrompt}
-            clearPrompt={() => setChatSessions(prev => prev.map(s => s.id === session.id ? { ...s, pendingPrompt: null } : s))}
-            style={{ 
-              pointerEvents: 'auto',
-              position: 'fixed',
-              inset: 0,
-              left: 'auto',
-              width: '100%',
-              maxWidth: '500px'
-            }}
-          />
-        ))}
+        <AnimatePresence>
+          {chatSessions.filter(s => !s.isMinimized).map((session) => (
+            <ChatSession 
+              key={session.id}
+              sessionId={session.id}
+              isActive={true}
+              isMinimized={false}
+              onMinimize={() => toggleMinimizeChat(session.id)}
+              onEndSession={() => closeChat(session.id)} 
+              isSandboxMode={isSandboxMode} 
+              pendingPrompt={session.pendingPrompt}
+              clearPrompt={() => updateSession(session.id, { pendingPrompt: null })}
+              style={{ 
+                pointerEvents: 'auto',
+                position: 'fixed',
+                inset: 0,
+                left: 'auto',
+                width: '100%',
+                maxWidth: '500px'
+              }}
+            />
+          ))}
+        </AnimatePresence>
       </div>
 
       {!hasCompletedSetup && <SetupScreen />}

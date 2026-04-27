@@ -1,7 +1,6 @@
 /* src/components/ChatSession.tsx */
-import { useState, useRef, useEffect } from 'react';
-import { m, AnimatePresence, LazyMotion, domMax } from 'framer-motion';
-import { useMasteryStore } from '../store/masteryStore';
+import { useChatStore } from '../store/chatStore';
+import type { ChatMessage } from '../store/chatStore';
 import {
   buildSystemPrompt, streamCompletion, stripProposedChanges,
   parseProposedChanges, resolveApiKey, fetchSessionRecap,
@@ -10,6 +9,7 @@ import {
 import type { ProposedChange } from '../services/linaService';
 
 interface Props {
+  sessionId: string;
   onEndSession: () => void;
   onMinimize?: () => void;
   isActive: boolean;
@@ -20,22 +20,20 @@ interface Props {
   style?: React.CSSProperties;
 }
 
-interface ChatMessage {
-  id: string;
-  role: 'user' | 'assistant';
-  displayContent: string;
-  raw?: string;
-  proposedChanges?: ProposedChange[];
-}
-
 const HISTORY_WINDOW = 10;
 const SANDBOX_RESPONSE = '[OFFLINE PROTOCOL]: o toki! I am in sandbox mode. Interaction simulated.';
 
-export default function ChatSession({ onEndSession, onMinimize, isActive, isMinimized, pendingPrompt, clearPrompt, isSandboxMode, style }: Props) {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+export default function ChatSession({ sessionId, onEndSession, onMinimize, isActive, isMinimized, pendingPrompt, clearPrompt, isSandboxMode, style }: Props) {
+  const session = useChatStore(state => state.sessions.find(s => s.id === sessionId));
+  const updateSession = useChatStore(state => state.updateSession);
+
+  const messages = session?.messages || [];
+  const history = session?.history || [];
+  const sessionDeltas = session?.sessionDeltas || [];
+  const chatContext = session?.context || 'GENERAL';
+
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [chatContext, setChatContext] = useState<'GENERAL' | 'DAILY REVIEW' | 'GRAMMAR CHECK'>('GENERAL');
 
   const [translateBubble, setTranslateBubble] = useState<{
     text: string;
@@ -55,8 +53,6 @@ export default function ChatSession({ onEndSession, onMinimize, isActive, isMini
   const displayName = profile.tpName || profile.tokiPonaName || studentName || 'ANTHONY';
 
   const messagesEndRef  = useRef<HTMLDivElement>(null);
-  const historyRef      = useRef<{ role: 'user' | 'assistant'; content: string }[]>([]);
-  const sessionDeltasRef = useRef<ProposedChange[]>([]);
 
   useEffect(() => {
     if (isActive && !isMinimized) messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -101,17 +97,21 @@ export default function ChatSession({ onEndSession, onMinimize, isActive, isMini
     if (!isActive || !pendingPrompt) return;
     
     // Detect context
+    let newContext: 'GENERAL' | 'DAILY REVIEW' | 'GRAMMAR CHECK' = 'GENERAL';
     const low = pendingPrompt.toLowerCase();
-    if (low.includes('daily review')) setChatContext('DAILY REVIEW');
-    else if (low.includes('explain the grammar')) setChatContext('GRAMMAR CHECK');
-    else if (low.includes('start a lesson')) setChatContext('GRAMMAR CHECK');
-    else if (low.includes('deep-dive')) setChatContext('GRAMMAR CHECK');
-    else setChatContext('GENERAL');
+    if (low.includes('daily review')) newContext = 'DAILY REVIEW';
+    else if (low.includes('explain the grammar')) newContext = 'GRAMMAR CHECK';
+    else if (low.includes('start a lesson')) newContext = 'GRAMMAR CHECK';
+    else if (low.includes('deep-dive')) newContext = 'GRAMMAR CHECK';
 
-    setMessages([]);
+    updateSession(sessionId, { 
+      context: newContext,
+      messages: [],
+      history: [],
+      sessionDeltas: []
+    });
+    
     setInput('');
-    historyRef.current = [];
-    sessionDeltasRef.current = [];
     const key = resolveApiKey();
     
     // PROACTIVE INITIALIZATION:
@@ -132,11 +132,16 @@ export default function ChatSession({ onEndSession, onMinimize, isActive, isMini
     if (!isSandboxMode && !resolveApiKey(overrideKey)) return;
     setIsLoading(true);
     const assistantId = crypto.randomUUID();
-    setMessages([{ id: assistantId, role: 'assistant', displayContent: '· · ·', raw: '' }]);
+    
+    const initialAssistantMsg: ChatMessage = { id: assistantId, role: 'assistant', displayContent: '· · ·', raw: '' };
+    updateSession(sessionId, { messages: [initialAssistantMsg] });
     
     if (isSandboxMode) {
-      setMessages([{ id: assistantId, role: 'assistant', displayContent: SANDBOX_RESPONSE, raw: SANDBOX_RESPONSE }]);
-      historyRef.current.push({ role: 'assistant', content: SANDBOX_RESPONSE });
+      const finalMsg = { ...initialAssistantMsg, displayContent: SANDBOX_RESPONSE, raw: SANDBOX_RESPONSE };
+      updateSession(sessionId, { 
+        messages: [finalMsg],
+        history: [{ role: 'assistant', content: SANDBOX_RESPONSE }]
+      });
       setIsLoading(false);
       return;
     }
@@ -151,19 +156,30 @@ export default function ChatSession({ onEndSession, onMinimize, isActive, isMini
       let full = '';
       for await (const chunk of streamCompletion(key, sys, [{ role: 'user', content: triggerMsg }])) {
         full += chunk;
-        setMessages(prev => prev.map(msg => msg.id === assistantId ? { ...msg, displayContent: stripProposedChanges(full), raw: full } : msg));
+        const currentSession = useChatStore.getState().sessions.find(s => s.id === sessionId);
+        if (!currentSession) break;
+
+        updateSession(sessionId, {
+          messages: currentSession.messages.map(msg => msg.id === assistantId ? { ...msg, displayContent: stripProposedChanges(full), raw: full } : msg)
+        });
       }
-      historyRef.current.push({ role: 'user', content: triggerMsg });
-      historyRef.current.push({ role: 'assistant', content: full });
+      updateSession(sessionId, {
+        history: [
+          { role: 'user', content: triggerMsg },
+          { role: 'assistant', content: full }
+        ]
+      });
     } catch (e) {
       console.error(e);
-      setMessages([{ id: assistantId, role: 'assistant', displayContent: "pakala!" }]);
+      updateSession(sessionId, {
+        messages: [{ id: assistantId, role: 'assistant', displayContent: "pakala!" }]
+      });
     } finally { setIsLoading(false); }
   }
 
   async function handleEndSession() {
     if (!window.confirm("Are you sure you want to end this session? Conversation history will be lost.")) return;
-    const deltas = sessionDeltasRef.current;
+    const deltas = sessionDeltas;
     if (deltas.length === 0 || isSandboxMode) { onEndSession(); return; }
     for (const change of deltas) {
       if (change.type === 'vocab') {
@@ -173,13 +189,22 @@ export default function ChatSession({ onEndSession, onMinimize, isActive, isMini
     setLastUpdated(new Date().toLocaleDateString());
     const key = resolveApiKey();
     const recapId = crypto.randomUUID();
-    setMessages(prev => [...prev, { id: recapId, role: 'assistant', displayContent: '· · ·' }]);
+    
+    updateSession(sessionId, {
+      messages: [...messages, { id: recapId, role: 'assistant', displayContent: '· · ·' }]
+    });
+    
     setIsLoading(true);
     const recap = await fetchSessionRecap(key, deltas);
-    setMessages(prev => prev.map(msg => msg.id === recapId ? { ...msg, displayContent: recap } : msg));
+    
+    updateSession(sessionId, {
+      messages: (session?.messages || []).map(msg => msg.id === recapId ? { ...msg, displayContent: recap } : msg)
+    });
+    
     setIsLoading(false);
     await new Promise(r => setTimeout(r, 2200));
-    sessionDeltasRef.current = [];
+    
+    updateSession(sessionId, { sessionDeltas: [] });
     onEndSession();
   }
 
@@ -188,36 +213,65 @@ export default function ChatSession({ onEndSession, onMinimize, isActive, isMini
     if (!isSandboxMode && !resolveApiKey(overrideKey)) return;
     setIsLoading(true);
     setInput('');
-    setMessages(prev => [...prev, { id: crypto.randomUUID(), role: 'user', displayContent: txt }]);
-    historyRef.current.push({ role: 'user', content: txt });
+    
+    const newUserMsg: ChatMessage = { id: crypto.randomUUID(), role: 'user', displayContent: txt };
     const assistantId = crypto.randomUUID();
-    setMessages(prev => [...prev, { id: assistantId, role: 'assistant', displayContent: '· · ·', raw: '' }]);
+    const newAssistantMsg: ChatMessage = { id: assistantId, role: 'assistant', displayContent: '· · ·', raw: '' };
+    
+    updateSession(sessionId, { 
+      messages: [...messages, newUserMsg, newAssistantMsg],
+      history: [...history, { role: 'user', content: txt }]
+    });
+
     if (isSandboxMode) {
-      setMessages(prev => prev.map(msg => msg.id === assistantId ? { ...msg, displayContent: SANDBOX_RESPONSE, raw: SANDBOX_RESPONSE } : msg));
-      historyRef.current.push({ role: 'assistant', content: SANDBOX_RESPONSE });
+      updateSession(sessionId, {
+        messages: (session?.messages || []).map(msg => msg.id === assistantId ? { ...msg, displayContent: SANDBOX_RESPONSE, raw: SANDBOX_RESPONSE } : msg),
+        history: [...history, { role: 'user', content: txt }, { role: 'assistant', content: SANDBOX_RESPONSE }]
+      });
       setIsLoading(false);
       return;
     }
+
     try {
       const key = resolveApiKey(overrideKey);
       const state = useMasteryStore.getState();
       const userContext = stringifyUserContext(state.profile, state.lore);
       const sys = buildSystemPrompt(state.vocabulary, [], displayName, userContext);
-      const windowedHistory = historyRef.current.slice(-HISTORY_WINDOW);
+      const windowedHistory = [...history, { role: 'user', content: txt }].slice(-HISTORY_WINDOW);
       let full = '';
       for await (const chunk of streamCompletion(key, sys, windowedHistory)) {
         full += chunk;
-        setMessages(prev => prev.map(msg => msg.id === assistantId ? { ...msg, displayContent: stripProposedChanges(full), raw: full } : msg));
+        const currentSession = useChatStore.getState().sessions.find(s => s.id === sessionId);
+        if (!currentSession) break; // User closed chat
+
+        updateSession(sessionId, {
+          messages: currentSession.messages.map(msg => 
+            msg.id === assistantId ? { ...msg, displayContent: stripProposedChanges(full), raw: full } : msg
+          )
+        });
       }
       const changes = parseProposedChanges(full);
+      const updatedMessages = (useChatStore.getState().sessions.find(s => s.id === sessionId)?.messages || []).map(msg => 
+        msg.id === assistantId ? { ...msg, proposedChanges: changes || undefined } : msg
+      );
+      
+      const newDeltas = [...sessionDeltas];
       if (changes && changes.length > 0) {
-        sessionDeltasRef.current.push(...changes);
-        setMessages(prev => prev.map(msg => msg.id === assistantId ? { ...msg, proposedChanges: changes } : msg));
+        newDeltas.push(...changes);
       }
-      historyRef.current.push({ role: 'assistant', content: full });
+
+      updateSession(sessionId, {
+        messages: updatedMessages,
+        history: [...history, { role: 'user', content: txt }, { role: 'assistant', content: full }],
+        sessionDeltas: newDeltas
+      });
     } catch (e) {
       console.error(e);
-      setMessages(prev => prev.map(msg => msg.id === assistantId ? { ...msg, displayContent: "pakala!" } : msg));
+      updateSession(sessionId, {
+        messages: (useChatStore.getState().sessions.find(s => s.id === sessionId)?.messages || []).map(msg => 
+          msg.id === assistantId ? { ...msg, displayContent: "pakala!" } : msg
+        )
+      });
     } finally { setIsLoading(false); }
   }
 
