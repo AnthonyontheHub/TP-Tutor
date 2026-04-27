@@ -11,7 +11,7 @@ interface Props {
   clearFocusPhrase?: () => void;
 }
 
-export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, clearFocusPhrase }: Props) {
+export default function PhraseGrid({ onAskLina, activeFilter, selectedWords, focusPhraseId, clearFocusPhrase }: Props) {
   const { studentName, vocabulary, savedPhrases, updatePhraseNote, deletePhrase, songs, commonPhrases, reviewVibe } = useMasteryStore();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [noteInput, setNoteInput] = useState('');
