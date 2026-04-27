@@ -202,6 +202,8 @@ export interface VocabWord {
   frequencyRank: number;
   isMasteryCandidate: boolean;
   sessionNotes: string;
+  aiExplanation?: string;
+  aiExamples?: Record<string, string>;
 
   // Deep Knowledge Scoring
   partOfSpeechScores: PartOfSpeechScores;

@@ -516,6 +516,7 @@ select {
   border-left: 1px solid var(--border);
   display: flex;
   flex-direction: column;
+  z-index: 6000 !important;
 }
 
 /* ─── Scrollbars ────────────────────────────────────────────────────────── */

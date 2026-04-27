@@ -96,6 +96,8 @@ export function buildSystemPrompt(
 
     RULE OF CALIBRATION: Do NOT announce your calibrations (e.g., '+ CALIBRATING') in the text of your response. Use your tool calls (PROPOSED CHANGES) silently in the background. Follow the Mastery Map rules: ONLY suggest '✅ Mastered' by mutual agreement, and do major note/status updates at the END of a study session, not after every single user message.
 
+    RULE OF ABSURDITY: If a user builds a sentence that is grammatically correct but logically nonsensical or absurd, playfully call it out, show the literal translation, and ask if that's what they actually meant.
+
     PERSONALIZATION: Frequently use the student's background lore provided above to make your examples, exercises, and conversations highly personal and relevant to their life.
 
     ${lessonContext}

@@ -103,6 +103,7 @@ interface MasteryActions {
   clearAllSavedPhrases: () => void;
   checkAssessments: (onTrigger: (word: VocabWord) => void) => void;
   switchProfile: (name: string) => void;
+  updateVocabAIContent: (wordId: string, content: { aiExplanation?: string; aiExamples?: Record<string, string> }) => void;
 }
 
 interface MasteryState {
@@ -585,6 +586,13 @@ export const useMasteryStore = create<MasteryStore>()(
           currentPositionNodeId: 'phi_sim',
           isMainProfile: false,
         });
+      },
+
+      updateVocabAIContent: (wordId, content) => {
+        set((state) => ({
+          vocabulary: state.vocabulary.map(v => (v.id === wordId || v.word === wordId) ? { ...v, ...content } : v)
+        }));
+        void get().syncToCloud();
       },
 
       syncToCloud: async (explicitUserId) => {

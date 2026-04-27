@@ -15,14 +15,21 @@ import ChatSession from './components/ChatSession';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
-export type AppPanel = 'profile' | 'settings' | 'instructions' | 'achievements' | 'chat' | 'logbook';
+export type AppPanel = 'profile' | 'settings' | 'instructions' | 'achievements' | 'logbook';
+
+interface ChatSessionState {
+  id: string;
+  title: string;
+  isMinimized: boolean;
+  pendingPrompt: string | null;
+}
 
 export default function App() {
   const { user, loading } = useAuthStore();
   const { hasCompletedSetup, isMainProfile } = useMasteryStore();
   
   const [activePanels, setActivePanels] = useState<AppPanel[]>([]);
-  const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
+  const [chatSessions, setChatSessions] = useState<ChatSessionState[]>([]);
   const [isSandboxMode, setIsSandboxMode] = useState<boolean>(
     () => localStorage.getItem('tp_sandbox_mode') === 'true'
   );
@@ -67,11 +74,22 @@ export default function App() {
   }, []);
 
   const handleAskLina = useCallback((prompt: string) => {
-    setPendingPrompt(prompt);
-    if (!activePanels.includes('chat')) {
-      setActivePanels(prev => [...prev, 'chat']);
-    }
-  }, [activePanels]);
+    const newSession: ChatSessionState = {
+      id: crypto.randomUUID(),
+      title: 'jan LINA LINK',
+      isMinimized: false,
+      pendingPrompt: prompt
+    };
+    setChatSessions(prev => [...prev, newSession]);
+  }, []);
+
+  const closeChat = (id: string) => {
+    setChatSessions(prev => prev.filter(s => s.id !== id));
+  };
+
+  const toggleMinimizeChat = (id: string) => {
+    setChatSessions(prev => prev.map(s => s.id === id ? { ...s, isMinimized: !s.isMinimized } : s));
+  };
 
   if (loading) {
     return (
@@ -94,12 +112,13 @@ export default function App() {
         onAskLina={handleAskLina}
         isSandboxMode={isSandboxMode}
         setIsSandboxMode={setIsSandboxMode}
+        chatCount={chatSessions.length}
       />
 
       <AnimatePresence>
-        {activePanels.filter(p => p !== 'chat').map(panel => (
+        {activePanels.map(panel => (
           <ModalWrapper key={panel} onClose={() => togglePanel(panel)}>
-             {panel === 'profile' && <UserProfilePanel isOpen={true} onClose={() => togglePanel('profile')} />}
+             {panel === 'profile' && <UserProfilePanel onClose={() => togglePanel('profile')} />}
              {panel === 'settings' && <SettingsPanel isOpen={true} onClose={() => togglePanel('settings')} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} onOpenLogbook={() => togglePanel('logbook')} />}
              {panel === 'achievements' && <AchievementsPanel onClose={() => togglePanel('achievements')} />}
              {panel === 'instructions' && <InstructionsPanel isOpen={true} onClose={() => togglePanel('instructions')} />}
@@ -108,17 +127,30 @@ export default function App() {
         ))}
       </AnimatePresence>
 
-      <AnimatePresence>
-        {activePanels.includes('chat') && (
+      <div className="chat-manager-layer" style={{ pointerEvents: 'none', position: 'fixed', inset: 0, zIndex: 6000 }}>
+        {chatSessions.map((session, idx) => (
           <ChatSession 
-            isActive={true} 
-            onEndSession={() => togglePanel('chat')} 
+            key={session.id}
+            isActive={true}
+            isMinimized={session.isMinimized}
+            onMinimize={() => toggleMinimizeChat(session.id)}
+            onEndSession={() => closeChat(session.id)} 
             isSandboxMode={isSandboxMode} 
-            pendingPrompt={pendingPrompt}
-            clearPrompt={() => setPendingPrompt(null)}
+            pendingPrompt={session.pendingPrompt}
+            clearPrompt={() => setChatSessions(prev => prev.map(s => s.id === session.id ? { ...s, pendingPrompt: null } : s))}
+            style={{ 
+              right: session.isMinimized ? (20 + (idx * 220)) : 0,
+              bottom: 0,
+              height: session.isMinimized ? 'var(--header-height)' : '100%',
+              width: session.isMinimized ? '200px' : '100%',
+              maxWidth: session.isMinimized ? '200px' : '500px',
+              pointerEvents: 'auto',
+              position: 'fixed',
+              transition: 'all 0.3s ease'
+            }}
           />
-        )}
-      </AnimatePresence>
+        ))}
+      </div>
 
       {!hasCompletedSetup && <SetupScreen />}
     </div>

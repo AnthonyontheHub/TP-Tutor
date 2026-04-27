@@ -13,12 +13,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export type DashboardView = 'vocab' | 'roadmap' | 'phrasebook';
 
-export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSandboxMode, setIsSandboxMode }: {
+export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSandboxMode, setIsSandboxMode, chatCount }: {
   onTogglePanel: (p: AppPanel) => void;
   activePanels: AppPanel[];
   onAskLina: (p: string) => void;
   isSandboxMode: boolean;
   setIsSandboxMode: (val: boolean) => void;
+  chatCount: number;
 }) {
   const { studentName, profile, profileImage, currentStreak, vocabulary, curriculums, savedPhrases, reviewVibe, setReviewVibe, selectedWords, setSelectedWords, savePhrase, lessonFilter, setLessonFilter, calculateDecay, checkAssessments, hardenWord, knowledgeCheckFrequency, lastKnowledgeCheckDate, setLastKnowledgeCheckDate } = useMasteryStore();
 
@@ -106,10 +107,10 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
     }
 
     if (targetWords.length === 0) {
-      onAskLina(`toki jan Lina! I'm in ${reviewVibe} mode but I have no words that fit that criteria. What should we work on instead?`);
+      onAskLina(`[SYSTEM: No words fit ${reviewVibe} criteria. Prompt user for next focus.]`);
       return;
     }
-    onAskLina(`toki jan Lina! Let's do a daily review in **${reviewVibe.toUpperCase()}** mode. Focus on these words: ${targetWords.join(', ')}. Please follow the standard 3-phase lesson structure.`);
+    onAskLina(`[SYSTEM: Daily Review in **${reviewVibe.toUpperCase()}** mode. Words: ${targetWords.join(', ')}. Use standard 3-phase structure.]`);
   };
 
   const handleSaved = (phraseId: string) => {
@@ -188,6 +189,23 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
           </div>
         </div>
         <div className="dashboard__header-right">
+          <button 
+            onClick={() => setIsSandboxMode(!isSandboxMode)} 
+            className="dashboard__icon-btn"
+            style={{ 
+              width: 'auto', 
+              padding: '0 12px', 
+              fontSize: '0.6rem', 
+              fontWeight: 900,
+              background: '#111',
+              color: isSandboxMode ? 'var(--gold)' : 'var(--text-muted)',
+              border: '1px solid #333',
+              boxShadow: isSandboxMode ? '0 0 10px rgba(255, 191, 0, 0.15)' : 'none',
+              borderRadius: '10px'
+            }}
+          >
+            {isSandboxMode ? 'SANDBOX ACTIVE' : 'LIVE LINK'}
+          </button>
           {currentStreak > 0 && (
             <div 
               className="dashboard__streak" 
@@ -198,7 +216,14 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
             </div>
           )}
           <button onClick={() => onTogglePanel('instructions')} className="dashboard__icon-btn" style={getActiveStyle('instructions')}>?</button>
-          <button onClick={() => onTogglePanel('chat')} className="dashboard__icon-btn" style={getActiveStyle('chat')}>💬</button>
+          <div style={{ position: 'relative' }}>
+            <button onClick={() => onAskLina('[SYSTEM: Start a general conversation.]')} className="dashboard__icon-btn" style={getActiveStyle('chat' as any)}>💬</button>
+            {chatCount > 0 && (
+              <span style={{ position: 'absolute', top: '-5px', right: '-5px', background: 'var(--gold)', color: 'black', borderRadius: '50%', width: '18px', height: '18px', fontSize: '0.65rem', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--bg)', pointerEvents: 'none' }}>
+                {chatCount}
+              </span>
+            )}
+          </div>
           <button onClick={() => onTogglePanel('settings')} className="dashboard__icon-btn" style={getActiveStyle('settings')}>⚙️</button>
         </div>
       </header>
@@ -352,8 +377,8 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
           translation={translation}
           isAutoTranslating={isAutoTranslating}
           onSave={() => setShowSaveNote(true)}
-          onPractice={(s) => { onAskLina(`toki jan Lina! Let's practice this: "${s}"`); setSelectedWords([]); }}
-          onExplain={(s) => { onAskLina(`toki jan Lina! Can you explain the grammar of this phrase: "${s}"?`); setSelectedWords([]); }}
+          onPractice={(s) => { onAskLina(`[SYSTEM: Practice this sentence: "${s}"]`); setSelectedWords([]); }}
+          onExplain={(s) => { onAskLina(`[SYSTEM: Explain the grammar of this phrase: "${s}"]`); setSelectedWords([]); }}
           onRemoveLast={() => {
             const newWords = [...selectedWords];
             newWords.pop();
@@ -410,7 +435,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
                 <p>jan Lina wants to verify your mastery of <strong>{assessmentWord.word}</strong>.</p>
                 <div style={{ margin: '20px 0', display: 'grid', gap: '10px' }}>
                    <button onClick={() => { 
-                     onAskLina(`jan Lina, I'm ready for the Knowledge Check on "${assessmentWord.word}". Give me 3 questions.`); 
+                     onAskLina(`[SYSTEM: Knowledge Check on "${assessmentWord.word}". Give 3 questions.]`); 
                      setAssessmentWord(null); 
                      setLastKnowledgeCheckDate(new Date().toDateString());
                    }} className="btn-review">START QUIZ</button>

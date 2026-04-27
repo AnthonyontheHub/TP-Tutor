@@ -48,23 +48,42 @@ function tierProgress(score: number, status: MasteryStatus): number {
 }
 
 export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isSandboxMode }: { isOpen: boolean; word?: VocabWord | null; onClose: () => void; onAskLina: (p: string) => void; isSandboxMode: boolean }) {
-  const { studentName, profile, lore } = useMasteryStore();
-  const [deepDive, setDeepDive] = useState<Record<string, string> | null>(null);
+  const { studentName, profile, lore, updateVocabAIContent } = useMasteryStore();
+  const [deepDive, setDeepDive] = useState<Record<string, string> | null>(word?.aiExamples || null);
   const [isLoading, setIsLoading] = useState(false);
 
   const primaryMeaning = word?.meanings?.split(',')[0].trim() || word?.meanings;
   const extra = word ? WORD_EXTRA_DATA[word.word] : null;
 
+  const triggerGeneration = async (force = false) => {
+    if (!word) return;
+    if (!force && word.aiExamples) {
+      setDeepDive(word.aiExamples);
+      return;
+    }
+
+    const key = resolveApiKey();
+    if (key && !isSandboxMode) {
+      setIsLoading(true);
+      const userContext = stringifyUserContext(profile, lore);
+      try {
+        const results = await fetchDeepDiveExamples(key, word.word, userContext);
+        if (results) {
+          setDeepDive(results);
+          updateVocabAIContent(word.id, { aiExamples: results });
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
+
   useEffect(() => {
     if (isOpen && word) {
-      setDeepDive(null);
-      const key = resolveApiKey();
-      if (key && !isSandboxMode) {
-        setIsLoading(true);
-        const userContext = stringifyUserContext(profile, lore);
-        fetchDeepDiveExamples(key, word.word, userContext)
-          .then(setDeepDive)
-          .finally(() => setIsLoading(false));
+      if (word.aiExamples) {
+        setDeepDive(word.aiExamples);
+      } else {
+        triggerGeneration();
       }
     }
   }, [isOpen, word, isSandboxMode, profile, lore]);
@@ -129,7 +148,16 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
             </div>
 
             <section style={{ marginBottom: '32px' }}>
-              <h3 className="section-title" style={{ fontSize: '0.6rem' }}>Neural Examples</h3>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <h3 className="section-title" style={{ fontSize: '0.6rem', margin: 0 }}>Neural Examples</h3>
+                <button 
+                  onClick={() => triggerGeneration(true)} 
+                  style={{ background: 'none', border: 'none', color: 'var(--gold)', fontSize: '0.7rem', cursor: 'pointer', opacity: 0.6 }}
+                  title="Regenerate Examples"
+                >
+                  RELOAD ↻
+                </button>
+              </div>
               <div style={{ display: 'grid', gap: '8px' }}>
                 {['Simple', 'Intermediate', 'Advanced', 'Personal'].map((tier) => {
                   const content = deepDive?.[tier.toLowerCase()];
@@ -142,7 +170,15 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
                   
                   return (
                     <div key={tier} className="glass-panel" style={{ padding: '10px 15px', borderLeft: `2px solid ${borderCol}` }}>
-                      <div style={{ fontSize: '0.55rem', fontWeight: 900, color: tier === 'Personal' ? 'var(--gold)' : 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '2px' }}>{label}</div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px' }}>
+                        <div style={{ fontSize: '0.55rem', fontWeight: 900, color: tier === 'Personal' ? 'var(--gold)' : 'var(--text-muted)', textTransform: 'uppercase' }}>{label}</div>
+                        <button 
+                          onClick={() => onAskLina(`[SYSTEM: Deep-dive into "${word.word}" focus on ${tier} tier. Context: ${content}]`)}
+                          style={{ background: 'none', border: 'none', color: 'var(--gold)', fontSize: '0.65rem', cursor: 'pointer', padding: '2px 6px', borderRadius: '4px', background: 'rgba(255,255,255,0.03)' }}
+                        >
+                          PRACTICE ✦
+                        </button>
+                      </div>
                       {isLoading ? <div style={{ height: '1.2rem', background: 'rgba(255,255,255,0.03)', borderRadius: '2px', width: '80%' }} /> : <div style={{ fontSize: '0.85rem', color: '#eee', lineHeight: '1.4' }}>{content || '...'}</div>}
                     </div>
                   );

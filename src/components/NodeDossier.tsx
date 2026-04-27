@@ -37,9 +37,7 @@ export default function NodeDossier({ node, onBack, onAskLina, isSandboxMode }: 
       ? ` The relevant vocabulary is: ${node.requiredVocabIds.join(', ')}.` 
       : '';
 
-    onAskLina(`toki jan Lina! I want to practice the concept: "${node.title}". 
-      Here is the curriculum context: ${contextStr}${vocabStr}
-      Please provide a brief review and then give me some interactive exercises or questions to test my mastery.`);
+    onAskLina(`[SYSTEM: Start a lesson on the concept: "${node.title}". Context: ${contextStr}${vocabStr}]`);
   };
 
   return (

@@ -11,10 +11,13 @@ import type { ProposedChange } from '../services/linaService';
 
 interface Props {
   onEndSession: () => void;
+  onMinimize?: () => void;
   isActive: boolean;
+  isMinimized?: boolean;
   pendingPrompt?: string | null;
   clearPrompt?: () => void;
   isSandboxMode: boolean;
+  style?: React.CSSProperties;
 }
 
 interface ChatMessage {
@@ -26,13 +29,12 @@ interface ChatMessage {
 }
 
 const HISTORY_WINDOW = 10;
-const SANDBOX_RESPONSE = '[SANDBOX MODE]: o toki! I am in offline testing mode. No API tokens are being used right now.';
+const SANDBOX_RESPONSE = '[OFFLINE PROTOCOL]: o toki! I am in sandbox mode. Interaction simulated.';
 
-export default function ChatSession({ onEndSession, isActive, pendingPrompt, clearPrompt, isSandboxMode }: Props) {
+export default function ChatSession({ onEndSession, onMinimize, isActive, isMinimized, pendingPrompt, clearPrompt, isSandboxMode, style }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(false);
   const [chatContext, setChatContext] = useState<'GENERAL' | 'DAILY REVIEW' | 'GRAMMAR CHECK'>('GENERAL');
 
   const [translateBubble, setTranslateBubble] = useState<{
@@ -57,8 +59,8 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
   const sessionDeltasRef = useRef<ProposedChange[]>([]);
 
   useEffect(() => {
-    if (isActive) messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isActive]);
+    if (isActive && !isMinimized) messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isActive, isMinimized]);
 
   useEffect(() => {
     const handleGlobalClick = () => setTranslateBubble(null);
@@ -102,6 +104,8 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
     const low = pendingPrompt.toLowerCase();
     if (low.includes('daily review')) setChatContext('DAILY REVIEW');
     else if (low.includes('explain the grammar')) setChatContext('GRAMMAR CHECK');
+    else if (low.includes('start a lesson')) setChatContext('GRAMMAR CHECK');
+    else if (low.includes('deep-dive')) setChatContext('GRAMMAR CHECK');
     else setChatContext('GENERAL');
 
     setMessages([]);
@@ -111,8 +115,8 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
     const key = resolveApiKey();
     
     // PROACTIVE INITIALIZATION:
-    // If it's a command-like prompt, treat it as hidden context and trigger jan Lina
-    const isProactive = low.includes('daily review') || low.includes('ready for the knowledge check') || low.includes('deep-dive');
+    // If it's a [SYSTEM: ...] prompt, treat it as hidden context and trigger jan Lina
+    const isProactive = pendingPrompt.startsWith('[SYSTEM:');
     
     if (isProactive) {
       triggerProactiveGreeting(pendingPrompt, key);
@@ -121,7 +125,6 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
     }
     
     clearPrompt?.();
-    setIsMinimized(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isActive, pendingPrompt, isSandboxMode, clearPrompt]);
 
@@ -144,7 +147,6 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
       const userContext = stringifyUserContext(state.profile, state.lore);
       const sys = buildSystemPrompt(state.vocabulary, [], displayName, userContext);
       
-      // Hidden trigger message
       const triggerMsg = `[SYSTEM: Start the session now based on this context: ${context}. Greet the student and proceed naturally.]`;
       let full = '';
       for await (const chunk of streamCompletion(key, sys, [{ role: 'user', content: triggerMsg }])) {
@@ -160,16 +162,12 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
   }
 
   async function handleEndSession() {
+    if (!window.confirm("Are you sure you want to end this session? Conversation history will be lost.")) return;
     const deltas = sessionDeltasRef.current;
     if (deltas.length === 0 || isSandboxMode) { onEndSession(); return; }
     for (const change of deltas) {
       if (change.type === 'vocab') {
         updateVocabStatus(change.id, change.newStatus);
-      } else {
-        // Concept-level mastery isn't tracked in the vocab store yet; surface
-        // it for debugging instead of silently funneling it through the vocab
-        // updater (which would no-op on a non-matching id).
-        console.warn('Concept status update not yet supported:', change.id, '→', change.newStatus);
       }
     }
     setLastUpdated(new Date().toLocaleDateString());
@@ -193,7 +191,7 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
     setMessages(prev => [...prev, { id: crypto.randomUUID(), role: 'user', displayContent: txt }]);
     historyRef.current.push({ role: 'user', content: txt });
     const assistantId = crypto.randomUUID();
-    setMessages(prev => [...prev, { id: assistantId, role: 'assistant', displayContent: '', raw: '' }]);
+    setMessages(prev => [...prev, { id: assistantId, role: 'assistant', displayContent: '· · ·', raw: '' }]);
     if (isSandboxMode) {
       setMessages(prev => prev.map(msg => msg.id === assistantId ? { ...msg, displayContent: SANDBOX_RESPONSE, raw: SANDBOX_RESPONSE } : msg));
       historyRef.current.push({ role: 'assistant', content: SANDBOX_RESPONSE });
@@ -204,7 +202,7 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
       const key = resolveApiKey(overrideKey);
       const state = useMasteryStore.getState();
       const userContext = stringifyUserContext(state.profile, state.lore);
-      const sys = buildSystemPrompt(state.vocabulary, [], state.studentName, userContext);
+      const sys = buildSystemPrompt(state.vocabulary, [], displayName, userContext);
       const windowedHistory = historyRef.current.slice(-HISTORY_WINDOW);
       let full = '';
       for await (const chunk of streamCompletion(key, sys, windowedHistory)) {
@@ -244,7 +242,8 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
           right: 0,
           boxShadow: '-10px 0 30px rgba(0,0,0,0.5)',
           borderLeft: '1px solid var(--border)',
-          zIndex: 1000
+          zIndex: 6000,
+          ...style
         }}
       >
         <header style={{ 
@@ -260,7 +259,7 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
           <h2 style={{ fontSize: '0.8rem', fontWeight: 900, letterSpacing: '0.2em', color: 'var(--gold)', margin: 0 }}>{chatContext === 'GENERAL' ? 'jan LINA LINK' : chatContext}</h2>
           <div style={{ display: 'flex', gap: '8px' }}>
             <button 
-              onClick={() => setIsMinimized(!isMinimized)}
+              onClick={onMinimize}
               style={{ background: 'none', border: 'none', color: 'var(--gold)', fontSize: '0.8rem', cursor: 'pointer', fontWeight: 900 }}
             >
               {isMinimized ? 'EXPAND' : 'MINIMIZE'}
@@ -288,7 +287,7 @@ export default function ChatSession({ onEndSession, isActive, pendingPrompt, cle
         </header>
 
         {translateBubble && (
-          <div onMouseDown={e => e.stopPropagation()} style={{ position: 'fixed', top: translateBubble.top, left: translateBubble.left, transform: 'translateX(-50%)', zIndex: 3000, background: '#222', border: '1px solid #444', borderRadius: '4px', padding: '8px 12px', boxShadow: '0 4px 12px rgba(0,0,0,0.5)', fontSize: '0.8rem', color: 'white', minWidth: '100px', textAlign: 'center' }}>
+          <div onMouseDown={e => e.stopPropagation()} style={{ position: 'fixed', top: translateBubble.top, left: translateBubble.left, transform: 'translateX(-50%)', zIndex: 7000, background: '#222', border: '1px solid #444', borderRadius: '4px', padding: '8px 12px', boxShadow: '0 4px 12px rgba(0,0,0,0.5)', fontSize: '0.8rem', color: 'white', minWidth: '100px', textAlign: 'center' }}>
             {translateBubble.result ? <div style={{ lineHeight: '1.4' }}>{translateBubble.result}</div> : <button onClick={handleTranslateClick} style={{ background: 'var(--gold)', border: 'none', borderRadius: '2px', color: 'black', padding: '4px 8px', fontWeight: 900, cursor: 'pointer', fontSize: '0.7rem' }}>{translateBubble.loading ? '...' : 'TRANSLATE'}</button>}
           </div>
         )}
