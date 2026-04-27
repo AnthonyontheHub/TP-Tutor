@@ -219,7 +219,7 @@ export default function App() {
         pointerEvents: 'none',
         zIndex: 7000 
       }}>
-        {chatSessions.filter(s => s.isMinimized).map((session, idx) => (
+        {chatSessions.filter(s => s.isMinimized).map((session) => (
           <div 
             key={session.id}
             onClick={() => toggleMinimizeChat(session.id)}

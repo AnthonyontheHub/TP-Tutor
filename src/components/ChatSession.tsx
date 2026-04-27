@@ -9,7 +9,6 @@ import {
   parseProposedChanges, resolveApiKey, fetchSessionRecap,
   fetchQuickTranslation, stringifyUserContext, detectSessionTitle
 } from '../services/linaService';
-import type { ProposedChange } from '../services/linaService';
 
 interface Props {
   sessionId: string;
@@ -46,12 +45,10 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
     loading?: boolean;
   } | null>(null);
 
-  const vocabulary          = useMasteryStore(s => s.vocabulary);
   const updateVocabStatus   = useMasteryStore(s => s.updateVocabStatus);
   const setLastUpdated      = useMasteryStore(s => s.setLastUpdated);
   const studentName         = useMasteryStore(s => s.studentName);
   const profile             = useMasteryStore(s => s.profile);
-  const lore                = useMasteryStore(s => s.lore);
 
   const displayName = profile.tpName || profile.tokiPonaName || studentName || 'ANTHONY';
 
@@ -91,7 +88,7 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
       const key = resolveApiKey();
       const result = await fetchQuickTranslation(key, translateBubble.text);
       setTranslateBubble(prev => prev ? { ...prev, loading: false, result: result || 'Could not translate.' } : null);
-    } catch (err) {
+    } catch {
       setTranslateBubble(prev => prev ? { ...prev, loading: false, result: 'Error translating.' } : null);
     }
   };
@@ -217,19 +214,20 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
     if (!isSandboxMode && !resolveApiKey(overrideKey)) return;
     setIsLoading(true);
     setInput('');
-    
+
     const newUserMsg: ChatMessage = { id: crypto.randomUUID(), role: 'user', displayContent: txt };
     const assistantId = crypto.randomUUID();
     const newAssistantMsg: ChatMessage = { id: assistantId, role: 'assistant', displayContent: '· · ·', raw: '' };
-    
-    updateSession(sessionId, { 
-      messages: [...messages, newUserMsg, newAssistantMsg],
+    const updatedMessages = [...messages, newUserMsg, newAssistantMsg];
+
+    updateSession(sessionId, {
+      messages: updatedMessages,
       history: [...history, { role: 'user', content: txt }]
     });
 
     if (isSandboxMode) {
       updateSession(sessionId, {
-        messages: (session?.messages || []).map(msg => msg.id === assistantId ? { ...msg, displayContent: SANDBOX_RESPONSE, raw: SANDBOX_RESPONSE } : msg),
+        messages: updatedMessages.map(msg => msg.id === assistantId ? { ...msg, displayContent: SANDBOX_RESPONSE, raw: SANDBOX_RESPONSE } : msg),
         history: [...history, { role: 'user', content: txt }, { role: 'assistant', content: SANDBOX_RESPONSE }]
       });
       setIsLoading(false);
