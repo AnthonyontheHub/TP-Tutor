@@ -13,7 +13,6 @@ interface Props {
 
 export default function PhraseGrid({ onAskLina, activeFilter, selectedWords, focusPhraseId, clearFocusPhrase }: Props) {
   const { studentName, vocabulary, savedPhrases, updatePhraseNote, deletePhrase, albums, commonPhrases } = useMasteryStore();
-  const [activeTab, setActiveTab] = useState<'saves' | 'everyday' | 'discography'>('saves');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [noteInput, setNoteInput] = useState('');
 
@@ -23,7 +22,6 @@ export default function PhraseGrid({ onAskLina, activeFilter, selectedWords, foc
 
   useEffect(() => {
     if (focusPhraseId) {
-      setActiveTab('saves');
       setEditingId(focusPhraseId);
       const target = safeSavedPhrases.find(p => typeof p !== 'string' && p.id === focusPhraseId);
       setNoteInput(target && typeof target !== 'string' ? target.notes : '');
@@ -33,17 +31,6 @@ export default function PhraseGrid({ onAskLina, activeFilter, selectedWords, foc
   const normalizedSaved = safeSavedPhrases.map(p => 
     typeof p === 'string' ? { id: p, tp: p, en: `${studentName || 'Anthony'} Saved Phrase *`, notes: '' } : p
   );
-
-  const handleLinasChoice = () => {
-    let source: { tp: string, en: string }[] = [];
-    if (activeTab === 'saves') source = normalizedSaved;
-    else if (activeTab === 'everyday') source = Object.values(commonPhrases || {}).flat();
-    else if (activeTab === 'discography') source = (albums || []).flatMap(a => a.songs.flatMap(s => s.blocks));
-
-    if (source.length === 0) return;
-    const random = source[Math.floor(Math.random() * source.length)];
-    onAskLina(`[SYSTEM: Lina's Choice Quiz. Phrase: "${random.tp}" (${random.en}). Ask the student to translate this or use it in a sentence.]`);
-  };
 
   const filteredSaves = normalizedSaved.filter(p => {
     if (selectedWords.length > 0) {
@@ -65,23 +52,13 @@ export default function PhraseGrid({ onAskLina, activeFilter, selectedWords, foc
   };
 
   return (
-    <section className="phrase-grid">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-        <div style={{ display: 'flex', gap: '8px', background: 'rgba(0,0,0,0.2)', padding: '4px', borderRadius: '8px', border: '1px solid #222' }}>
-          <button onClick={() => setActiveTab('saves')} style={{ padding: '8px 16px', borderRadius: '6px', border: 'none', background: activeTab === 'saves' ? 'var(--gold)' : 'transparent', color: activeTab === 'saves' ? 'black' : '#888', fontSize: '0.7rem', fontWeight: 900, cursor: 'pointer' }}>MY SAVES</button>
-          <button onClick={() => setActiveTab('everyday')} style={{ padding: '8px 16px', borderRadius: '6px', border: 'none', background: activeTab === 'everyday' ? 'var(--gold)' : 'transparent', color: activeTab === 'everyday' ? 'black' : '#888', fontSize: '0.7rem', fontWeight: 900, cursor: 'pointer' }}>EVERYDAY</button>
-          <button onClick={() => setActiveTab('discography')} style={{ padding: '8px 16px', borderRadius: '6px', border: 'none', background: activeTab === 'discography' ? 'var(--gold)' : 'transparent', color: activeTab === 'discography' ? 'black' : '#888', fontSize: '0.7rem', fontWeight: 900, cursor: 'pointer' }}>DISCOGRAPHY</button>
-        </div>
-        
-        <button onClick={handleLinasChoice} className="btn-review" style={{ margin: 0, padding: '8px 16px', fontSize: '0.65rem' }}>
-          ✨ LINA'S CHOICE
-        </button>
-      </div>
-
-      {activeTab === 'saves' && (
+    <section className="phrase-grid" style={{ display: 'grid', gap: '48px' }}>
+      {/* Section 1: My Saves */}
+      <div>
+        <h2 className="section-title" style={{ color: 'var(--gold)', marginBottom: '20px', borderLeft: '4px solid var(--gold)', paddingLeft: '12px' }}>MY SAVES</h2>
         <div style={{ display: 'grid', gap: '12px', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))' }}>
           {filteredSaves.length === 0 ? (
-            <p style={{ color: '#555', gridColumn: '1/-1', textAlign: 'center', padding: '40px' }}>{selectedWords.length > 0 ? 'No saved phrases match your selection.' : 'No phrases saved yet.'}</p>
+            <p style={{ color: '#555', gridColumn: '1/-1', textAlign: 'center', padding: '20px' }}>{selectedWords.length > 0 ? 'No saved phrases match your selection.' : 'No phrases saved yet.'}</p>
           ) : filteredSaves.map((p) => (
             <div key={p.id} style={{ background: '#0f172a', padding: '16px', borderRadius: '8px', border: '1px solid #3b82f6' }}>
               <div onClick={() => onAskLina(`Let's practice this specific phrase/lyric: [${p.tp}]`)} style={{ cursor: 'pointer' }}>
@@ -115,9 +92,11 @@ export default function PhraseGrid({ onAskLina, activeFilter, selectedWords, foc
             </div>
           ))}
         </div>
-      )}
+      </div>
 
-      {activeTab === 'everyday' && (
+      {/* Section 2: Everyday Library */}
+      <div>
+        <h2 className="section-title" style={{ color: 'var(--gold)', marginBottom: '20px', borderLeft: '4px solid var(--gold)', paddingLeft: '12px' }}>EVERYDAY LIBRARY</h2>
         <div style={{ display: 'grid', gap: '32px' }}>
           {Object.entries(commonPhrases || {}).map(([cat, phrases]) => {
             const filtered = getFilteredPhrases(phrases);
@@ -137,9 +116,11 @@ export default function PhraseGrid({ onAskLina, activeFilter, selectedWords, foc
             );
           })}
         </div>
-      )}
+      </div>
 
-      {activeTab === 'discography' && (
+      {/* Section 3: Discography */}
+      <div>
+        <h2 className="section-title" style={{ color: 'var(--gold)', marginBottom: '20px', borderLeft: '4px solid var(--gold)', paddingLeft: '12px' }}>DISCOGRAPHY</h2>
         <div style={{ display: 'grid', gap: '32px' }}>
           {(albums || []).map((album) => (
             <div key={album.id}>
@@ -172,7 +153,7 @@ export default function PhraseGrid({ onAskLina, activeFilter, selectedWords, foc
             </div>
           ))}
         </div>
-      )}
+      </div>
 
       {editingId && (
         <div className="drawer-backdrop" onClick={() => { setEditingId(null); clearFocusPhrase?.(); }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 5000 }}>

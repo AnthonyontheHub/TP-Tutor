@@ -75,8 +75,12 @@ export function buildSystemPrompt(
     .join('\n');
 
   const vibeContext = vibe === 'chill' 
-    ? "The student wants a 'Chill' session. Prioritize reviewing words they already know well (high mastery) and keep the conversation light and encouraging."
-    : "The student wants a 'Deep' session. Prioritize new concepts, 'Introduced' or 'Not Started' words, and more complex grammatical structures.";
+    ? "The student wants a 'Chill' session focusing on **Reviewing personal saved phrases**. Use their known vocabulary to reinforce progress."
+    : vibe === 'deep'
+    ? "The student wants a 'Deep' session focusing on **Learning everyday phrases and common expressions**. Introduce and drill standard Toki Pona idioms and daily speech."
+    : vibe === 'intense'
+    ? "The student wants an 'Intense' session focusing on **Mastering song lyrics from the discography**. Use lyrics from their album library to deep-dive into grammar and poetic usage."
+    : "The student wants a balanced session. Chat naturally and test them on their active vocabulary.";
 
   const lessonContext = activeModuleTitle
     ? `CURRENT LESSON GOAL:\nThe student has explicitly chosen to study: ${activeCurriculumTitle} - ${activeModuleTitle}. Focus your teaching and drills entirely on this topic today.`

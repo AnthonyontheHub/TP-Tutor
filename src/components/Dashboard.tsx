@@ -91,44 +91,21 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   }, [selectedWords, isSandboxMode, vocabulary]);
 
   const handleDailyReview = () => {
-    if (activeView === 'vocab') {
-      let targetWords: string[] = [];
+    if (activeView === 'vocab' || activeView === 'phrasebook') {
       let prompt = '';
 
       if (reviewVibe === 'chill') {
-        targetWords = vocabulary
-          .filter(w => w.status === 'confident' || w.status === 'mastered')
-          .sort((a, b) => b.baseScore - a.baseScore)
-          .slice(0, 8)
-          .map(w => w.word);
-        prompt = `[SYSTEM: Daily Review in **CHILL** mode. Words: ${targetWords.join(', ')}. Keep it light.]`;
+        prompt = `[SYSTEM: The student has chosen a **CHILL** session. Please focus our practice on **Saved Phrases** today.]`;
       } else if (reviewVibe === 'deep') {
-        targetWords = vocabulary
-          .filter(w => w.status === 'introduced' || w.status === 'not_started')
-          .sort((a, b) => (a.frequencyRank ?? 999) - (b.frequencyRank ?? 999))
-          .slice(0, 6)
-          .map(w => w.word);
-        prompt = `[SYSTEM: Daily Review in **DEEP** mode. Focus on new concepts/words: ${targetWords.join(', ')}. Follow 3-phase structure.]`;
+        prompt = `[SYSTEM: The student has chosen a **DEEP** session. Please focus our practice on **Everyday Phrases** today.]`;
       } else if (reviewVibe === 'intense') {
-        targetWords = vocabulary
-          .filter(w => w.status !== 'mastered')
-          .sort((a, b) => {
-            if (a.baseScore !== b.baseScore) return a.baseScore - b.baseScore;
-            return (a.frequencyRank ?? 999) - (b.frequencyRank ?? 999);
-          })
-          .slice(0, 10)
-          .map(w => w.word);
-        prompt = `[SYSTEM: Daily Review in **INTENSE** mode. Target weak points and common words: ${targetWords.join(', ')}. Push the student hard.]`;
+        prompt = `[SYSTEM: The student has chosen an **INTENSE** session. Please focus our practice on **Lyrics** today.]`;
       } else {
         // Balanced review if no vibe (fallback)
-        targetWords = [...vocabulary].sort(() => 0.5 - Math.random()).slice(0, 8).map(w => w.word);
+        const targetWords = [...vocabulary].sort(() => 0.5 - Math.random()).slice(0, 8).map(w => w.word);
         prompt = `[SYSTEM: Balanced Vocab Practice. Mix of all levels: ${targetWords.join(', ')}.]`;
       }
 
-      if (targetWords.length === 0 && reviewVibe) {
-        onAskLina(`[SYSTEM: No words fit ${reviewVibe} criteria. Prompt user for next focus.]`);
-        return;
-      }
       onAskLina(prompt);
     } else if (activeView === 'roadmap') {
       const activeNode = curriculums.flatMap(l => l.nodes).find(n => n.id === useMasteryStore.getState().currentPositionNodeId);
