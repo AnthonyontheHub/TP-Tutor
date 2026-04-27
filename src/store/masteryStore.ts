@@ -82,6 +82,29 @@ const defaultSongs = [
       { title: "07 mi awen lon ni", blocks: [] },
       { title: "08 pini ala", blocks: [] }
     ]
+  },
+  {
+    id: 'jan-olami',
+    title: "jan olin mi",
+    tracks: [
+      { title: "jan olin mi", blocks: [] },
+      { title: "tomo pona", blocks: [] },
+      { title: "suno li suli", blocks: [] },
+      { title: "tenpo pi olin ni", blocks: [] },
+      { title: "mi mute", blocks: [] }
+    ]
+  },
+  {
+    id: 'toki-nasa',
+    title: "toki nasa, kalama pona",
+    tracks: [
+      { title: "o tawa wawa", blocks: [] },
+      { title: "lukin sama", blocks: [] },
+      { title: "o kule e kon", blocks: [] },
+      { title: "KULUPU PONA", blocks: [] },
+      { title: "alasa tawa sin", blocks: [] },
+      { title: "kili wawa (Bonus Track)", blocks: [] }
+    ]
   }
 ];
 
@@ -882,8 +905,8 @@ export const useMasteryStore = create<MasteryStore>()(
             showCircuitPaths: data.showCircuitPaths !== undefined ? data.showCircuitPaths : true,
             knowledgeCheckFrequency: data.knowledgeCheckFrequency || 'session',
             lastKnowledgeCheckDate: data.lastKnowledgeCheckDate || '',
-            songs: data.songs || [],
-            commonPhrases: data.commonPhrases || [],
+            songs: (Array.isArray(data.songs) && data.songs.length > 0) ? data.songs : defaultSongs,
+            commonPhrases: (Array.isArray(data.commonPhrases) && data.commonPhrases.length > 0) ? data.commonPhrases : defaultCommonPhrases,
           };
 
           if (data.studentName) update.studentName = data.studentName;
@@ -904,11 +927,11 @@ export const useMasteryStore = create<MasteryStore>()(
       },
       onRehydrateStorage: () => (state) => {
         if (state) {
-          // Ensure critical array fields are always arrays
-          if (!Array.isArray(state.commonPhrases)) {
+          // Ensure critical array fields are always arrays and not empty if defaults exist
+          if (!Array.isArray(state.commonPhrases) || state.commonPhrases.length === 0) {
             state.commonPhrases = defaultCommonPhrases;
           }
-          if (!Array.isArray(state.songs)) {
+          if (!Array.isArray(state.songs) || state.songs.length === 0) {
             state.songs = defaultSongs;
           }
           if (!Array.isArray(state.savedPhrases)) {

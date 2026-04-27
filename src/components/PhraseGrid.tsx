@@ -216,7 +216,11 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
           <h2 className="section-title" style={{ color: 'var(--gold)', marginBottom: '20px', borderLeft: '4px solid var(--gold)', paddingLeft: '12px' }}>DISCOGRAPHY</h2>
           {!selectedAlbumId ? (
              <div style={{ display: 'grid', gap: '20px', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))' }}>
-               {safeSongs.map(album => (
+               {safeSongs.length === 0 ? (
+                 <p style={{ color: '#555', gridColumn: '1/-1', textAlign: 'center', padding: '40px 20px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px dashed #333' }}>
+                   No albums found in discography.
+                 </p>
+               ) : safeSongs.map(album => (
                  <button 
                   key={album.id}
                   onClick={() => setSelectedAlbumId(album.id)}
@@ -257,11 +261,21 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
                  const album = safeSongs.find(a => a.id === selectedAlbumId);
                  const track = (album?.tracks || []).find((t: any) => t.title === selectedTrackTitle);
                  if (!track) return null;
+                 
+                 // If selected words are active, filter blocks. If not, show all.
+                 const blocks = track.blocks || [];
+                 const filteredBlocks = (selectedWords && selectedWords.length > 0)
+                   ? blocks.filter((b: any) => {
+                       const ws = (b.tp || '').split(/[ \/]+/).map(clean);
+                       return selectedWords.every(sw => ws.includes(clean(sw)));
+                     })
+                   : blocks;
+
                  return (
                    <div style={{ background: 'rgba(5,5,5,0.8)', padding: '32px', borderRadius: '16px', border: '1px solid #222', boxShadow: '0 20px 40px rgba(0,0,0,0.4)' }}>
                      <h4 style={{ color: 'white', fontSize: '1.5rem', marginBottom: '32px', borderLeft: '6px solid var(--gold)', paddingLeft: '20px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{track.title}</h4>
                      <div style={{ display: 'grid', gap: '20px' }}>
-                        {track.blocks && track.blocks.length > 0 ? track.blocks.map((block: any, bi: number) => (
+                        {filteredBlocks.length > 0 ? filteredBlocks.map((block: any, bi: number) => (
                           <div key={bi} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', background: 'rgba(255,255,255,0.02)', padding: '24px', borderRadius: '12px', border: '1px solid #1a1a1a' }}>
                             <div style={{ flex: 1 }}>
                               <div style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--gold)', textTransform: 'uppercase', marginBottom: '10px', opacity: 0.6 }}>{block.title || 'BLOCK'}</div>
@@ -277,7 +291,9 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
                             </button>
                           </div>
                         )) : (
-                          <p style={{ color: '#444', textAlign: 'center', padding: '40px' }}>Lyrics integration pending...</p>
+                          <p style={{ color: '#444', textAlign: 'center', padding: '40px' }}>
+                            {selectedWords && selectedWords.length > 0 ? 'No lyrics match your selection.' : 'Lyrics integration pending...'}
+                          </p>
                         )}
                      </div>
                    </div>
