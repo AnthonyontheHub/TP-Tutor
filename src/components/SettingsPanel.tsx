@@ -96,7 +96,9 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
                 margin: 0,
                 width: 'auto',
                 padding: '8px 16px',
-                color: localSandbox ? 'var(--gold)' : 'white',
+                background: '#1a1a1a',
+                border: '1px solid #d4af37',
+                color: '#d4af37',
                 opacity: isMainUser ? 1 : 0.5,
                 cursor: isMainUser ? 'pointer' : 'not-allowed'
               }}
@@ -140,13 +142,13 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
       <section style={{ marginBottom: '40px' }}>
         <h2 style={{ fontSize: '0.8rem', fontWeight: 900, opacity: 0.5, marginBottom: '20px', color: '#ef4444' }}>DANGER ZONE</h2>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px' }}>
-          <button onClick={handleRandomize} className="btn-settings">RANDOMIZE NEURAL SYNC</button>
-          <button onClick={handleMasterAll} className="btn-settings">FORCE TOTAL MASTERY</button>
-          <button onClick={handleClearPhrases} className="btn-settings">CLEAR ALL SAVED PHRASES</button>
+          <button onClick={handleRandomize} className="btn-settings" style={{ background: '#1a1a1a', border: '1px solid #d4af37', color: '#d4af37' }}>RANDOMIZE NEURAL SYNC</button>
+          <button onClick={handleMasterAll} className="btn-settings" style={{ background: '#1a1a1a', border: '1px solid #d4af37', color: '#d4af37' }}>FORCE TOTAL MASTERY</button>
+          <button onClick={handleClearPhrases} className="btn-settings" style={{ background: '#1a1a1a', border: '1px solid #d4af37', color: '#d4af37' }}>CLEAR ALL SAVED PHRASES</button>
           <button 
             onClick={handleReset} 
             className="btn-settings" 
-            style={{ color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.2)' }}
+            style={{ background: '#1a1a1a', border: '1px solid #ef4444', color: '#ef4444' }}
           >
             PURGE NEURAL CACHE
           </button>
