@@ -47,7 +47,8 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
   const getFilteredPhrases = (phrases: { tp: string, en: string }[]) => {
     return phrases.filter(p => {
       if (selectedWords.length > 0) {
-        const ws = p.tp.split(/[ \n]+/).map(clean);
+        // Handle multi-line TP text by flattening
+        const ws = p.tp.split(/[ \n/]+/).map(clean);
         if (!selectedWords.every(sw => ws.includes(clean(sw)))) return false;
       }
       return true;
@@ -60,7 +61,7 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
 
   return (
     <section className="phrase-grid">
-      {/* Tab 1: My Saves */}
+      {/* View 1: My Saves (Chill) */}
       {isChill && (
         <div>
           <h2 className="section-title" style={{ color: 'var(--gold)', marginBottom: '20px', borderLeft: '4px solid var(--gold)', paddingLeft: '12px' }}>MY SAVES</h2>
@@ -103,10 +104,10 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
         </div>
       )}
 
-      {/* Tab 2: Everyday Archive */}
+      {/* Tab 2: Everyday Library (Deep) */}
       {isDeep && (
         <div>
-          <h2 className="section-title" style={{ color: 'var(--gold)', marginBottom: '20px', borderLeft: '4px solid var(--gold)', paddingLeft: '12px' }}>EVERYDAY ARCHIVE</h2>
+          <h2 className="section-title" style={{ color: 'var(--gold)', marginBottom: '20px', borderLeft: '4px solid var(--gold)', paddingLeft: '12px' }}>EVERYDAY LIBRARY</h2>
           <div style={{ display: 'grid', gap: '32px' }}>
             {Object.entries(commonPhrases || {}).map(([cat, phrases]) => {
               const filtered = getFilteredPhrases(phrases);
@@ -129,7 +130,7 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
         </div>
       )}
 
-      {/* Tab 3: Discography */}
+      {/* View 3: Discography (Intense) */}
       {isIntense && (
         <div>
           <h2 className="section-title" style={{ color: 'var(--gold)', marginBottom: '20px', borderLeft: '4px solid var(--gold)', paddingLeft: '12px' }}>DISCOGRAPHY</h2>
@@ -176,7 +177,7 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
                    <div style={{ background: 'rgba(255,255,255,0.02)', padding: '24px', borderRadius: '12px', border: '1px solid #222' }}>
                      <h4 style={{ color: 'white', fontSize: '1.2rem', marginBottom: '20px', borderLeft: '4px solid var(--gold)', paddingLeft: '16px' }}>{song.title}</h4>
                      <div style={{ display: 'grid', gap: '16px' }}>
-                        {getFilteredPhrases(song.blocks).map((block, bi) => (
+                        {song.blocks && song.blocks.length > 0 ? getFilteredPhrases(song.blocks).map((block, bi) => (
                           <div key={bi} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', background: 'rgba(0,0,0,0.2)', padding: '16px', borderRadius: '8px', border: '1px solid #333' }}>
                             <div style={{ flex: 1 }}>
                               <div style={{ fontSize: '0.6rem', fontWeight: 900, color: 'var(--gold)', textTransform: 'uppercase', marginBottom: '6px' }}>{(block as any).type || 'verse'}</div>
@@ -191,7 +192,9 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
                               PRACTICE THIS
                             </button>
                           </div>
-                        ))}
+                        )) : (
+                          <p style={{ color: '#555', textAlign: 'center', padding: '20px' }}>No lyrics available for this track yet.</p>
+                        )}
                      </div>
                    </div>
                  );
