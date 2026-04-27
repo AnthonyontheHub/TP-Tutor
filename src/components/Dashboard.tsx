@@ -91,26 +91,59 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   }, [selectedWords, isSandboxMode, vocabulary]);
 
   const handleDailyReview = () => {
-    let targetWords: string[] = [];
-    if (reviewVibe === 'chill') {
-      targetWords = vocabulary
-        .filter(w => w.status === 'confident' || w.status === 'mastered')
-        .sort((a, b) => b.baseScore - a.baseScore)
-        .slice(0, 8)
-        .map(w => w.word);
-    } else {
-      targetWords = vocabulary
-        .filter(w => w.status === 'introduced' || w.status === 'not_started')
-        .sort((a, b) => (a.frequencyRank ?? 999) - (b.frequencyRank ?? 999))
-        .slice(0, 6)
-        .map(w => w.word);
-    }
+    if (activeView === 'vocab') {
+      let targetWords: string[] = [];
+      let prompt = '';
 
-    if (targetWords.length === 0) {
-      onAskLina(`[SYSTEM: No words fit ${reviewVibe} criteria. Prompt user for next focus.]`);
-      return;
+      if (reviewVibe === 'chill') {
+        targetWords = vocabulary
+          .filter(w => w.status === 'confident' || w.status === 'mastered')
+          .sort((a, b) => b.baseScore - a.baseScore)
+          .slice(0, 8)
+          .map(w => w.word);
+        prompt = `[SYSTEM: Daily Review in **CHILL** mode. Words: ${targetWords.join(', ')}. Keep it light.]`;
+      } else if (reviewVibe === 'deep') {
+        targetWords = vocabulary
+          .filter(w => w.status === 'introduced' || w.status === 'not_started')
+          .sort((a, b) => (a.frequencyRank ?? 999) - (b.frequencyRank ?? 999))
+          .slice(0, 6)
+          .map(w => w.word);
+        prompt = `[SYSTEM: Daily Review in **DEEP** mode. Focus on new concepts/words: ${targetWords.join(', ')}. Follow 3-phase structure.]`;
+      } else if (reviewVibe === 'intense') {
+        targetWords = vocabulary
+          .filter(w => w.status !== 'mastered')
+          .sort((a, b) => {
+            if (a.baseScore !== b.baseScore) return a.baseScore - b.baseScore;
+            return (a.frequencyRank ?? 999) - (b.frequencyRank ?? 999);
+          })
+          .slice(0, 10)
+          .map(w => w.word);
+        prompt = `[SYSTEM: Daily Review in **INTENSE** mode. Target weak points and common words: ${targetWords.join(', ')}. Push the student hard.]`;
+      } else {
+        // Balanced review if no vibe (fallback)
+        targetWords = [...vocabulary].sort(() => 0.5 - Math.random()).slice(0, 8).map(w => w.word);
+        prompt = `[SYSTEM: Balanced Vocab Practice. Mix of all levels: ${targetWords.join(', ')}.]`;
+      }
+
+      if (targetWords.length === 0 && reviewVibe) {
+        onAskLina(`[SYSTEM: No words fit ${reviewVibe} criteria. Prompt user for next focus.]`);
+        return;
+      }
+      onAskLina(prompt);
+    } else if (activeView === 'roadmap') {
+      const activeNode = curriculums.flatMap(l => l.nodes).find(n => n.id === useMasteryStore.getState().currentPositionNodeId);
+      const nodeTitle = activeNode?.title || 'Current Module';
+
+      if (reviewVibe === 'chill') { // NEW CONCEPT
+        onAskLina(`[SYSTEM: Roadmap Lesson - NEW CONCEPT. Focus strictly on current module items for "${nodeTitle}".]`);
+      } else if (reviewVibe === 'deep') { // REVIEW
+        onAskLina(`[SYSTEM: Roadmap Lesson - REVIEW. Mix items from "${nodeTitle}" with previously introduced words.]`);
+      } else if (reviewVibe === 'intense') { // QUIZ
+        onAskLina(`[SYSTEM: Roadmap Lesson - QUIZ / LEVEL UP. Conduct a proficiency test on the current module "${nodeTitle}".]`);
+      } else {
+        onAskLina(`[SYSTEM: Roadmap Lesson. Continue "${nodeTitle}" with a mix of new material and past review.]`);
+      }
     }
-    onAskLina(`[SYSTEM: Daily Review in **${reviewVibe.toUpperCase()}** mode. Words: ${targetWords.join(', ')}. Use standard 3-phase structure.]`);
   };
 
   const handleSaved = (phraseId: string) => {
@@ -236,26 +269,26 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
           <div className="flex flex-col md:flex-row gap-2 w-full">
             <button onClick={handleDailyReview} className="btn-review w-full" style={{ flex: 1, marginBottom: 0 }}>
-              ⚡ START DAILY REVIEW
+              {activeView === 'vocab' ? '⚡ VOCAB PRACTICE' : '🚀 ROADMAP LESSON'}
             </button>
             <div className="w-full" style={{ display: 'flex', background: 'var(--surface)', borderRadius: '4px', padding: '4px', border: '1px solid var(--border)', flex: 1.5 }}>
               <button 
                 onClick={() => setReviewVibe('chill')}
                 style={{ flex: 1, border: 'none', background: reviewVibe === 'chill' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'chill' ? 'black' : '#666', borderRadius: '2px', padding: '6px 4px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
               >
-                CHILL
+                {activeView === 'vocab' ? 'CHILL' : 'NEW CONCEPT'}
               </button>
               <button 
                 onClick={() => setReviewVibe('deep')}
                 style={{ flex: 1, border: 'none', background: reviewVibe === 'deep' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'deep' ? 'black' : '#666', borderRadius: '2px', padding: '6px 4px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
               >
-                DEEP
+                {activeView === 'vocab' ? 'DEEP' : 'REVIEW'}
               </button>
               <button 
                 onClick={() => setReviewVibe('intense')}
                 style={{ flex: 1, border: 'none', background: reviewVibe === 'intense' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'intense' ? 'black' : '#666', borderRadius: '2px', padding: '6px 4px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
               >
-                INTENSE
+                {activeView === 'vocab' ? 'INTENSE' : 'QUIZ / LEVEL UP'}
               </button>
             </div>
           </div>
