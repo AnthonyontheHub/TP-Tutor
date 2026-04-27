@@ -168,20 +168,29 @@ export const useMasteryStore = create<MasteryStore>()(
       lastKnowledgeCheckDate: '',
       cloudSynced: false,
       commonPhrases: [
-        { category: "GREETINGS", tp: "toki!", en: "Hello" },
+        { category: "GREETINGS", tp: "toki!", en: "Hello / Hi" },
         { category: "GREETINGS", tp: "sina pilin seme?", en: "How are you?" },
+        { category: "GREETINGS", tp: "mi tawa", en: "Goodbye (I am leaving)" },
         { category: "SOCIAL", tp: "nimi mi li Anthony", en: "My name is Anthony" },
-        { category: "POLITE", tp: "sina pona", en: "Thank you" },
-        { category: "EATING", tp: "mi wile moku", en: "I'm hungry" },
-        { category: "FEELINGS", tp: "mi pilin pona", en: "I feel good" }
+        { category: "SOCIAL", tp: "mi kama sona e toki pona", en: "I'm learning Toki Pona" },
+        { category: "POLITE", tp: "sina pona", en: "Thank you / You are good" },
+        { category: "POLITE", tp: "mi pakala", en: "I'm sorry / I messed up" },
+        { category: "POLITE", tp: "ale li pona", en: "Everything is good" },
+        { category: "FEELINGS", tp: "mi pilin pona", en: "I feel good / happy" },
+        { category: "FEELINGS", tp: "mi pilin seli", en: "I feel hot / angry" }
       ],
       songs: [
         {
           id: "utala-kon",
           title: "utala kon",
           tracks: [
-            { title: "01 wawa kama", blocks: [{ title: "Verse 1", tp: "mi tawa / mi tawa / mi tawa lon nasin", en: "I go / I go / I go on the path" }, { title: "Chorus", tp: "ona li lon / pini li kama / mi ken ala pini e tawa", en: "It is here / the end is coming / I cannot stop going" }] },
-            { title: "02 nasin li ken ala", blocks: [{ title: "Chorus", tp: "nasin li ken ala", en: "The path is not possible" }] },
+            { title: "01 wawa kama", blocks: [
+              { title: "Verse 1", tp: "mi tawa / mi tawa / mi tawa lon nasin / nasin li pini", en: "I go / I go / I go on the path / The path ends" },
+              { title: "Chorus", tp: "ona li lon / pini li kama / mi ken ala pini e tawa", en: "It is here / The end is coming / I cannot stop the movement" }
+            ]},
+            { title: "02 nasin li ken ala", blocks: [
+              { title: "Chorus", tp: "nasin li ken ala", en: "The path is not possible" }
+            ]},
             { title: "03 pini li kama", blocks: [] },
             { title: "04 toki ike", blocks: [] },
             { title: "05 lukin moli", blocks: [] },
@@ -689,6 +698,7 @@ export const useMasteryStore = create<MasteryStore>()(
                 studentName: initialName,
                 profile: { firstName: initialName, lastName: '', tpName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
                 lore: [],
+                reviewVibe: null,
                 profileImage: initialProfileImage || '',
                 savedPhrases: [],
                 currentStreak: 0,

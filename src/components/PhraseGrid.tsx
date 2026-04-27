@@ -113,7 +113,7 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
         </div>
       )}
 
-      {/* View 2: Everyday Library (Deep) */}
+      {/* View 2: Everyday Archive (Deep) */}
       {isDeep && (
         <div>
           <h2 className="section-title" style={{ color: 'var(--gold)', marginBottom: '20px', borderLeft: '4px solid var(--gold)', paddingLeft: '12px' }}>EVERYDAY ARCHIVE</h2>
@@ -126,11 +126,11 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
                   <h3 style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--gold)', letterSpacing: '0.1em', marginBottom: '12px', textTransform: 'uppercase', opacity: 0.8 }}>{cat}</h3>
                   <div style={{ display: 'grid', gap: '12px', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))' }}>
                     {(filtered || []).map((p, i) => (
-                      <div key={i} className="glass-panel" style={{ padding: '16px', cursor: 'pointer' }} onClick={() => onAskLina(`Let's practice this specific phrase/lyric: [${p.tp}]`)}>
+                      <div key={i} className="glass-panel" style={{ padding: '16px', cursor: 'pointer' }} onClick={() => onAskLina(`Let's practice this specific phrase: [${p.tp}]`)}>
                         <div style={{ fontWeight: 'bold', color: 'white', marginBottom: '4px' }}>{p.tp}</div>
                         <div style={{ fontSize: '0.8rem', color: '#777', fontStyle: 'italic' }}>{p.en}</div>
                         <button 
-                          onClick={(e) => { e.stopPropagation(); onAskLina(`Let's practice this specific phrase/lyric: [${p.tp}]`); }}
+                          onClick={(e) => { e.stopPropagation(); onAskLina(`Let's practice this specific phrase: [${p.tp}]`); }}
                           className="btn-toggle"
                           style={{ marginTop: '12px', padding: '6px 10px', fontSize: '0.6rem', width: 'auto', background: 'rgba(255,255,255,0.05)' }}
                         >
@@ -153,7 +153,7 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
           
           {!selectedAlbumId ? (
              <div style={{ display: 'grid', gap: '16px', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))' }}>
-               {(songs ?? []).map(album => (
+               {(songs || []).map(album => (
                  <button 
                   key={album.id}
                   onClick={() => setSelectedAlbumId(album.id)}
@@ -168,9 +168,9 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
           ) : !selectedTrackTitle ? (
             <div>
               <button onClick={() => setSelectedAlbumId(null)} style={{ background: 'none', border: 'none', color: '#666', fontSize: '0.7rem', fontWeight: 900, cursor: 'pointer', marginBottom: '16px' }}>← BACK TO ALBUMS</button>
-              <h3 style={{ fontSize: '0.8rem', fontWeight: 900, color: 'var(--gold)', letterSpacing: '0.2em', marginBottom: '16px', textTransform: 'uppercase' }}>TRACKLIST: {(songs ?? []).find(a => a.id === selectedAlbumId)?.title}</h3>
+              <h3 style={{ fontSize: '0.8rem', fontWeight: 900, color: 'var(--gold)', letterSpacing: '0.2em', marginBottom: '16px', textTransform: 'uppercase' }}>TRACKLIST: {(songs || []).find(a => a.id === selectedAlbumId)?.title}</h3>
               <div style={{ display: 'grid', gap: '12px' }}>
-                {(songs ?? []).find(a => a.id === selectedAlbumId)?.tracks?.map((track: any) => (
+                {(songs || []).find(a => a.id === selectedAlbumId)?.tracks?.map((track: any) => (
                   <button 
                     key={track.title} 
                     onClick={() => setSelectedTrackTitle(track.title)}
@@ -187,8 +187,8 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
             <div>
                <button onClick={() => setSelectedTrackTitle(null)} style={{ background: 'none', border: 'none', color: '#666', fontSize: '0.7rem', fontWeight: 900, cursor: 'pointer', marginBottom: '16px' }}>← BACK TO TRACKLIST</button>
                {(() => {
-                 const album = (songs ?? []).find(a => a.id === selectedAlbumId);
-                 const track = (album?.tracks ?? []).find((t: any) => t.title === selectedTrackTitle);
+                 const album = (songs || []).find(a => a.id === selectedAlbumId);
+                 const track = (album?.tracks || []).find((t: any) => t.title === selectedTrackTitle);
                  if (!track) return null;
                  return (
                    <div style={{ background: 'rgba(255,255,255,0.02)', padding: '24px', borderRadius: '12px', border: '1px solid #222' }}>
@@ -202,7 +202,7 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
                               <div style={{ color: '#666', fontSize: '0.8rem', fontStyle: 'italic' }}>{block.en}</div>
                             </div>
                             <button 
-                              onClick={() => onAskLina(`Let's practice this specific phrase/lyric: [${block.tp}]`)}
+                              onClick={() => onAskLina(`Let's practice this specific lyric: [${block.tp}]`)}
                               className="btn-toggle"
                               style={{ padding: '8px 12px', fontSize: '0.65rem', width: 'auto', background: 'rgba(255,255,255,0.05)' }}
                             >
