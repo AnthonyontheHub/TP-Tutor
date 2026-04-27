@@ -27,12 +27,45 @@ interface ChatSessionState {
 export default function App() {
   const { user, loading } = useAuthStore();
   const { hasCompletedSetup, isMainProfile } = useMasteryStore();
-  
+
   const [activePanels, setActivePanels] = useState<AppPanel[]>([]);
   const [chatSessions, setChatSessions] = useState<ChatSessionState[]>([]);
   const [isSandboxMode, setIsSandboxMode] = useState<boolean>(
     () => localStorage.getItem('tp_sandbox_mode') === 'true'
   );
+
+  // Validate localStorage data on mount to fix any corruption
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('tp-tutor-mastery');
+      if (stored) {
+        const data = JSON.parse(stored);
+        let corrupted = false;
+
+        // Check if critical arrays are corrupted
+        if (data.commonPhrases && !Array.isArray(data.commonPhrases)) {
+          console.warn('Corrupted commonPhrases detected in localStorage, clearing...');
+          corrupted = true;
+        }
+        if (data.songs && !Array.isArray(data.songs)) {
+          console.warn('Corrupted songs detected in localStorage, clearing...');
+          corrupted = true;
+        }
+        if (data.savedPhrases && !Array.isArray(data.savedPhrases)) {
+          console.warn('Corrupted savedPhrases detected in localStorage, clearing...');
+          corrupted = true;
+        }
+
+        // If data is corrupted, clear it to force a fresh reload
+        if (corrupted) {
+          localStorage.removeItem('tp-tutor-mastery');
+          window.location.reload();
+        }
+      }
+    } catch (err) {
+      console.error('Error validating localStorage:', err);
+    }
+  }, []);
 
   // Enforce Sandbox Mode for any profile that is not the main user
   useEffect(() => {
