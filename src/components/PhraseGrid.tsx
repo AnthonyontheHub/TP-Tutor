@@ -1,8 +1,9 @@
 /* src/components/PhraseGrid.tsx */
 import React, { useState, useMemo, useEffect } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
-import type { MasteryStatus } from '../types/mastery';
-import { Phrase, PhraseCategory, phraseData } from '../data/phraseData'; // Import phrase data
+import type { MasteryStatus, CommonPhrase } from '../types/mastery'; // Keep CommonPhrase for Everyday Archive
+import { phraseData } from '../data/phraseData'; // Import only the data value
+import type { Phrase, PhraseCategory } from '../data/phraseData'; // Import types separately
 import PhraseCard from './PhraseCard'; // Import the new PhraseCard component
 
 interface Props {
@@ -14,7 +15,7 @@ interface Props {
 }
 
 export default function PhraseGrid({ selectedWords, focusPhraseId, clearFocusPhrase }: Props) {
-  const { studentName, vocabulary, savedPhrases, updatePhraseNote, deletePhrase, reviewVibe } = useMasteryStore();
+  const { studentName, vocabulary, savedPhrases, updatePhraseNote, deletePhrase, commonPhrases, reviewVibe } = useMasteryStore(); // Removed 'songs' as it's only for Discography
   const [editingId, setEditingId] = useState<string | null>(null);
   const [noteInput, setNoteInput] = useState('');
   
@@ -22,6 +23,9 @@ export default function PhraseGrid({ selectedWords, focusPhraseId, clearFocusPhr
   const [selectedPhraseCategory, setSelectedPhraseCategory] = useState<PhraseCategory | null>(null);
   const [selectedPhrase, setSelectedPhrase] = useState<Phrase | null>(null);
   const [isPhraseCardOpen, setIsPhraseCardOpen] = useState<boolean>(false);
+
+  // Removed state for Discography tab navigation (selectedAlbumId, selectedTrackTitle)
+  // as this logic is moved out of PhraseGrid.
 
   const clean = (w: string) => w.toLowerCase().replace(/[.!?,]/g, '');
 
@@ -47,6 +51,17 @@ export default function PhraseGrid({ selectedWords, focusPhraseId, clearFocusPhr
     return true;
   });
 
+  // Group commonPhrases once at the top level, outside the return statement.
+  const groupedCommonPhrases = useMemo(() => {
+    const groups: Record<string, CommonPhrase[]> = {};
+    (Array.
+    isArray(commonPhrases) ? commonPhrases : []).forEach(p => {
+      if (!groups[p.category]) groups[p.category] = [];
+      groups[p.category].push(p);
+    });
+    return groups;
+  }, [commonPhrases]);
+
   // This function is used for filtering phrases in both the 'My Saves' and 'Toki Pona Phrases' sections.
   const filterPhrasesBySelectedWords = (phrases: { tokiPona: string, english: string }[]) => {
     if (!selectedWords || selectedWords.length === 0) {
@@ -54,7 +69,7 @@ export default function PhraseGrid({ selectedWords, focusPhraseId, clearFocusPhr
     }
     return phrases.filter(p => {
       // Split tokiPona by spaces and common punctuation, then clean each word
-      const ws = (p.tokiPona || '').split(/[ \n/]+/).map(clean);
+      const ws = (p.tokiPona || '').split(/[ \/]+/).map(clean);
       // Check if all selectedWords (cleaned) are present in the phrase's words (cleaned)
       return selectedWords.every(sw => ws.includes(clean(sw)));
     });
@@ -74,13 +89,12 @@ export default function PhraseGrid({ selectedWords, focusPhraseId, clearFocusPhr
   };
 
   const isChill = reviewVibe === 'chill' || reviewVibe === null;
-  // Keeping other vibe states for context, but not actively using them for phrase display in this update.
-  // const isDeep = reviewVibe === 'deep'; 
-  // const isIntense = reviewVibe === 'intense'; 
+  const isDeep = reviewVibe === 'deep'; 
+  // Removed isIntense variable and logic as Discography is no longer managed here.
 
   return (
     <section className="phrase-grid">
-      {/* View 1: My Saves (Chill) - Modified to use PhraseCard */}
+      {/* View 1: My Saves (Chill) */}
       {isChill && (
         <div>
           <h2 className="section-title" style={{ color: 'var(--gold)', marginBottom: '20px', borderLeft: '4px solid var(--gold)', paddingLeft: '12px' }}>MY SAVES</h2>
@@ -88,13 +102,10 @@ export default function PhraseGrid({ selectedWords, focusPhraseId, clearFocusPhr
             {filteredSaves.length === 0 ? (
               <p style={{ color: '#555', gridColumn: '1/-1', textAlign: 'center', padding: '20px' }}>{selectedWords && selectedWords.length > 0 ? 'No saved phrases match your selection.' : 'No phrases saved yet.'}</p>
             ) : filteredSaves.map((p) => {
-              // We don't have category info for saved phrases directly here, so we'll just show the phrase.
-              // If needed, this could be extended to link to a category or show minimal info.
-              // For now, clicking a saved phrase won't open PhraseCard as we lack category context.
-              // A more robust solution would involve storing category ID with saved phrases.
+              // Saved phrases lack category context for PhraseCard, so click handler is omitted for them.
               return (
                 <div key={p.id} style={{ background: '#0f172a', padding: '16px', borderRadius: '8px', border: '1px solid #3b82f6' }}>
-                  <div style={{ cursor: 'default' }}> {/* Removed direct click handler for opening PhraseCard as category context is missing */}
+                  <div style={{ cursor: 'default' }}> 
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '8px' }}>
                       {(p.tp || '').split(' ').map((w, idx) => {
                         const cleanW = clean(w);
@@ -129,39 +140,76 @@ export default function PhraseGrid({ selectedWords, focusPhraseId, clearFocusPhr
         </div>
       )}
 
-      {/* New Section: Toki Pona Phrases from phraseData.ts */}
-      <div>
-        <h2 className="section-title" style={{ color: 'var(--gold)', marginBottom: '20px', borderLeft: '4px solid var(--gold)', paddingLeft: '12px' }}>TOKI PONA PHRASES</h2>
-        <div style={{ display: 'grid', gap: '32px' }}>
-          {phraseData.map((category) => {
-            // Filter category phrases based on selectedWords if any
-            const filteredPhrases = filterPhrasesBySelectedWords(category.phrases);
-
-            // If no phrases match the filter and words are selected, skip this category
-            if (filteredPhrases.length === 0 && selectedWords && selectedWords.length > 0) return null;
-
-            return (
-              <div key={category.title}>
-                <h3 style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--gold)', letterSpacing: '0.1em', marginBottom: '12px', textTransform: 'uppercase', opacity: 0.8 }}>{category.title}</h3>
-                <p style={{ fontSize: '0.85rem', color: '#bbb', marginBottom: '16px' }}>{category.contextParagraph}</p>
-                <div style={{ display: 'grid', gap: '12px', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))' }}>
-                  {(filteredPhrases || []).map((phrase, i) => (
-                    <div 
-                      key={i} 
-                      className="glass-panel" 
-                      style={{ padding: '16px', cursor: 'pointer' }} 
-                      onClick={() => handlePhraseClick(category, phrase)} // Click to open PhraseCard
-                    >
-                      <div style={{ fontWeight: 'bold', color: 'white', marginBottom: '4px' }}>{phrase.english}</div>
-                      <div style={{ fontSize: '0.8rem', color: '#777', fontStyle: 'italic' }}>{phrase.tokiPona}</div>
-                    </div>
-                  ))}
+      {/* View 2: Everyday Archive (Deep) - now includes Toki Pona Phrases */}
+      {isDeep && (
+        <div>
+          <h2 className="section-title" style={{ color: 'var(--gold)', marginBottom: '20px', borderLeft: '4px solid var(--gold)', paddingLeft: '12px' }}>EVERYDAY ARCHIVE</h2>
+          {/* Context paragraph for the Everyday Archive tab */}
+          <p style={{ fontSize: '0.9rem', color: '#a0aec0', marginBottom: '20px', fontStyle: 'italic' }}>
+            Explore common Toki Pona phrases used in daily life, organized into categories for easy learning.
+          </p>
+          {/* This div handles the layout for categories themselves, making them stack vertically */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}> 
+            {Object.entries(groupedCommonPhrases).map(([cat, phrases]) => {
+              const filtered = filterPhrasesBySelectedWords(phrases);
+              if (filtered.length === 0 && selectedWords && selectedWords.length > 0) return null;
+              return (
+                <div key={cat}>
+                  <h3 style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--gold)', letterSpacing: '0.1em', marginBottom: '12px', textTransform: 'uppercase', opacity: 0.8 }}>{cat}</h3>
+                  {/* This inner div handles the grid layout for phrases within a category */}
+                  <div style={{ display: 'grid', gap: '12px', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))' }}>
+                    {(filtered || []).map((p, i) => (
+                      <div key={i} className="glass-panel" style={{ padding: '16px', cursor: 'pointer' }} onClick={() => { /* handle click for common phrases if needed */ }}>
+                        <div style={{ fontWeight: 'bold', color: 'white', marginBottom: '4px' }}>{p.tp}</div>
+                        <div style={{ fontSize: '0.8rem', color: '#777', fontStyle: 'italic' }}>{p.en}</div>
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); /* handle click for common phrases */ }}
+                          className="btn-toggle"
+                          style={{ marginTop: '12px', padding: '6px 10px', fontSize: '0.6rem', width: 'auto', background: 'rgba(255,255,255,0.05)' }}
+                        >
+                          PRACTICE THIS
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+
+          {/* Toki Pona Phrases section is now correctly nested within isDeep */}
+          <div style={{ marginTop: '32px' }}> {/* Add margin to separate from previous section */}
+            <h3 style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--gold)', letterSpacing: '0.1em', marginBottom: '12px', textTransform: 'uppercase', opacity: 0.8 }}>TOKI PONA PHRASES</h3>
+            {/* Using context from the first category as a general intro for this section */}
+            <p style={{ fontSize: '0.85rem', color: '#bbb', marginBottom: '16px' }}>{phraseData[0].contextParagraph}</p> 
+            <div style={{ display: 'grid', gap: '12px', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))' }}>
+              {phraseData.map((category) => {
+                const filteredPhrases = filterPhrasesBySelectedWords(category.phrases);
+                if (filteredPhrases.length === 0 && selectedWords && selectedWords.length > 0) return null;
+
+                return (
+                  <div key={category.title}>
+                    <h4 style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--gold)', marginBottom: '8px' }}>{category.title}</h4>
+                    <div style={{ display: 'grid', gap: '8px' }}>
+                      {(filteredPhrases || []).map((phrase, i) => (
+                        <div 
+                          key={i} 
+                          className="glass-panel" 
+                          style={{ padding: '16px', cursor: 'pointer' }} 
+                          onClick={() => handlePhraseClick(category, phrase)} // Click to open PhraseCard
+                        >
+                          <div style={{ fontWeight: 'bold', color: 'white', marginBottom: '4px' }}>{phrase.english}</div>
+                          <div style={{ fontSize: '0.8rem', color: '#777', fontStyle: 'italic' }}>{phrase.tokiPona}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Render PhraseCard conditionally */}
       {isPhraseCardOpen && selectedPhraseCategory && selectedPhrase && (

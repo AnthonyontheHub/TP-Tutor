@@ -136,5 +136,102 @@ export const phraseData: PhraseCategory[] = [
       { english: "It’s sunny", tokiPona: "suno li lon", literal: "Sun exists" },
       { english: "It’s windy", tokiPona: "kon li wawa", literal: "Air/wind is strong" },
     ]
+  },
+  {
+    title: "10. Questions and Responses",
+    contextParagraph: "Perhaps the most distinctive feature of toki pona’s question system: there is no single word for “yes.” Like Chinese, Irish, and Welsh, toki pona answers yes/no questions by repeating the verb for affirmation or adding ala for negation. For general agreement, lon (true, exists) serves as a standalone affirmative.",
+    phrases: [
+      { english: "What is this?", tokiPona: "ni li seme?", literal: "This is what?" },
+      { english: "Yes", tokiPona: "(repeat the verb) or lon", literal: "(affirm) or True/exists" },
+      { english: "No", tokiPona: "ala or (verb + ala)", literal: "No / not" },
+      { english: "I don’t know", tokiPona: "mi sona ala", literal: "I know not" },
+      { english: "I understand", tokiPona: "mi sona", literal: "I know" },
+      { english: "Why?", tokiPona: "tan seme?", literal: "Because-of what?" },
+      { english: "Who?", tokiPona: "jan seme?", literal: "Person what?" },
+      { english: "Can you help me?", tokiPona: "sina ken ala ken pona e mi?", literal: "You can-not-can help me?" },
+      { english: "What do you want?", tokiPona: "sina wile e seme?", literal: "You want what?" },
+      { english: "Really? / Is that true?", tokiPona: "lon ala lon?", literal: "True-not-true?" }
+    ]
+  },
+  {
+    title: "11. Time Expressions",
+    contextParagraph: "Toki pona has no grammatical tense. Time is expressed exclusively through context phrases built on tenpo (time) placed before the particle la. The system uses: ni (this) for the present, kama (coming) for the future, and pini (finished/past) for the past.",
+    phrases: [
+      { english: "Today", tokiPona: "tenpo suno ni", literal: "This sun-time" },
+      { english: "Tomorrow", tokiPona: "tenpo suno kama", literal: "Coming sun-time" },
+      { english: "Yesterday", tokiPona: "tenpo suno pini", literal: "Past/finished sun-time" },
+      { english: "Now", tokiPona: "tenpo ni", literal: "This time" },
+      { english: "Later / In the future", tokiPona: "tenpo kama", literal: "Coming time" },
+      { english: "Morning / Daytime", tokiPona: "tenpo suno", literal: "Sun-time" },
+      { english: "Evening / Night", tokiPona: "tenpo pimeja", literal: "Dark-time" },
+      { english: "Soon", tokiPona: "tenpo lili la", literal: "In small-time, ..." },
+      { english: "A long time ago", tokiPona: "tenpo suli pini la", literal: "In big-past-time, ..." },
+      { english: "Always", tokiPona: "tenpo ale la", literal: "In all-time, ..." },
+      { english: "Never", tokiPona: "tenpo ala la", literal: "In no-time, ..." }
+    ]
+  },
+  {
+    title: "12. Home and Family",
+    contextParagraph: "Family vocabulary reveals toki pona’s compositionality at its best. The word mama alone is gender-neutral “parent” — add meli (female) or mije (male) to specify. The word jan pona — literally “good person” — is universally understood as “friend,” making friendship a matter of definition.",
+    phrases: [
+      { english: "Mother", tokiPona: "mama meli", literal: "Female parent" },
+      { english: "Father", tokiPona: "mama mije", literal: "Male parent" },
+      { english: "Parent (gender-neutral)", tokiPona: "mama", literal: "Parent" },
+      { english: "Child / Children", tokiPona: "jan lili", literal: "Small person(s)" },
+      { english: "Friend", tokiPona: "jan pona", literal: "Good person" },
+      { english: "My house / home", tokiPona: "tomo mi", literal: "House my" },
+      { english: "Family", tokiPona: "kulupu mama", literal: "Parent-group" },
+      { english: "Brother", tokiPona: "mije sama", literal: "Male sibling/same" },
+      { english: "Sister", tokiPona: "meli sama", literal: "Female sibling/same" },
+      { english: "Sibling (gender-neutral)", tokiPona: "jan sama", literal: "Same person" },
+      { english: "Partner / Significant other", tokiPona: "jan olin", literal: "Love-person" },
+      { english: "Come to my house", tokiPona: "o kama tawa tomo mi", literal: "Come to house my" }
+    ]
+  },
+  {
+    title: "13. Health and Body",
+    contextParagraph: "Body parts in toki pona are few but sufficient: lawa (head/mind), sijelo (body/torso), luka (hand/arm), noka (foot/leg), oko (eye), kute (ear), uta (mouth), nena (nose), insa (stomach/inside), monsi (back/behind), selo (skin), and linja (hair). The word misikeke (medicine) was added in the 2021 dictionary after strong community demand.",
+    phrases: [
+      { english: "I’m sick / I feel unwell", tokiPona: "mi pilin ike", literal: "I feel bad" },
+      { english: "My body is unwell", tokiPona: "sijelo mi li ike", literal: "Body my is bad" },
+      { english: "I need help", tokiPona: "o pona e mi", literal: "Fix/help me" },
+      { english: "My head hurts", tokiPona: "lawa mi li pilin ike", literal: "Head my feels bad" },
+      { english: "I need medicine", tokiPona: "mi wile e misikeke", literal: "I want medicine" },
+      { english: "I feel better", tokiPona: "mi kama pilin pona", literal: "I become feel-good" },
+      { english: "Are you okay?", tokiPona: "sina pona ala pona?", literal: "You good-not-good?" },
+      { english: "I’m fine / I’m okay", tokiPona: "mi pona", literal: "I am good" }
+    ]
+  },
+  {
+    title: "14. Work and Activities",
+    contextParagraph: "The preverb kama creates one of toki pona’s most-used compounds: kama sona — “come to know” — the standard way to say “learn.” Reading is literally “looking at a document” (lukin e lipu), and writing is sitelen (which also means drawing — the language does not distinguish the two).",
+    phrases: [
+      { english: "I’m working", tokiPona: "mi pali", literal: "I work/do" },
+      { english: "I’m learning / studying", tokiPona: "mi kama sona", literal: "I come-to-know" },
+      { english: "Let’s play / have fun", tokiPona: "o musi", literal: "Play! / Be fun!" },
+      { english: "I’m reading", tokiPona: "mi lukin e lipu", literal: "I look-at document" },
+      { english: "I’m writing", tokiPona: "mi sitelen", literal: "I write/draw" },
+      { english: "I’m making something", tokiPona: "mi pali e ijo", literal: "I make thing" },
+      { english: "I’m busy", tokiPona: "mi pali mute", literal: "I work much" },
+      { english: "I finished / I’m done", tokiPona: "mi pini", literal: "I finish" },
+      { english: "Let’s start / begin", tokiPona: "o open", literal: "Start! / Open!" },
+      { english: "I’m resting", tokiPona: "mi lape", literal: "I rest/sleep" }
+    ]
+  },
+  {
+    title: "15. Compliments and Descriptions",
+    contextParagraph: "The fact that suli means both “big” and “important” reflects toki pona’s philosophical stance that significance and scale are intertwined. Similarly, pona lukin (“good to look at”) serves for “beautiful,” “pretty,” “handsome,” and “attractive” without distinction.",
+    phrases: [
+      { english: "You are good / great", tokiPona: "sina pona / sina pona mute", literal: "You are good / You are very good" },
+      { english: "This is beautiful", tokiPona: "ni li pona lukin", literal: "This is good visually" },
+      { english: "That is big", tokiPona: "ni li suli", literal: "That is big/important" },
+      { english: "That is small", tokiPona: "ni li lili", literal: "That is small/little" },
+      { english: "You are smart / wise", tokiPona: "sina sona mute", literal: "You know much" },
+      { english: "This is fun", tokiPona: "ni li musi", literal: "This is fun/entertaining" },
+      { english: "You are strong", tokiPona: "sina wawa", literal: "You are strong/powerful" },
+      { english: "Well done / Good job", tokiPona: "pali pona!", literal: "Good work!" },
+      { english: "You are kind", tokiPona: "sina pona tawa jan", literal: "You are good toward people" },
+      { english: "This is important", tokiPona: "ni li suli", literal: "This is big/important" }
+    ]
   }
 ];

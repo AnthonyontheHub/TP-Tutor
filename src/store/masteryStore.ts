@@ -55,7 +55,9 @@ function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: Maste
     culturalNotes: staticData.culturalNotes || '',
     avoidWhen: staticData.avoidWhen || '',
     rolesMastered: {},
-    userNotes: ''
+    userNotes: '',
+    notes: '',
+    customDefinition: ''
   };
 }
 
@@ -829,6 +831,8 @@ export const useMasteryStore = create<MasteryStore>()(
                 // User fields should remain as loaded from data
                 userMnemonic: w.userMnemonic || '',
                 userNotes: w.userNotes || '',
+                notes: w.notes || '',
+                customDefinition: w.customDefinition || '',
                 culturalNotes: staticData.culturalNotes || '',
                 avoidWhen: staticData.avoidWhen || '',
                 rolesMastered: w.rolesMastered || {},

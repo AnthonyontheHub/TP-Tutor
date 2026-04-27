@@ -99,10 +99,16 @@ export default function VocabCard({ word, onLongPress, onClick, isSandboxMode }:
     isLongPressActive.current = false;
   };
 
+  const hasSavedInfo = (word.notes && word.notes.trim() !== '') || (word.customDefinition && word.customDefinition.trim() !== '');
+
   return (
     <div
       className={`vocab-card vocab-card--${status}`}
-      style={{ touchAction: 'none', borderLeftColor: RING_COLOR[status] }}
+      style={{ 
+        touchAction: 'none', 
+        borderLeftColor: RING_COLOR[status],
+        boxShadow: hasSavedInfo ? `0 0 15px ${RING_COLOR[status]}66` : undefined
+      }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}

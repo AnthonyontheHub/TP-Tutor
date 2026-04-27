@@ -230,6 +230,8 @@ export interface VocabWord {
   avoidWhen?: string;
   rolesMastered: Partial<Record<PosRole, boolean>>;
   userNotes?: string;
+  notes?: string;
+  customDefinition?: string;
 }
 
 // ─── Curriculum ──────────────────────────────────────────────────────────────
