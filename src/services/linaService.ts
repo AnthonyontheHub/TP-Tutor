@@ -185,14 +185,15 @@ export async function fetchDeepDiveExamples(apiKey: string, word: string, userCo
     generationConfig: { responseMimeType: "application/json" },
   });
   const contextInstruction = userContext ? ` User Context: ${userContext}.` : '';
-  const prompt = `Act as jan Lina, a Toki Pona teacher. For the word "${word}", generate 4 specific examples:
+  const prompt = `Act as jan Lina, a Toki Pona teacher. For the word "${word}", generate a deep-dive response including:
 1. Simple: A basic "Subject + Word" sentence.
 2. Intermediate: "Word + Modifiers" sentence.
 3. Advanced: A complex sentence using "la" or "e".
 4. Personal Take: A sentence combining the word "${word}" with a random piece of background lore.
+5. Explanation: A 2-3 sentence explanation of the word's deeper semantic meaning or common usage nuances.
 
 ${contextInstruction}
-Return a JSON object: {"simple": "tp (en)", "intermediate": "tp (en)", "advanced": "tp (en)", "personal": "tp (en)"}`;
+Return a JSON object: {"simple": "tp (en)", "intermediate": "tp (en)", "advanced": "tp (en)", "personal": "tp (en)", "explanation": "..."}`;
   try {
     const result = await model.generateContent(prompt);
     return JSON.parse(sanitizeJson(result.response.text())) as Record<string, string>;
