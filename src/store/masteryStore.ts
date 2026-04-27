@@ -125,7 +125,7 @@ interface MasteryState {
   lessonFilter: string[] | null;
   isMainProfile: boolean;
   cloudSynced: boolean;
-  albums: Album[];
+  songs: { id: string; title: string; tracks: any[] }[];
   commonPhrases: CommonPhrase[];
   // Dashboard settings
   widgetDensity: 'Compact' | 'Expanded';
@@ -176,15 +176,20 @@ export const useMasteryStore = create<MasteryStore>()(
         { category: "POLITE", tp: "sina pona", en: "Thank you" },
         { category: "POLITE", tp: "mi pakala", en: "I'm sorry / My bad" },
         { category: "FEELINGS", tp: "mi pilin pona", en: "I feel good" },
-        { category: "FEELINGS", tp: "mi pilin seli", en: "I feel angry/hot" }
+        { category: "FEELINGS", tp: "mi pilin seli", en: "I feel angry" }
       ],
-      albums: [
+      songs: [
         {
           id: "utala-kon",
           title: "utala kon",
-          songs: [
-            { id: "01", title: "01 wawa kama", blocks: [{ type: 'verse', tp: "mi tawa / mi tawa / mi tawa lon nasin", en: "I go / I go / I go on the path" }] },
-            { id: "02", title: "02 nasin li ken ala", blocks: [{ type: 'chorus', tp: "nasin li ken ala", en: "The path is not possible" }] },
+          tracks: [
+            { id: "01", title: "01 wawa kama", blocks: [
+              { title: "Verse 1", tp: "mi tawa / mi tawa / mi tawa lon nasin", en: "I go / I go / I go on the path" },
+              { title: "Chorus", tp: "ona li lon / pini li kama / mi ken ala pini e tawa", en: "It is here / the end is coming / I cannot stop going" }
+            ]},
+            { id: "02", title: "02 nasin li ken ala", blocks: [
+              { title: "Chorus", tp: "nasin li ken ala", en: "The path is not possible" }
+            ]},
             { id: "03", title: "03 pini li kama", blocks: [] },
             { id: "04", title: "04 toki ike", blocks: [] },
             { id: "05", title: "05 lukin moli", blocks: [] },
@@ -633,7 +638,7 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       syncToCloud: async (explicitUserId) => {
-        const { vocabulary, curriculums, lastUpdated, studentName, profile, lore, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, isMainProfile, widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, cloudSynced, albums, commonPhrases } = get();
+        const { vocabulary, curriculums, lastUpdated, studentName, profile, lore, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, isMainProfile, widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, cloudSynced, songs, commonPhrases } = get();
         const targetId = explicitUserId || userId;
 
         // Block premature syncs before cloud data has loaded — prevents stale
@@ -663,7 +668,7 @@ export const useMasteryStore = create<MasteryStore>()(
             vocabulary: partialVocab,
             curriculums, lastUpdated, studentName, profile, lore, profileImage,
             savedPhrases, currentStreak, lastActiveDate, hasCompletedSetup, currentPositionNodeId, isMainProfile,
-            widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, albums, commonPhrases
+            widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, songs, commonPhrases
           }, { merge: true });
         } catch (err) {
           console.error('Firebase Sync Error:', err);
@@ -866,7 +871,7 @@ export const useMasteryStore = create<MasteryStore>()(
             showCircuitPaths: data.showCircuitPaths !== undefined ? data.showCircuitPaths : true,
             knowledgeCheckFrequency: data.knowledgeCheckFrequency || 'session',
             lastKnowledgeCheckDate: data.lastKnowledgeCheckDate || '',
-            albums: data.albums || [],
+            songs: data.songs || [],
             commonPhrases: data.commonPhrases || [],
           };
 
