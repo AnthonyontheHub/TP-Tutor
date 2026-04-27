@@ -161,7 +161,30 @@ export default function App() {
   if (!user) return <LoginPage />;
 
   return (
-    <div className="app-container" style={{ position: 'relative' }}>
+    <div className="app-container" style={{ position: 'relative', paddingTop: isSandboxMode ? '24px' : 0 }}>
+      {isSandboxMode && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '24px',
+          background: 'var(--gold)',
+          color: 'black',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '0.65rem',
+          fontWeight: 900,
+          letterSpacing: '0.1em',
+          textTransform: 'uppercase',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.5)',
+          pointerEvents: 'none'
+        }}>
+          Sandbox Mode Enabled — Local Changes Only
+        </div>
+      )}
       <Dashboard 
         activePanels={activePanels}
         onTogglePanel={togglePanel}
