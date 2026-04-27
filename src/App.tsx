@@ -127,26 +127,66 @@ export default function App() {
         ))}
       </AnimatePresence>
 
-      <div className="chat-manager-layer" style={{ pointerEvents: 'none', position: 'fixed', inset: 0, zIndex: 6000 }}>
-        {chatSessions.map((session, idx) => (
+      <div className="chat-dock" style={{ 
+        position: 'fixed', 
+        bottom: 0, 
+        right: 0, 
+        left: 0,
+        height: 'var(--header-height)',
+        display: 'flex', 
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+        padding: '0 20px',
+        gap: '12px',
+        pointerEvents: 'none',
+        zIndex: 7000 
+      }}>
+        {chatSessions.filter(s => s.isMinimized).map((session, idx) => (
+          <div 
+            key={session.id}
+            onClick={() => toggleMinimizeChat(session.id)}
+            style={{ 
+              background: 'var(--surface-opaque)',
+              border: '1px solid var(--gold)',
+              borderRadius: '8px 8px 0 0',
+              padding: '8px 16px',
+              color: 'var(--gold)',
+              fontSize: '0.7rem',
+              fontWeight: 900,
+              cursor: 'pointer',
+              pointerEvents: 'auto',
+              boxShadow: '0 -4px 15px rgba(0,0,0,0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              minWidth: '150px',
+              height: '40px'
+            }}
+          >
+            <span>💬</span>
+            <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{session.title?.toUpperCase()}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="chat-manager-layer" style={{ pointerEvents: 'none', position: 'fixed', inset: 0, zIndex: 6500 }}>
+        {chatSessions.filter(s => !s.isMinimized).map((session) => (
           <ChatSession 
             key={session.id}
             isActive={true}
-            isMinimized={session.isMinimized}
+            isMinimized={false}
             onMinimize={() => toggleMinimizeChat(session.id)}
             onEndSession={() => closeChat(session.id)} 
             isSandboxMode={isSandboxMode} 
             pendingPrompt={session.pendingPrompt}
             clearPrompt={() => setChatSessions(prev => prev.map(s => s.id === session.id ? { ...s, pendingPrompt: null } : s))}
             style={{ 
-              right: session.isMinimized ? (20 + (idx * 220)) : 0,
-              bottom: 0,
-              height: session.isMinimized ? 'var(--header-height)' : '100%',
-              width: session.isMinimized ? '200px' : '100%',
-              maxWidth: session.isMinimized ? '200px' : '500px',
               pointerEvents: 'auto',
               position: 'fixed',
-              transition: 'all 0.3s ease'
+              inset: 0,
+              left: 'auto',
+              width: '100%',
+              maxWidth: '500px'
             }}
           />
         ))}

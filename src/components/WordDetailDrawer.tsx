@@ -49,7 +49,7 @@ function tierProgress(score: number, status: MasteryStatus): number {
 
 export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isSandboxMode }: { isOpen: boolean; word?: VocabWord | null; onClose: () => void; onAskLina: (p: string) => void; isSandboxMode: boolean }) {
   const { studentName, profile, lore, updateVocabAIContent } = useMasteryStore();
-  const [deepDive, setDeepDive] = useState<Record<string, string> | null>(word?.aiExamples || null);
+  const [deepDive, setDeepDive] = useState<Record<string, string> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const primaryMeaning = word?.meanings?.split(',')[0].trim() || word?.meanings;
@@ -57,11 +57,7 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
 
   const triggerGeneration = async (force = false) => {
     if (!word) return;
-    if (!force && word.aiExamples) {
-      setDeepDive(word.aiExamples);
-      return;
-    }
-
+    
     const key = resolveApiKey();
     if (key && !isSandboxMode) {
       setIsLoading(true);
@@ -81,13 +77,16 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
 
   useEffect(() => {
     if (isOpen && word) {
-      if (word.aiExamples) {
-        setDeepDive(word.aiExamples);
+      // RESET STATE for new word
+      setDeepDive(null);
+      
+      if (word.aiExamples && word.aiExplanation) {
+        setDeepDive({ ...word.aiExamples, explanation: word.aiExplanation });
       } else {
         triggerGeneration();
       }
     }
-  }, [isOpen, word, isSandboxMode, profile, lore]);
+  }, [isOpen, word?.id, isSandboxMode]); // Only re-run when word ID changes
 
   return (
     <AnimatePresence>

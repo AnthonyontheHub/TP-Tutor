@@ -197,11 +197,12 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
               padding: '0 12px', 
               fontSize: '0.6rem', 
               fontWeight: 900,
-              background: '#111',
+              background: '#1a1a1a',
               color: isSandboxMode ? 'var(--gold)' : 'var(--text-muted)',
               border: '1px solid #333',
-              boxShadow: isSandboxMode ? '0 0 10px rgba(255, 191, 0, 0.15)' : 'none',
-              borderRadius: '10px'
+              boxShadow: isSandboxMode ? '0 4px 12px rgba(0,0,0,0.5), 0 0 10px rgba(255, 191, 0, 0.1)' : '0 2px 4px rgba(0,0,0,0.3)',
+              borderRadius: '10px',
+              letterSpacing: '0.05em'
             }}
           >
             {isSandboxMode ? 'SANDBOX ACTIVE' : 'LIVE LINK'}

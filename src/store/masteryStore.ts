@@ -725,6 +725,20 @@ export const useMasteryStore = create<MasteryStore>()(
               const frequencyRank = typeof w.frequencyRank === 'number' ? w.frequencyRank : (base?.frequencyRank ?? 999);
               const type = w.type || (base?.type ?? 'word');
               
+              let sessionNotes = w.sessionNotes || '';
+              let meanings = w.meanings || (base?.meanings ?? '');
+
+              // DATA MIGRATION: If meanings is missing/generic and sessionNotes contains definition-like text
+              if ((!meanings || meanings === '') && sessionNotes.includes('.')) {
+                const parts = sessionNotes.split('.');
+                const firstPart = parts[0].trim();
+                // Check if the first part looks like a dictionary definition (no "Study Session" or "Learning" keywords)
+                if (!firstPart.match(/session|improvement|accuracy|mastery|learned/i)) {
+                   meanings = firstPart;
+                   sessionNotes = parts.slice(1).join('.').trim();
+                }
+              }
+
               // Handle Migration to baseScore (0-1000)
               let baseScore = w.baseScore;
               if (baseScore === undefined) {
@@ -743,6 +757,8 @@ export const useMasteryStore = create<MasteryStore>()(
                 useCount, 
                 frequencyRank, 
                 type,
+                meanings,
+                sessionNotes,
                 partOfSpeech: w.partOfSpeech || (base?.partOfSpeech ?? ''),
                 partOfSpeechScores: w.partOfSpeechScores || { noun: 0, verb: 0, modifier: 0 },
                 lastReviewed: w.lastReviewed || new Date().toISOString(),

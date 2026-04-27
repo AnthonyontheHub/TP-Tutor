@@ -242,7 +242,7 @@ export default function MasteryGrid({
                     <td style={{ padding: '12px 16px', color: '#ccc', fontWeight: 700 }}>
                       {word.meanings.split(/[;,]/)[0].trim()}
                     </td>
-                    <td style={{ padding: '12px 16px', color: '#666', fontSize: '0.75rem', fontStyle: 'italic' }}>
+                    <td style={{ padding: '12px 16px', color: 'var(--text-muted)', fontSize: '0.75rem', fontStyle: 'italic', lineHeight: '1.4' }}>
                       {word.sessionNotes || '-'}
                     </td>
                   </tr>
