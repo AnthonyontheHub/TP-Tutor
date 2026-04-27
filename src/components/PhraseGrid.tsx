@@ -189,7 +189,7 @@ export default function PhraseGrid({ onAskLina, activeFilter, selectedWords, foc
             <div>
                <button onClick={() => setSelectedTrackTitle(null)} style={{ background: 'none', border: 'none', color: '#666', fontSize: '0.7rem', fontWeight: 900, cursor: 'pointer', marginBottom: '16px' }}>← BACK TO TRACKLIST</button>
                {(() => {
-                 const album = (songs || []).find(a => a.id === selectedAlbumId);
+                 const album = safeSongs.find(a => a.id === selectedAlbumId);
                  const track = (album?.tracks || []).find((t: any) => t.title === selectedTrackTitle);
                  if (!track) return null;
                  return (
