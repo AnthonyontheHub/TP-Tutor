@@ -18,7 +18,7 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
   
   // Nested Discography State
   const [selectedAlbumId, setSelectedAlbumId] = useState<string | null>(null);
-  const [selectedTrackTitle, setSelectedTrackId] = useState<string | null>(null);
+  const [selectedTrackTitle, setSelectedTrackTitle] = useState<string | null>(null);
 
   const clean = (w: string) => w.toLowerCase().replace(/[.!?,]/g, '');
 
@@ -38,7 +38,7 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
 
   const filteredSaves = normalizedSaved.filter(p => {
     if (selectedWords && selectedWords.length > 0) {
-      const ws = p.tp.split(' ').map(clean);
+      const ws = (p.tp || '').split(' ').map(clean);
       if (!selectedWords.every(sw => ws.includes(clean(sw)))) return false;
     }
     return true;
@@ -48,7 +48,7 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
     return (phrases || []).filter(p => {
       if (selectedWords && selectedWords.length > 0) {
         // Handle multi-line TP text by flattening
-        const ws = p.tp.split(/[ \n/]+/).map(clean);
+        const ws = (p.tp || '').split(/[ \n/]+/).map(clean);
         if (!selectedWords.every(sw => ws.includes(clean(sw)))) return false;
       }
       return true;
@@ -153,7 +153,7 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
           
           {!selectedAlbumId ? (
              <div style={{ display: 'grid', gap: '16px', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))' }}>
-               {(songs || []).map(album => (
+               {(songs ?? []).map(album => (
                  <button 
                   key={album.id}
                   onClick={() => setSelectedAlbumId(album.id)}
@@ -168,12 +168,12 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
           ) : !selectedTrackTitle ? (
             <div>
               <button onClick={() => setSelectedAlbumId(null)} style={{ background: 'none', border: 'none', color: '#666', fontSize: '0.7rem', fontWeight: 900, cursor: 'pointer', marginBottom: '16px' }}>← BACK TO ALBUMS</button>
-              <h3 style={{ fontSize: '0.8rem', fontWeight: 900, color: 'var(--gold)', letterSpacing: '0.2em', marginBottom: '16px', textTransform: 'uppercase' }}>TRACKLIST: {(songs || []).find(a => a.id === selectedAlbumId)?.title}</h3>
+              <h3 style={{ fontSize: '0.8rem', fontWeight: 900, color: 'var(--gold)', letterSpacing: '0.2em', marginBottom: '16px', textTransform: 'uppercase' }}>TRACKLIST: {(songs ?? []).find(a => a.id === selectedAlbumId)?.title}</h3>
               <div style={{ display: 'grid', gap: '12px' }}>
-                {(songs || []).find(a => a.id === selectedAlbumId)?.tracks.map((track: any) => (
+                {(songs ?? []).find(a => a.id === selectedAlbumId)?.tracks?.map((track: any) => (
                   <button 
                     key={track.title} 
-                    onClick={() => setSelectedTrackId(track.title)}
+                    onClick={() => setSelectedTrackTitle(track.title)}
                     className="glass-panel"
                     style={{ padding: '16px 24px', textAlign: 'left', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '16px' }}
                   >
@@ -185,10 +185,10 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
             </div>
           ) : (
             <div>
-               <button onClick={() => setSelectedTrackId(null)} style={{ background: 'none', border: 'none', color: '#666', fontSize: '0.7rem', fontWeight: 900, cursor: 'pointer', marginBottom: '16px' }}>← BACK TO TRACKLIST</button>
+               <button onClick={() => setSelectedTrackTitle(null)} style={{ background: 'none', border: 'none', color: '#666', fontSize: '0.7rem', fontWeight: 900, cursor: 'pointer', marginBottom: '16px' }}>← BACK TO TRACKLIST</button>
                {(() => {
-                 const album = (songs || []).find(a => a.id === selectedAlbumId);
-                 const track = album?.tracks.find((t: any) => t.title === selectedTrackTitle);
+                 const album = (songs ?? []).find(a => a.id === selectedAlbumId);
+                 const track = (album?.tracks ?? []).find((t: any) => t.title === selectedTrackTitle);
                  if (!track) return null;
                  return (
                    <div style={{ background: 'rgba(255,255,255,0.02)', padding: '24px', borderRadius: '12px', border: '1px solid #222' }}>
@@ -210,7 +210,7 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
                             </button>
                           </div>
                         )) : (
-                          <p style={{ color: '#555', textAlign: 'center', padding: '20px' }}>No lyrics available for this track yet.</p>
+                          <p style={{ color: '#555', textAlign: 'center', padding: '20px' }}>Coming Soon...</p>
                         )}
                      </div>
                    </div>

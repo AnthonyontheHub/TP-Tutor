@@ -7,7 +7,7 @@ import type { Unsubscribe } from 'firebase/firestore';
 import type { 
   MasteryStatus, VocabWord, StatusSummary, SavedPhrase, 
   UserProfile, LoreEntry, ReviewVibe, LoreCategory, 
-  CurriculumLevel, NodeStatus 
+  CurriculumLevel, NodeStatus, CommonPhrase 
 } from '../types/mastery';
 import { scoreToStatus, STATUS_MIDPOINT } from '../types/mastery';
 import { initialMasteryMap } from '../data/initialMasteryMap';
@@ -170,26 +170,18 @@ export const useMasteryStore = create<MasteryStore>()(
       commonPhrases: [
         { category: "GREETINGS", tp: "toki!", en: "Hello" },
         { category: "GREETINGS", tp: "sina pilin seme?", en: "How are you?" },
-        { category: "GREETINGS", tp: "mi tawa", en: "Goodbye (leaver)" },
         { category: "SOCIAL", tp: "nimi mi li Anthony", en: "My name is Anthony" },
-        { category: "SOCIAL", tp: "mi kama sona e toki pona", en: "I am learning Toki Pona" },
         { category: "POLITE", tp: "sina pona", en: "Thank you" },
-        { category: "POLITE", tp: "mi pakala", en: "I'm sorry / My bad" },
-        { category: "FEELINGS", tp: "mi pilin pona", en: "I feel good" },
-        { category: "FEELINGS", tp: "mi pilin seli", en: "I feel angry" }
+        { category: "EATING", tp: "mi wile moku", en: "I'm hungry" },
+        { category: "FEELINGS", tp: "mi pilin pona", en: "I feel good" }
       ],
       songs: [
         {
           id: "utala-kon",
           title: "utala kon",
           tracks: [
-            { title: "01 wawa kama", blocks: [
-              { title: "Verse 1", tp: "mi tawa / mi tawa / mi tawa lon nasin", en: "I go / I go / I go on the path" },
-              { title: "Chorus", tp: "ona li lon / pini li kama / mi ken ala pini e tawa", en: "It is here / the end is coming / I cannot stop going" }
-            ]},
-            { title: "02 nasin li ken ala", blocks: [
-              { title: "Chorus", tp: "nasin li ken ala", en: "The path is not possible" }
-            ]},
+            { title: "01 wawa kama", blocks: [{ title: "Verse 1", tp: "mi tawa / mi tawa / mi tawa lon nasin", en: "I go / I go / I go on the path" }, { title: "Chorus", tp: "ona li lon / pini li kama / mi ken ala pini e tawa", en: "It is here / the end is coming / I cannot stop going" }] },
+            { title: "02 nasin li ken ala", blocks: [{ title: "Chorus", tp: "nasin li ken ala", en: "The path is not possible" }] },
             { title: "03 pini li kama", blocks: [] },
             { title: "04 toki ike", blocks: [] },
             { title: "05 lukin moli", blocks: [] },
@@ -501,7 +493,7 @@ export const useMasteryStore = create<MasteryStore>()(
           curriculums: curriculumRoadmap,
           currentPositionNodeId: 'phi_sim',
           hasCompletedSetup: false,
-          albums: [],
+          songs: [],
           commonPhrases: [],
         });
         void get().syncToCloud();
@@ -512,11 +504,12 @@ export const useMasteryStore = create<MasteryStore>()(
           studentName: '',
           profile: { firstName: '', lastName: '', tpName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
           lore: [],
+          reviewVibe: null,
           profileImage: '',
           curriculums: curriculumRoadmap,
           currentPositionNodeId: 'phi_sim',
           hasCompletedSetup: false,
-          albums: [],
+          songs: [],
           commonPhrases: [],
         });
         void get().syncToCloud();
@@ -561,7 +554,7 @@ export const useMasteryStore = create<MasteryStore>()(
           vocabulary: mappedVocabulary,
           curriculums: curriculumRoadmap,
           hasCompletedSetup: false,
-          albums: [],
+          songs: [],
           commonPhrases: [],
         });
       },
@@ -623,7 +616,7 @@ export const useMasteryStore = create<MasteryStore>()(
           vocabulary: mappedVocabulary,
           curriculums: curriculumRoadmap,
           hasCompletedSetup: false,
-          albums: [],
+          songs: [],
           commonPhrases: [],
           currentPositionNodeId: 'phi_sim',
           isMainProfile: false,
@@ -704,8 +697,8 @@ export const useMasteryStore = create<MasteryStore>()(
                 curriculums: curriculumRoadmap,
                 currentPositionNodeId: 'phi_sim',
                 hasCompletedSetup: false,
-          albums: [],
-          commonPhrases: [],
+                songs: [],
+                commonPhrases: [],
               });
             } else {
               if (initialName && (localName === 'Anthony' || !localName)) {
@@ -755,8 +748,8 @@ export const useMasteryStore = create<MasteryStore>()(
               curriculums: curriculumRoadmap,
               currentPositionNodeId: 'phi_sim',
               hasCompletedSetup: false,
-          albums: [],
-          commonPhrases: [],
+              songs: [],
+              commonPhrases: [],
               cloudSynced: true,
             });
             void get().syncToCloud(uid);
