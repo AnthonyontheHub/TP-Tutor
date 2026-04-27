@@ -1,7 +1,7 @@
 /* src/components/PhraseGrid.tsx */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
-import type { MasteryStatus } from '../types/mastery';
+import type { MasteryStatus, CommonPhrase } from '../types/mastery';
 
 interface Props {
   onAskLina: (prompt: string) => void;
@@ -55,6 +55,15 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
     });
   };
 
+  const groupedCommonPhrases = useMemo(() => {
+    const groups: Record<string, CommonPhrase[]> = {};
+    (commonPhrases || []).forEach(p => {
+      if (!groups[p.category]) groups[p.category] = [];
+      groups[p.category].push(p);
+    });
+    return groups;
+  }, [commonPhrases]);
+
   const isChill = reviewVibe === 'chill' || reviewVibe === null;
   const isDeep = reviewVibe === 'deep';
   const isIntense = reviewVibe === 'intense';
@@ -104,12 +113,12 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
         </div>
       )}
 
-      {/* Tab 2: Everyday Library (Deep) */}
+      {/* View 2: Everyday Library (Deep) */}
       {isDeep && (
         <div>
-          <h2 className="section-title" style={{ color: 'var(--gold)', marginBottom: '20px', borderLeft: '4px solid var(--gold)', paddingLeft: '12px' }}>EVERYDAY LIBRARY</h2>
+          <h2 className="section-title" style={{ color: 'var(--gold)', marginBottom: '20px', borderLeft: '4px solid var(--gold)', paddingLeft: '12px' }}>EVERYDAY ARCHIVE</h2>
           <div style={{ display: 'grid', gap: '32px' }}>
-            {Object.entries(commonPhrases || {}).map(([cat, phrases]) => {
+            {Object.entries(groupedCommonPhrases).map(([cat, phrases]) => {
               const filtered = getFilteredPhrases(phrases);
               if (filtered.length === 0 && selectedWords.length > 0) return null;
               return (

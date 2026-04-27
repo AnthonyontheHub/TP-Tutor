@@ -126,7 +126,7 @@ interface MasteryState {
   isMainProfile: boolean;
   cloudSynced: boolean;
   albums: Album[];
-  commonPhrases: Record<string, CommonPhrase[]>;
+  commonPhrases: CommonPhrase[];
   // Dashboard settings
   widgetDensity: 'Compact' | 'Expanded';
   fogOfWar: 'Strict' | 'Visible';
@@ -167,56 +167,30 @@ export const useMasteryStore = create<MasteryStore>()(
       knowledgeCheckFrequency: 'session',
       lastKnowledgeCheckDate: '',
       cloudSynced: false,
-      commonPhrases: {
-        "GREETINGS": [
-          { tp: "toki!", en: "Hello" },
-          { tp: "sina pilin seme?", en: "How are you?" },
-          { tp: "mi tawa", en: "Goodbye (leaver)" },
-          { tp: "tawa pona", en: "Goodbye (stayer)" }
-        ],
-        "SOCIAL": [
-          { tp: "nimi mi li [X]", en: "My name is [X]" },
-          { tp: "sina tan ma seme?", en: "Where are you from?" },
-          { tp: "mi kama sona e toki pona", en: "I'm learning Toki Pona" }
-        ],
-        "POLITE": [
-          { tp: "sina pona", en: "Thank you" },
-          { tp: "mi pakala", en: "Sorry / My bad" },
-          { tp: "ale li pona", en: "Everything is good" }
-        ],
-        "FEELINGS": [
-          { tp: "mi pilin pona", en: "I'm happy" },
-          { tp: "mi pilin ike", en: "I'm sad" },
-          { tp: "mi pilin seli", en: "I'm angry" }
-        ]
-      },
+      commonPhrases: [
+        { category: "GREETINGS", tp: "toki!", en: "Hello" },
+        { category: "GREETINGS", tp: "sina pilin seme?", en: "How are you?" },
+        { category: "GREETINGS", tp: "mi tawa", en: "Goodbye (leaver)" },
+        { category: "SOCIAL", tp: "nimi mi li Anthony", en: "My name is Anthony" },
+        { category: "SOCIAL", tp: "mi kama sona e toki pona", en: "I am learning Toki Pona" },
+        { category: "POLITE", tp: "sina pona", en: "Thank you" },
+        { category: "POLITE", tp: "mi pakala", en: "I'm sorry / My bad" },
+        { category: "FEELINGS", tp: "mi pilin pona", en: "I feel good" },
+        { category: "FEELINGS", tp: "mi pilin seli", en: "I feel angry/hot" }
+      ],
       albums: [
         {
-          id: 'utala_kon',
-          title: 'utala kon',
+          id: "utala-kon",
+          title: "utala kon",
           songs: [
-            {
-              id: 'wawa_kama',
-              title: '01 wawa kama',
-              blocks: [
-                { type: 'verse', tp: "mi tawa / mi tawa / mi tawa lon nasin / nasin li pini", en: "I go / I go / I go on the path / the path is finished" },
-                { type: 'chorus', tp: "ona li lon / pini li kama / mi ken ala pini e tawa", en: "It is here / the end is coming / I cannot stop going" }
-              ]
-            },
-            {
-              id: 'nasin_li_ken_ala',
-              title: '02 nasin li ken ala',
-              blocks: [
-                { type: 'verse', tp: "mi wile e nasin / mi wile e lawa / mi wile e suli / mi wile e pini", en: "I want a path / I want guidance / I want importance / I want an end" },
-                { type: 'chorus', tp: "nasin li ken ala", en: "The path is not possible" }
-              ]
-            },
-            { id: 'pini_li_kama', title: '03 pini li kama', blocks: [] },
-            { id: 'toki_ike', title: '04 toki ike', blocks: [] },
-            { id: 'lukin_moli', title: '05 lukin moli', blocks: [] },
-            { id: 'mi_olin_e_ike', title: '06 mi olin e ike', blocks: [] },
-            { id: 'mi_awen_lon_ni', title: '07 mi awen lon ni', blocks: [] },
-            { id: 'pini_ala', title: '08 pini ala', blocks: [] }
+            { id: "01", title: "01 wawa kama", blocks: [{ type: 'verse', tp: "mi tawa / mi tawa / mi tawa lon nasin", en: "I go / I go / I go on the path" }] },
+            { id: "02", title: "02 nasin li ken ala", blocks: [{ type: 'chorus', tp: "nasin li ken ala", en: "The path is not possible" }] },
+            { id: "03", title: "03 pini li kama", blocks: [] },
+            { id: "04", title: "04 toki ike", blocks: [] },
+            { id: "05", title: "05 lukin moli", blocks: [] },
+            { id: "06", title: "06 mi olin e ike", blocks: [] },
+            { id: "07", title: "07 mi awen lon ni", blocks: [] },
+            { id: "08", title: "08 pini ala", blocks: [] }
           ]
         }
       ],
@@ -523,7 +497,7 @@ export const useMasteryStore = create<MasteryStore>()(
           currentPositionNodeId: 'phi_sim',
           hasCompletedSetup: false,
           albums: [],
-          commonPhrases: {},
+          commonPhrases: [],
         });
         void get().syncToCloud();
       },
@@ -538,7 +512,7 @@ export const useMasteryStore = create<MasteryStore>()(
           currentPositionNodeId: 'phi_sim',
           hasCompletedSetup: false,
           albums: [],
-          commonPhrases: {},
+          commonPhrases: [],
         });
         void get().syncToCloud();
       },
@@ -583,7 +557,7 @@ export const useMasteryStore = create<MasteryStore>()(
           curriculums: curriculumRoadmap,
           hasCompletedSetup: false,
           albums: [],
-          commonPhrases: {},
+          commonPhrases: [],
         });
       },
 
@@ -645,7 +619,7 @@ export const useMasteryStore = create<MasteryStore>()(
           curriculums: curriculumRoadmap,
           hasCompletedSetup: false,
           albums: [],
-          commonPhrases: {},
+          commonPhrases: [],
           currentPositionNodeId: 'phi_sim',
           isMainProfile: false,
         });
@@ -726,7 +700,7 @@ export const useMasteryStore = create<MasteryStore>()(
                 currentPositionNodeId: 'phi_sim',
                 hasCompletedSetup: false,
           albums: [],
-          commonPhrases: {},
+          commonPhrases: [],
               });
             } else {
               if (initialName && (localName === 'Anthony' || !localName)) {
@@ -777,7 +751,7 @@ export const useMasteryStore = create<MasteryStore>()(
               currentPositionNodeId: 'phi_sim',
               hasCompletedSetup: false,
           albums: [],
-          commonPhrases: {},
+          commonPhrases: [],
               cloudSynced: true,
             });
             void get().syncToCloud(uid);
@@ -893,7 +867,7 @@ export const useMasteryStore = create<MasteryStore>()(
             knowledgeCheckFrequency: data.knowledgeCheckFrequency || 'session',
             lastKnowledgeCheckDate: data.lastKnowledgeCheckDate || '',
             albums: data.albums || [],
-            commonPhrases: data.commonPhrases || {},
+            commonPhrases: data.commonPhrases || [],
           };
 
           if (data.studentName) update.studentName = data.studentName;

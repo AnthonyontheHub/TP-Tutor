@@ -290,6 +290,7 @@ export interface Album {
 }
 
 export interface CommonPhrase {
+  category: string;
   tp: string;
   en: string;
 }
