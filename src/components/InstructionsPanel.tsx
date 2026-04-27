@@ -68,21 +68,43 @@ export default function InstructionsPanel({ onClose }: Props) {
           </div>
         </section>
 
-        {/* SECTION 4: MASTERY TIERS */}
+        {/* SECTION 4: NEURAL CALIBRATION */}
         <section style={{ marginBottom: '32px' }}>
-          <h3 className="section-title" style={{ fontSize: '0.65rem', color: 'var(--gold)', letterSpacing: '0.1em' }}>MASTERY TIERS</h3>
-          <div style={{ display: 'grid', gap: '8px' }}>
-            {[
-              { status: 'Introduced', color: '#a855f7', desc: 'Initial concept synchronization.' },
-              { status: 'Practicing', color: '#3b82f6', desc: 'Neural pathways forming.' },
-              { status: 'Confident', color: '#eab308', desc: 'High recall reliability.' },
-              { status: 'Mastered', color: '#22c55e', desc: 'Permanent integration achieved.' }
-            ].map((item, i) => (
-              <div key={i} className="glass-panel" style={{ borderLeft: `3px solid ${item.color}`, padding: '12px 15px' }}>
-                <div style={{ fontWeight: 900, color: '#fff', fontSize: '0.75rem', marginBottom: '2px' }}>{item.status.toUpperCase()}</div>
-                <div style={{ fontSize: '0.7rem', color: '#888' }}>{item.desc}</div>
-              </div>
-            ))}
+          <h3 className="section-title" style={{ fontSize: '0.65rem', color: 'var(--gold)', letterSpacing: '0.1em' }}>NEURAL CALIBRATION</h3>
+          <div className="glass-panel" style={{ padding: '20px' }}>
+            <p style={{ fontSize: '0.8rem', marginBottom: '16px' }}>Every word in your vocabulary has a calibration score from <strong>0 to 1000</strong>. This score determines its status and visibility on the grid.</p>
+            
+            <div style={{ marginBottom: '16px' }}>
+              <div style={{ fontWeight: 900, fontSize: '0.7rem', color: '#fff', marginBottom: '4px', textTransform: 'uppercase' }}>How to Earn Points:</div>
+              <ul style={{ paddingLeft: '16px', listStyleType: 'circle', fontSize: '0.75rem', color: '#aaa' }}>
+                <li><strong>Active Usage:</strong> Building sentences and chatting with Lina.</li>
+                <li><strong>Correct Recall:</strong> Demonstrating you know a word's meaning during lessons.</li>
+                <li><strong>Link Sessions:</strong> Completing a full chat session allows Lina to batch-calibrate multiple neural pathways.</li>
+              </ul>
+            </div>
+
+            <div style={{ marginBottom: '16px' }}>
+              <div style={{ fontWeight: 900, fontSize: '0.7rem', color: '#fff', marginBottom: '4px', textTransform: 'uppercase' }}>Neural Decay & "Bleeding":</div>
+              <ul style={{ paddingLeft: '16px', listStyleType: 'circle', fontSize: '0.75rem', color: '#aaa' }}>
+                <li><strong>The 48-Hour Rule:</strong> If a word is not reviewed within 48 hours, it loses <strong>15 points</strong> of calibration.</li>
+                <li><strong>Bleeding State:</strong> If a word loses more than 50 points in a 48-hour window, it will appear "bleeding" (red status) until reviewed.</li>
+                <li><strong>Hardening:</strong> Once a word is Mastered, you can "harden" it in the Detail drawer to permanently stop decay.</li>
+              </ul>
+            </div>
+
+            <div style={{ display: 'grid', gap: '8px' }}>
+              {[
+                { status: 'Introduced', color: '#a855f7', range: '201–500', desc: 'Concept synchronization.' },
+                { status: 'Practicing', color: '#3b82f6', range: '501–750', desc: 'Neural pathways forming.' },
+                { status: 'Confident', color: '#eab308', range: '751–949', desc: 'High recall reliability.' },
+                { status: 'Mastered', color: '#22c55e', range: '950–1000', desc: 'Permanent integration.' }
+              ].map((item, i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', background: 'rgba(255,255,255,0.02)', padding: '6px 10px', borderRadius: '4px' }}>
+                  <span style={{ color: item.color, fontWeight: 900 }}>{item.status.toUpperCase()}</span>
+                  <span style={{ color: '#666' }}>{item.range} PTS</span>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
