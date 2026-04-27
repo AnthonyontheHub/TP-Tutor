@@ -42,13 +42,21 @@ export default function App() {
         const data = JSON.parse(stored);
         let corrupted = false;
 
-        // Check if critical arrays are corrupted
+        // Check if critical arrays are corrupted or empty
         if (data.commonPhrases && !Array.isArray(data.commonPhrases)) {
           console.warn('Corrupted commonPhrases detected in localStorage, clearing...');
           corrupted = true;
         }
+        if (Array.isArray(data.commonPhrases) && data.commonPhrases.length === 0) {
+          console.warn('Empty commonPhrases detected in localStorage, clearing...');
+          corrupted = true;
+        }
         if (data.songs && !Array.isArray(data.songs)) {
           console.warn('Corrupted songs detected in localStorage, clearing...');
+          corrupted = true;
+        }
+        if (Array.isArray(data.songs) && data.songs.length === 0) {
+          console.warn('Empty songs detected in localStorage, clearing...');
           corrupted = true;
         }
         if (data.savedPhrases && !Array.isArray(data.savedPhrases)) {
@@ -56,7 +64,7 @@ export default function App() {
           corrupted = true;
         }
 
-        // If data is corrupted, clear it to force a fresh reload
+        // If data is corrupted or empty, clear it to force a fresh reload
         if (corrupted) {
           localStorage.removeItem('tp-tutor-mastery');
           window.location.reload();

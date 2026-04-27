@@ -901,10 +901,12 @@ export const useMasteryStore = create<MasteryStore>()(
       onRehydrateStorage: () => (state) => {
         if (state) {
           // Ensure critical array fields are always arrays
-          if (!Array.isArray(state.commonPhrases)) {
+          // Restore commonPhrases if missing or empty
+          if (!Array.isArray(state.commonPhrases) || state.commonPhrases.length === 0) {
             state.commonPhrases = defaultCommonPhrases;
           }
-          if (!Array.isArray(state.songs)) {
+          // Restore songs if missing or empty
+          if (!Array.isArray(state.songs) || state.songs.length === 0) {
             state.songs = defaultSongs;
           }
           if (!Array.isArray(state.savedPhrases)) {
