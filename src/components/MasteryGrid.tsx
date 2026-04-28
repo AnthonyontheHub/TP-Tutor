@@ -304,6 +304,7 @@ export default function MasteryGrid({
               const gap = 10;
               const minColWidth = 100;
               const columnCount = Math.max(1, Math.floor((width + gap) / (minColWidth + gap)));
+              const itemWidth = Math.floor((width - (gap * (columnCount - 1))) / columnCount);
               const rowCount = Math.ceil(displayed.length / columnCount);
               const rowHeight = 115; 
 

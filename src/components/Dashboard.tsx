@@ -186,10 +186,93 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
 
   return (
     <div className="dashboard">
+      <style>{`
+        .dashboard__header {
+          display: flex;
+          flex-direction: column;
+          height: auto;
+          background: var(--bg);
+          border-bottom: 1px solid var(--border);
+          position: sticky;
+          top: 0;
+          z-index: 100;
+          padding: 0;
+        }
+
+        .dashboard__header-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 8px 16px;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        .dashboard__header-row--bottom {
+          justify-content: flex-start;
+          gap: 8px;
+          border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        @media (min-width: 768px) {
+          .dashboard__header {
+            flex-direction: row;
+            height: var(--header-height);
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+          }
+          .dashboard__header-row {
+            padding: 0;
+            width: auto;
+          }
+          .dashboard__header-row--bottom {
+            border-top: none;
+            margin-left: 12px;
+          }
+        }
+
+        /* Adjust main content padding for taller mobile header */
+        .dashboard__main {
+          padding-top: 10px;
+        }
+        @media (max-width: 767px) {
+          .dashboard {
+            --header-offset: 108px;
+          }
+        }
+      `}</style>
+
       {/* Row 1: Mastery Counters */}
-      <header className="dashboard__header" style={{ marginBottom: '8px' }}>
-        <div className="dashboard__header-left">
-          <h1 className="dashboard__title">TOKI PONA</h1>
+      <header className="dashboard__header">
+        <div className="dashboard__header-row dashboard__header-row--top">
+          <h1 className="dashboard__title" style={{ margin: 0 }}>TOKI PONA</h1>
+          
+          <div className="dashboard__header-right" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {currentStreak > 0 && (
+              <div 
+                className="dashboard__streak" 
+                onClick={() => onTogglePanel('achievements')}
+                style={{ ...getActiveStyle('achievements'), margin: 0 }}
+              >
+                🔥 {currentStreak}
+              </div>
+            )}
+            <button onClick={() => onTogglePanel('instructions')} className="dashboard__icon-btn" style={getActiveStyle('instructions')}>?</button>
+            <button onClick={() => setShowProveIt(true)} className="dashboard__icon-btn" title="Prove It Drill">🎯</button>
+            <div style={{ position: 'relative' }}>
+              <button onClick={() => onAskLina('[SYSTEM: Start a general conversation.]')} className="dashboard__icon-btn" style={getActiveStyle('chat' as any)}>💬</button>
+              {chatCount > 0 && (
+                <span style={{ position: 'absolute', top: '-5px', right: '-5px', background: 'var(--gold)', color: 'black', borderRadius: '50%', width: '18px', height: '18px', fontSize: '0.65rem', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--bg)', pointerEvents: 'none' }}>
+                  {chatCount}
+                </span>
+              )}
+            </div>
+            <button onClick={() => onTogglePanel('settings')} className="dashboard__icon-btn" style={getActiveStyle('settings')}>⚙️</button>
+          </div>
+        </div>
+
+        <div className="dashboard__header-row dashboard__header-row--bottom">
           <button 
             onClick={() => onTogglePanel('profile')} 
             className="dashboard__profile-trigger"
@@ -199,7 +282,9 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
               alignItems: 'center',
               gap: '8px',
               padding: '4px 12px 4px 4px',
-              borderRadius: '20px'
+              borderRadius: '20px',
+              background: 'rgba(255,255,255,0.03)',
+              border: '1px solid rgba(255,255,255,0.05)'
             }}
           >
             {profileImage ? (
@@ -220,35 +305,10 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
             <span style={{ fontSize: '0.75rem', fontWeight: 900 }}>{(profile?.tpName || studentName)?.toUpperCase() || 'STUDENT'}</span>
           </button>
           
-          {/* Operational Intelligence Widget */}
-          <div style={{ marginLeft: '12px' }}>
-            <OperationalIntelligenceWidget 
-              onAskLina={onAskLina}
-              onOpenAchievements={() => onTogglePanel('achievements')}
-            />
-          </div>
-        </div>
-        <div className="dashboard__header-right">
-          {currentStreak > 0 && (
-            <div 
-              className="dashboard__streak" 
-              onClick={() => onTogglePanel('achievements')}
-              style={getActiveStyle('achievements')}
-            >
-              🔥 {currentStreak}
-            </div>
-          )}
-          <button onClick={() => onTogglePanel('instructions')} className="dashboard__icon-btn" style={getActiveStyle('instructions')}>?</button>
-          <button onClick={() => setShowProveIt(true)} className="dashboard__icon-btn" title="Prove It Drill">🎯</button>
-          <div style={{ position: 'relative' }}>
-            <button onClick={() => onAskLina('[SYSTEM: Start a general conversation.]')} className="dashboard__icon-btn" style={getActiveStyle('chat' as any)}>💬</button>
-            {chatCount > 0 && (
-              <span style={{ position: 'absolute', top: '-5px', right: '-5px', background: 'var(--gold)', color: 'black', borderRadius: '50%', width: '18px', height: '18px', fontSize: '0.65rem', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--bg)', pointerEvents: 'none' }}>
-                {chatCount}
-              </span>
-            )}
-          </div>
-          <button onClick={() => onTogglePanel('settings')} className="dashboard__icon-btn" style={getActiveStyle('settings')}>⚙️</button>
+          <OperationalIntelligenceWidget 
+            onAskLina={onAskLina}
+            onOpenAchievements={() => onTogglePanel('achievements')}
+          />
         </div>
       </header>
 
