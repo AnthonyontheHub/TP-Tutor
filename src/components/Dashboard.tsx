@@ -6,6 +6,9 @@ import MasteryGrid from './MasteryGrid';
 import PhraseGrid from './PhraseGrid';
 import CurriculumRoadmap from './CurriculumRoadmap';
 import SentenceBuilder from './SentenceBuilder';
+import ProveIt from './ProveIt';
+import ChallengeWidget from './ChallengeWidget';
+import OperationalIntelligenceWidget from './OperationalIntelligenceWidget';
 import { fetchQuickTranslation, resolveApiKey, buildOfflineTranslation } from '../services/linaService';
 import type { MasteryStatus, VocabWord } from '../types/mastery';
 import type { AppPanel } from '../App';
@@ -37,6 +40,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   const [showSaveNote, setShowSaveNote] = useState(false);
   const [saveNoteInput, setSaveNoteInput] = useState('');
   const [savedConfirm, setSavedConfirm] = useState(false);
+  const [showProveIt, setShowProveIt] = useState(false);
   const confirmTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -216,15 +220,12 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
             <span style={{ fontSize: '0.75rem', fontWeight: 900 }}>{(profile?.tpName || studentName)?.toUpperCase() || 'STUDENT'}</span>
           </button>
           
-          {/* Roadmap Progress Indicator */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginLeft: '12px', background: 'rgba(255,255,255,0.03)', padding: '4px 12px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.05)' }}>
-            <div style={{ width: '60px', height: '4px', background: '#222', borderRadius: '2px', overflow: 'hidden' }}>
-              <motion.div 
-                animate={{ width: `${roadmapProgress}%` }}
-                style={{ height: '100%', background: 'var(--gold)', boxShadow: '0 0 10px var(--gold-glow)' }} 
-              />
-            </div>
-            <span style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--gold)', minWidth: '35px' }}>{roadmapProgress}%</span>
+          {/* Operational Intelligence Widget */}
+          <div style={{ marginLeft: '12px' }}>
+            <OperationalIntelligenceWidget 
+              onAskLina={onAskLina}
+              onOpenAchievements={() => onTogglePanel('achievements')}
+            />
           </div>
         </div>
         <div className="dashboard__header-right">
@@ -238,6 +239,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
             </div>
           )}
           <button onClick={() => onTogglePanel('instructions')} className="dashboard__icon-btn" style={getActiveStyle('instructions')}>?</button>
+          <button onClick={() => setShowProveIt(true)} className="dashboard__icon-btn" title="Prove It Drill">🎯</button>
           <div style={{ position: 'relative' }}>
             <button onClick={() => onAskLina('[SYSTEM: Start a general conversation.]')} className="dashboard__icon-btn" style={getActiveStyle('chat' as any)}>💬</button>
             {chatCount > 0 && (
@@ -251,6 +253,9 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
       </header>
 
       <main className="dashboard__main" style={{ paddingBottom: '12rem' }}>
+        <div style={{ marginBottom: '20px' }}>
+          <ChallengeWidget />
+        </div>
         <ProgressSummary activeFilter={activeFilter} onFilterClick={setActiveFilter} />
         
         {/* Row 2: Review Controls */}
@@ -324,7 +329,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
         </div>
 
         {/* Main Viewport */}
-        <div className="dashboard__content-area" style={{ position: 'relative', minHeight: '400px' }}>
+        <div className="dashboard__content-area" style={{ position: 'relative', display: 'flex', flexDirection: 'column', flex: 1, minHeight: '60vh' }}>
           {lessonFilter && (
             <motion.div 
               initial={{ opacity: 0, height: 0 }}
@@ -359,6 +364,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.2 }}
+              style={{ display: 'flex', flexDirection: 'column', flex: 1, width: '100%' }}
             >
               {activeView === 'vocab' && (
                 <MasteryGrid
@@ -462,6 +468,19 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
                      setLastKnowledgeCheckDate(new Date().toDateString());
                    }} style={{ background: 'none', border: 'none', color: '#666', fontSize: '0.8rem' }}>MAYBE LATER</button>
                 </div>
+              </motion.div>
+            </div>
+          )}
+
+          {showProveIt && (
+            <div className="modal-backdrop" style={{ zIndex: 5001 }}>
+              <motion.div 
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                onClick={e => e.stopPropagation()}
+              >
+                <ProveIt onClose={() => setShowProveIt(false)} />
               </motion.div>
             </div>
           )}

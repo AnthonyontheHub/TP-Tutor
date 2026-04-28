@@ -19,7 +19,9 @@ export interface ChatSessionData {
   messages: ChatMessage[];
   history: { role: 'user' | 'assistant'; content: string }[];
   sessionDeltas: ProposedChange[];
-  context: 'GENERAL' | 'DAILY REVIEW' | 'GRAMMAR CHECK';
+  context: 'GENERAL' | 'DAILY_REVIEW' | 'GRAMMAR_CHECK' | 'LESSON' | 'PHRASE_PRACTICE' | 'VOCAB_PANEL' | 'MASTERY_COURT';
+  vibe?: string;
+  contextPayload?: string;
 }
 
 interface ChatState {

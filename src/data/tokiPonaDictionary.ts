@@ -22,3 +22,19 @@ export const TOKI_PONA_DICTIONARY: Record<string, string> = {
   "tonsi": "non-binary, trans", "tu": "two, divide", "unpa": "sex, sexual", "uta": "mouth, lips", "utala": "fight, battle", "walo": "white, light",
   "wan": "one, unique", "waso": "bird, winged animal", "wawa": "strong, power", "weka": "away, absent", "wile": "want, need, must"
 };
+
+export const WORD_FREQUENCY: Record<string, number> = {
+  // Tier 1 — multiplier 1.5
+  "li": 1.5, "e": 1.5, "la": 1.5, "mi": 1.5, "sina": 1.5, "ona": 1.5, "jan": 1.5, 
+  "toki": 1.5, "pona": 1.5, "lon": 1.5, "tawa": 1.5, "ala": 1.5, "ni": 1.5, 
+  "wile": 1.5, "sona": 1.5, "moku": 1.5, "telo": 1.5, "ken": 1.5, "awen": 1.5, 
+  "pali": 1.5, "jo": 1.5, "lukin": 1.5, "kama": 1.5, "pini": 1.5, "open": 1.5,
+
+  // Tier 2 — multiplier 1.25
+  "tomo": 1.25, "soweli": 1.25, "meli": 1.25, "mije": 1.25, "suli": 1.25, 
+  "lili": 1.25, "mute": 1.25, "wan": 1.25, "tu": 1.25, "ale": 1.25, "ike": 1.25, 
+  "pilin": 1.25, "tenpo": 1.25, "ma": 1.25, "nasin": 1.25, "nimi": 1.25, 
+  "sitelen": 1.25, "lipu": 1.25, "kalama": 1.25, "seli": 1.25, "lete": 1.25, 
+  "wawa": 1.25, "luka": 1.25, "noka": 1.25, "sewi": 1.25, "anpa": 1.25, 
+  "insa": 1.25, "monsi": 1.25, "sinpin": 1.25, "poka": 1.25
+};

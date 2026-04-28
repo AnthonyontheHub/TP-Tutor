@@ -4,16 +4,18 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { doc, setDoc, onSnapshot, getDoc } from 'firebase/firestore';
 import type { Unsubscribe } from 'firebase/firestore';
-import type { 
-  MasteryStatus, VocabWord, StatusSummary, SavedPhrase, 
-  UserProfile, LoreEntry, ReviewVibe, LoreCategory, 
-  CurriculumLevel, NodeStatus, CommonPhrase 
+import { 
+  type MasteryStatus, type VocabWord, type StatusSummary, type SavedPhrase, 
+  type UserProfile, type LoreEntry, type ReviewVibe, type LoreCategory, 
+  type CurriculumLevel, type NodeStatus, type CommonPhrase, type PosRole,
+  type SmallRank, type CeremonialRank, type Badge, SMALL_RANKS, 
+  CEREMONIAL_RANKS, ALL_BADGES, type SessionLogEntry, type WeeklyChallenge
 } from '../types/mastery';
 import { scoreToStatus, STATUS_MIDPOINT } from '../types/mastery';
 import { initialMasteryMap } from '../data/initialMasteryMap';
 import { curriculumRoadmap } from '../data/curriculum';
 import { vocabContent } from '../data/vocabContent';
-import { TOKI_PONA_DICTIONARY } from '../data/tokiPonaDictionary';
+import { TOKI_PONA_DICTIONARY, WORD_FREQUENCY } from '../data/tokiPonaDictionary';
 
 function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: MasteryStatus; type: 'word' | 'grammar'; sessionNotes: string; frequencyRank?: number }): VocabWord {
   const score = STATUS_MIDPOINT[v.status];
@@ -132,8 +134,6 @@ interface MasteryActions {
   recordActivity: () => void;
   setStudentName: (name: string) => void;
   updateProfile: (profile: Partial<UserProfile>) => void;
-  addLore: (category: LoreCategory, detail: string) => void;
-  deleteLore: (id: string) => void;
   setReviewVibe: (vibe: ReviewVibe) => void;
   setProfileImage: (url: string) => void;
   updatePhraseNote: (id: string, notes: string) => void;
@@ -148,6 +148,10 @@ interface MasteryActions {
   getStatusSummary: () => StatusSummary & { xp: number; level: number; rankTitle: string };
   setHasCompletedSetup: (val: boolean) => void;
   updateNodeStatus: (nodeId: string, status: NodeStatus) => void;
+  awardBadge: (badgeId: string) => void;
+  checkAndAwardRanks: () => void;
+  clearNewRankUnlocked: () => void;
+  updateSessionXPRecord: (xp: number) => void;
   refreshCurriculumStatus: () => void;
   setWidgetDensity: (val: 'Compact' | 'Expanded') => void;
   setFogOfWar: (val: 'Strict' | 'Visible') => void;
@@ -164,13 +168,45 @@ interface MasteryActions {
   checkAssessments: (onTrigger: (word: VocabWord) => void) => void;
   switchProfile: (name: string) => void;
   updateVocabAIContent: (wordId: string, content: { aiExplanation?: string; aiExamples?: Record<string, string> }) => void;
+  updateSessionNotes: (wordId: string, notes: string) => void;
+
+  // Feature 5
+  recordLearningDay: (date: string) => void;
+  runMorningStreakCheck: () => boolean;
+
+  // Feature 6
+  recordWordOutcome: (wordId: string, outcome: 'correct' | 'struggled', date: string) => void;
+  getRegressionCandidates: (windowDays: number) => string[];
+
+  // Feature 7
+  recordConfusion: (wordA: string, wordB: string) => void;
+  getTopConfusionPairs: (limit: number) => { wordA: string, wordB: string, count: number }[];
+
+  // Feature 8
+  updateProductionStatus: (wordId: string, status: MasteryStatus) => void;
+  updateRecognitionStatus: (wordId: string, status: MasteryStatus) => void;
+
+  // Feature 10
+  addProveItResponse: (entry: { word: string, sentence: string, date: string }) => void;
+  clearProveItResponses: () => void;
+
+  // Feature 11
+  setPinnedExample: (wordId: string, example: string) => void;
+  markRoleMastered: (wordId: string, role: PosRole) => void;
+  resetLearningProgress: () => void;
+
+  // Prompt C Actions
+  startSessionTimer: () => void;
+  commitSessionLog: (entry: Omit<SessionLogEntry, 'id' | 'durationMinutes'>) => void;
+  generateWeeklyChallenge: () => void;
+  progressChallenge: (amount?: number, type?: WeeklyChallenge['type'], wordId?: string) => void;
+  clearRankAcknowledgement: () => void;
 }
 
 interface MasteryState {
   userId: string | null;
   studentName: string;
   profile: UserProfile;
-  lore: LoreEntry[];
   reviewVibe: ReviewVibe;
   profileImage: string;
   lastUpdated: string;
@@ -181,6 +217,8 @@ interface MasteryState {
   lastActiveDate: string;
   hasCompletedSetup: boolean;
   currentPositionNodeId: string;
+  activeCurriculumId: string | null;
+  activeModuleId: string | null;
   selectedWords: string[];
   lessonFilter: string[] | null;
   isMainProfile: boolean;
@@ -193,6 +231,29 @@ interface MasteryState {
   showCircuitPaths: boolean;
   knowledgeCheckFrequency: 'daily' | 'session' | 'never';
   lastKnowledgeCheckDate: string;
+
+  // New Features
+  lastStreakCheck: string;
+  learningDays: string[];
+  confusionPairs: { wordA: string, wordB: string, count: number }[];
+  pendingProveItResponses: { word: string, sentence: string, date: string }[];
+  earnedCeremonialRanks: CeremonialRank[];
+  newRankUnlocked: SmallRank | CeremonialRank | null;
+  lastSmallRankTitle: string;
+  earnedBadges: Badge[];
+  totalProveItSubmitted: number;
+  streakShields: number;
+  xpMultiplier: number;
+  lastStreakMilestone: number;
+  pendingComebackBonus: boolean;
+  sessionXPRecord: number;
+
+  // Prompt C State
+  sessionLog: SessionLogEntry[];
+  sessionStartTime: string;
+  currentChallenge: WeeklyChallenge | null;
+  completedChallenges: WeeklyChallenge[];
+  pendingRankAcknowledgement: string | null;
 }
 
 type MasteryStore = MasteryState & MasteryActions;
@@ -201,13 +262,61 @@ const XP_MAP = { not_started: 0, introduced: 10, practicing: 25, confident: 50, 
 const STATUS_ORDER: MasteryStatus[] = ['not_started', 'introduced', 'practicing', 'confident', 'mastered'];
 const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
 
+const defaultProfile: UserProfile = {
+  firstName: 'Anthony',
+  lastName: '',
+  tpName: '',
+  difficulty: 'Beginner',
+  interests: [],
+  history: [],
+  
+  age: undefined,
+  sex: undefined,
+  locationString: undefined,
+  
+  // Personality
+  mbti: undefined,
+  enneagram: undefined,
+  bigFiveOpenness: undefined,
+  bigFiveConscientiousness: undefined,
+  bigFiveExtraversion: undefined,
+  bigFiveAgreeableness: undefined,
+  bigFiveNeuroticism: undefined,
+  attachmentStyle: undefined,
+
+  // Beliefs
+  religion: undefined,
+  religionOther: undefined,
+  politicalIdentity: [],
+  politicalIdentityOther: undefined,
+
+  // Health
+  bloodType: undefined,
+  dietPattern: undefined,
+  workoutStyle: undefined,
+  activityLevel: undefined,
+  chronicConditions: undefined,
+
+  // Media
+  bookGenres: [],
+  tvGenres: [],
+  musicGenres: [],
+  gamingGenres: [],
+  gamingPlatforms: [],
+
+  // Daily Life
+  chronotype: undefined,
+  workSchedule: undefined,
+  livingSituation: undefined,
+  socialPreference: undefined,
+};
+
 export const useMasteryStore = create<MasteryStore>()(
   persist(
     (set, get) => ({
       userId: null,
       studentName: 'Anthony',
-      profile: { firstName: 'Anthony', lastName: '', tpName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
-      lore: [],
+      profile: defaultProfile,
       reviewVibe: null,
       profileImage: '',
       lastUpdated: '',
@@ -218,6 +327,8 @@ export const useMasteryStore = create<MasteryStore>()(
       lastActiveDate: '',
       hasCompletedSetup: false,
       currentPositionNodeId: 'phi_sim',
+          activeCurriculumId: null,
+          activeModuleId: null,
       selectedWords: [],
       lessonFilter: null,
       widgetDensity: 'Expanded',
@@ -229,6 +340,29 @@ export const useMasteryStore = create<MasteryStore>()(
       cloudSynced: false,
       commonPhrases: defaultCommonPhrases,
       songs: defaultSongs,
+
+      // New Features Defaults
+      lastStreakCheck: '',
+      learningDays: [],
+      confusionPairs: [],
+      pendingProveItResponses: [],
+      earnedCeremonialRanks: [],
+      newRankUnlocked: null,
+      lastSmallRankTitle: 'jan lili',
+      earnedBadges: [],
+      totalProveItSubmitted: 0,
+      streakShields: 0,
+      xpMultiplier: 1.0,
+      lastStreakMilestone: 0,
+      pendingComebackBonus: false,
+      sessionXPRecord: 0,
+
+      // Prompt C Defaults
+      sessionLog: [],
+      sessionStartTime: '',
+      currentChallenge: null,
+      completedChallenges: [],
+      pendingRankAcknowledgement: null,
 
       setHasCompletedSetup: (val) => { set({ hasCompletedSetup: val }); void get().syncToCloud(); },
 
@@ -335,6 +469,7 @@ export const useMasteryStore = create<MasteryStore>()(
         set(state => ({
           vocabulary: state.vocabulary.map(w => (w.id === wordId || w.word === wordId) ? { ...w, hardened: true, baseScore: 1000, status: 'mastered' } : w)
         }));
+        get().awardBadge('first_hardened');
         void get().syncToCloud();
       },
 
@@ -353,26 +488,60 @@ export const useMasteryStore = create<MasteryStore>()(
 
       applyScoreDeltas: (deltas) => {
         const now = new Date().toISOString();
+        const { xpMultiplier, pendingComebackBonus } = get();
+        let comebackApplied = false;
+
         set((state) => ({
-          vocabulary: state.vocabulary.map((w) => {
+          vocabulary: state.vocabulary.map((w, idx) => {
             const d = deltas.find(
               (delta) =>
                 delta.wordId === w.id ||
                 delta.wordId.toLowerCase() === w.word.toLowerCase()
             );
             if (!d) return w;
-            const newScore = clamp((w.baseScore ?? 0) + d.delta, 0, 1000);
+            
+            const multiplier = WORD_FREQUENCY[w.word.toLowerCase()] ?? 1.0;
+            let effectiveDelta = d.delta * multiplier;
+            
+            // Apply streak multiplier to positive deltas
+            if (effectiveDelta > 0) {
+              effectiveDelta *= xpMultiplier;
+            }
+
+            // Apply comeback bonus to first word
+            if (pendingComebackBonus && !comebackApplied) {
+               effectiveDelta += 100;
+               comebackApplied = true;
+            }
+
+            const newScore = clamp((w.baseScore ?? 0) + effectiveDelta, 0, 1000);
+            const historyReason = (pendingComebackBonus && idx === 0) ? 'manual_delta + comeback_bonus' : 'manual_delta';
+            
+            const newStatus = scoreToStatus(newScore);
+            if (newStatus === 'mastered' && w.status !== 'mastered') {
+               setTimeout(() => get().awardBadge('first_master'), 0);
+            }
+            if (newStatus === 'practicing' && w.status === 'introduced') {
+               setTimeout(() => get().progressChallenge(1, 'word_progression'), 0);
+            }
+
             return {
               ...w,
               baseScore: newScore,
               confidenceScore: newScore,
-              status: scoreToStatus(newScore),
+              status: newStatus,
               useCount: (w.useCount ?? 0) + 1,
               lastReviewed: now,
-              scoreHistory: [{ date: now, change: d.delta, reason: 'manual_delta' }, ...(w.scoreHistory || [])].slice(0, 5)
+              scoreHistory: [{ date: now, change: effectiveDelta, reason: historyReason }, ...(w.scoreHistory || [])].slice(0, 5)
             };
           }),
+          pendingComebackBonus: false // Reset after application
         }));
+
+        if (comebackApplied) {
+          get().awardBadge('comeback');
+        }
+
         get().refreshCurriculumStatus();
         get().recordActivity();
         void get().syncToCloud();
@@ -383,6 +552,11 @@ export const useMasteryStore = create<MasteryStore>()(
         set((state) => ({
           vocabulary: state.vocabulary.map((w) => {
             if (w.id !== wordIdOrText && w.word.toLowerCase() !== wordIdOrText.toLowerCase()) return w;
+            
+            if (status === 'practicing' && w.status === 'introduced') {
+              setTimeout(() => get().progressChallenge(1, 'word_progression'), 0);
+            }
+
             const targetScore = STATUS_MIDPOINT[status];
             const diff = targetScore - (w.baseScore || 0);
             return { 
@@ -444,6 +618,7 @@ export const useMasteryStore = create<MasteryStore>()(
           if (already) return state;
           return { savedPhrases: [...state.savedPhrases, phrase] };
         });
+        get().progressChallenge(1, 'phrase_save');
         void get().syncToCloud();
       },
 
@@ -485,16 +660,464 @@ export const useMasteryStore = create<MasteryStore>()(
         }
       },
 
+      recordLearningDay: (date) => {
+        set((state) => {
+          if (state.learningDays.includes(date)) return state;
+          return { learningDays: [...state.learningDays, date] };
+        });
+        void get().syncToCloud();
+      },
+      runMorningStreakCheck: () => {
+        const today = new Date().toISOString().split('T')[0];
+        const yesterdayDate = new Date();
+        yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+        const yesterday = yesterdayDate.toISOString().split('T')[0];
+
+        let wasActiveYesterday = false;
+        let shieldUsed = false;
+
+        set((state) => {
+          if (state.lastStreakCheck === today) {
+            wasActiveYesterday = state.learningDays.includes(yesterday);
+            return state; // Already checked today
+          }
+
+          wasActiveYesterday = state.learningDays.includes(yesterday);
+          let newStreak = state.currentStreak;
+          let newShields = state.streakShields;
+          let newLastStreakMilestone = state.lastStreakMilestone;
+          let newPendingComebackBonus = state.pendingComebackBonus;
+
+          if (wasActiveYesterday) {
+            newStreak += 1;
+            
+            // Award shield every 7 days
+            if (newStreak > 0 && newStreak % 7 === 0 && newStreak > newLastStreakMilestone) {
+              if (newShields < 2) newShields += 1;
+              newLastStreakMilestone = newStreak;
+            }
+          } else {
+            // Missed a day
+            if (newShields > 0) {
+              newShields -= 1;
+              shieldUsed = true;
+              // Streak maintained by shield
+            } else {
+              // Comeback bonus check
+              if (newStreak >= 3) {
+                newPendingComebackBonus = true;
+              }
+              newStreak = 0;
+            }
+          }
+
+          // Recalculate Multiplier
+          let newMultiplier = 1.0;
+          if (newStreak >= 30) newMultiplier = 1.75;
+          else if (newStreak >= 14) newMultiplier = 1.50;
+          else if (newStreak >= 7) newMultiplier = 1.25;
+          else if (newStreak >= 3) newMultiplier = 1.10;
+
+          return { 
+            lastStreakCheck: today, 
+            currentStreak: newStreak,
+            streakShields: newShields,
+            lastStreakMilestone: newLastStreakMilestone,
+            xpMultiplier: newMultiplier,
+            pendingComebackBonus: newPendingComebackBonus
+          };
+        });
+        get().generateWeeklyChallenge();
+        void get().syncToCloud();
+        return wasActiveYesterday;
+      },
+      recordWordOutcome: (wordId, outcome, date) => {
+        set((state) => ({
+          vocabulary: state.vocabulary.map((w) => {
+            if (w.id !== wordId && w.word.toLowerCase() !== wordId.toLowerCase()) return w;
+            const recentPerformance = [{ date, outcome }, ...(w.recentPerformance || [])].slice(0, 10);
+            return { ...w, recentPerformance };
+          })
+        }));
+        void get().syncToCloud();
+      },
+      getRegressionCandidates: (windowDays) => {
+        const { vocabulary } = get();
+        const limitDate = new Date();
+        limitDate.setDate(limitDate.getDate() - windowDays);
+        const limitTime = limitDate.getTime();
+
+        const candidates: { word: string, ratio: number }[] = [];
+
+        vocabulary.forEach(w => {
+          if (!w.recentPerformance) return;
+          const windowEntries = w.recentPerformance.filter(e => new Date(e.date).getTime() >= limitTime);
+          if (windowEntries.length === 0) return;
+
+          const struggledCount = windowEntries.filter(e => e.outcome === 'struggled').length;
+          const correctCount = windowEntries.filter(e => e.outcome === 'correct').length;
+
+          if (struggledCount > correctCount) {
+            candidates.push({ word: w.word, ratio: struggledCount / windowEntries.length });
+          }
+        });
+
+        return candidates.sort((a, b) => b.ratio - a.ratio).map(c => c.word);
+      },
+      recordConfusion: (wordA, wordB) => {
+        set((state) => {
+          const pairs = [...state.confusionPairs];
+          const a = wordA.toLowerCase();
+          const b = wordB.toLowerCase();
+          const existing = pairs.find(p => 
+            (p.wordA.toLowerCase() === a && p.wordB.toLowerCase() === b) || 
+            (p.wordA.toLowerCase() === b && p.wordB.toLowerCase() === a)
+          );
+          if (existing) {
+            existing.count += 1;
+          } else {
+            pairs.push({ wordA, wordB, count: 1 });
+          }
+          return { confusionPairs: pairs };
+        });
+        void get().syncToCloud();
+      },
+      getTopConfusionPairs: (limit) => {
+        const pairs = [...get().confusionPairs];
+        return pairs.sort((a, b) => b.count - a.count).slice(0, limit);
+      },
+      updateProductionStatus: (wordId, status) => {
+        set((state) => ({
+          vocabulary: state.vocabulary.map((w) => {
+            if (w.id !== wordId && w.word.toLowerCase() !== wordId.toLowerCase()) return w;
+            return { ...w, productionStatus: status };
+          })
+        }));
+        void get().syncToCloud();
+      },
+      updateRecognitionStatus: (wordId, status) => {
+        set((state) => ({
+          vocabulary: state.vocabulary.map((w) => {
+            if (w.id !== wordId && w.word.toLowerCase() !== wordId.toLowerCase()) return w;
+            return { ...w, recognitionStatus: status };
+          })
+        }));
+        void get().syncToCloud();
+      },
+      addProveItResponse: (entry) => {
+        set((state) => {
+          const total = state.totalProveItSubmitted + 1;
+          if (total === 5) {
+            // awardBadge will handle firestore sync
+            setTimeout(() => get().awardBadge('prove_it_5'), 0);
+          }
+          return { 
+            pendingProveItResponses: [...state.pendingProveItResponses, entry],
+            totalProveItSubmitted: total
+          };
+        });
+        get().progressChallenge(1, 'prove_it_usage', entry.word);
+        void get().syncToCloud();
+      },
+      awardBadge: (badgeId) => {
+        const badge = ALL_BADGES.find(b => b.id === badgeId);
+        if (!badge) return;
+
+        set((state) => {
+          if (state.earnedBadges.some(b => b.id === badgeId)) return state;
+          const newBadge = { ...badge, earnedDate: new Date().toISOString() };
+          return { earnedBadges: [...state.earnedBadges, newBadge] };
+        });
+        void get().syncToCloud();
+      },
+      checkAndAwardRanks: () => {
+        const summary = get().getStatusSummary();
+        const { vocabulary, curriculums, currentStreak, earnedCeremonialRanks, lastSmallRankTitle } = get();
+        const today = new Date().toISOString();
+
+        // 1. Small Rank
+        const currentSmallRank = [...SMALL_RANKS].reverse().find(r => summary.xp >= r.xpThreshold) || SMALL_RANKS[0];
+        
+        // 2. Ceremonial Ranks
+        const newlyEarned: CeremonialRank[] = [];
+        
+        const checkRank = (id: string, condition: boolean) => {
+          if (earnedCeremonialRanks.some(r => r.id === id)) return;
+          if (condition) {
+            const rank = CEREMONIAL_RANKS.find(r => r.id === id);
+            if (rank) newlyEarned.push({ ...rank, achievedDate: today });
+          }
+        };
+
+        checkRank('initiate', vocabulary.filter(w => w.status === 'mastered').length >= 10);
+        checkRank('speaker', vocabulary.filter(w => w.status === 'confident' || w.status === 'mastered').length >= 25);
+        
+        const ch12Mastered = curriculums
+          .filter(c => c.id === 'book_1' || c.id === 'book_2') // Assuming Book 1 & 2 are Chapter 1 & 2
+          .every(c => c.nodes.every(n => n.status === 'mastered'));
+        checkRank('grammarian', ch12Mastered);
+        
+        checkRank('sewi_speaker', vocabulary.filter(w => w.status === 'confident' || w.status === 'mastered').length >= 50);
+        checkRank('consistent', currentStreak >= 30);
+        checkRank('toki_pona_lon', vocabulary.filter(w => w.status === 'confident' || w.status === 'mastered').length >= 137);
+        checkRank('jan_sonja', vocabulary.filter(w => w.status === 'mastered').length >= 137);
+
+        // Badges related to ranks
+        if (vocabulary.some(w => w.status === 'mastered')) get().awardBadge('first_master');
+        if (vocabulary.filter(w => w.status === 'mastered').length >= 10) get().awardBadge('ten_masters');
+        if (currentStreak >= 7) get().awardBadge('streak_7');
+        if (currentStreak >= 14) get().awardBadge('streak_14');
+        if (currentStreak >= 30) get().awardBadge('streak_30');
+        if (currentStreak >= 60) get().awardBadge('streak_60');
+        if (currentStreak >= 100) get().awardBadge('streak_100');
+        if (vocabulary.filter(w => w.status === 'mastered').length >= 137) get().awardBadge('jan_sonja_badge');
+
+        set((state) => {
+          let updates: Partial<MasteryState> = {};
+          if (newlyEarned.length > 0) {
+            updates.earnedCeremonialRanks = [...state.earnedCeremonialRanks, ...newlyEarned];
+            updates.newRankUnlocked = newlyEarned[0];
+            updates.pendingRankAcknowledgement = newlyEarned[0].title;
+          } else if (currentSmallRank.title !== lastSmallRankTitle) {
+            updates.newRankUnlocked = currentSmallRank;
+            updates.lastSmallRankTitle = currentSmallRank.title;
+          }
+          return updates;
+        });
+
+        void get().syncToCloud();
+      },
+      clearNewRankUnlocked: () => {
+        set({ newRankUnlocked: null });
+      },
+      updateSessionXPRecord: (xp) => {
+        if (xp > get().sessionXPRecord) {
+          set({ sessionXPRecord: xp });
+          void get().syncToCloud();
+        }
+      },
+      clearProveItResponses: () => {
+        set({ pendingProveItResponses: [] });
+        void get().syncToCloud();
+      },
+      setPinnedExample: (wordId, example) => {
+        set((state) => ({
+          vocabulary: state.vocabulary.map((w) => {
+            if (w.id !== wordId && w.word.toLowerCase() !== wordId.toLowerCase()) return w;
+            return { ...w, pinnedExample: example };
+          })
+        }));
+        void get().syncToCloud();
+      },
+      markRoleMastered: (wordId, role) => {
+        const now = new Date().toISOString();
+        set((state) => ({
+          vocabulary: state.vocabulary.map((w) => {
+            if (w.id !== wordId && w.word.toLowerCase() !== wordId.toLowerCase()) return w;
+            
+            const rolesMastered = { ...w.rolesMastered, [role]: true };
+            const masteredCount = Object.values(rolesMastered).filter(Boolean).length;
+            
+            let extraBonus = 0;
+            let bonusReason = "";
+
+            if (masteredCount >= 2 && !w.rolesMastered[role]) {
+              // One-time bonus for 2+ roles
+              const alreadyHad2 = Object.values(w.rolesMastered).filter(Boolean).length >= 2;
+              if (!alreadyHad2) {
+                extraBonus += 50;
+                bonusReason = `Role mastery bonus: ${role} confirmed (2+ roles)`;
+              }
+            }
+
+            // Check if all roles are mastered
+            const allRolesDefined = w.roles.map(r => r.role);
+            const allMastered = allRolesDefined.every(r => rolesMastered[r]);
+            const wasAllMastered = allRolesDefined.every(r => w.rolesMastered[r]);
+            
+            if (allMastered && !wasAllMastered && allRolesDefined.length > 0) {
+              extraBonus += 100;
+              bonusReason = bonusReason ? bonusReason + " + Full Role Mastery" : `Full Role Mastery: ${wordId}`;
+              setTimeout(() => get().awardBadge('full_roles'), 0);
+              // Note: No specific challenge for markRoleMastered mentioned in Prompt C wiring list, 
+              // but I'll keep the previous progressChallenge if it fits. 
+              // Actually Prompt C says "Achieved full role mastery on any word" badge, 
+              // but doesn't list a weekly challenge for it.
+              // I will remove the generic progressChallenge(1) I added earlier.
+            }
+
+            if (extraBonus > 0) {
+              const newScore = clamp((w.baseScore ?? 0) + extraBonus, 0, 1000);
+              return {
+                ...w,
+                rolesMastered,
+                baseScore: newScore,
+                confidenceScore: newScore,
+                status: scoreToStatus(newScore),
+                scoreHistory: [{ date: now, change: extraBonus, reason: bonusReason }, ...(w.scoreHistory || [])].slice(0, 5)
+              };
+            }
+
+            return { ...w, rolesMastered };
+          })
+        }));
+        void get().syncToCloud();
+      },
+
+      resetLearningProgress: () => {
+        set({
+          vocabulary: mappedVocabulary,
+          curriculums: curriculumRoadmap,
+          activeCurriculumId: null,
+          activeModuleId: null,
+          savedPhrases: [],
+          currentStreak: 0,
+          lastActiveDate: '',
+          currentPositionNodeId: 'phi_sim',
+        });
+        void get().syncToCloud();
+      },
+
+      startSessionTimer: () => set({ sessionStartTime: new Date().toISOString() }),
+      
+      commitSessionLog: (entry) => {
+        const id = crypto.randomUUID();
+        const startTime = get().sessionStartTime;
+        const now = new Date();
+        const start = startTime ? new Date(startTime) : now;
+        const durationMinutes = Math.round((now.getTime() - start.getTime()) / 60000);
+
+        set(state => ({
+          sessionLog: [{ ...entry, id, durationMinutes }, ...state.sessionLog].slice(0, 100)
+        }));
+        void get().syncToCloud();
+      },
+
+      generateWeeklyChallenge: () => {
+        const now = new Date();
+        const day = now.getDay(); // 0 (Sun) to 6 (Sat)
+        const diff = now.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+        const monday = new Date(now.setDate(diff));
+        monday.setHours(0,0,0,0);
+        const weekStartDate = monday.toISOString().split('T')[0];
+
+        const { currentChallenge, vocabulary } = get();
+        if (currentChallenge && currentChallenge.weekStartDate === weekStartDate) return;
+
+        if (currentChallenge && new Date(currentChallenge.expiresDate) < new Date()) {
+           set(state => ({ completedChallenges: [currentChallenge, ...state.completedChallenges] }));
+        }
+
+        const templates: { type: WeeklyChallenge['type'], title: string, description: string, targetCount: number, xpReward: number }[] = [
+          {
+            type: 'word_usage',
+            title: "Use [word] in 3 different sentences",
+            description: "Show jan Lina you can use [word] as a noun, verb, and modifier.",
+            targetCount: 3, xpReward: 150
+          },
+          {
+            type: 'session_count',
+            title: "Complete 3 sessions this week",
+            description: "Show up three times. Consistency beats intensity.",
+            targetCount: 3, xpReward: 200
+          },
+          {
+            type: 'word_progression',
+            title: "Get any word from Introduced to Practicing",
+            description: "Push a new word deeper into your memory.",
+            targetCount: 1, xpReward: 175
+          },
+          {
+            type: 'prove_it_usage',
+            title: "Use [word] correctly in a Prove It drill",
+            description: "Submit a Prove It sentence using [word] and have jan Lina confirm it.",
+            targetCount: 1, xpReward: 125
+          },
+          {
+            type: 'convo_length',
+            title: "Have a 10-message conversation with jan Lina",
+            description: "Go deep. Ten messages back and forth in one session.",
+            targetCount: 10, xpReward: 225
+          },
+          {
+            type: 'phrase_save',
+            title: "Save 2 new phrases to The Archive",
+            description: "Build your personal phrase library.",
+            targetCount: 2, xpReward: 100
+          },
+        ];
+
+        const template = templates[Math.floor(Math.random() * templates.length)];
+        const candidates = vocabulary.filter(w => w.status === 'introduced' || w.status === 'practicing');
+        const randomWord = candidates.length > 0 ? candidates[Math.floor(Math.random() * candidates.length)].word : 'toki';
+        
+        const expires = new Date(monday);
+        expires.setDate(expires.getDate() + 6);
+        expires.setHours(23, 59, 59, 999);
+
+        const newChallenge: WeeklyChallenge = {
+          id: crypto.randomUUID(),
+          type: template.type,
+          weekStartDate,
+          title: template.title.replace('[word]', randomWord),
+          description: template.description.replace('[word]', randomWord),
+          targetWord: randomWord,
+          targetCount: template.targetCount,
+          currentCount: 0,
+          completed: false,
+          xpReward: template.xpReward,
+          expiresDate: expires.toISOString()
+        };
+
+        set({ currentChallenge: newChallenge });
+        void get().syncToCloud();
+      },
+
+      progressChallenge: (amount = 1, type?: WeeklyChallenge['type'], wordId?: string) => {
+        const { currentChallenge, vocabulary } = get();
+        if (!currentChallenge || currentChallenge.completed) return;
+
+        // If type is specified, only progress if it matches
+        if (type && currentChallenge.type !== type) return;
+        
+        // If targetWord is specified for the challenge, check if it matches
+        if (currentChallenge.targetWord && wordId && currentChallenge.targetWord.toLowerCase() !== wordId.toLowerCase()) return;
+
+        const newCount = Math.min(currentChallenge.currentCount + amount, currentChallenge.targetCount);
+        const completed = newCount >= currentChallenge.targetCount;
+
+        set(state => ({
+          currentChallenge: state.currentChallenge ? {
+            ...state.currentChallenge,
+            currentCount: newCount,
+            completed
+          } : null
+        }));
+
+        if (completed) {
+          const sorted = [...vocabulary].sort((a,b) => (b.baseScore || 0) - (a.baseScore || 0));
+          const bestWord = sorted[0];
+          if (bestWord) {
+            const now = new Date().toISOString();
+            const newScore = Math.min((bestWord.baseScore || 0) + currentChallenge.xpReward, 1000);
+            set(state => ({
+              vocabulary: state.vocabulary.map(w => w.id === bestWord.id ? {
+                ...w,
+                baseScore: newScore,
+                confidenceScore: newScore,
+                status: scoreToStatus(newScore),
+                scoreHistory: [{ date: now, change: currentChallenge.xpReward, reason: `Weekly challenge complete: ${currentChallenge.title}` }, ...(w.scoreHistory || [])].slice(0, 5)
+              } : w)
+            }));
+          }
+        }
+        void get().syncToCloud();
+      },
+
+      clearRankAcknowledgement: () => set({ pendingRankAcknowledgement: null }),
+
       setStudentName: (name) => { set({ studentName: name }); get().updateProfile({ firstName: name }); },
       updateProfile: (profile) => { set((state) => ({ profile: { ...state.profile, ...profile } })); void get().syncToCloud(); },
-      addLore: (category, detail) => { 
-        set((state) => ({ lore: [...state.lore, { id: crypto.randomUUID(), category, detail }] })); 
-        void get().syncToCloud(); 
-      },
-      deleteLore: (id) => { 
-        set((state) => ({ lore: state.lore.filter(l => l.id !== id) })); 
-        void get().syncToCloud(); 
-      },
       setReviewVibe: (vibe) => { set({ reviewVibe: vibe }); },
       setProfileImage: (url) => { set({ profileImage: url }); void get().syncToCloud(); },
 
@@ -520,8 +1143,7 @@ export const useMasteryStore = create<MasteryStore>()(
       resetAsNewUser: () => {
         set({
           studentName: '',
-          profile: { firstName: '', lastName: '', tpName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
-          lore: [],
+          profile: defaultProfile,
           reviewVibe: null,
           profileImage: '',
           savedPhrases: [],
@@ -530,6 +1152,8 @@ export const useMasteryStore = create<MasteryStore>()(
           vocabulary: mappedVocabulary,
           curriculums: curriculumRoadmap,
           currentPositionNodeId: 'phi_sim',
+          activeCurriculumId: null,
+          activeModuleId: null,
           hasCompletedSetup: false,
           songs: defaultSongs,
           commonPhrases: defaultCommonPhrases,
@@ -540,12 +1164,13 @@ export const useMasteryStore = create<MasteryStore>()(
       resetProfileAndRunSetup: () => {
         set({
           studentName: '',
-          profile: { firstName: '', lastName: '', tpName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
-          lore: [],
+          profile: defaultProfile,
           reviewVibe: null,
           profileImage: '',
           curriculums: curriculumRoadmap,
           currentPositionNodeId: 'phi_sim',
+          activeCurriculumId: null,
+          activeModuleId: null,
           hasCompletedSetup: false,
           songs: defaultSongs,
           commonPhrases: defaultCommonPhrases,
@@ -582,8 +1207,7 @@ export const useMasteryStore = create<MasteryStore>()(
         set({
           userId: null,
           studentName: 'Anthony',
-          profile: { firstName: 'Anthony', lastName: '', tpName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
-          lore: [],
+          profile: defaultProfile,
           reviewVibe: null,
           profileImage: '',
           savedPhrases: [],
@@ -632,20 +1256,22 @@ export const useMasteryStore = create<MasteryStore>()(
         const summary = { not_started: 0, introduced: 0, practicing: 0, confident: 0, mastered: 0, xp: 0 };
         for (const word of vocabulary) {
           summary[word.status]++;
-          summary.xp += XP_MAP[word.status];
+          const multiplier = WORD_FREQUENCY[word.word.toLowerCase()] ?? 1.0;
+          summary.xp += (word.baseScore || 0) * multiplier;
         }
+        summary.xp = Math.round(summary.xp);
         const level = Math.floor(summary.xp / 500) + 1;
-        let rankTitle = 'nimi lili';
-        if (level >= 5) rankTitle = 'jan pi toki pona';
-        if (level >= 10) rankTitle = 'jan sona';
+        
+        const rank = [...SMALL_RANKS].reverse().find(r => summary.xp >= r.xpThreshold) || SMALL_RANKS[0];
+        const rankTitle = rank.title;
+
         return { ...summary, level, rankTitle };
       },
 
       switchProfile: (name: string) => {
         set({
           studentName: name,
-          profile: { firstName: name, lastName: '', tpName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
-          lore: [],
+          profile: { ...defaultProfile, firstName: name },
           reviewVibe: null,
           profileImage: '',
           savedPhrases: [],
@@ -657,6 +1283,8 @@ export const useMasteryStore = create<MasteryStore>()(
           songs: defaultSongs,
           commonPhrases: defaultCommonPhrases,
           currentPositionNodeId: 'phi_sim',
+          activeCurriculumId: null,
+          activeModuleId: null,
           isMainProfile: false,
         });
       },
@@ -667,9 +1295,18 @@ export const useMasteryStore = create<MasteryStore>()(
         }));
         void get().syncToCloud();
       },
+      updateSessionNotes: (wordId, notes) => {
+        set((state) => ({
+          vocabulary: state.vocabulary.map(v => (v.id === wordId || v.word === wordId) ? { ...v, sessionNotes: notes } : v)
+        }));
+        void get().syncToCloud();
+      },
 
       syncToCloud: async (explicitUserId) => {
-        const { vocabulary, curriculums, lastUpdated, studentName, profile, lore, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, isMainProfile, widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, cloudSynced, songs, commonPhrases } = get();
+        const { vocabulary, curriculums, lastUpdated, studentName, profile, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, isMainProfile, widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, cloudSynced, songs, commonPhrases, lastStreakCheck, learningDays, confusionPairs, pendingProveItResponses,
+            earnedCeremonialRanks, lastSmallRankTitle, earnedBadges, totalProveItSubmitted,
+            streakShields, xpMultiplier, lastStreakMilestone, pendingComebackBonus, sessionXPRecord,
+            sessionLog, currentChallenge, completedChallenges, pendingRankAcknowledgement } = get();
         const targetId = explicitUserId || userId;
 
         // Block premature syncs before cloud data has loaded — prevents stale
@@ -697,9 +1334,13 @@ export const useMasteryStore = create<MasteryStore>()(
 
           await setDoc(doc(db, 'users', targetId), {
             vocabulary: partialVocab,
-            curriculums, lastUpdated, studentName, profile, lore, profileImage,
+            curriculums, lastUpdated, studentName, profile, profileImage,
             savedPhrases, currentStreak, lastActiveDate, hasCompletedSetup, currentPositionNodeId, isMainProfile,
-            widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, songs, commonPhrases
+            widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, songs, commonPhrases,
+            lastStreakCheck, learningDays, confusionPairs, pendingProveItResponses,
+            earnedCeremonialRanks, lastSmallRankTitle, earnedBadges, totalProveItSubmitted,
+            streakShields, xpMultiplier, lastStreakMilestone, pendingComebackBonus, sessionXPRecord,
+            sessionLog, currentChallenge, completedChallenges, pendingRankAcknowledgement
           }, { merge: true });
         } catch (err) {
           console.error('Firebase Sync Error:', err);
@@ -725,8 +1366,7 @@ export const useMasteryStore = create<MasteryStore>()(
               // Local data belongs to a different user — start fresh for this account
               set({
                 studentName: initialName,
-                profile: { firstName: initialName, lastName: '', tpName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
-                lore: [],
+                profile: { ...defaultProfile, firstName: initialName },
                 reviewVibe: null,
                 profileImage: initialProfileImage || '',
                 savedPhrases: [],
@@ -735,6 +1375,8 @@ export const useMasteryStore = create<MasteryStore>()(
                 vocabulary: mappedVocabulary,
                 curriculums: curriculumRoadmap,
                 currentPositionNodeId: 'phi_sim',
+          activeCurriculumId: null,
+          activeModuleId: null,
                 hasCompletedSetup: false,
                 songs: defaultSongs,
                 commonPhrases: defaultCommonPhrases,
@@ -777,8 +1419,7 @@ export const useMasteryStore = create<MasteryStore>()(
           if (nameMismatch && allVocabMastered) {
             set({
               studentName: initialName,
-              profile: { firstName: initialName, lastName: '', tpName: '', difficulty: 'Beginner', interests: [], age: '', locationString: '', sex: '', history: [] },
-              lore: [],
+              profile: { ...defaultProfile, firstName: initialName },
               profileImage: initialProfileImage || '',
               savedPhrases: [],
               currentStreak: 0,
@@ -786,6 +1427,8 @@ export const useMasteryStore = create<MasteryStore>()(
               vocabulary: mappedVocabulary,
               curriculums: curriculumRoadmap,
               currentPositionNodeId: 'phi_sim',
+          activeCurriculumId: null,
+          activeModuleId: null,
               hasCompletedSetup: false,
               songs: defaultSongs,
               commonPhrases: defaultCommonPhrases,
@@ -893,7 +1536,6 @@ export const useMasteryStore = create<MasteryStore>()(
             vocabulary,
             curriculums: mergedCurriculums,
             lastUpdated: data.lastUpdated || '',
-            lore: data.lore || [],
             savedPhrases: data.savedPhrases || [],
             currentStreak: data.currentStreak || 0,
             lastActiveDate: data.lastActiveDate || '',
@@ -907,6 +1549,23 @@ export const useMasteryStore = create<MasteryStore>()(
             lastKnowledgeCheckDate: data.lastKnowledgeCheckDate || '',
             songs: (Array.isArray(data.songs) && data.songs.length > 0) ? data.songs : defaultSongs,
             commonPhrases: (Array.isArray(data.commonPhrases) && data.commonPhrases.length > 0) ? data.commonPhrases : defaultCommonPhrases,
+            lastStreakCheck: data.lastStreakCheck || '',
+            learningDays: data.learningDays || [],
+            confusionPairs: data.confusionPairs || [],
+            pendingProveItResponses: data.pendingProveItResponses || [],
+            earnedCeremonialRanks: data.earnedCeremonialRanks || [],
+            lastSmallRankTitle: data.lastSmallRankTitle || 'jan lili',
+            earnedBadges: data.earnedBadges || [],
+            totalProveItSubmitted: data.totalProveItSubmitted || 0,
+            streakShields: data.streakShields || 0,
+            xpMultiplier: data.xpMultiplier || 1.0,
+            lastStreakMilestone: data.lastStreakMilestone || 0,
+            pendingComebackBonus: !!data.pendingComebackBonus,
+            sessionXPRecord: data.sessionXPRecord || 0,
+            sessionLog: data.sessionLog || [],
+            currentChallenge: data.currentChallenge || null,
+            completedChallenges: data.completedChallenges || [],
+            pendingRankAcknowledgement: data.pendingRankAcknowledgement || null,
           };
 
           if (data.studentName) update.studentName = data.studentName;

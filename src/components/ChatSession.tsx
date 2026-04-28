@@ -4,12 +4,15 @@ import { m, LazyMotion, domMax } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
 import { useChatStore } from '../store/chatStore';
 import type { ChatMessage } from '../store/chatStore';
+import { STATUS_MIDPOINT } from '../types/mastery';
 import {
-  buildSystemPrompt, streamCompletion, stripProposedChanges,
-  parseProposedChanges, resolveApiKey, fetchSessionRecap,
+  buildTutorPrompt, buildChatPrompt, buildMasteryCourtPrompt, streamCompletion, stripProposedChanges,
+  parseProposedChanges, parseSessionSummaryNotes, resolveApiKey, fetchSessionRecap,
   fetchQuickTranslation, stringifyUserContext, detectSessionTitle
 } from '../services/linaService';
 import type { ProposedChange } from '../services/linaService';
+import SessionRecap from './SessionRecap';
+import { WORD_FREQUENCY } from '../data/tokiPonaDictionary';
 
 interface Props {
   sessionId: string;
@@ -37,6 +40,11 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
 
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showRecap, setShowRecap] = useState(false);
+  const [sessionXP, setSessionXP] = useState(0);
+  const [startingTotalXP, setStartingTotalXP] = useState(0);
+  const [userMsgCount, setUserMsgCount] = useState(0);
+  const yesterdayWasActive = useRef(false);
 
   const [translateBubble, setTranslateBubble] = useState<{
     text: string;
@@ -53,9 +61,56 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
   const profile             = useMasteryStore(s => s.profile);
   const lore                = useMasteryStore(s => s.lore);
 
+  const runMorningStreakCheck = useMasteryStore(s => s.runMorningStreakCheck);
+  const getRegressionCandidates = useMasteryStore(s => s.getRegressionCandidates);
+  const getTopConfusionPairs  = useMasteryStore(s => s.getTopConfusionPairs);
+  const pendingProveItResponses = useMasteryStore(s => s.pendingProveItResponses);
+  const clearProveItResponses   = useMasteryStore(s => s.clearProveItResponses);
+  const recordLearningDay       = useMasteryStore(s => s.recordLearningDay);
+  const updateSessionNotes      = useMasteryStore(s => s.updateSessionNotes);
+  const updateProductionStatus  = useMasteryStore(s => s.updateProductionStatus);
+  const updateRecognitionStatus = useMasteryStore(s => s.updateRecognitionStatus);
+  const recordConfusion         = useMasteryStore(s => s.recordConfusion);
+  const setPinnedExample        = useMasteryStore(s => s.setPinnedExample);
+  const checkAndAwardRanks      = useMasteryStore(s => s.checkAndAwardRanks);
+  const updateSessionXPRecord   = useMasteryStore(s => s.updateSessionXPRecord);
+  const xpMultiplier            = useMasteryStore(s => s.xpMultiplier);
+  const currentStreak           = useMasteryStore(s => s.currentStreak);
+  const streakShields           = useMasteryStore(s => s.streakShields);
+  const awardBadge              = useMasteryStore(s => s.awardBadge);
+  const getStatusSummary        = useMasteryStore(s => s.getStatusSummary);
+  const newRankUnlocked         = useMasteryStore(s => s.newRankUnlocked);
+  const clearNewRankUnlocked    = useMasteryStore(s => s.clearNewRankUnlocked);
+  const startSessionTimer       = useMasteryStore(s => s.startSessionTimer);
+  const commitSessionLog        = useMasteryStore(s => s.commitSessionLog);
+  const progressChallenge       = useMasteryStore(s => s.progressChallenge);
+  const currentChallenge        = useMasteryStore(s => s.currentChallenge);
+  const pendingRankAcknowledgement = useMasteryStore(s => s.pendingRankAcknowledgement);
+  const clearRankAcknowledgement = useMasteryStore(s => s.clearRankAcknowledgement);
+  const currentPositionNodeId   = useMasteryStore(s => s.currentPositionNodeId);
+  const earnedBadges            = useMasteryStore(s => s.earnedBadges);
+  const earnedCeremonialRanks   = useMasteryStore(s => s.earnedCeremonialRanks);
+
   const displayName = profile.tpName || profile.tokiPonaName || studentName || 'ANTHONY';
 
   const messagesEndRef  = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let currentXP = 0;
+    for (const change of sessionDeltas) {
+      const vocabWord = vocabulary.find(v => v.id === change.id || v.word.toLowerCase() === change.id.toLowerCase());
+      const multiplier = WORD_FREQUENCY[vocabWord?.word.toLowerCase() || ''] ?? 1.0;
+      
+      if (change.newStatus) {
+         const oldScore = vocabWord?.baseScore || 0;
+         const newScore = STATUS_MIDPOINT[change.newStatus];
+         let diff = newScore - oldScore;
+         if (diff > 0) diff *= xpMultiplier;
+         currentXP += diff * multiplier;
+      }
+    }
+    setSessionXP(Math.round(currentXP));
+  }, [sessionDeltas, vocabulary, xpMultiplier]);
 
   useEffect(() => {
     if (isActive && !isMinimized) messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -98,23 +153,44 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
 
   useEffect(() => {
     if (!isActive || !pendingPrompt) return;
+    yesterdayWasActive.current = runMorningStreakCheck();
     
     // Detect context
-    let newContext: 'GENERAL' | 'DAILY REVIEW' | 'GRAMMAR CHECK' = 'GENERAL';
+    let newContext: 'GENERAL' | 'DAILY_REVIEW' | 'GRAMMAR_CHECK' | 'LESSON' | 'PHRASE_PRACTICE' | 'VOCAB_PANEL' | 'MASTERY_COURT' = 'GENERAL';
     const low = pendingPrompt.toLowerCase();
-    if (low.includes('daily review')) newContext = 'DAILY REVIEW';
-    else if (low.includes('explain the grammar')) newContext = 'GRAMMAR CHECK';
-    else if (low.includes('start a lesson')) newContext = 'GRAMMAR CHECK';
-    else if (low.includes('deep-dive')) newContext = 'GRAMMAR CHECK';
+    
+    if (low.includes('daily review')) newContext = 'DAILY_REVIEW';
+    else if (low.includes('mastery court')) newContext = 'MASTERY_COURT';
+    else if (low.includes('explain the grammar') || low.includes('deep-dive')) newContext = 'GRAMMAR_CHECK';
+    else if (low.includes('start a lesson') || low.includes('roadmap')) newContext = 'LESSON';
+    else if (low.includes('practice this sentence') || low.includes('sentence builder')) newContext = 'GRAMMAR_CHECK';
+    else if (low.includes('practice my saved phrases') || low.includes('practice this phrase')) newContext = 'PHRASE_PRACTICE';
+    else if (low.includes('vocab') || low.includes('deep dive')) newContext = 'VOCAB_PANEL';
+
+    let contextPayload: string | undefined = undefined;
+    if (newContext === 'VOCAB_PANEL') {
+      const match = pendingPrompt.match(/(?:about the word|deep-dive|for the word|word)\s+([^\s\.\?!]+)/i);
+      if (match) contextPayload = match[1].replace(/[[\]"']/g, '').trim();
+    } else if (newContext === 'PHRASE_PRACTICE' || newContext === 'GRAMMAR_CHECK') {
+      const match = pendingPrompt.match(/"([^"]+)"/);
+      if (match) contextPayload = match[1].trim();
+    }
+
+    if (newContext === 'MASTERY_COURT') {
+      awardBadge('court_session');
+    }
 
     updateSession(sessionId, { 
-      context: newContext,
+      context: newContext as any,
+      contextPayload: contextPayload,
       title: detectSessionTitle(pendingPrompt),
       messages: [],
       history: [],
       sessionDeltas: []
-    });
+    } as any);
     
+    setStartingTotalXP(getStatusSummary().xp);
+    setSessionXP(0);
     setInput('');
     const key = resolveApiKey();
     
@@ -134,6 +210,7 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
 
   async function triggerProactiveGreeting(context: string, overrideKey?: string) {
     if (!isSandboxMode && !resolveApiKey(overrideKey)) return;
+    startSessionTimer();
     setIsLoading(true);
     const assistantId = crypto.randomUUID();
     
@@ -153,8 +230,17 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
     try {
       const key = resolveApiKey(overrideKey);
       const state = useMasteryStore.getState();
-      const userContext = stringifyUserContext(state.profile, state.lore);
-      const sys = buildSystemPrompt(state.vocabulary, [], displayName, userContext);
+      const userContext = stringifyUserContext(state.profile);
+      const currentSession = useChatStore.getState().sessions.find(s => s.id === sessionId) as any;
+      const latestChatContext = currentSession?.context || 'GENERAL';
+      const payload = currentSession?.contextPayload;
+      const vibe = currentSession?.vibe ?? 'chill';
+
+      const sys = latestChatContext === 'MASTERY_COURT'
+        ? buildMasteryCourtPrompt(state.vocabulary, displayName, userContext)
+        : latestChatContext === 'LESSON' 
+          ? buildTutorPrompt(state.vocabulary, [], displayName, userContext, undefined, undefined, vibe, yesterdayWasActive.current, getRegressionCandidates(7), getTopConfusionPairs(5), pendingProveItResponses, xpMultiplier, currentChallenge, pendingRankAcknowledgement)
+          : buildChatPrompt(state.vocabulary, displayName, userContext, latestChatContext, payload, yesterdayWasActive.current, getTopConfusionPairs(5), xpMultiplier, pendingRankAcknowledgement);
       
       const triggerMsg = `[SYSTEM: Start the session now based on this context: ${context}. Greet the student and proceed naturally.]`;
       let full = '';
@@ -183,33 +269,104 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
 
   async function handleEndSession() {
     if (!window.confirm("Are you sure you want to end this session? Conversation history will be lost.")) return;
+    
+    const lastAsstMsg = messages.filter(m => m.role === 'assistant').pop();
+    if (lastAsstMsg && lastAsstMsg.raw) {
+       const summaryNotes = parseSessionSummaryNotes(lastAsstMsg.raw);
+       if (summaryNotes) {
+         for (const n of summaryNotes) updateSessionNotes(n.word, n.note);
+       }
+    }
+
     const deltas = sessionDeltas;
-    if (deltas.length === 0 || isSandboxMode) { onEndSession(); return; }
+    
+    // XP Calculation for Recap
+    let totalXP = 0;
+    const wordsMoved: any[] = [];
+    
     for (const change of deltas) {
-      if (change.type === 'vocab') {
-        updateVocabStatus(change.id, change.newStatus);
+      const vocabWord = vocabulary.find(v => v.id === change.id || v.word.toLowerCase() === change.id.toLowerCase());
+      const multiplier = WORD_FREQUENCY[vocabWord?.word.toLowerCase() || ''] ?? 1.0;
+      
+      if (change.newStatus) {
+         const oldScore = vocabWord?.baseScore || 0;
+         const newScore = STATUS_MIDPOINT[change.newStatus];
+         let diff = newScore - oldScore;
+         if (diff > 0) diff *= xpMultiplier;
+         totalXP += diff * multiplier;
+         
+         wordsMoved.push({
+           word: vocabWord?.word || change.id,
+           oldStatus: vocabWord?.status || 'not_started',
+           newStatus: change.newStatus,
+           hardened: vocabWord?.hardened,
+           roleMastered: false // Simplified for now
+         });
       }
     }
+    totalXP = Math.round(totalXP);
+
+    if (deltas.length === 0 || isSandboxMode) { 
+      if (chatContext === 'LESSON') clearProveItResponses();
+      onEndSession(); 
+      return; 
+    }
+
+    // Mark that a session happened
+    if (!earnedBadges.some(b => b.id === 'first_session')) {
+      awardBadge('first_session');
+    }
+    
+    for (const change of deltas) {
+      if (change.type === 'vocab' && change.newStatus) updateVocabStatus(change.id, change.newStatus);
+      if (change.type === 'vocab_production' && change.newStatus) updateProductionStatus(change.id, change.newStatus);
+      if (change.type === 'vocab_recognition' && change.newStatus) updateRecognitionStatus(change.id, change.newStatus);
+      if (change.type === 'confusion' && change.wordB) recordConfusion(change.id, change.wordB);
+      if (change.type === 'example' && change.exampleSentence) setPinnedExample(change.id, change.exampleSentence);
+    }
+    
     setLastUpdated(new Date().toLocaleDateString());
-    const key = resolveApiKey();
-    const recapId = crypto.randomUUID();
+    recordLearningDay(new Date().toISOString().split('T')[0]);
+
+    if (chatContext === 'LESSON') clearProveItResponses();
+
+    // Gamification Updates
+    updateSessionXPRecord(totalXP);
+    const badgesBefore = earnedBadges.map(b => b.id);
+    const ranksBefore = earnedCeremonialRanks.map(r => r.id);
     
-    updateSession(sessionId, {
-      messages: [...messages, { id: recapId, role: 'assistant', displayContent: '· · ·' }]
+    checkAndAwardRanks();
+    
+    const badgesAfter = useMasteryStore.getState().earnedBadges.map(b => b.id);
+    const ranksAfter = useMasteryStore.getState().earnedCeremonialRanks.map(r => r.id);
+    
+    const newBadges = badgesAfter.filter(id => !badgesBefore.includes(id));
+    const newRanks = ranksAfter.filter(id => !ranksBefore.includes(id));
+
+    setSessionXP(totalXP);
+
+    // Commit Log
+    commitSessionLog({
+      date: new Date().toISOString(),
+      title: currentSession?.title || 'Session Summary',
+      context: chatContext,
+      xpEarned: totalXP,
+      grade: totalXP > 500 || wordsMoved.some(w => w.newStatus === 'mastered') ? 'S' : totalXP > 250 ? 'A' : totalXP > 100 ? 'B' : totalXP > 0 ? 'C' : null,
+      wordsChanged: wordsMoved.map(w => ({ word: w.word, fromStatus: w.oldStatus, toStatus: w.newStatus })),
+      smallRankAtClose: getStatusSummary().rankTitle,
+      sessionRecapText: '', // Will be filled if needed, but SessionRecap doesn't strictly need it from log
+      badgesEarned: newBadges,
+      ceremonialRanksEarned: newRanks,
+      streakAtClose: currentStreak,
+      curriculumNodeId: currentPositionNodeId
     });
-    
-    setIsLoading(true);
-    const recap = await fetchSessionRecap(key, deltas);
-    
-    updateSession(sessionId, {
-      messages: (session?.messages || []).map(msg => msg.id === recapId ? { ...msg, displayContent: recap } : msg)
-    });
-    
-    setIsLoading(false);
-    await new Promise(r => setTimeout(r, 2200));
-    
-    updateSession(sessionId, { sessionDeltas: [] });
-    onEndSession();
+
+    if (totalXP > 0) {
+      progressChallenge(1, 'session_count');
+    }
+
+    clearRankAcknowledgement();
+    setShowRecap(true);
   }
 
   async function sendToLina(txt: string, overrideKey?: string) {
@@ -236,11 +393,29 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
       return;
     }
 
+    setUserMsgCount(prev => {
+      const next = prev + 1;
+      if (next === 10) {
+        progressChallenge(1, 'convo_length');
+      }
+      return next;
+    });
+
     try {
       const key = resolveApiKey(overrideKey);
       const state = useMasteryStore.getState();
-      const userContext = stringifyUserContext(state.profile, state.lore);
-      const sys = buildSystemPrompt(state.vocabulary, [], displayName, userContext);
+      const userContext = stringifyUserContext(state.profile);
+      const currentSession = useChatStore.getState().sessions.find(s => s.id === sessionId) as any;
+      const latestChatContext = currentSession?.context || 'GENERAL';
+      const payload = currentSession?.contextPayload;
+      const vibe = currentSession?.vibe ?? 'chill';
+
+      const sys = latestChatContext === 'MASTERY_COURT'
+        ? buildMasteryCourtPrompt(state.vocabulary, displayName, userContext)
+        : latestChatContext === 'LESSON' 
+          ? buildTutorPrompt(state.vocabulary, [], displayName, userContext, undefined, undefined, vibe, yesterdayWasActive.current, getRegressionCandidates(7), getTopConfusionPairs(5), pendingProveItResponses, xpMultiplier, currentChallenge, pendingRankAcknowledgement)
+          : buildChatPrompt(state.vocabulary, displayName, userContext, latestChatContext, payload, yesterdayWasActive.current, getTopConfusionPairs(5), xpMultiplier, pendingRankAcknowledgement);
+      
       const windowedHistory = [...history, { role: 'user', content: txt }].slice(-HISTORY_WINDOW);
       let full = '';
       for await (const chunk of streamCompletion(key, sys, windowedHistory)) {
@@ -261,6 +436,15 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
       
       const newDeltas = [...sessionDeltas];
       if (changes && changes.length > 0) {
+        if (latestChatContext === 'MASTERY_COURT') {
+          for (const change of changes) {
+            if (change.type === 'vocab' && change.newStatus) updateVocabStatus(change.id, change.newStatus);
+            if (change.type === 'vocab_production' && change.newStatus) updateProductionStatus(change.id, change.newStatus);
+            if (change.type === 'vocab_recognition' && change.newStatus) updateRecognitionStatus(change.id, change.newStatus);
+            if (change.type === 'confusion' && change.wordB) recordConfusion(change.id, change.wordB);
+            if (change.type === 'example' && change.exampleSentence) setPinnedExample(change.id, change.exampleSentence);
+          }
+        }
         newDeltas.push(...changes);
       }
 
@@ -314,7 +498,14 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
           background: 'rgba(5,5,5,0.95)',
           backdropFilter: 'var(--glass)'
         }}>
-          <h2 style={{ fontSize: '0.8rem', fontWeight: 900, letterSpacing: '0.2em', color: 'var(--gold)', margin: 0 }}>{chatContext === 'GENERAL' ? 'jan LINA LINK' : chatContext}</h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <h2 style={{ fontSize: '0.8rem', fontWeight: 900, letterSpacing: '0.2em', color: 'var(--gold)', margin: 0 }}>{chatContext === 'GENERAL' ? 'jan LINA LINK' : chatContext}</h2>
+            {sessionXP > 0 && (
+              <div style={{ fontSize: '0.7rem', color: 'var(--gold)', fontWeight: 800 }}>
+                +{sessionXP} XP {xpMultiplier > 1.0 && '🔥'}
+              </div>
+            )}
+          </div>
           <div style={{ display: 'flex', gap: '8px' }}>
             <button 
               onClick={onMinimize}
@@ -372,6 +563,47 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
           />
           <button onClick={() => sendToLina(input)} disabled={isLoading} style={{ background: 'var(--gold)', border: 'none', borderRadius: '2px', padding: '0 20px', color: 'black', fontWeight: 900, cursor: 'pointer', opacity: isLoading ? 0.6 : 1 }}>{isLoading ? '...' : 'SEND'}</button>
         </div>
+
+        {showRecap && (
+          <SessionRecap
+            sessionTitle={currentSession?.title || 'Session Summary'}
+            totalXPEarned={sessionXP}
+            prevTotalXP={startingTotalXP}
+            xpMultiplier={xpMultiplier}
+            wordsMoved={sessionDeltas.filter(d => !!d.newStatus).map(d => {
+              const v = vocabulary.find(word => word.id === d.id || word.word === d.id);
+              return {
+                word: v?.word || d.id,
+                oldStatus: v?.status || 'not_started',
+                newStatus: d.newStatus!,
+                hardened: v?.hardened,
+                roleMastered: false // simplified
+              };
+            })}
+            wordOfTheSession={(() => {
+              const bestChange = [...sessionDeltas].filter(d => !!d.newStatus).sort((a, b) => {
+                const va = vocabulary.find(w => w.id === a.id || w.word === a.id);
+                const vb = vocabulary.find(w => w.id === b.id || w.word === b.id);
+                const scoreA = STATUS_MIDPOINT[a.newStatus!] - (va?.baseScore || 0);
+                const scoreB = STATUS_MIDPOINT[b.newStatus!] - (vb?.baseScore || 0);
+                return scoreB - scoreA;
+              })[0];
+              if (!bestChange) return null;
+              const v = vocabulary.find(w => w.id === bestChange.id || w.word === bestChange.id);
+              return { word: v?.word || bestChange.id, newStatus: bestChange.newStatus!, note: v?.sessionNotes || 'Great improvement!' };
+            })()}
+            newRankUnlocked={newRankUnlocked}
+            isPersonalBest={sessionXP > 0 && sessionXP >= useMasteryStore.getState().sessionXPRecord}
+            streak={currentStreak}
+            shieldsRemaining={streakShields}
+            onContinue={() => {
+              setShowRecap(false);
+              clearNewRankUnlocked();
+              updateSession(sessionId, { sessionDeltas: [] });
+              onEndSession();
+            }}
+          />
+        )}
       </m.div>
     </LazyMotion>
   );

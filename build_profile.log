@@ -1,0 +1,18 @@
+vite v6.4.2 building for production...
+transforming...
+src/components/MasteryGrid.tsx (4:71): "default" is not exported by "node_modules/react-window/dist/index.esm.js", imported by "src/components/MasteryGrid.tsx".
+src/components/MasteryGrid.tsx (4:115): "default" is not exported by "node_modules/react-window/dist/index.esm.js", imported by "src/components/MasteryGrid.tsx".
+src/components/MasteryGrid.tsx (6:72): "default" is not exported by "node_modules/react-virtualized-auto-sizer/dist/react-virtualized-auto-sizer.js", imported by "src/components/MasteryGrid.tsx".
+src/components/MasteryGrid.tsx (6:112): "default" is not exported by "node_modules/react-virtualized-auto-sizer/dist/react-virtualized-auto-sizer.js", imported by "src/components/MasteryGrid.tsx".
+✓ 455 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                     0.46 kB │ gzip:   0.29 kB
+dist/assets/index-DMcan5cc.css      9.50 kB │ gzip:   2.58 kB
+dist/assets/index-BldnxRWF.js   1,096.46 kB │ gzip: 296.40 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 47.42s

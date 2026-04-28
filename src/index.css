@@ -371,8 +371,7 @@ select {
   padding: 12px 10px;
   border-radius: 2px;
   border: 1px solid var(--border);
-  background: var(--surface);
-  backdrop-filter: var(--glass);
+  background: #111111;
   user-select: none;
   cursor: pointer;
   position: relative;

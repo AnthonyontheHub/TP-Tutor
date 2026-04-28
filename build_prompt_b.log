@@ -1,0 +1,36 @@
+vite v6.4.2 building for production...
+transforming...
+src/components/MasteryGrid.tsx (4:71): "default" is not exported by "node_modules/react-window/dist/index.esm.js", imported by "src/components/MasteryGrid.tsx".
+src/components/MasteryGrid.tsx (4:115): "default" is not exported by "node_modules/react-window/dist/index.esm.js", imported by "src/components/MasteryGrid.tsx".
+src/components/MasteryGrid.tsx (6:72): "default" is not exported by "node_modules/react-virtualized-auto-sizer/dist/react-virtualized-auto-sizer.js", imported by "src/components/MasteryGrid.tsx".
+src/components/MasteryGrid.tsx (6:112): "default" is not exported by "node_modules/react-virtualized-auto-sizer/dist/react-virtualized-auto-sizer.js", imported by "src/components/MasteryGrid.tsx".
+src/store/masteryStore.ts (8:2): "MasteryStatus" is not exported by "src/types/mastery.ts", imported by "src/store/masteryStore.ts".
+src/store/masteryStore.ts (8:17): "VocabWord" is not exported by "src/types/mastery.ts", imported by "src/store/masteryStore.ts".
+src/store/masteryStore.ts (8:28): "StatusSummary" is not exported by "src/types/mastery.ts", imported by "src/store/masteryStore.ts".
+src/store/masteryStore.ts (8:43): "SavedPhrase" is not exported by "src/types/mastery.ts", imported by "src/store/masteryStore.ts".
+src/store/masteryStore.ts (9:2): "UserProfile" is not exported by "src/types/mastery.ts", imported by "src/store/masteryStore.ts".
+src/store/masteryStore.ts (9:15): "LoreEntry" is not exported by "src/types/mastery.ts", imported by "src/store/masteryStore.ts".
+src/store/masteryStore.ts (9:26): "ReviewVibe" is not exported by "src/types/mastery.ts", imported by "src/store/masteryStore.ts".
+src/store/masteryStore.ts (9:38): "LoreCategory" is not exported by "src/types/mastery.ts", imported by "src/store/masteryStore.ts".
+src/store/masteryStore.ts (10:2): "CurriculumLevel" is not exported by "src/types/mastery.ts", imported by "src/store/masteryStore.ts".
+src/store/masteryStore.ts (10:19): "NodeStatus" is not exported by "src/types/mastery.ts", imported by "src/store/masteryStore.ts".
+src/store/masteryStore.ts (10:31): "CommonPhrase" is not exported by "src/types/mastery.ts", imported by "src/store/masteryStore.ts".
+src/store/masteryStore.ts (10:45): "PosRole" is not exported by "src/types/mastery.ts", imported by "src/store/masteryStore.ts".
+src/store/masteryStore.ts (11:2): "SmallRank" is not exported by "src/types/mastery.ts", imported by "src/store/masteryStore.ts".
+src/store/masteryStore.ts (11:13): "CeremonialRank" is not exported by "src/types/mastery.ts", imported by "src/store/masteryStore.ts".
+src/store/masteryStore.ts (11:29): "Badge" is not exported by "src/types/mastery.ts", imported by "src/store/masteryStore.ts".
+src/components/SessionRecap.tsx (3:22): "MasteryStatus" is not exported by "src/types/mastery.ts", imported by "src/components/SessionRecap.tsx".
+src/components/SessionRecap.tsx (3:37): "SmallRank" is not exported by "src/types/mastery.ts", imported by "src/components/SessionRecap.tsx".
+src/components/SessionRecap.tsx (3:48): "CeremonialRank" is not exported by "src/types/mastery.ts", imported by "src/components/SessionRecap.tsx".
+✓ 454 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                     0.46 kB │ gzip:   0.29 kB
+dist/assets/index-DMcan5cc.css      9.50 kB │ gzip:   2.58 kB
+dist/assets/index-cjBuMxOa.js   1,065.60 kB │ gzip: 288.08 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 40.70s

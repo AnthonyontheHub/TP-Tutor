@@ -2,17 +2,18 @@ import { useState, useEffect } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import { useAuthStore } from '../store/authStore';
 
-export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSandboxMode, onOpenLogbook }: {
+export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSandboxMode, onOpenLogbook, onOpenMasteryCourt }: {
   isOpen: boolean;
   onClose: () => void;
   isSandboxMode: boolean;
   setIsSandboxMode: (val: boolean) => void;
   onOpenLogbook: () => void;
+  onOpenMasteryCourt?: () => void;
 }) {
   const { 
     resetAsNewUser, masterAllVocab, randomizeVocab, isMainProfile,
     knowledgeCheckFrequency, setKnowledgeCheckFrequency, clearAllSavedPhrases,
-    vocabulary
+    vocabulary, resetLearningProgress
   } = useMasteryStore();
   const { logout } = useAuthStore();
 
@@ -37,6 +38,13 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
     localStorage.setItem('TP_GEMINI_KEY', localApiKey);
     setKnowledgeCheckFrequency(localFreq);
     onClose();
+  };
+
+  const handleResetLearning = async () => {
+    if(confirm("Reset learning progress? Your profile will be kept, but vocabulary and streaks will be reset to zero.")) {
+      resetLearningProgress();
+      onClose();
+    }
   };
 
   const handleReset = async () => {
@@ -72,14 +80,25 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
       <h1 style={{ color: 'var(--gold)', fontWeight: 900, marginBottom: '32px', letterSpacing: '0.1em' }}>SETTINGS</h1>
 
       <section style={{ marginBottom: '40px' }}>
-        <h2 style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--gold)', letterSpacing: '0.15em', marginBottom: '20px', opacity: 0.8 }}>TEACHER'S LOGBOOK</h2>
-        <button 
-          onClick={onOpenLogbook}
-          className="btn-review"
-          style={{ width: '100%', background: '#111', border: '1px solid #222', color: 'var(--gold)' }}
-        >
-          VIEW TEACHER'S LOGBOOK
-        </button>
+        <h2 style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--gold)', letterSpacing: '0.15em', marginBottom: '20px', opacity: 0.8 }}>TEACHER'S LOGBOOK & MASTERY</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px' }}>
+          <button 
+            onClick={onOpenLogbook}
+            className="btn-review"
+            style={{ width: '100%', background: '#111', border: '1px solid #222', color: 'var(--gold)' }}
+          >
+            VIEW TEACHER'S LOGBOOK
+          </button>
+          {onOpenMasteryCourt && (
+            <button 
+              onClick={onOpenMasteryCourt}
+              className="btn-review"
+              style={{ width: '100%', background: '#111', border: '1px solid #222', color: 'var(--gold)' }}
+            >
+              MASTERY COURT
+            </button>
+          )}
+        </div>
       </section>
 
       <section style={{ marginBottom: '40px' }}>
@@ -145,12 +164,13 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
           <button onClick={handleRandomize} className="btn-settings" style={{ background: '#1a1a1a', border: '1px solid #d4af37', color: '#d4af37' }}>RANDOMIZE NEURAL SYNC</button>
           <button onClick={handleMasterAll} className="btn-settings" style={{ background: '#1a1a1a', border: '1px solid #d4af37', color: '#d4af37' }}>FORCE TOTAL MASTERY</button>
           <button onClick={handleClearPhrases} className="btn-settings" style={{ background: '#1a1a1a', border: '1px solid #d4af37', color: '#d4af37' }}>CLEAR ALL SAVED PHRASES</button>
+          <button onClick={handleResetLearning} className="btn-settings" style={{ background: '#1a1a1a', border: '1px solid #d4af37', color: '#d4af37' }}>RESET LEARNING PROGRESS</button>
           <button 
             onClick={handleReset} 
             className="btn-settings" 
             style={{ background: '#1a1a1a', border: '1px solid #d4af37', color: '#d4af37' }}
           >
-            PURGE NEURAL CACHE
+            WIPE EVERYTHING
           </button>
         </div>
       </section>

@@ -9,6 +9,7 @@ interface Props {
   onLongPress?: (word: VocabWord) => void;
   onClick?: (word: VocabWord) => void;
   isSandboxMode: boolean;
+  isDimmed?: boolean;
 }
 
 const STATUS_ICONS: Record<MasteryStatus, string> = {
@@ -27,7 +28,7 @@ const RING_COLOR: Record<MasteryStatus, string> = {
   mastered: '#22c55e',
 };
 
-export default function VocabCard({ word, onLongPress, onClick, isSandboxMode }: Props) {
+export default function VocabCard({ word, onLongPress, onClick, isSandboxMode, isDimmed }: Props) {
   const { cycleWordStatus } = useMasteryStore();
   const status = word.status;
 
@@ -111,8 +112,10 @@ export default function VocabCard({ word, onLongPress, onClick, isSandboxMode }:
       className={`vocab-card vocab-card--${status}`}
       style={{ 
         touchAction: 'none', 
-        borderLeftColor: RING_COLOR[status],
-        boxShadow: hasSavedInfo ? `0 0 20px 2px ${RING_COLOR[status]}88` : undefined
+        borderLeftColor: isDimmed ? 'transparent' : RING_COLOR[status],
+        background: isDimmed ? 'rgba(0,0,0,0.5)' : undefined,
+        borderColor: isDimmed ? '#222' : undefined,
+        transition: 'all 0.3s ease'
       }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
@@ -127,12 +130,25 @@ export default function VocabCard({ word, onLongPress, onClick, isSandboxMode }:
         {STATUS_ICONS[status]}
       </div>
 
-      <div className="vocab-card__word">
+      <div className="vocab-card__word" style={{ transition: 'all 0.3s ease', color: (hasSavedInfo && !isDimmed) ? 'var(--gold)' : undefined }}>
         {word.type === 'grammar' ? word.sessionNotes : word.word}
       </div>
-      <div className="vocab-card__pos">
+      <div className="vocab-card__pos" style={{ opacity: isDimmed ? 0.7 : 1, transition: 'all 0.3s ease' }}>
         {word.type === 'grammar' ? 'GRAMMAR' : word.partOfSpeech}
       </div>
+      {word.pinnedExample && (
+        <div style={{
+          fontSize: '0.65rem',
+          color: 'var(--gold)',
+          fontStyle: 'italic',
+          marginTop: '4px',
+          opacity: isDimmed ? 0.3 : 0.8,
+          lineHeight: 1.2,
+          transition: 'all 0.3s ease'
+        }}>
+          "{word.pinnedExample}"
+        </div>
+      )}
     </div>
   );
 }

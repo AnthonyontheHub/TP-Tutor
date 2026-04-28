@@ -1,10 +1,15 @@
 /* src/components/MasteryGrid.tsx */
-import { useState } from 'react';
+import { useState, useMemo, memo, useCallback } from 'react';
+import * as RWModule from 'react-window';
+const List: any = (RWModule as any).FixedSizeList || (RWModule as any).default?.FixedSizeList || (RWModule as any).default || RWModule;
+import * as ASModule from 'react-virtualized-auto-sizer';
+const AutoSizer: any = (ASModule as any).AutoSizer || (ASModule as any).default?.AutoSizer || (ASModule as any).default || ASModule;
 import { useMasteryStore } from '../store/masteryStore';
 import VocabCard from './VocabCard';
 import WordDetailDrawer from './WordDetailDrawer';
 import type { MasteryStatus, VocabWord } from '../types/mastery';
 import { STATUS_META } from '../types/mastery';
+import { WORD_RELATIONSHIPS } from '../data/wordRelationships';
 
 interface Props {
   onAskLina: (p: string) => void;
@@ -22,6 +27,108 @@ const STATUS_RANK: Record<MasteryStatus, number> = {
   not_started: 0, introduced: 1, practicing: 2, confident: 3, mastered: 4
 };
 
+// Memoized Row component to prevent unnecessary re-renders
+const Row = memo(({ index, style, data }: any) => {
+  const { 
+    items, columnCount, gap, selectedWords, activeFilter, 
+    relatedWordIds, isSandboxMode, handleCardClick, handleCardLongPress,
+    itemWidth
+  } = data;
+  
+  const startIndex = index * columnCount;
+  const rowItems = items.slice(startIndex, startIndex + columnCount);
+
+  return (
+    <div style={{ 
+      ...style, 
+      display: 'flex', 
+      gap: `${gap}px`, 
+      paddingRight: `${gap}px`,
+      boxSizing: 'border-box',
+      height: (style.height as number) - gap
+    }}>
+      {rowItems.map((word: VocabWord) => {
+        const positions: number[] = [];
+        selectedWords.forEach((w: string, i: number) => { if (w === word.word) positions.push(i + 1); });
+        const isFilterDimmed = activeFilter && word.status !== activeFilter;
+        const isRelated = relatedWordIds.has(word.word.toLowerCase());
+        const isSelected = positions.length > 0;
+
+        let isSelectionDimmed = false;
+        if (selectedWords.length > 0) {
+          if (!isSelected && !isRelated) {
+            isSelectionDimmed = true;
+          }
+        }
+
+        return (
+          <div
+            key={word.id}
+            className="grid-item-wrapper"
+            style={{
+              position: 'relative',
+              cursor: 'pointer',
+              animation: isRelated ? 'relatedPulse 1.2s ease-in-out infinite' : 'none',
+              touchAction: 'pan-y',
+              width: itemWidth,
+              flex: '0 0 auto',
+              height: '100%',
+              boxSizing: 'border-box'
+            }}
+            onClick={(e) => { e.stopPropagation(); handleCardClick(word); }}
+          >
+            <VocabCard 
+              word={word} 
+              onClick={handleCardClick}
+              onLongPress={handleCardLongPress}
+              isSandboxMode={isSandboxMode}
+              isDimmed={isFilterDimmed || isSelectionDimmed}
+            />
+
+            {positions.length > 0 && (
+              <div style={{
+                position: 'absolute',
+                top: -6,
+                right: -6,
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '2px',
+                justifyContent: 'flex-end',
+                maxWidth: '64px',
+                pointerEvents: 'none',
+                zIndex: 10
+              }}>
+                {positions.map(pos => (
+                  <span
+                    key={pos}
+                    style={{
+                      background: 'var(--gold)',
+                      color: 'black',
+                      borderRadius: '50%',
+                      width: '18px',
+                      height: '18px',
+                      fontSize: '0.65rem',
+                      fontWeight: 900,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      lineHeight: 1,
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.5)',
+                      border: '1px solid black'
+                    }}
+                  >
+                    {pos}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+});
+
 export default function MasteryGrid({
   onAskLina, isSandboxMode, activeFilter, sortMode, sortDirection, posFilter,
   setSortMode, setSortDirection, setPosFilter
@@ -29,58 +136,108 @@ export default function MasteryGrid({
   const { vocabulary, selectedWords, toggleWordSelection, setSelectedWords, lessonFilter } = useMasteryStore();
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [selectedPOS, setSelectedPOS] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'card' | 'table'>('card');
 
-  const handleCardClick = (word: VocabWord) => {
+  const handleCardClick = useCallback((word: VocabWord) => {
     if (selectedWords.length === 0) {
       setDrawerId(word.id);
     } else {
       toggleWordSelection(word.word);
     }
-  };
+  }, [selectedWords, toggleWordSelection]);
 
-  const handleCardLongPress = (word: VocabWord) => {
+  const handleCardLongPress = useCallback((word: VocabWord) => {
     toggleWordSelection(word.word);
-  };
+  }, [toggleWordSelection]);
 
-  const displayed = vocabulary
-    .filter(item => {
-      const passesLesson = !lessonFilter || lessonFilter.includes(item.id) || lessonFilter.includes(item.word);
-      const matchesPOS = selectedPOS === 'All' || item.partOfSpeech === selectedPOS;
-      return passesLesson && matchesPOS;
-    })
-    .sort((a, b) => {
-      if (sortMode === 'status') {
-        const diff = STATUS_RANK[a.status] - STATUS_RANK[b.status];
-        return sortDirection === 'asc' ? diff : -diff;
+  const relatedWordIds = useMemo(() => {
+    const ids = new Set<string>();
+    if (selectedWords.length === 1) {
+      const w = selectedWords[0].toLowerCase();
+      if (WORD_RELATIONSHIPS[w]) {
+        WORD_RELATIONSHIPS[w].forEach(r => ids.add(r));
       }
-      if (sortMode === 'length') {
-        const diff = a.word.length - b.word.length;
-        return sortDirection === 'asc' ? diff : -diff;
-      }
-      if (sortMode === 'partOfSpeech') {
-        const diff = a.partOfSpeech.localeCompare(b.partOfSpeech);
-        return sortDirection === 'asc' ? diff : -diff;
-      }
-      if (sortMode === 'useCount') {
-        const diff = (a.frequencyRank ?? 999) - (b.frequencyRank ?? 999);
-        return sortDirection === 'asc' ? diff : -diff;
-      }
-      const valA = a.word.toLowerCase();
-      const valB = b.word.toLowerCase();
-      return sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
-    });
+    }
+    return ids;
+  }, [selectedWords]);
+
+  const displayed = useMemo(() => {
+    return vocabulary
+      .filter(item => {
+        const passesLesson = !lessonFilter || lessonFilter.includes(item.id) || lessonFilter.includes(item.word);
+        const matchesPOS = selectedPOS === 'All' || item.partOfSpeech === selectedPOS;
+        
+        let matchesSearch = true;
+        if (searchQuery.trim() !== '') {
+          const q = searchQuery.toLowerCase().trim();
+          matchesSearch = 
+            item.word.toLowerCase().includes(q) ||
+            item.meanings.toLowerCase().includes(q) ||
+            item.partOfSpeech.toLowerCase().includes(q) ||
+            (item.sessionNotes && item.sessionNotes.toLowerCase().includes(q));
+        }
+
+        return passesLesson && matchesPOS && matchesSearch;
+      })
+      .sort((a, b) => {
+        if (sortMode === 'status') {
+          const diff = STATUS_RANK[a.status] - STATUS_RANK[b.status];
+          return sortDirection === 'asc' ? diff : -diff;
+        }
+        if (sortMode === 'length') {
+          const diff = a.word.length - b.word.length;
+          return sortDirection === 'asc' ? diff : -diff;
+        }
+        if (sortMode === 'partOfSpeech') {
+          const diff = a.partOfSpeech.localeCompare(b.partOfSpeech);
+          return sortDirection === 'asc' ? diff : -diff;
+        }
+        if (sortMode === 'useCount') {
+          const diff = (a.frequencyRank ?? 999) - (b.frequencyRank ?? 999);
+          return sortDirection === 'asc' ? diff : -diff;
+        }
+        const valA = a.word.toLowerCase();
+        const valB = b.word.toLowerCase();
+        return sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+      });
+  }, [vocabulary, lessonFilter, selectedPOS, searchQuery, sortMode, sortDirection]);
+
+  const itemData = useMemo(() => {
+     return {
+        items: displayed,
+        // Wait, columnCount depends on width which comes from AutoSizer
+        // I will pass handleCardClick/LongPress here though
+        selectedWords,
+        activeFilter,
+        relatedWordIds,
+        isSandboxMode,
+        handleCardClick,
+        handleCardLongPress
+     };
+  }, [displayed, selectedWords, activeFilter, relatedWordIds, isSandboxMode, handleCardClick, handleCardLongPress]);
 
   return (
     <div
       className="mastery-grid-container"
       style={{ 
         paddingBottom: selectedWords.length > 0 ? '280px' : undefined,
-        touchAction: 'pan-y' 
+        touchAction: 'pan-y',
+        display: 'flex',
+        flexDirection: 'column',
+        height: 'calc(100vh - 250px)',
+        minHeight: '400px'
       }}
       onClick={(e) => { if (e.target === e.currentTarget && selectedWords.length > 0) setSelectedWords([]); }}
     >
-      <div className="grid-toolbar">
+      <style>{`
+        @keyframes relatedPulse {
+          0% { opacity: 1; }
+          50% { opacity: 0.6; }
+          100% { opacity: 1; }
+        }
+      `}</style>
+      <div className="grid-toolbar" style={{ flexShrink: 0 }}>
         <div className="flex items-center gap-4 mb-6">
           <select 
             value={selectedPOS} 
@@ -96,6 +253,20 @@ export default function MasteryGrid({
             <option value="Pronoun">Pronouns</option>
             <option value="Number">Numbers</option>
           </select>
+          <input
+            type="text"
+            placeholder="Search vocab..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{
+              background: '#111',
+              border: '1px solid #222',
+              borderRadius: '10px',
+              color: 'white',
+              padding: '8px 12px',
+              minWidth: '200px'
+            }}
+          />
         </div>
         <select 
           value={sortMode} 
@@ -127,72 +298,39 @@ export default function MasteryGrid({
       </div>
 
       {viewMode === 'card' ? (
-        <div className="mastery-grid__cards" style={{ pointerEvents: 'auto' }}>
-          {displayed.map((word) => {
-            const positions: number[] = [];
-            selectedWords.forEach((w, i) => { if (w === word.word) positions.push(i + 1); });
-            const isFilterDimmed = activeFilter && word.status !== activeFilter;
+        <div style={{ position: 'relative', flex: 1, pointerEvents: 'auto', width: '100%' }}>
+          <AutoSizer>
+            {({ height, width }: any) => {
+              const gap = 10;
+              const minColWidth = 100;
+              const columnCount = Math.max(1, Math.floor((width + gap) / (minColWidth + gap)));
+              const rowCount = Math.ceil(displayed.length / columnCount);
+              const rowHeight = 115; 
 
-            return (
-              <div
-                key={word.id}
-                className="grid-item-wrapper"
-                style={{
-                  position: 'relative',
-                  opacity: isFilterDimmed ? 0.3 : 1,
-                  cursor: 'pointer',
-                  transition: 'opacity 0.25s ease',
-                  touchAction: 'pan-y'
-                }}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <VocabCard 
-                  word={word} 
-                  onClick={handleCardClick}
-                  onLongPress={handleCardLongPress}
-                  isSandboxMode={isSandboxMode}
-                />
+              if (!height || !width) return null;
 
-                {positions.length > 0 && (
-                  <div style={{
-                    position: 'absolute',
-                    top: -6,
-                    right: -6,
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: '2px',
-                    justifyContent: 'flex-end',
-                    maxWidth: '64px',
-                    pointerEvents: 'none',
-                    zIndex: 10
-                  }}>
-                    {positions.map(pos => (
-                      <span
-                        key={pos}
-                        style={{
-                          background: 'var(--gold)',
-                          color: 'black',
-                          borderRadius: '50%',
-                          width: '18px',
-                          height: '18px',
-                          fontSize: '0.65rem',
-                          fontWeight: 900,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          lineHeight: 1,
-                          boxShadow: '0 2px 4px rgba(0,0,0,0.5)',
-                          border: '1px solid black'
-                        }}
-                      >
-                        {pos}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+              const combinedData = {
+                ...itemData,
+                columnCount,
+                gap,
+                itemWidth
+              };
+
+              return (
+                <List
+                  height={height}
+                  itemCount={rowCount}
+                  itemSize={rowHeight}
+                  width={width}
+                  itemData={combinedData}
+                  overscanCount={3}
+                  style={{ WebkitOverflowScrolling: 'touch', overflowX: 'hidden' }}
+                >
+                  {Row}
+                </List>
+              );
+            }}
+          </AutoSizer>
         </div>
       ) : (
         <div className="mastery-grid__table-wrapper" style={{ overflowX: 'auto', background: 'rgba(0,0,0,0.2)', borderRadius: '8px', border: '1px solid #222' }}>

@@ -16,6 +16,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-easy-crop": "^5.5.7",
+    "react-virtualized-auto-sizer": "^2.0.3",
+    "react-window": "^1.8.11",
     "zustand": "^5.0.1"
   },
   "devDependencies": {
@@ -23,6 +25,8 @@
     "@types/node": "^20.17.6",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@types/react-virtualized-auto-sizer": "^1.0.4",
+    "@types/react-window": "^1.8.5",
     "@vitejs/plugin-react": "^4.3.4",
     "eslint": "^9.15.0",
     "eslint-plugin-react-hooks": "^5.0.0",
