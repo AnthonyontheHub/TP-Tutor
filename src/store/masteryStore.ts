@@ -971,7 +971,7 @@ export const useMasteryStore = create<MasteryStore>()(
           savedPhrases: [],
           currentStreak: 0,
           lastActiveDate: '',
-          currentPositionNodeId: curriculumRoadmap[0].nodes[0].id,
+          currentPositionNodeId: 'phi_sim',
           earnedBadges: [],
           earnedCeremonialRanks: [],
           newRankUnlocked: null,
@@ -991,6 +991,7 @@ export const useMasteryStore = create<MasteryStore>()(
           pendingProveItResponses: [],
           totalProveItSubmitted: 0
         });
+        get().refreshCurriculumStatus();
         void get().syncToCloud(undefined, false);
       },
 
@@ -1197,6 +1198,7 @@ export const useMasteryStore = create<MasteryStore>()(
           pendingProveItResponses: [],
           totalProveItSubmitted: 0
         });
+        get().refreshCurriculumStatus();
         void get().syncToCloud(undefined, false);
       },
 
@@ -1232,6 +1234,7 @@ export const useMasteryStore = create<MasteryStore>()(
           pendingProveItResponses: [],
           totalProveItSubmitted: 0
         });
+        get().refreshCurriculumStatus();
         void get().syncToCloud(undefined, false);
       },
 
