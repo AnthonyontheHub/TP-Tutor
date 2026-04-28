@@ -14,7 +14,7 @@ interface Props {
 }
 
 export default function CurriculumRoadmap({ onSetActiveView, onAskLina, isSandboxMode }: Props) {
-  const { curriculums, vocabulary, currentPositionNodeId, sessionLog } = useMasteryStore();
+  const { curriculums, currentPositionNodeId, sessionLog } = useMasteryStore();
   const [selectedNode, setSelectedNode] = useState<CurriculumNode | null>(null);
   const [hoveredSession, setHoveredSession] = useState<SessionLogEntry | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
