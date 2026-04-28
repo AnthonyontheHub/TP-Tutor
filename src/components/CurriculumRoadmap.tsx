@@ -32,27 +32,6 @@ export default function CurriculumRoadmap({ onSetActiveView, onAskLina, isSandbo
     return curriculums.flatMap(level => level.nodes);
   }, [curriculums]);
 
-  const calculateNodeMastery = (requiredVocabIds: string[], requiredGrammarIds: string[]) => {
-    const allIds = [...requiredVocabIds, ...requiredGrammarIds];
-    if (allIds.length === 0) return 0;
-
-    const scores = allIds.map(id => {
-      const word = vocabulary.find(v => v.id === id || v.word === id);
-      return word ? word.baseScore : 0;
-    });
-
-    const average = scores.reduce((a, b) => a + b, 0) / scores.length;
-    return Math.round(average);
-  };
-
-  const getMasteryColor = (score: number) => {
-    if (score >= 950) return '#22c55e'; // Mastered: Bright Green
-    if (score >= 751) return '#eab308'; // Confident: Yellow
-    if (score >= 501) return '#3b82f6'; // Practicing: Blue
-    if (score >= 201) return '#a855f7'; // Introduced: Purple
-    return '#444'; // Not started
-  };
-
   const getGradeColor = (grade: string | null) => {
     switch (grade) {
       case 'S': return 'var(--gold)';
