@@ -246,8 +246,6 @@ export default function CurriculumRoadmap({ onSetActiveView, onAskLina, isSandbo
 
             // Node rendering
             const node = item.data;
-            const mastery = calculateNodeMastery(node.requiredVocabIds || [], node.requiredGrammarIds || []);
-            const masteryColor = getMasteryColor(mastery);
 
             return (
               <div key={node.id} style={{ position: 'relative', zIndex: 1, left: xOffset, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -282,13 +280,7 @@ export default function CurriculumRoadmap({ onSetActiveView, onAskLina, isSandbo
         <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '48px' }}>
           {unifiedPath.future.map((item, index) => {
             const node = item.data;
-            const mastery = calculateNodeMastery(node.requiredVocabIds || [], node.requiredGrammarIds || []);
-            const isLocked = node.status === 'locked';
-            const isMastered = node.status === 'mastered';
-            const isActive = node.status === 'active';
             const isCurrent = node.id === currentPositionNodeId;
-
-            const masteryColor = getMasteryColor(mastery);
             const xOffset = getWindingOffset(index + unifiedPath.past.length);
 
             return (

@@ -1,6 +1,6 @@
 /* src/components/MasteryGrid.tsx */
 import { useState, useMemo, memo, useCallback } from 'react';
-import { FixedSizeList as List, ListChildComponentProps } from 'react-window';
+import { FixedSizeList as List } from 'react-window';
 import { AutoSizer } from 'react-virtualized-auto-sizer';
 import { useMasteryStore } from '../store/masteryStore';
 import VocabCard from './VocabCard';
@@ -15,10 +15,8 @@ interface Props {
   activeFilter: MasteryStatus | null;
   sortMode: string;
   sortDirection: 'asc' | 'desc';
-  posFilter: string;
-  setSortMode: (mode: any) => void;
-  setSortDirection: (dir: any) => void;
-  setPosFilter: (pos: string) => void;
+  setSortMode: (mode: string) => void;
+  setSortDirection: (dir: 'asc' | 'desc') => void;
 }
 
 const STATUS_RANK: Record<MasteryStatus, number> = {
@@ -26,7 +24,7 @@ const STATUS_RANK: Record<MasteryStatus, number> = {
 };
 
 // Memoized Row component to prevent unnecessary re-renders
-const Row = memo(({ index, style, data }: any) => {
+const Row = memo(({ index, style, data }: { index: number; style: React.CSSProperties; data: unknown }) => {
   const { 
     items, columnCount, gap, selectedWords, activeFilter, 
     relatedWordIds, isSandboxMode, handleCardClick, handleCardLongPress,
@@ -128,8 +126,8 @@ const Row = memo(({ index, style, data }: any) => {
 });
 
 export default function MasteryGrid({
-  onAskLina, isSandboxMode, activeFilter, sortMode, sortDirection, posFilter,
-  setSortMode, setSortDirection, setPosFilter
+  onAskLina, isSandboxMode, activeFilter, sortMode, sortDirection,
+  setSortMode, setSortDirection
 }: Props) {
   const { vocabulary, selectedWords, toggleWordSelection, setSelectedWords, lessonFilter } = useMasteryStore();
   const [drawerId, setDrawerId] = useState<string | null>(null);

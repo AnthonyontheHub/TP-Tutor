@@ -155,11 +155,6 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
     }
   };
 
-  const handleSaved = (phraseId: string) => {
-    setFocusPhraseId(phraseId);
-    setActiveView('phrasebook');
-  };
-
   const handleSaveSentence = () => {
     const sentence = selectedWords.join(' ');
     savePhrase({ id: sentence, tp: sentence, en: translation ?? '', notes: saveNoteInput });
@@ -175,13 +170,6 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   };
 
   const getActiveStyle = (p: AppPanel) => activePanels.includes(p) ? { borderColor: 'var(--gold)', color: 'var(--gold)', boxShadow: '0 0 10px var(--gold-glow)' } : {};
-
-  const roadmapProgress = useMemo(() => {
-    const allNodes = (curriculums || []).flatMap(l => l.nodes);
-    if (allNodes.length === 0) return 0;
-    const mastered = allNodes.filter(n => n.status === 'mastered').length;
-    return Math.round((mastered / allNodes.length) * 100);
-  }, [curriculums]);
 
   return (
     <div className="dashboard">
