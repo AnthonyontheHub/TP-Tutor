@@ -138,13 +138,13 @@ interface MasteryActions {
   setProfileImage: (url: string) => void;
   updatePhraseNote: (id: string, notes: string) => void;
   deletePhrase: (id: string) => void;
-  resetAsNewUser: () => void;
-  resetProfileAndRunSetup: () => void;
+  resetAsNewUser: () => Promise<void>;
+  resetProfileAndRunSetup: () => Promise<void>;
   randomizeVocab: () => void;
   masterAllVocab: () => void;
   clearLocalData: () => void;
   syncFromCloud: (userId: string, initialName?: string, initialProfileImage?: string) => Promise<Unsubscribe | void>;
-  syncToCloud: (userId?: string, merge?: boolean) => Promise<void>;
+  syncToCloud: (userId?: string, merge?: boolean, force?: boolean) => Promise<void>;
   getStatusSummary: () => StatusSummary & { xp: number; level: number; rankTitle: string };
   setHasCompletedSetup: (val: boolean) => void;
   updateNodeStatus: (nodeId: string, status: NodeStatus) => void;
@@ -181,6 +181,7 @@ interface MasteryActions {
   // Feature 7
   recordConfusion: (wordA: string, wordB: string) => void;
   getTopConfusionPairs: (limit: number) => { wordA: string, wordB: string, count: number }[];
+  completeIntroduction: (introId: string) => void;
 
   // Feature 8
   updateProductionStatus: (wordId: string, status: MasteryStatus) => void;
@@ -193,7 +194,8 @@ interface MasteryActions {
   // Feature 11
   setPinnedExample: (wordId: string, example: string) => void;
   markRoleMastered: (wordId: string, role: PosRole) => void;
-  resetLearningProgress: () => void;
+  resetLearningProgress: () => Promise<void>;
+  completeNode: (nodeId: string) => void;
 
   // Prompt C Actions
   startSessionTimer: () => void;
@@ -235,6 +237,8 @@ interface MasteryState {
   // New Features
   lastStreakCheck: string;
   learningDays: string[];
+  completedNodeIds: string[];
+  seenIntroductions: string[];
   confusionPairs: { wordA: string, wordB: string, count: number }[];
   pendingProveItResponses: { word: string, sentence: string, date: string }[];
   earnedCeremonialRanks: CeremonialRank[];
@@ -343,6 +347,8 @@ export const useMasteryStore = create<MasteryStore>()(
       // New Features Defaults
       lastStreakCheck: '',
       learningDays: [],
+      completedNodeIds: [],
+      seenIntroductions: [],
       confusionPairs: [],
       pendingProveItResponses: [],
       earnedCeremonialRanks: [],
@@ -367,7 +373,7 @@ export const useMasteryStore = create<MasteryStore>()(
 
       refreshCurriculumStatus: () => {
         set((state) => {
-          let lastNodeMastery = 1000; // Book 1 starts unlocked
+          let lastNodeMastery = 0; // Conceptual nodes stay active until sign-off
 
           const newCurriculums = state.curriculums.map((level, lIdx) => ({
             ...level,
@@ -377,29 +383,38 @@ export const useMasteryStore = create<MasteryStore>()(
               
               const avgScore = vocabReqs.length > 0 
                 ? vocabReqs.reduce((acc, v) => acc + v.baseScore, 0) / vocabReqs.length 
-                : lastNodeMastery; // Default to last node's mastery if no reqs
+                : (isFinite(lastNodeMastery) ? lastNodeMastery : 0);
 
-              const isMastered = (vocabReqs.length > 0 && vocabReqs.every(v => v.status === 'mastered')) || (vocabReqs.length === 0 && lastNodeMastery >= 950);
+              const isMastered = 
+                state.completedNodeIds.includes(node.id) ||
+                (vocabReqs.length > 0 && vocabReqs.every(v => v.status === 'mastered')) || 
+                (vocabReqs.length === 0 && lastNodeMastery >= 950 && nIdx > 0);
+
               const isUnlocked = lastNodeMastery > 700 || (lIdx === 0 && nIdx === 0);
               
               let newStatus: NodeStatus = 'locked';
               if (isMastered) newStatus = 'mastered';
               else if (isUnlocked) newStatus = 'active';
 
-              lastNodeMastery = avgScore;
+              lastNodeMastery = isMastered ? 1000 : avgScore;
 
               return { ...node, status: newStatus };
             })
           }));
 
-          // Update currentPositionNodeId to the first active/mastered but not yet hardened node?
-          // Actually user said: "The current stop is highlighted and clickable."
-          // So the first non-mastered node that is active.
           const allNodes = newCurriculums.flatMap(l => l.nodes);
           const firstActive = allNodes.find(n => n.status === 'active')?.id || state.currentPositionNodeId;
 
           return { curriculums: newCurriculums, currentPositionNodeId: firstActive };
         });
+      },
+
+      completeNode: (nodeId) => {
+        set((state) => ({
+          completedNodeIds: [...new Set([...state.completedNodeIds, nodeId])]
+        }));
+        get().refreshCurriculumStatus();
+        void get().syncToCloud();
       },
 
       applyScoreUpdate: (nodeId, points, context) => {
@@ -685,6 +700,7 @@ export const useMasteryStore = create<MasteryStore>()(
           let newShields = state.streakShields;
           let newLastStreakMilestone = state.lastStreakMilestone;
           let newPendingComebackBonus = state.pendingComebackBonus;
+          let shieldWasUsed = false;
 
           if (wasActiveYesterday) {
             newStreak += 1;
@@ -698,7 +714,7 @@ export const useMasteryStore = create<MasteryStore>()(
             // Missed a day
             if (newShields > 0) {
               newShields -= 1;
-              shieldUsed = true;
+              shieldWasUsed = true;
               // Streak maintained by shield
             } else {
               // Comeback bonus check
@@ -783,6 +799,12 @@ export const useMasteryStore = create<MasteryStore>()(
       getTopConfusionPairs: (limit) => {
         const pairs = [...get().confusionPairs];
         return pairs.sort((a, b) => b.count - a.count).slice(0, limit);
+      },
+      completeIntroduction: (introId) => {
+        set((state) => ({
+          seenIntroductions: [...new Set([...state.seenIntroductions, introId])]
+        }));
+        void get().syncToCloud();
       },
       updateProductionStatus: (wordId, status) => {
         set((state) => ({
@@ -962,9 +984,10 @@ export const useMasteryStore = create<MasteryStore>()(
         void get().syncToCloud();
       },
 
-      resetLearningProgress: () => {
+      resetLearningProgress: async () => {
         set({
-          vocabulary: mappedVocabulary,
+          profile: defaultProfile,
+          vocabulary: mappedVocabulary.map(v => ({ ...v, baseScore: 0, confidenceScore: 0, status: 'not_started' as MasteryStatus })),
           curriculums: curriculumRoadmap,
           activeCurriculumId: null,
           activeModuleId: null,
@@ -982,6 +1005,8 @@ export const useMasteryStore = create<MasteryStore>()(
           lastStreakMilestone: 0,
           pendingComebackBonus: false,
           learningDays: [],
+          completedNodeIds: [],
+          seenIntroductions: [],
           confusionPairs: [],
           sessionLog: [],
           currentChallenge: null,
@@ -991,8 +1016,9 @@ export const useMasteryStore = create<MasteryStore>()(
           pendingProveItResponses: [],
           totalProveItSubmitted: 0
         });
+        localStorage.setItem('tp_sandbox_mode', 'false');
         get().refreshCurriculumStatus();
-        void get().syncToCloud(undefined, false);
+        await get().syncToCloud(undefined, false, true);
       },
 
       startSessionTimer: () => set({ sessionStartTime: new Date().toISOString() }),
@@ -1162,7 +1188,8 @@ export const useMasteryStore = create<MasteryStore>()(
         void get().syncToCloud();
       },
 
-      resetAsNewUser: () => {
+      resetAsNewUser: async () => {
+        const { userId } = get();
         set({
           studentName: '',
           profile: defaultProfile,
@@ -1171,7 +1198,7 @@ export const useMasteryStore = create<MasteryStore>()(
           savedPhrases: [],
           currentStreak: 0,
           lastActiveDate: '',
-          vocabulary: mappedVocabulary,
+          vocabulary: mappedVocabulary.map(v => ({ ...v, baseScore: 0, confidenceScore: 0, status: 'not_started' as MasteryStatus })),
           curriculums: curriculumRoadmap,
           currentPositionNodeId: 'phi_sim',
           activeCurriculumId: null,
@@ -1189,6 +1216,8 @@ export const useMasteryStore = create<MasteryStore>()(
           lastStreakMilestone: 0,
           pendingComebackBonus: false,
           learningDays: [],
+          completedNodeIds: [],
+          seenIntroductions: [],
           confusionPairs: [],
           sessionLog: [],
           currentChallenge: null,
@@ -1198,17 +1227,21 @@ export const useMasteryStore = create<MasteryStore>()(
           pendingProveItResponses: [],
           totalProveItSubmitted: 0
         });
+        localStorage.setItem('tp_sandbox_mode', 'false');
         get().refreshCurriculumStatus();
-        void get().syncToCloud(undefined, false);
+        if (userId) {
+          await get().syncToCloud(userId, false, true);
+        }
       },
 
-      resetProfileAndRunSetup: () => {
+      resetProfileAndRunSetup: async () => {
         set({
           studentName: '',
           profile: defaultProfile,
           reviewVibe: null,
           profileImage: '',
           curriculums: curriculumRoadmap,
+          vocabulary: mappedVocabulary.map(v => ({ ...v, baseScore: 0, confidenceScore: 0, status: 'not_started' as MasteryStatus })),
           currentPositionNodeId: 'phi_sim',
           activeCurriculumId: null,
           activeModuleId: null,
@@ -1225,6 +1258,8 @@ export const useMasteryStore = create<MasteryStore>()(
           lastStreakMilestone: 0,
           pendingComebackBonus: false,
           learningDays: [],
+          completedNodeIds: [],
+          seenIntroductions: [],
           confusionPairs: [],
           sessionLog: [],
           currentChallenge: null,
@@ -1234,8 +1269,9 @@ export const useMasteryStore = create<MasteryStore>()(
           pendingProveItResponses: [],
           totalProveItSubmitted: 0
         });
+        localStorage.setItem('tp_sandbox_mode', 'false');
         get().refreshCurriculumStatus();
-        void get().syncToCloud(undefined, false);
+        await get().syncToCloud(undefined, false, true);
       },
 
       randomizeVocab: () => {
@@ -1362,38 +1398,51 @@ export const useMasteryStore = create<MasteryStore>()(
         void get().syncToCloud();
       },
 
-      syncToCloud: async (explicitUserId, merge = true) => {
+      syncToCloud: async (explicitUserId, merge = true, force = false) => {
         const { vocabulary, curriculums, lastUpdated, studentName, profile, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, isMainProfile, widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, cloudSynced, songs, commonPhrases, lastStreakCheck, learningDays, confusionPairs, pendingProveItResponses,
             earnedCeremonialRanks, lastSmallRankTitle, earnedBadges, totalProveItSubmitted,
             streakShields, xpMultiplier, lastStreakMilestone, pendingComebackBonus, sessionXPRecord,
-            sessionLog, currentChallenge, completedChallenges, pendingRankAcknowledgement, newRankUnlocked } = get();
+            sessionLog, currentChallenge, completedChallenges, pendingRankAcknowledgement, newRankUnlocked,
+            activeCurriculumId, activeModuleId, selectedWords, lessonFilter } = get();
         const targetId = explicitUserId || userId;
 
         // Block premature syncs before cloud data has loaded — prevents stale
         // localStorage data from overwriting Firestore during the auth race window
-        if (!cloudSynced && !explicitUserId) return;
+        if (!cloudSynced && !explicitUserId && !force) return;
 
         // Prevent sync for guest users and any non-main profile (Sandbox mode)
-        if (!targetId || targetId === 'guest_user' || !isMainProfile) return;
-
-        // NEW: Also check explicit sandbox mode toggle
-        if (localStorage.getItem('tp_sandbox_mode') === 'true') return;
+        // Unless force=true (used for resets)
+        if (!targetId || targetId === 'guest_user') return;
+        if (!force && (!isMainProfile || localStorage.getItem('tp_sandbox_mode') === 'true')) return;
 
         try {
           // Strip static content before sending to Firestore
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const partialVocab = vocabulary.map(({ phonetic, syllables, anchor, semanticCluster, connotation, roles, examples, collocations, relatedWordIds, boundaryNotes, etymology, mnemonic, culturalNotes, avoidWhen, ...dynamicData }) => dynamicData);
 
-          await setDoc(doc(db, 'users', targetId), {
+          // Deep sanitize object to convert undefined -> null for Firestore reliability
+          const sanitize = (obj: any): any => {
+            if (Array.isArray(obj)) return obj.map(sanitize);
+            if (obj !== null && typeof obj === 'object') {
+              return Object.entries(obj).reduce((acc, [key, value]) => ({
+                ...acc,
+                [key]: value === undefined ? null : sanitize(value)
+              }), {});
+            }
+            return obj === undefined ? null : obj;
+          };
+
+          await setDoc(doc(db, 'users', targetId), sanitize({
             vocabulary: partialVocab,
             curriculums, lastUpdated, studentName, profile, profileImage,
             savedPhrases, currentStreak, lastActiveDate, hasCompletedSetup, currentPositionNodeId, isMainProfile,
             widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, songs, commonPhrases,
-            lastStreakCheck, learningDays, confusionPairs, pendingProveItResponses,
+            lastStreakCheck, learningDays, completedNodeIds, seenIntroductions, confusionPairs, pendingProveItResponses,
             earnedCeremonialRanks, lastSmallRankTitle, earnedBadges, totalProveItSubmitted,
             streakShields, xpMultiplier, lastStreakMilestone, pendingComebackBonus, sessionXPRecord,
-            sessionLog, currentChallenge, completedChallenges, pendingRankAcknowledgement, newRankUnlocked
-          }, { merge });
+            sessionLog, currentChallenge, completedChallenges, pendingRankAcknowledgement, newRankUnlocked,
+            activeCurriculumId, activeModuleId, selectedWords, lessonFilter
+          }), { merge });
         } catch (err) {
           console.error('Firebase Sync Error:', err);
         }
@@ -1603,6 +1652,8 @@ export const useMasteryStore = create<MasteryStore>()(
             commonPhrases: (Array.isArray(data.commonPhrases) && data.commonPhrases.length > 0) ? data.commonPhrases : defaultCommonPhrases,
             lastStreakCheck: data.lastStreakCheck || '',
             learningDays: data.learningDays || [],
+            completedNodeIds: data.completedNodeIds || [],
+            seenIntroductions: data.seenIntroductions || [],
             confusionPairs: data.confusionPairs || [],
             pendingProveItResponses: data.pendingProveItResponses || [],
             earnedCeremonialRanks: data.earnedCeremonialRanks || [],
@@ -1619,11 +1670,17 @@ export const useMasteryStore = create<MasteryStore>()(
             completedChallenges: data.completedChallenges || [],
             pendingRankAcknowledgement: data.pendingRankAcknowledgement || null,
             newRankUnlocked: data.newRankUnlocked || null,
+            activeCurriculumId: data.activeCurriculumId || null,
+            activeModuleId: data.activeModuleId || null,
+            selectedWords: data.selectedWords || [],
+            lessonFilter: data.lessonFilter || null,
           };
 
           if (data.studentName) update.studentName = data.studentName;
           if (data.profileImage) update.profileImage = data.profileImage;
-          if (data.profile) update.profile = data.profile;
+          if (data.profile) {
+            update.profile = { ...defaultProfile, ...data.profile };
+          }
 
           set(update);
           get().refreshCurriculumStatus();

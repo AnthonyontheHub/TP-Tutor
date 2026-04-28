@@ -42,7 +42,8 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
 
   const handleResetLearning = async () => {
     if(confirm("Reset learning progress? Your profile will be kept, but vocabulary and streaks will be reset to zero.")) {
-      resetLearningProgress();
+      await resetLearningProgress();
+      setIsSandboxMode(false);
       onClose();
     }
   };
@@ -50,6 +51,7 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
   const handleReset = async () => {
     if(confirm("Wipe all local and cloud data? This will also sign you out.")) {
       await resetAsNewUser();
+      setIsSandboxMode(false);
       await logout();
     }
   };

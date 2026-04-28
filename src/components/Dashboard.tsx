@@ -9,12 +9,13 @@ import SentenceBuilder from './SentenceBuilder';
 import ProveIt from './ProveIt';
 import ChallengeWidget from './ChallengeWidget';
 import OperationalIntelligenceWidget from './OperationalIntelligenceWidget';
+import WordScramble from './WordScramble';
 import { fetchQuickTranslation, resolveApiKey, buildOfflineTranslation } from '../services/linaService';
 import type { MasteryStatus, VocabWord } from '../types/mastery';
 import type { AppPanel } from '../App';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export type DashboardView = 'vocab' | 'roadmap' | 'archive';
+export type DashboardView = 'vocab' | 'roadmap' | 'archive' | 'games';
 
 export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSandboxMode, chatCount }: {
   onTogglePanel: (p: AppPanel) => void;
@@ -259,6 +260,25 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
             )} 
             <span style={{ fontSize: '0.75rem', fontWeight: 900 }}>{(profile?.tpName || studentName)?.toUpperCase() || 'STUDENT'}</span>
           </button>
+
+          <button 
+            onClick={() => setActiveView('games')} 
+            className="dashboard__icon-btn" 
+            style={{ 
+              ...activeView === 'games' ? { borderColor: 'var(--gold)', color: 'var(--gold)', boxShadow: '0 0 10px var(--gold-glow)' } : {},
+              width: '38px',
+              height: '38px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '1.2rem',
+              background: 'rgba(255,255,255,0.03)',
+              borderRadius: '50%'
+            }}
+            title="Games"
+          >
+            🎮
+          </button>
           
           <OperationalIntelligenceWidget 
             onAskLina={onAskLina}
@@ -430,6 +450,9 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
                     clearFocusPhrase={() => setFocusPhraseId(null)}
                   />
                 </div>
+              )}
+              {activeView === 'games' && (
+                <WordScramble />
               )}
             </motion.div>
           </AnimatePresence>

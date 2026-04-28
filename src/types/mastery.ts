@@ -63,7 +63,7 @@ export function scoreToStatus(score: number): MasteryStatus {
 // Midpoint of each tier's range — used to seed baseScore when reading
 // legacy cloud data that only has a status field.
 export const STATUS_MIDPOINT: Record<MasteryStatus, number> = {
-  not_started: 100,
+  not_started: 0,
   introduced:  350,
   practicing:  625,
   confident:   850,

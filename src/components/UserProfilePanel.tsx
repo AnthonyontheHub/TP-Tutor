@@ -202,43 +202,42 @@ export default function UserProfilePanel({ onClose }: Props) {
         </div>
 
         {/* Tab Bar */}
-        <div className="profile-tabs hide-scrollbar" style={{ 
-          display: 'flex', 
-          overflowX: 'auto', 
-          whiteSpace: 'nowrap',
-          WebkitOverflowScrolling: 'touch',
-          background: '#0a0a0a', 
-          borderBottom: '1px solid var(--border)', 
-          position: 'sticky', 
-          top: 0, 
-          zIndex: 5,
-          padding: '0 4px'
-        }}>
-          {tabs.map(tab => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              style={{
-                padding: '12px 16px',
-                background: 'none',
-                border: 'none',
-                color: activeTab === tab ? 'var(--gold)' : '#666',
-                borderBottom: activeTab === tab ? '2px solid var(--gold)' : '2px solid transparent',
-                fontSize: '0.6rem',
-                fontWeight: 900,
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-                whiteSpace: 'nowrap',
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-                flexShrink: 0,
-                display: 'inline-flex',
-                marginRight: '8px'
-              }}
-            >
-              {tab}
-            </button>
-          ))}
+        <div style={{ position: 'sticky', background: '#0a0a0a', borderBottom: '1px solid var(--border)', top: 0, zIndex: 10 }}>
+          <div className="profile-tabs hide-scrollbar" style={{ 
+            display: 'flex', 
+            overflowX: 'auto', 
+            whiteSpace: 'nowrap',
+            WebkitOverflowScrolling: 'touch',
+            padding: '0 4px',
+            background: '#0a0a0a'
+          }}>
+            {tabs.map(tab => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                style={{
+                  padding: '16px 20px',
+                  background: 'none',
+                  border: 'none',
+                  color: activeTab === tab ? 'var(--gold)' : '#555',
+                  borderBottom: activeTab === tab ? '2px solid var(--gold)' : '2px solid transparent',
+                  fontSize: '0.8rem',
+                  fontWeight: 900,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  whiteSpace: 'nowrap',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  flexShrink: 0,
+                  display: 'inline-flex',
+                }}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+          {/* Scroll Indicator Gradient */}
+          <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '40px', background: 'linear-gradient(to left, #0a0a0a, transparent)', pointerEvents: 'none', zIndex: 11 }} />
         </div>
 
         <div style={{ padding: '20px', flex: 1 }}>
@@ -529,10 +528,18 @@ export default function UserProfilePanel({ onClose }: Props) {
               </div>
               <div style={{ textAlign: 'right' }}>
                 <div style={{ fontSize: '0.6rem', letterSpacing: '0.1em', opacity: 0.5, marginBottom: '4px' }}>STREAK SHIELDS</div>
-                <div style={{ display: 'flex', gap: '4px', justifyContent: 'flex-end' }}>
-                  {[0, 1].map(i => (
-                    <div key={i} style={{ fontSize: '1rem', opacity: i < streakShields ? 1 : 0.2 }}>🛡️</div>
-                  ))}
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'flex-end' }}>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--gold)', marginRight: '4px' }}>{streakShields} / 2</span>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    {[0, 1].map(i => (
+                      <div key={i} style={{ 
+                        fontSize: '1.1rem', 
+                        opacity: i < streakShields ? 1 : 0.1, 
+                        filter: i < streakShields ? 'none' : 'grayscale(100%) brightness(0.4)',
+                        transition: 'all 0.3s ease'
+                      }}>🛡️</div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>

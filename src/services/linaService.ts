@@ -80,7 +80,7 @@ export function stringifyUserContext(profile: UserProfile, lore?: string): strin
 }
 
 export interface ProposedChange {
-  type: 'vocab' | 'concept' | 'vocab_production' | 'vocab_recognition' | 'confusion' | 'example';
+  type: 'vocab' | 'concept' | 'node' | 'vocab_production' | 'vocab_recognition' | 'confusion' | 'example';
   id: string;
   newStatus?: MasteryStatus;
   wordB?: string;
@@ -248,6 +248,10 @@ export function buildTutorPrompt(
     EXAMPLE: [word_id] | [toki pona sentence] ([english translation])
     ---
     Statuses: introduced, practicing, confident, mastered.
+
+    YOUR RULES FOR CURRICULUM NODES:
+    If the current session is a structured lesson, and the student has demonstrated mastery of the CONCEPT or TOPIC (even if no specific vocabulary was required), you may propose completing the node:
+    CHANGE: node | [node_id] | mastered
   `;
 }
 
@@ -357,6 +361,10 @@ export function buildChatPrompt(
     EXAMPLE: [word_id] | [toki pona sentence] ([english translation])
     ---
     Statuses: introduced, practicing, confident, mastered.
+
+    YOUR RULES FOR CURRICULUM NODES:
+    If the current session is a structured lesson, and the student has demonstrated mastery of the CONCEPT or TOPIC (even if no specific vocabulary was required), you may propose completing the node:
+    CHANGE: node | [node_id] | mastered
   `;
 }
 
@@ -404,6 +412,10 @@ export function buildMasteryCourtPrompt(vocabulary: any[], studentName: string, 
     EXAMPLE: [word_id] | [toki pona sentence] ([english translation])
     ---
     Statuses: introduced, practicing, confident, mastered.
+
+    YOUR RULES FOR CURRICULUM NODES:
+    If the current session is a structured lesson, and the student has demonstrated mastery of the CONCEPT or TOPIC (even if no specific vocabulary was required), you may propose completing the node:
+    CHANGE: node | [node_id] | mastered
   `;
 }
 
@@ -529,15 +541,15 @@ export function parseProposedChanges(text: string): ProposedChange[] | null {
        continue;
     }
 
-    if (!/change:\s*(vocab|concept|vocab_production|vocab_recognition)/i.test(line)) continue;
+    if (!/change:\s*(vocab|concept|node|vocab_production|vocab_recognition)/i.test(line)) continue;
     const parts = line.split('|').map(p => p.trim());
     if (parts.length < 3) continue;
-    const typeMatch = parts[0].match(/change:\s*(vocab|concept|vocab_production|vocab_recognition)/i);
+    const typeMatch = parts[0].match(/change:\s*(vocab|concept|node|vocab_production|vocab_recognition)/i);
     if (!typeMatch) continue;
-    const type = typeMatch[1].toLowerCase() as 'vocab' | 'concept' | 'vocab_production' | 'vocab_recognition';
+    const type = typeMatch[1].toLowerCase() as any;
     const id = parts[1];
     const rawStatus = parts[2].toLowerCase().replace(/[^a-z_]/g, '') as MasteryStatus;
-    if (id && VALID_STATUSES.includes(rawStatus)) {
+    if (id && (VALID_STATUSES.includes(rawStatus) || rawStatus === 'mastered')) {
       changes.push({ type, id, newStatus: rawStatus });
     }
   }

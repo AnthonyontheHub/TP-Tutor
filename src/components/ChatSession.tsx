@@ -87,6 +87,9 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
   const currentChallenge        = useMasteryStore(s => s.currentChallenge);
   const pendingRankAcknowledgement = useMasteryStore(s => s.pendingRankAcknowledgement);
   const clearRankAcknowledgement = useMasteryStore(s => s.clearRankAcknowledgement);
+  const completeNode            = useMasteryStore(s => s.completeNode);
+  const completeIntroduction    = useMasteryStore(s => s.completeIntroduction);
+  const seenIntroductions       = useMasteryStore(s => s.seenIntroductions);
   const currentPositionNodeId   = useMasteryStore(s => s.currentPositionNodeId);
   const earnedBadges            = useMasteryStore(s => s.earnedBadges);
   const earnedCeremonialRanks   = useMasteryStore(s => s.earnedCeremonialRanks);
@@ -242,13 +245,32 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
       const payload = currentSession?.contextPayload;
       const vibe = currentSession?.vibe ?? 'chill';
 
+      const activeNodes = state.curriculums.flatMap(l => l.nodes.map(n => ({ id: n.id, title: n.title, status: n.status, sessionNotes: '' })));
+
       const sys = latestChatContext === 'MASTERY_COURT'
         ? buildMasteryCourtPrompt(state.vocabulary, displayName, userContext)
         : latestChatContext === 'LESSON' 
-          ? buildTutorPrompt(state.vocabulary, [], displayName, userContext, undefined, undefined, vibe, yesterdayWasActive.current, getRegressionCandidates(7), getTopConfusionPairs(5), pendingProveItResponses, xpMultiplier, currentChallenge, pendingRankAcknowledgement)
+          ? buildTutorPrompt(state.vocabulary, activeNodes, displayName, userContext, undefined, undefined, vibe, yesterdayWasActive.current, getRegressionCandidates(7), getTopConfusionPairs(5), pendingProveItResponses, xpMultiplier, currentChallenge, pendingRankAcknowledgement)
           : buildChatPrompt(state.vocabulary, displayName, userContext, latestChatContext, payload, yesterdayWasActive.current, getTopConfusionPairs(5), xpMultiplier, pendingRankAcknowledgement);
       
-      const triggerMsg = `[SYSTEM: Start the session now based on this context: ${context}. Greet the student and proceed naturally.]`;
+      let introId: string | null = null;
+      if (latestChatContext === 'LESSON') {
+        const match = context.match(/for "(.*?)"/);
+        introId = match ? `lesson_${match[1]}` : 'lesson_general';
+      } else if (context.includes('Daily Review')) {
+        introId = 'daily_review';
+      } else if (context.includes('Archive Practice') || context.includes('practice my saved phrases')) {
+        introId = 'archive_practice';
+      } else if (context.includes('Start a general conversation')) {
+        introId = 'general_chat';
+      }
+
+      let finalContext = context;
+      if (introId && !seenIntroductions.includes(introId)) {
+        finalContext += `\n[SYSTEM: This is the FIRST TIME the student has entered this specific mode or lesson. Before proceeding with the session as normal, take a moment to introduce yourself in this context and explain briefly what the goal of this module is and how you will be helping them master it. Keep it casual and helpful in your jan Lina personality.]`;
+      }
+
+      const triggerMsg = `[SYSTEM: Start the session now based on this context: ${finalContext}. Greet the student and proceed naturally.]`;
       let full = '';
       for await (const chunk of streamCompletion(key, sys, [{ role: 'user', content: triggerMsg }])) {
         full += chunk;
@@ -265,6 +287,7 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
           { role: 'assistant', content: full }
         ]
       });
+      if (introId) completeIntroduction(introId);
     } catch (e) {
       console.error(e);
       updateSession(sessionId, {
@@ -329,6 +352,7 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
       if (change.type === 'vocab_recognition' && change.newStatus) updateRecognitionStatus(change.id, change.newStatus);
       if (change.type === 'confusion' && change.wordB) recordConfusion(change.id, change.wordB);
       if (change.type === 'example' && change.exampleSentence) setPinnedExample(change.id, change.exampleSentence);
+      if (change.type === 'node' && (change.newStatus === 'mastered' || change.newStatus === 'confident')) completeNode(change.id);
     }
     
     setLastUpdated(new Date().toLocaleDateString());
@@ -408,10 +432,12 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
       const payload = currentSession?.contextPayload;
       const vibe = currentSession?.vibe ?? 'chill';
 
+      const activeNodes = state.curriculums.flatMap(l => l.nodes.map(n => ({ id: n.id, title: n.title, status: n.status, sessionNotes: '' })));
+
       const sys = latestChatContext === 'MASTERY_COURT'
         ? buildMasteryCourtPrompt(state.vocabulary, displayName, userContext)
         : latestChatContext === 'LESSON'
-          ? buildTutorPrompt(state.vocabulary, [], displayName, userContext, undefined, undefined, vibe, yesterdayWasActive.current, getRegressionCandidates(7), getTopConfusionPairs(5), pendingProveItResponses, xpMultiplier, currentChallenge, pendingRankAcknowledgement)
+          ? buildTutorPrompt(state.vocabulary, activeNodes, displayName, userContext, undefined, undefined, vibe, yesterdayWasActive.current, getRegressionCandidates(7), getTopConfusionPairs(5), pendingProveItResponses, xpMultiplier, currentChallenge, pendingRankAcknowledgement)
           : buildChatPrompt(state.vocabulary, displayName, userContext, latestChatContext, payload, yesterdayWasActive.current, getTopConfusionPairs(5), xpMultiplier, pendingRankAcknowledgement);
 
       const windowedHistory = [...history, { role: 'user', content: txt }].slice(-HISTORY_WINDOW);
