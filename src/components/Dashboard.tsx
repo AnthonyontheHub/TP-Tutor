@@ -39,6 +39,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   const [isAutoTranslating, setIsAutoTranslating] = useState(false);
   const [showSaveNote, setShowSaveNote] = useState(false);
   const [saveNoteInput, setSaveNoteInput] = useState('');
+  const [savedConfirm, setSavedConfirm] = useState(false);
   const [showProveIt, setShowProveIt] = useState(false);
   const confirmTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
