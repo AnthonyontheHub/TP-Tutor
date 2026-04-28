@@ -144,7 +144,7 @@ interface MasteryActions {
   masterAllVocab: () => void;
   clearLocalData: () => void;
   syncFromCloud: (userId: string, initialName?: string, initialProfileImage?: string) => Promise<Unsubscribe | void>;
-  syncToCloud: (userId?: string) => Promise<void>;
+  syncToCloud: (userId?: string, merge?: boolean) => Promise<void>;
   getStatusSummary: () => StatusSummary & { xp: number; level: number; rankTitle: string };
   setHasCompletedSetup: (val: boolean) => void;
   updateNodeStatus: (nodeId: string, status: NodeStatus) => void;
@@ -971,7 +971,7 @@ export const useMasteryStore = create<MasteryStore>()(
           savedPhrases: [],
           currentStreak: 0,
           lastActiveDate: '',
-          currentPositionNodeId: get().curriculums[0].nodes[0].id,
+          currentPositionNodeId: curriculumRoadmap[0].nodes[0].id,
           earnedBadges: [],
           earnedCeremonialRanks: [],
           newRankUnlocked: null,
@@ -991,7 +991,7 @@ export const useMasteryStore = create<MasteryStore>()(
           pendingProveItResponses: [],
           totalProveItSubmitted: 0
         });
-        void get().syncToCloud();
+        void get().syncToCloud(undefined, false);
       },
 
       startSessionTimer: () => set({ sessionStartTime: new Date().toISOString() }),
@@ -1178,8 +1178,26 @@ export const useMasteryStore = create<MasteryStore>()(
           hasCompletedSetup: false,
           songs: defaultSongs,
           commonPhrases: defaultCommonPhrases,
+          earnedBadges: [],
+          earnedCeremonialRanks: [],
+          newRankUnlocked: null,
+          lastSmallRankTitle: 'jan lili',
+          sessionXPRecord: 0,
+          xpMultiplier: 1.0,
+          streakShields: 0,
+          lastStreakMilestone: 0,
+          pendingComebackBonus: false,
+          learningDays: [],
+          confusionPairs: [],
+          sessionLog: [],
+          currentChallenge: null,
+          completedChallenges: [],
+          pendingRankAcknowledgement: null,
+          lastStreakCheck: '',
+          pendingProveItResponses: [],
+          totalProveItSubmitted: 0
         });
-        void get().syncToCloud();
+        void get().syncToCloud(undefined, false);
       },
 
       resetProfileAndRunSetup: () => {
@@ -1195,8 +1213,26 @@ export const useMasteryStore = create<MasteryStore>()(
           hasCompletedSetup: false,
           songs: defaultSongs,
           commonPhrases: defaultCommonPhrases,
+          earnedBadges: [],
+          earnedCeremonialRanks: [],
+          newRankUnlocked: null,
+          lastSmallRankTitle: 'jan lili',
+          sessionXPRecord: 0,
+          xpMultiplier: 1.0,
+          streakShields: 0,
+          lastStreakMilestone: 0,
+          pendingComebackBonus: false,
+          learningDays: [],
+          confusionPairs: [],
+          sessionLog: [],
+          currentChallenge: null,
+          completedChallenges: [],
+          pendingRankAcknowledgement: null,
+          lastStreakCheck: '',
+          pendingProveItResponses: [],
+          totalProveItSubmitted: 0
         });
-        void get().syncToCloud();
+        void get().syncToCloud(undefined, false);
       },
 
       randomizeVocab: () => {
@@ -1323,7 +1359,7 @@ export const useMasteryStore = create<MasteryStore>()(
         void get().syncToCloud();
       },
 
-      syncToCloud: async (explicitUserId) => {
+      syncToCloud: async (explicitUserId, merge = true) => {
         const { vocabulary, curriculums, lastUpdated, studentName, profile, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, isMainProfile, widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, cloudSynced, songs, commonPhrases, lastStreakCheck, learningDays, confusionPairs, pendingProveItResponses,
             earnedCeremonialRanks, lastSmallRankTitle, earnedBadges, totalProveItSubmitted,
             streakShields, xpMultiplier, lastStreakMilestone, pendingComebackBonus, sessionXPRecord,
@@ -1354,7 +1390,7 @@ export const useMasteryStore = create<MasteryStore>()(
             earnedCeremonialRanks, lastSmallRankTitle, earnedBadges, totalProveItSubmitted,
             streakShields, xpMultiplier, lastStreakMilestone, pendingComebackBonus, sessionXPRecord,
             sessionLog, currentChallenge, completedChallenges, pendingRankAcknowledgement, newRankUnlocked
-          }, { merge: true });
+          }, { merge });
         } catch (err) {
           console.error('Firebase Sync Error:', err);
         }
