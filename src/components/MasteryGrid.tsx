@@ -235,7 +235,7 @@ export default function MasteryGrid({
         }
       `}</style>
       <div className="grid-toolbar" style={{ flexShrink: 0 }}>
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex flex-wrap items-center gap-2 mb-6">
           <select 
             value={selectedPOS} 
             onChange={(e) => setSelectedPOS(e.target.value)}
@@ -261,7 +261,8 @@ export default function MasteryGrid({
               borderRadius: '10px',
               color: 'white',
               padding: '8px 12px',
-              minWidth: '200px'
+              flex: '1',
+              minWidth: '120px'
             }}
           />
         </div>
