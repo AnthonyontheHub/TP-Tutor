@@ -1,13 +1,12 @@
 /* src/components/UserProfilePanel.tsx */
 import { useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Cropper from 'react-easy-crop';
 import type { Point, Area } from 'react-easy-crop';
 import { useMasteryStore } from '../store/masteryStore';
 import { useAuthStore } from '../store/authStore';
 import { auth, googleProvider } from '../services/firebase';
 import { signInWithPopup } from 'firebase/auth';
-import { STATUS_META } from '../types/mastery';
 
 interface Props {
   isOpen: boolean;
@@ -71,9 +70,9 @@ type TabID = 'IDENTITY' | 'PERSONA' | 'BELIEFS' | 'HEALTH' | 'MEDIA' | 'DAILY';
 
 export default function UserProfilePanel({ onClose }: Props) {
   const { 
-    studentName, profile, updateProfile, setProfileImage, 
+    studentName, profile, updateProfile, setProfileImage,
     profileImage, getStatusSummary,
-    earnedCeremonialRanks, earnedBadges, streakShields
+    earnedCeremonialRanks, streakShields
   } = useMasteryStore();
   const { logout, user, isGuest } = useAuthStore();
   
@@ -583,8 +582,8 @@ export default function UserProfilePanel({ onClose }: Props) {
           letter-spacing: 0.1em;
           margin-bottom: 6px;
         }
-        .field-group input[type=\"text\"],
-        .field-group input[type=\"number\"],
+        .field-group input[type="text"],
+        .field-group input[type="number"],
         .field-group select {
           width: 100%;
           padding: 10px;

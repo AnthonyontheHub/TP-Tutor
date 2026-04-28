@@ -149,11 +149,11 @@ export default function App() {
 
   if (loading) {
     return (
-      <div style={{ 
-        height: '100dvh', display: 'flex', alignItems: 'center', 
-        justifyContent: 'center', background: 'var(--bg)', color: 'var(--text)' 
+      <div style={{
+        height: '100dvh', display: 'flex', alignItems: 'center',
+        justifyContent: 'center', background: 'var(--bg)', color: 'var(--text)'
       }}>
-        <div style={{ fontWeight: 900, letterSpacing: '0.15em', color: 'var(--gold)' }}>jan LINA IS READY...</div>
+        <div style={{ fontWeight: 900, letterSpacing: '0.15em', color: 'var(--gold)' }}>LINA IS READY...</div>
       </div>
     );
   }
@@ -182,7 +182,7 @@ export default function App() {
           boxShadow: '0 2px 10px rgba(0,0,0,0.5)',
           pointerEvents: 'none'
         }}>
-          Sandbox Mode Enabled — Local Changes Only
+          SANDBOX MODE ENABLED — LOCAL CHANGES ONLY
         </div>
       )}
       <Dashboard 
@@ -205,21 +205,21 @@ export default function App() {
         ))}
       </AnimatePresence>
 
-      <div className="chat-dock" style={{ 
-        position: 'fixed', 
-        bottom: 0, 
-        right: 0, 
+      <div className="chat-dock" style={{
+        position: 'fixed',
+        bottom: 0,
+        right: 0,
         left: 0,
         height: 'var(--header-height)',
-        display: 'flex', 
+        display: 'flex',
         justifyContent: 'flex-end',
         alignItems: 'center',
         padding: '0 20px',
         gap: '12px',
         pointerEvents: 'none',
-        zIndex: 7000 
+        zIndex: 7000
       }}>
-        {chatSessions.filter(s => s.isMinimized).map((session, idx) => (
+        {chatSessions.filter(s => s.isMinimized).map((session) => (
           <div 
             key={session.id}
             onClick={() => toggleMinimizeChat(session.id)}

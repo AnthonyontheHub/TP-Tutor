@@ -1,7 +1,6 @@
 import type { VocabWord, MasteryStatus, UserProfile, ReviewVibe, WeeklyChallenge } from '../types/mastery';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { TOKI_PONA_DICTIONARY } from '../data/tokiPonaDictionary';
-import { STATUS_MIDPOINT, scoreToStatus } from '../types/mastery';
 
 const GEMINI_MODEL = "gemini-2.5-flash";
 
@@ -547,8 +546,6 @@ export function parseProposedChanges(text: string): ProposedChange[] | null {
 }
 
 export function detectSessionTitle(prompt: string): string {
-  const low = prompt.toLowerCase();
-  
   if (prompt.includes('Roadmap Lesson')) {
     const match = prompt.match(/for "([^"]+)"/);
     return match ? match[1] : 'Roadmap Lesson';

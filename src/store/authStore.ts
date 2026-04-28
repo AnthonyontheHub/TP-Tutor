@@ -31,24 +31,26 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       console.log('Attempting sign-in with popup...');
       await signInWithPopup(auth, googleProvider);
-    } catch (error: any) {
-      console.error('Sign-in popup failed:', error.code, error.message);
-      
+    } catch (error) {
+      const authError = error as { code?: string; message?: string };
+      console.error('Sign-in popup failed:', authError.code, authError.message);
+
       // Fallback for Chromebooks/blocked popups
       if (
-        error.code === 'auth/popup-blocked' || 
-        error.code === 'auth/popup-closed-by-user' || 
-        error.code === 'auth/cancelled-popup-request'
+        authError.code === 'auth/popup-blocked'
+        || authError.code === 'auth/popup-closed-by-user'
+        || authError.code === 'auth/cancelled-popup-request'
       ) {
         console.log('Switching to redirect mode...');
         try {
           await signInWithRedirect(auth, googleProvider);
-        } catch (redirectError: any) {
-          console.error('Sign-in redirect failed:', redirectError.code);
-          set({ error: redirectError.message, loading: false });
+        } catch (redirectError) {
+          const redirectAuthError = redirectError as { code?: string; message?: string };
+          console.error('Sign-in redirect failed:', redirectAuthError.code);
+          set({ error: redirectAuthError.message || 'Sign-in failed', loading: false });
         }
       } else {
-        set({ error: error.message, loading: false });
+        set({ error: authError.message || 'Sign-in failed', loading: false });
       }
     }
   },

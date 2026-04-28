@@ -23,7 +23,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   isSandboxMode: boolean;
   chatCount: number;
 }) {
-  const { studentName, profile, profileImage, currentStreak, vocabulary, curriculums, savedPhrases, reviewVibe, setReviewVibe, selectedWords, setSelectedWords, savePhrase, lessonFilter, setLessonFilter, calculateDecay, checkAssessments, hardenWord, knowledgeCheckFrequency, lastKnowledgeCheckDate, setLastKnowledgeCheckDate } = useMasteryStore();
+  const { studentName, profile, profileImage, currentStreak, vocabulary, curriculums, reviewVibe, setReviewVibe, selectedWords, setSelectedWords, savePhrase, lessonFilter, setLessonFilter, calculateDecay, checkAssessments, knowledgeCheckFrequency, lastKnowledgeCheckDate, setLastKnowledgeCheckDate } = useMasteryStore();
 
   const [activeView, setActiveView] = useState<DashboardView>('vocab');
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
@@ -39,7 +39,6 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   const [isAutoTranslating, setIsAutoTranslating] = useState(false);
   const [showSaveNote, setShowSaveNote] = useState(false);
   const [saveNoteInput, setSaveNoteInput] = useState('');
-  const [savedConfirm, setSavedConfirm] = useState(false);
   const [showProveIt, setShowProveIt] = useState(false);
   const confirmTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 

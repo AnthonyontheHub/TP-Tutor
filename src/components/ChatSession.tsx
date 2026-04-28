@@ -7,10 +7,9 @@ import type { ChatMessage } from '../store/chatStore';
 import { STATUS_MIDPOINT } from '../types/mastery';
 import {
   buildTutorPrompt, buildChatPrompt, buildMasteryCourtPrompt, streamCompletion, stripProposedChanges,
-  parseProposedChanges, parseSessionSummaryNotes, resolveApiKey, fetchSessionRecap,
+  parseProposedChanges, parseSessionSummaryNotes, resolveApiKey,
   fetchQuickTranslation, stringifyUserContext, detectSessionTitle
 } from '../services/linaService';
-import type { ProposedChange } from '../services/linaService';
 import SessionRecap from './SessionRecap';
 import { WORD_FREQUENCY } from '../data/tokiPonaDictionary';
 
@@ -43,7 +42,6 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
   const [showRecap, setShowRecap] = useState(false);
   const [sessionXP, setSessionXP] = useState(0);
   const [startingTotalXP, setStartingTotalXP] = useState(0);
-  const [userMsgCount, setUserMsgCount] = useState(0);
   const yesterdayWasActive = useRef(false);
 
   const [translateBubble, setTranslateBubble] = useState<{
@@ -59,7 +57,6 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
   const setLastUpdated      = useMasteryStore(s => s.setLastUpdated);
   const studentName         = useMasteryStore(s => s.studentName);
   const profile             = useMasteryStore(s => s.profile);
-  const lore                = useMasteryStore(s => s.lore);
 
   const runMorningStreakCheck = useMasteryStore(s => s.runMorningStreakCheck);
   const getRegressionCandidates = useMasteryStore(s => s.getRegressionCandidates);
@@ -146,7 +143,7 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
       const key = resolveApiKey();
       const result = await fetchQuickTranslation(key, translateBubble.text);
       setTranslateBubble(prev => prev ? { ...prev, loading: false, result: result || 'Could not translate.' } : null);
-    } catch (err) {
+    } catch {
       setTranslateBubble(prev => prev ? { ...prev, loading: false, result: 'Error translating.' } : null);
     }
   };
@@ -169,7 +166,7 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
 
     let contextPayload: string | undefined = undefined;
     if (newContext === 'VOCAB_PANEL') {
-      const match = pendingPrompt.match(/(?:about the word|deep-dive|for the word|word)\s+([^\s\.\?!]+)/i);
+      const match = pendingPrompt.match(/(?:about the word|deep-dive|for the word|word)\s+([^\s.?!]+)/i);
       if (match) contextPayload = match[1].replace(/[[\]"']/g, '').trim();
     } else if (newContext === 'PHRASE_PRACTICE' || newContext === 'GRAMMAR_CHECK') {
       const match = pendingPrompt.match(/"([^"]+)"/);
@@ -180,14 +177,14 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
       awardBadge('court_session');
     }
 
-    updateSession(sessionId, { 
-      context: newContext as any,
+    updateSession(sessionId, {
+      context: newContext,
       contextPayload: contextPayload,
       title: detectSessionTitle(pendingPrompt),
       messages: [],
       history: [],
       sessionDeltas: []
-    } as any);
+    });
     
     setStartingTotalXP(getStatusSummary().xp);
     setSessionXP(0);
@@ -231,7 +228,7 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
       const key = resolveApiKey(overrideKey);
       const state = useMasteryStore.getState();
       const userContext = stringifyUserContext(state.profile);
-      const currentSession = useChatStore.getState().sessions.find(s => s.id === sessionId) as any;
+      const currentSession = useChatStore.getState().sessions.find(s => s.id === sessionId);
       const latestChatContext = currentSession?.context || 'GENERAL';
       const payload = currentSession?.contextPayload;
       const vibe = currentSession?.vibe ?? 'chill';
@@ -279,10 +276,10 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
     }
 
     const deltas = sessionDeltas;
-    
+
     // XP Calculation for Recap
     let totalXP = 0;
-    const wordsMoved: any[] = [];
+    const wordsMoved: { word: string; oldStatus: MasteryStatus; newStatus: MasteryStatus; hardened?: boolean; roleMastered: boolean }[] = [];
     
     for (const change of deltas) {
       const vocabWord = vocabulary.find(v => v.id === change.id || v.word.toLowerCase() === change.id.toLowerCase());
@@ -393,29 +390,21 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
       return;
     }
 
-    setUserMsgCount(prev => {
-      const next = prev + 1;
-      if (next === 10) {
-        progressChallenge(1, 'convo_length');
-      }
-      return next;
-    });
-
     try {
       const key = resolveApiKey(overrideKey);
       const state = useMasteryStore.getState();
       const userContext = stringifyUserContext(state.profile);
-      const currentSession = useChatStore.getState().sessions.find(s => s.id === sessionId) as any;
+      const currentSession = useChatStore.getState().sessions.find(s => s.id === sessionId);
       const latestChatContext = currentSession?.context || 'GENERAL';
       const payload = currentSession?.contextPayload;
       const vibe = currentSession?.vibe ?? 'chill';
 
       const sys = latestChatContext === 'MASTERY_COURT'
         ? buildMasteryCourtPrompt(state.vocabulary, displayName, userContext)
-        : latestChatContext === 'LESSON' 
+        : latestChatContext === 'LESSON'
           ? buildTutorPrompt(state.vocabulary, [], displayName, userContext, undefined, undefined, vibe, yesterdayWasActive.current, getRegressionCandidates(7), getTopConfusionPairs(5), pendingProveItResponses, xpMultiplier, currentChallenge, pendingRankAcknowledgement)
           : buildChatPrompt(state.vocabulary, displayName, userContext, latestChatContext, payload, yesterdayWasActive.current, getTopConfusionPairs(5), xpMultiplier, pendingRankAcknowledgement);
-      
+
       const windowedHistory = [...history, { role: 'user', content: txt }].slice(-HISTORY_WINDOW);
       let full = '';
       for await (const chunk of streamCompletion(key, sys, windowedHistory)) {

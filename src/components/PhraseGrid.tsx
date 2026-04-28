@@ -65,7 +65,7 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
       return phrases;
     }
     return phrases.filter(p => {
-      const ws = (p.tokiPona || '').split(/[ \/]+/).map(clean);
+      const ws = (p.tokiPona || '').split(/[ /]+/).map(clean);
       return selectedWords.every(sw => ws.includes(clean(sw)));
     });
   };

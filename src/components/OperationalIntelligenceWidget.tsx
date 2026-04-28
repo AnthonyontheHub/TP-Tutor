@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
-import { STATUS_META, type MasteryStatus } from '../types/mastery';
+import type { MasteryStatus } from '../types/mastery';
 
 interface Props {
   onAskLina: (prompt: string) => void;

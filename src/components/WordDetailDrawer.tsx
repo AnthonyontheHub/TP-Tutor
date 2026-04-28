@@ -19,9 +19,6 @@ const NEXT_STATUS: Partial<Record<MasteryStatus, MasteryStatus>> = {
   practicing:  'confident',
   confident:   'mastered',
 };
-const NEXT_THRESHOLD: Partial<Record<MasteryStatus, number>> = {
-  not_started: 201, introduced: 501, practicing: 751, confident: 950,
-};
 const NEXT_COLOR: Record<MasteryStatus, string> = {
   not_started: '#a855f7',
   introduced:  '#3b82f6',
@@ -55,9 +52,9 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
   const primaryMeaning = word?.meanings?.split(',')[0].trim() || word?.meanings;
   const extra = word ? WORD_EXTRA_DATA[word.word] : null;
 
-  const triggerGeneration = async (force = false) => {
+  const triggerGeneration = async () => {
     if (!word) return;
-    
+
     const key = resolveApiKey();
     if (key && !isSandboxMode) {
       setIsLoading(true);

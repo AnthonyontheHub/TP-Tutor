@@ -4,11 +4,11 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { doc, setDoc, onSnapshot, getDoc } from 'firebase/firestore';
 import type { Unsubscribe } from 'firebase/firestore';
-import { 
-  type MasteryStatus, type VocabWord, type StatusSummary, type SavedPhrase, 
-  type UserProfile, type LoreEntry, type ReviewVibe, type LoreCategory, 
+import {
+  type MasteryStatus, type VocabWord, type StatusSummary, type SavedPhrase,
+  type UserProfile, type ReviewVibe,
   type CurriculumLevel, type NodeStatus, type CommonPhrase, type PosRole,
-  type SmallRank, type CeremonialRank, type Badge, SMALL_RANKS, 
+  type SmallRank, type CeremonialRank, type Badge, SMALL_RANKS,
   CEREMONIAL_RANKS, ALL_BADGES, type SessionLogEntry, type WeeklyChallenge
 } from '../types/mastery';
 import { scoreToStatus, STATUS_MIDPOINT } from '../types/mastery';
@@ -258,7 +258,6 @@ interface MasteryState {
 
 type MasteryStore = MasteryState & MasteryActions;
 
-const XP_MAP = { not_started: 0, introduced: 10, practicing: 25, confident: 50, mastered: 100 };
 const STATUS_ORDER: MasteryStatus[] = ['not_started', 'introduced', 'practicing', 'confident', 'mastered'];
 const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
 
@@ -674,7 +673,6 @@ export const useMasteryStore = create<MasteryStore>()(
         const yesterday = yesterdayDate.toISOString().split('T')[0];
 
         let wasActiveYesterday = false;
-        let shieldUsed = false;
 
         set((state) => {
           if (state.lastStreakCheck === today) {
@@ -873,7 +871,7 @@ export const useMasteryStore = create<MasteryStore>()(
         if (vocabulary.filter(w => w.status === 'mastered').length >= 137) get().awardBadge('jan_sonja_badge');
 
         set((state) => {
-          let updates: Partial<MasteryState> = {};
+          const updates: Partial<MasteryState> = {};
           if (newlyEarned.length > 0) {
             updates.earnedCeremonialRanks = [...state.earnedCeremonialRanks, ...newlyEarned];
             updates.newRankUnlocked = newlyEarned[0];
@@ -1321,16 +1319,8 @@ export const useMasteryStore = create<MasteryStore>()(
 
         try {
           // Strip static content before sending to Firestore
-          const partialVocab = vocabulary.map(w => {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { 
-              phonetic, syllables, anchor, semanticCluster, connotation, 
-              roles, examples, collocations, relatedWordIds, boundaryNotes, 
-              etymology, mnemonic, culturalNotes, avoidWhen, 
-              ...dynamicData 
-            } = w;
-            return dynamicData;
-          });
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const partialVocab = vocabulary.map(({ phonetic, syllables, anchor, semanticCluster, connotation, roles, examples, collocations, relatedWordIds, boundaryNotes, etymology, mnemonic, culturalNotes, avoidWhen, ...dynamicData }) => dynamicData);
 
           await setDoc(doc(db, 'users', targetId), {
             vocabulary: partialVocab,
@@ -1412,7 +1402,7 @@ export const useMasteryStore = create<MasteryStore>()(
           const cloudName = data.studentName as string | undefined;
           const allVocabMastered = Array.isArray(data.vocabulary) &&
             data.vocabulary.length > 0 &&
-            (data.vocabulary as any[]).every((w) => w.status === 'mastered');
+            (data.vocabulary as Array<{ status: MasteryStatus }>).every((w) => w.status === 'mastered');
           const nameMismatch = initialName && cloudName &&
             cloudName.toLowerCase() !== initialName.toLowerCase();
 
@@ -1439,9 +1429,9 @@ export const useMasteryStore = create<MasteryStore>()(
           }
 
           const vocabulary = (data.vocabulary || mappedVocabulary).map(
-            (w: any) => {
+            (w: { word?: string; useCount?: number; frequencyRank?: number; type?: string; status?: MasteryStatus; [key: string]: unknown }) => {
               const base = mappedVocabulary.find(iv => iv.word === w.word);
-              const staticData = vocabContent[w.word] || {};
+              const staticData = vocabContent[w.word || ''] || {};
               const useCount = typeof w.useCount === 'number' ? w.useCount : 0;
               const frequencyRank = typeof w.frequencyRank === 'number' ? w.frequencyRank : (base?.frequencyRank ?? 999);
               const type = w.type || (base?.type ?? 'word');
@@ -1514,11 +1504,11 @@ export const useMasteryStore = create<MasteryStore>()(
 
           // Merge static curriculum content (richContent, etc.) with stored status
           const mergedCurriculums = curriculumRoadmap.map(staticLevel => {
-            const storedLevel = (data.curriculums || []).find((l: any) => l.id === staticLevel.id);
+            const storedLevel = (data.curriculums || []).find((l: { id?: string }) => l.id === staticLevel.id);
             return {
               ...staticLevel,
               nodes: staticLevel.nodes.map(staticNode => {
-                const storedNode = (storedLevel?.nodes || []).find((n: any) => n.id === staticNode.id);
+                const storedNode = (storedLevel?.nodes || []).find((n: { id?: string; status?: NodeStatus }) => n.id === staticNode.id);
                 return {
                   ...staticNode,
                   status: storedNode?.status || staticNode.status
@@ -1599,11 +1589,11 @@ export const useMasteryStore = create<MasteryStore>()(
 
           // Merge static content on rehydration
           const mergedCurriculums = curriculumRoadmap.map(staticLevel => {
-            const storedLevel = (state.curriculums || []).find((l: any) => l.id === staticLevel.id);
+            const storedLevel = (state.curriculums || []).find((l: { id?: string }) => l.id === staticLevel.id);
             return {
               ...staticLevel,
               nodes: staticLevel.nodes.map(staticNode => {
-                const storedNode = (storedLevel?.nodes || []).find((n: any) => n.id === staticNode.id);
+                const storedNode = (storedLevel?.nodes || []).find((n: { id?: string; status?: NodeStatus }) => n.id === staticNode.id);
                 return {
                   ...staticNode,
                   status: storedNode?.status || staticNode.status

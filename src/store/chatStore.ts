@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { ProposedChange } from '../services/linaService';
-import type { MasteryStatus } from '../types/mastery';
 
 export interface ChatMessage {
   id: string;

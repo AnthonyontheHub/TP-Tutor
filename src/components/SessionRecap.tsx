@@ -30,7 +30,6 @@ const SessionRecap: React.FC<SessionRecapProps> = ({
   onContinue
 }) => {
   const [displayXP, setDisplayXP] = useState(prevTotalXP);
-  const targetXP = prevTotalXP + totalXPEarned;
 
   useEffect(() => {
     const duration = 1500;

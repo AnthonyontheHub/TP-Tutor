@@ -81,8 +81,6 @@ export default function CurriculumRoadmap({ onSetActiveView, onAskLina, isSandbo
 
   // Unified Path Logic
   const unifiedPath = useMemo(() => {
-    const path: (({ type: 'node', data: CurriculumNode } | { type: 'session', data: SessionLogEntry }))[] = [];
-    
     // Group sessions by node
     const sessionsByNodeId: Record<string, SessionLogEntry[]> = {};
     const generalSessions: SessionLogEntry[] = [];
@@ -99,21 +97,21 @@ export default function CurriculumRoadmap({ onSetActiveView, onAskLina, isSandbo
     // We build the path backwards from current to future, and backwards from current to past
     // Find index of current node
     const currentIndex = allNodes.findIndex(n => n.id === currentPositionNodeId);
-    
+
     // Future
     const futureNodes = allNodes.slice(currentIndex).map(n => ({ type: 'node' as const, data: n }));
-    
+
     // Past (mastered nodes and sessions)
     const past: (({ type: 'node', data: CurriculumNode } | { type: 'session', data: SessionLogEntry }))[] = [];
-    
+
     for (let i = currentIndex - 1; i >= 0; i--) {
       const node = allNodes[i];
       past.push({ type: 'node', data: node });
-      
+
       const nodeSessions = sessionsByNodeId[node.id];
       if (nodeSessions) {
         // Oldest first as you scroll up from current position
-        [...nodeSessions].sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime()).forEach(s => {
+        [...nodeSessions].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).forEach(s => {
           past.push({ type: 'session', data: s });
         });
       }
@@ -121,7 +119,7 @@ export default function CurriculumRoadmap({ onSetActiveView, onAskLina, isSandbo
 
     // Add general sessions at the very top
     if (generalSessions.length > 0) {
-      generalSessions.sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime()).forEach(s => {
+      generalSessions.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).forEach(s => {
         past.push({ type: 'session', data: s });
       });
     }

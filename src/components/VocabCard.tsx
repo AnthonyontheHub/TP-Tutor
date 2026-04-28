@@ -72,7 +72,7 @@ export default function VocabCard({ word, onLongPress, onClick, isSandboxMode, i
     }
   };
 
-  const handlePointerUp = (e: React.PointerEvent) => {
+  const handlePointerUp = () => {
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;

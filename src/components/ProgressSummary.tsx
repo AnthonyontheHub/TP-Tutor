@@ -8,7 +8,6 @@ interface Props {
 }
 
 export default function ProgressSummary({ activeFilter, onFilterClick }: Props) {
-  const _vocab = useMasteryStore((s) => s.vocabulary);
   const getStatusSummary = useMasteryStore((s) => s.getStatusSummary);
   const summary = getStatusSummary();
 

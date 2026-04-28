@@ -10,10 +10,10 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
   onOpenLogbook: () => void;
   onOpenMasteryCourt?: () => void;
 }) {
-  const { 
+  const {
     resetAsNewUser, masterAllVocab, randomizeVocab, isMainProfile,
     knowledgeCheckFrequency, setKnowledgeCheckFrequency, clearAllSavedPhrases,
-    vocabulary, resetLearningProgress
+    resetLearningProgress
   } = useMasteryStore();
   const { logout } = useAuthStore();
 

@@ -1,6 +1,5 @@
 import React from 'react';
-import { phraseData } from '../data/phraseData'; // Import value
-import type { Phrase, PhraseCategory } from '../data/phraseData'; // Import types separately
+import type { Phrase, PhraseCategory } from '../data/phraseData';
 
 interface PhraseCardProps {
   phraseCategory: PhraseCategory;
