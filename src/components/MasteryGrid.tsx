@@ -1,6 +1,7 @@
 /* src/components/MasteryGrid.tsx */
 import { useState, useMemo, memo, useCallback } from 'react';
 import { FixedSizeList as List } from 'react-window';
+import type { ListChildComponentProps } from 'react-window';
 import { AutoSizer } from 'react-virtualized-auto-sizer';
 import { useMasteryStore } from '../store/masteryStore';
 import VocabCard from './VocabCard';
@@ -24,7 +25,7 @@ const STATUS_RANK: Record<MasteryStatus, number> = {
 };
 
 // Memoized Row component to prevent unnecessary re-renders
-const Row = memo(({ index, style, data }: { index: number; style: React.CSSProperties; data: unknown }) => {
+const Row = memo(({ index, style, data }: ListChildComponentProps) => {
   const { 
     items, columnCount, gap, selectedWords, activeFilter, 
     relatedWordIds, isSandboxMode, handleCardClick, handleCardLongPress,
@@ -51,7 +52,7 @@ const Row = memo(({ index, style, data }: { index: number; style: React.CSSPrope
         const isSelected = positions.length > 0;
 
         let isSelectionDimmed = false;
-        if (selectedWords.length > 0) {
+        if (selectedWords.length === 1) {
           if (!isSelected && !isRelated) {
             isSelectionDimmed = true;
           }
@@ -71,7 +72,7 @@ const Row = memo(({ index, style, data }: { index: number; style: React.CSSPrope
               height: '100%',
               boxSizing: 'border-box'
             }}
-            onClick={(e) => { e.stopPropagation(); handleCardClick(word); }}
+            onClick={(e) => e.stopPropagation()}
           >
             <VocabCard 
               word={word} 
@@ -129,17 +130,17 @@ export default function MasteryGrid({
   onAskLina, isSandboxMode, activeFilter, sortMode, sortDirection,
   setSortMode, setSortDirection
 }: Props) {
-  const { vocabulary, selectedWords, toggleWordSelection, setSelectedWords, lessonFilter } = useMasteryStore();
+  const { vocabulary, selectedWords, toggleWordSelection, addWordToSelection, setSelectedWords, lessonFilter } = useMasteryStore();
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [selectedPOS, setSelectedPOS] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'card' | 'table'>('card');
 
   const handleCardClick = useCallback((word: VocabWord) => {
-    if (selectedWords.length === 0) {
-      setDrawerId(word.id);
-    } else {
+    if (selectedWords.length > 0) {
       toggleWordSelection(word.word);
+    } else {
+      setDrawerId(word.id);
     }
   }, [selectedWords, toggleWordSelection]);
 

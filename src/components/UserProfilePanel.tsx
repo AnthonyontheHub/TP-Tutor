@@ -202,29 +202,29 @@ export default function UserProfilePanel({ onClose }: Props) {
         </div>
 
         {/* Tab Bar */}
-        <div className="profile-tabs" style={{ 
+        <div className="profile-tabs hide-scrollbar" style={{ 
           display: 'flex', 
           overflowX: 'auto', 
           whiteSpace: 'nowrap',
           WebkitOverflowScrolling: 'touch',
-          scrollbarWidth: 'none',
           background: '#0a0a0a', 
           borderBottom: '1px solid var(--border)', 
           position: 'sticky', 
           top: 0, 
-          zIndex: 5 
+          zIndex: 5,
+          padding: '0 4px'
         }}>
           {tabs.map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               style={{
-                padding: '12px 20px',
+                padding: '12px 16px',
                 background: 'none',
                 border: 'none',
                 color: activeTab === tab ? 'var(--gold)' : '#666',
                 borderBottom: activeTab === tab ? '2px solid var(--gold)' : '2px solid transparent',
-                fontSize: '0.65rem',
+                fontSize: '0.6rem',
                 fontWeight: 900,
                 textTransform: 'uppercase',
                 letterSpacing: '0.05em',
@@ -232,7 +232,8 @@ export default function UserProfilePanel({ onClose }: Props) {
                 cursor: 'pointer',
                 transition: 'all 0.2s',
                 flexShrink: 0,
-                display: 'inline-flex'
+                display: 'inline-flex',
+                marginRight: '8px'
               }}
             >
               {tab}

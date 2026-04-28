@@ -15,14 +15,14 @@ interface Props {
 export default function VocabGrid({
   onAskLina, isSandboxMode, filterIds, hideToolbar = false
 }: Props) {
-  const { vocabulary, selectedWords, toggleWordSelection, setSelectedWords } = useMasteryStore();
+  const { vocabulary, selectedWords, toggleWordSelection, addWordToSelection, setSelectedWords } = useMasteryStore();
   const [drawerId, setDrawerId] = useState<string | null>(null);
 
   const handleCardClick = (word: VocabWord) => {
-    if (selectedWords.length === 0) {
-      setDrawerId(word.id);
-    } else {
+    if (selectedWords.length > 0) {
       toggleWordSelection(word.word);
+    } else {
+      setDrawerId(word.id);
     }
   };
 

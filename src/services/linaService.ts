@@ -31,7 +31,7 @@ export function buildOfflineTranslation(selectedWords: string[], vocabulary: Voc
 }
 
 // Helper to stringify user context for prompts
-export function stringifyUserContext(profile: UserProfile): string {
+export function stringifyUserContext(profile: UserProfile, lore?: string): string {
   const name = profile.tpName || profile.firstName || 'Student';
   const profileStr = `Name: ${name}, Age: ${profile.age || 'Unknown'}, Location: ${profile.locationString || 'Unknown'}, Sex: ${profile.sex || 'Unknown'}`;
   
@@ -74,7 +74,9 @@ export function stringifyUserContext(profile: UserProfile): string {
     profile.socialPreference ? `Social Preference: ${profile.socialPreference}` : null,
   ].filter(Boolean).join(', ');
 
-  return `${profileStr}. Personality: ${personality}. Beliefs: ${beliefs}. Health: ${health}. Media: ${media}. Daily Life: ${dailyLife}.`;
+  const loreStr = lore ? `\n\nBACKGROUND LORE:\n${lore}` : '';
+
+  return `${profileStr}. Personality: ${personality}. Beliefs: ${beliefs}. Health: ${health}. Media: ${media}. Daily Life: ${dailyLife}.${loreStr}`;
 }
 
 export interface ProposedChange {
@@ -136,12 +138,10 @@ export function buildTutorPrompt(
   pendingRankAcknowledgement?: string | null
 ) {
   const activeVocab = vocabulary
-    .filter(v => v.status === 'introduced' || v.status === 'practicing' || v.status === 'confident')
     .map(v => `${v.word} (overall: ${v.status}, production: ${v.productionStatus || 'same'}, recognition: ${v.recognitionStatus || 'same'}) - Notes: ${v.sessionNotes || 'None'}`)
     .join('\n');
 
   const activeConcepts = concepts
-    .filter(c => c.status === 'introduced' || c.status === 'practicing' || c.status === 'confident')
     .map(c => `${c.title} (${c.status}) - Notes: ${c.sessionNotes || 'None'}`)
     .join('\n');
 
@@ -263,7 +263,6 @@ export function buildChatPrompt(
   pendingRankAcknowledgement?: string | null
 ) {
   const activeVocab = vocabulary
-    .filter(v => v.status === 'introduced' || v.status === 'practicing' || v.status === 'confident')
     .map(v => `${v.word} (overall: ${v.status}, production: ${v.productionStatus || 'same'}, recognition: ${v.recognitionStatus || 'same'}) - Notes: ${v.sessionNotes || 'None'}`)
     .join('\n');
 

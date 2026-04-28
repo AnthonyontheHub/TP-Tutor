@@ -971,7 +971,8 @@ export const useMasteryStore = create<MasteryStore>()(
           savedPhrases: [],
           currentStreak: 0,
           lastActiveDate: '',
-          currentPositionNodeId: 'phi_sim',
+          currentPositionNodeId: get().curriculums[0].nodes[0].id,
+          sessionLog: [],
         });
         void get().syncToCloud();
       },
@@ -1115,8 +1116,13 @@ export const useMasteryStore = create<MasteryStore>()(
       clearRankAcknowledgement: () => set({ pendingRankAcknowledgement: null }),
 
       setStudentName: (name) => { set({ studentName: name }); get().updateProfile({ firstName: name }); },
-      updateProfile: (profile) => { set((state) => ({ profile: { ...state.profile, ...profile } })); void get().syncToCloud(); },
-      setReviewVibe: (vibe) => { set({ reviewVibe: vibe }); },
+      updateProfile: (profileUpdate) => { 
+        set((state) => ({ 
+          profile: { ...state.profile, ...profileUpdate } 
+        })); 
+        void get().syncToCloud(); 
+      },
+      setReviewVibe: (vibe) => { set({ reviewVibe: vibe }); void get().syncToCloud(); },
       setProfileImage: (url) => { set({ profileImage: url }); void get().syncToCloud(); },
 
       updatePhraseNote: (id, notes) => {

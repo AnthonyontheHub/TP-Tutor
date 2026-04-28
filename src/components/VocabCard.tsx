@@ -28,6 +28,14 @@ const RING_COLOR: Record<MasteryStatus, string> = {
   mastered: '#22c55e',
 };
 
+const GLOW_COLOR: Record<MasteryStatus, string> = {
+  not_started: 'rgba(255, 255, 255, 0.4)',
+  introduced: 'rgba(168, 85, 247, 0.6)',
+  practicing: 'rgba(59, 130, 246, 0.6)',
+  confident: 'rgba(245, 158, 11, 0.6)',
+  mastered: 'rgba(34, 197, 94, 0.65)',
+};
+
 export default function VocabCard({ word, onLongPress, onClick, isSandboxMode, isDimmed }: Props) {
   const { cycleWordStatus } = useMasteryStore();
   const status = word.status;
@@ -77,18 +85,6 @@ export default function VocabCard({ word, onLongPress, onClick, isSandboxMode, i
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
     }
-
-    if (isLongPressActive.current) {
-      startPos.current = null;
-      return;
-    }
-
-    if (startPos.current && !hasMovedSignificant.current) {
-      // Single Tap -> Trigger onClick (drawer or selection)
-      onClick?.(word);
-    }
-    
-    startPos.current = null;
   };
 
   const handlePointerCancel = () => {
@@ -98,6 +94,19 @@ export default function VocabCard({ word, onLongPress, onClick, isSandboxMode, i
     }
     startPos.current = null;
     isLongPressActive.current = false;
+  };
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    // If it was a long press or a significant move, don't trigger a tap
+    if (isLongPressActive.current || hasMovedSignificant.current) {
+      isLongPressActive.current = false;
+      hasMovedSignificant.current = false;
+      return;
+    }
+
+    onClick?.(word);
   };
 
   const hasSavedInfo = !!(
@@ -114,13 +123,15 @@ export default function VocabCard({ word, onLongPress, onClick, isSandboxMode, i
         touchAction: 'none', 
         borderLeftColor: isDimmed ? 'transparent' : RING_COLOR[status],
         background: isDimmed ? 'rgba(0,0,0,0.5)' : undefined,
-        borderColor: isDimmed ? '#222' : undefined,
+        borderColor: isDimmed ? '#222' : RING_COLOR[status],
+        boxShadow: isDimmed ? 'none' : `0 0 15px ${GLOW_COLOR[status]}, 0 0 5px ${GLOW_COLOR[status]}`,
         transition: 'all 0.3s ease'
       }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerCancel}
+      onClick={handleCardClick}
     >
       <div 
         className="vocab-card__status"
@@ -130,7 +141,14 @@ export default function VocabCard({ word, onLongPress, onClick, isSandboxMode, i
         {STATUS_ICONS[status]}
       </div>
 
-      <div className="vocab-card__word" style={{ transition: 'all 0.3s ease', color: (hasSavedInfo && !isDimmed) ? 'var(--gold)' : undefined }}>
+      <div 
+        className="vocab-card__word" 
+        style={{ 
+          transition: 'all 0.3s ease', 
+          color: (hasSavedInfo && !isDimmed) ? 'var(--gold)' : undefined,
+          textShadow: isDimmed ? 'none' : `0 0 10px ${GLOW_COLOR[status]}`
+        }}
+      >
         {word.type === 'grammar' ? word.sessionNotes : word.word}
       </div>
       <div className="vocab-card__pos" style={{ opacity: isDimmed ? 0.7 : 1, transition: 'all 0.3s ease' }}>

@@ -90,15 +90,36 @@ export default function SentenceBuilder({
               fontWeight: 900,
               color: 'white',
               letterSpacing: '0.02em',
-              lineHeight: 1.1
+              lineHeight: 1.1,
+              display: 'flex',
+              gap: '6px',
+              flexWrap: 'wrap',
+              justifyContent: 'center'
             }}>
-              {isAutoTranslating ? (
-                <motion.span animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.5 }}>
-                  {sentence}
-                </motion.span>
-              ) : (
-                sentence
-              )}
+              {selectedWords.map((word, idx) => (
+                <span 
+                  key={idx}
+                  onClick={() => {
+                    const newWords = [...selectedWords];
+                    newWords.splice(idx, 1);
+                    setSelectedWords(newWords);
+                  }}
+                  style={{ 
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--gold)'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'white'}
+                >
+                  {isAutoTranslating ? (
+                    <motion.span animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.5 }}>
+                      {word}
+                    </motion.span>
+                  ) : (
+                    word
+                  )}
+                </span>
+              ))}
             </div>
             {translation && !isAutoTranslating && (
               <div style={{ fontSize: '0.7rem', color: 'var(--gold)', opacity: 0.9, fontWeight: 600, marginTop: '2px' }}>

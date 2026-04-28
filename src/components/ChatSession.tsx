@@ -42,6 +42,8 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
   const [showRecap, setShowRecap] = useState(false);
   const [sessionXP, setSessionXP] = useState(0);
   const [startingTotalXP, setStartingTotalXP] = useState(0);
+  const [userMsgCount, setUserMsgCount] = useState(0);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const yesterdayWasActive = useRef(false);
 
   const [translateBubble, setTranslateBubble] = useState<{
@@ -57,6 +59,7 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
   const setLastUpdated      = useMasteryStore(s => s.setLastUpdated);
   const studentName         = useMasteryStore(s => s.studentName);
   const profile             = useMasteryStore(s => s.profile);
+  const lore                = useMasteryStore(s => s.lore);
 
   const runMorningStreakCheck = useMasteryStore(s => s.runMorningStreakCheck);
   const getRegressionCandidates = useMasteryStore(s => s.getRegressionCandidates);
@@ -91,6 +94,12 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
   const displayName = profile.tpName || profile.tokiPonaName || studentName || 'ANTHONY';
 
   const messagesEndRef  = useRef<HTMLDivElement>(null);
+
+  const handleCopy = (text: string, id: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   useEffect(() => {
     let currentXP = 0;
@@ -227,8 +236,8 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
     try {
       const key = resolveApiKey(overrideKey);
       const state = useMasteryStore.getState();
-      const userContext = stringifyUserContext(state.profile);
-      const currentSession = useChatStore.getState().sessions.find(s => s.id === sessionId);
+      const userContext = stringifyUserContext(state.profile, state.lore);
+      const currentSession = useChatStore.getState().sessions.find(s => s.id === sessionId) as any;
       const latestChatContext = currentSession?.context || 'GENERAL';
       const payload = currentSession?.contextPayload;
       const vibe = currentSession?.vibe ?? 'chill';
@@ -393,8 +402,8 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
     try {
       const key = resolveApiKey(overrideKey);
       const state = useMasteryStore.getState();
-      const userContext = stringifyUserContext(state.profile);
-      const currentSession = useChatStore.getState().sessions.find(s => s.id === sessionId);
+      const userContext = stringifyUserContext(state.profile, state.lore);
+      const currentSession = useChatStore.getState().sessions.find(s => s.id === sessionId) as any;
       const latestChatContext = currentSession?.context || 'GENERAL';
       const payload = currentSession?.contextPayload;
       const vibe = currentSession?.vibe ?? 'chill';
@@ -534,7 +543,33 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
           {isSandboxMode && <div style={{ marginBottom: '12px', padding: '8px', border: '1px solid var(--gold)', borderRadius: '2px', fontSize: '0.7rem', color: 'var(--gold)', textAlign: 'center' }}>OFFLINE PROTOCOL ACTIVE</div>}
           {messages.map((msg) => (
             <div key={msg.id} style={{ marginBottom: '24px', textAlign: msg.role === 'user' ? 'right' : 'left' }}>
-              <div style={{ color: 'var(--gold)', fontSize: '0.6rem', marginBottom: '4px', fontWeight: 900, letterSpacing: '0.1em' }}>{msg.role === 'assistant' ? 'jan LINA' : (displayName.toUpperCase())}</div>
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
+                gap: '8px',
+                marginBottom: '4px'
+              }}>
+                <div style={{ color: 'var(--gold)', fontSize: '0.6rem', fontWeight: 900, letterSpacing: '0.1em' }}>
+                  {msg.role === 'assistant' ? 'jan LINA' : (displayName.toUpperCase())}
+                </div>
+                <button 
+                  onClick={() => handleCopy(msg.displayContent || '', msg.id)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: copiedId === msg.id ? '#22c55e' : 'var(--text-muted)',
+                    fontSize: '0.55rem',
+                    fontWeight: 900,
+                    cursor: 'pointer',
+                    padding: '2px 4px',
+                    borderRadius: '2px',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  {copiedId === msg.id ? 'COPIED' : 'COPY'}
+                </button>
+              </div>
               <div style={{ background: msg.role === 'assistant' ? 'rgba(255,255,255,0.03)' : 'rgba(255, 191, 0, 0.1)', padding: '12px', borderRadius: '2px', border: '1px solid var(--border)', color: 'white', display: 'inline-block', textAlign: 'left', maxWidth: '90%', fontSize: '0.9rem', lineHeight: '1.5' }}>{msg.displayContent || (isLoading && msg.role === 'assistant' ? '· · ·' : '')}</div>
               {msg.proposedChanges && msg.proposedChanges.map((c) => <div key={`${c.type}_${c.id}`} style={{ marginTop: '4px', fontSize: '0.65rem', color: 'var(--gold)', fontWeight: 700 }}>+ CALIBRATING: {c.id} → {c.newStatus}</div>)}
             </div>
