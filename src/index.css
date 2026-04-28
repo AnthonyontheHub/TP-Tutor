@@ -198,6 +198,7 @@ select {
 .dashboard__main {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 20px;
   -webkit-overflow-scrolling: touch;
 }
@@ -588,5 +589,21 @@ button:active { transform: scale(0.96); }
   .btn-review {
     padding: 12px 10px;
     font-size: 0.75rem;
+  }
+
+  .grid-toolbar > div {
+    flex: 0 0 100%;
+    margin-bottom: 0;
+  }
+
+  .grid-toolbar > div select,
+  .grid-toolbar > div input {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .grid-toolbar .sort-select {
+    flex: 1 1 0;
+    min-width: 0;
   }
 }
