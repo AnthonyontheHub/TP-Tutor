@@ -8,13 +8,12 @@ import type { CurriculumNode, SessionLogEntry } from '../types/mastery';
 import { STATUS_META } from '../types/mastery';
 
 interface Props {
-  onSetActiveView: (view: 'vocab' | 'roadmap' | 'phrasebook') => void;
   onAskLina: (p: string) => void;
   isSandboxMode: boolean;
 }
 
-export default function CurriculumRoadmap({ onSetActiveView, onAskLina, isSandboxMode }: Props) {
-  const { curriculums, currentPositionNodeId, sessionLog } = useMasteryStore();
+export default function CurriculumRoadmap({ onAskLina, isSandboxMode }: Props) {
+  const { curriculums, currentPositionNodeId, sessionLog, vocabulary } = useMasteryStore();
   const [selectedNode, setSelectedNode] = useState<CurriculumNode | null>(null);
   const [hoveredSession, setHoveredSession] = useState<SessionLogEntry | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -26,6 +25,19 @@ export default function CurriculumRoadmap({ onSetActiveView, onAskLina, isSandbo
       currentPositionRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }, []);
+
+  // Helper to calculate mastery for a node
+  const calculateNodeMastery = (node: CurriculumNode) => {
+    const allIds = [...(node.requiredVocabIds || []), ...(node.requiredGrammarIds || [])];
+    if (allIds.length === 0) {
+       return node.status === 'mastered' ? 100 : 0;
+    }
+    const scores = allIds.map(id => {
+      const word = vocabulary.find(v => v.id === id || v.word === id);
+      return word ? word.baseScore : 0;
+    });
+    return Math.round(scores.reduce((a, b) => a + b, 0) / scores.length / 10);
+  };
 
   // Flatten all nodes into a single sequence for the winding path
   const allNodes = useMemo(() => {
@@ -75,7 +87,8 @@ export default function CurriculumRoadmap({ onSetActiveView, onAskLina, isSandbo
 
     // We build the path backwards from current to future, and backwards from current to past
     // Find index of current node
-    const currentIndex = allNodes.findIndex(n => n.id === currentPositionNodeId);
+    let currentIndex = allNodes.findIndex(n => n.id === currentPositionNodeId);
+    if (currentIndex === -1) currentIndex = 0;
 
     // Future
     const futureNodes = allNodes.slice(currentIndex).map(n => ({ type: 'node' as const, data: n }));
@@ -123,7 +136,6 @@ export default function CurriculumRoadmap({ onSetActiveView, onAskLina, isSandbo
             node={selectedNode} 
             onBack={() => setSelectedNode(null)} 
             onAskLina={onAskLina}
-            onSetActiveView={onSetActiveView}
             isSandboxMode={isSandboxMode}
           />
         )}
@@ -260,6 +272,10 @@ export default function CurriculumRoadmap({ onSetActiveView, onAskLina, isSandbo
           {unifiedPath.future.map((item, index) => {
             const node = item.data;
             const isCurrent = node.id === currentPositionNodeId;
+            const isLocked = node.status === 'locked' && !isCurrent;
+            const isMastered = node.status === 'mastered';
+            const mastery = calculateNodeMastery(node);
+            const masteryColor = mastery >= 100 ? 'var(--gold)' : (mastery > 50 ? '#3b82f6' : '#a855f7');
             const xOffset = getWindingOffset(index + unifiedPath.past.length);
 
             return (
@@ -320,7 +336,7 @@ export default function CurriculumRoadmap({ onSetActiveView, onAskLina, isSandbo
                         stroke={masteryColor} 
                         strokeWidth="3" 
                         strokeDasharray="100 100" 
-                        strokeDashoffset={100 - (mastery / 10)}
+                        strokeDashoffset={100 - mastery}
                         strokeLinecap="round"
                         style={{ transition: 'stroke-dashoffset 1s ease-out' }}
                       />

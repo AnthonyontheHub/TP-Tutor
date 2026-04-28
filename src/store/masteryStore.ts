@@ -972,7 +972,24 @@ export const useMasteryStore = create<MasteryStore>()(
           currentStreak: 0,
           lastActiveDate: '',
           currentPositionNodeId: get().curriculums[0].nodes[0].id,
+          earnedBadges: [],
+          earnedCeremonialRanks: [],
+          newRankUnlocked: null,
+          lastSmallRankTitle: 'jan lili',
+          sessionXPRecord: 0,
+          xpMultiplier: 1.0,
+          streakShields: 0,
+          lastStreakMilestone: 0,
+          pendingComebackBonus: false,
+          learningDays: [],
+          confusionPairs: [],
           sessionLog: [],
+          currentChallenge: null,
+          completedChallenges: [],
+          pendingRankAcknowledgement: null,
+          lastStreakCheck: '',
+          pendingProveItResponses: [],
+          totalProveItSubmitted: 0
         });
         void get().syncToCloud();
       },
@@ -1310,7 +1327,7 @@ export const useMasteryStore = create<MasteryStore>()(
         const { vocabulary, curriculums, lastUpdated, studentName, profile, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, isMainProfile, widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, cloudSynced, songs, commonPhrases, lastStreakCheck, learningDays, confusionPairs, pendingProveItResponses,
             earnedCeremonialRanks, lastSmallRankTitle, earnedBadges, totalProveItSubmitted,
             streakShields, xpMultiplier, lastStreakMilestone, pendingComebackBonus, sessionXPRecord,
-            sessionLog, currentChallenge, completedChallenges, pendingRankAcknowledgement } = get();
+            sessionLog, currentChallenge, completedChallenges, pendingRankAcknowledgement, newRankUnlocked } = get();
         const targetId = explicitUserId || userId;
 
         // Block premature syncs before cloud data has loaded — prevents stale
@@ -1336,7 +1353,7 @@ export const useMasteryStore = create<MasteryStore>()(
             lastStreakCheck, learningDays, confusionPairs, pendingProveItResponses,
             earnedCeremonialRanks, lastSmallRankTitle, earnedBadges, totalProveItSubmitted,
             streakShields, xpMultiplier, lastStreakMilestone, pendingComebackBonus, sessionXPRecord,
-            sessionLog, currentChallenge, completedChallenges, pendingRankAcknowledgement
+            sessionLog, currentChallenge, completedChallenges, pendingRankAcknowledgement, newRankUnlocked
           }, { merge: true });
         } catch (err) {
           console.error('Firebase Sync Error:', err);
@@ -1562,6 +1579,7 @@ export const useMasteryStore = create<MasteryStore>()(
             currentChallenge: data.currentChallenge || null,
             completedChallenges: data.completedChallenges || [],
             pendingRankAcknowledgement: data.pendingRankAcknowledgement || null,
+            newRankUnlocked: data.newRankUnlocked || null,
           };
 
           if (data.studentName) update.studentName = data.studentName;
