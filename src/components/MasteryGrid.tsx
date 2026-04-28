@@ -1,9 +1,7 @@
 /* src/components/MasteryGrid.tsx */
 import { useState, useMemo, memo, useCallback } from 'react';
-import * as RWModule from 'react-window';
-const List: any = (RWModule as any).FixedSizeList || (RWModule as any).default?.FixedSizeList || (RWModule as any).default || RWModule;
-import * as ASModule from 'react-virtualized-auto-sizer';
-const AutoSizer: any = (ASModule as any).AutoSizer || (ASModule as any).default?.AutoSizer || (ASModule as any).default || ASModule;
+import { FixedSizeList as List, ListChildComponentProps } from 'react-window';
+import { AutoSizer } from 'react-virtualized-auto-sizer';
 import { useMasteryStore } from '../store/masteryStore';
 import VocabCard from './VocabCard';
 import WordDetailDrawer from './WordDetailDrawer';
@@ -299,22 +297,22 @@ export default function MasteryGrid({
 
       {viewMode === 'card' ? (
         <div style={{ position: 'relative', flex: 1, pointerEvents: 'auto', width: '100%' }}>
-          <AutoSizer>
-            {({ height, width }: any) => {
+          <AutoSizer
+            renderProp={({ height, width }: { height: number; width: number }) => {
+              if (!height || !width) return null;
+
               const gap = 10;
               const minColWidth = 100;
               const columnCount = Math.max(1, Math.floor((width + gap) / (minColWidth + gap)));
               const itemWidth = Math.floor((width - (gap * (columnCount - 1))) / columnCount);
               const rowCount = Math.ceil(displayed.length / columnCount);
-              const rowHeight = 115; 
-
-              if (!height || !width) return null;
+              const rowHeight = 115;
 
               const combinedData = {
                 ...itemData,
                 columnCount,
                 gap,
-                itemWidth
+                itemWidth,
               };
 
               return (
@@ -331,7 +329,7 @@ export default function MasteryGrid({
                 </List>
               );
             }}
-          </AutoSizer>
+          />
         </div>
       ) : (
         <div className="mastery-grid__table-wrapper" style={{ overflowX: 'auto', background: 'rgba(0,0,0,0.2)', borderRadius: '8px', border: '1px solid #222' }}>
