@@ -64,12 +64,12 @@ const InsightLedger: React.FC<Props> = ({ onClose }) => {
         </header>
 
         <div style={{ flex: 1, overflowY: 'auto', paddingRight: '10px' }} className="hide-scrollbar">
-          {insightHistory.length === 0 && (
+          {masteryHistory.length === 0 && (
             <div style={{ textAlign: 'center', color: '#444', marginTop: '40px', fontSize: '0.8rem' }}>
               NO INSIGHTS RECORDED YET
             </div>
           )}
-          {insightHistory.map((event, i) => (
+          {masteryHistory.map((event, i) => (
             <div key={i} style={{ 
               display: 'flex', 
               justifyContent: 'space-between', 

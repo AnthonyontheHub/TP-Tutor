@@ -215,7 +215,16 @@ export default function UserProfilePanel({ onClose }: Props) {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setShowLedger(true)}
-                  style={{ background: 'rgba(255,191,0,0.1)', border: '1px solid var(--gold)', borderRadius: '4px', padding: '4px 8px', marginTop: '4px', cursor: 'pointer' }}
+                  style={{ 
+                    background: 'rgba(255,191,0,0.1)', 
+                    borderWidth: '1px',
+                    borderStyle: 'solid',
+                    borderColor: 'var(--gold)',
+                    borderRadius: '4px', 
+                    padding: '4px 8px', 
+                    marginTop: '4px', 
+                    cursor: 'pointer' 
+                  }}
                 >
                   <div style={{ fontSize: '0.7rem', color: 'var(--gold)', fontWeight: 800 }}>Level {summary.level} • {summary.xp} XP</div>
                 </motion.button>

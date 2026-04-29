@@ -1847,7 +1847,7 @@ export const useMasteryStore = create<MasteryStore>()(
           if (data.studentName) update.studentName = data.studentName;
           if (data.profileImage) update.profileImage = data.profileImage;
           if (data.profile) {
-            update.profile = { ...defaultProfile, ...data.profile };
+            update.profile = { ...get().profile, ...(data.profile || {}) };
           }
 
           set(update);

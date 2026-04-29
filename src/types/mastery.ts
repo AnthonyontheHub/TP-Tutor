@@ -125,6 +125,8 @@ export interface UserProfile {
   workSchedule?: string | null;
   livingSituation?: string | null;
   socialPreference?: string | null;
+
+  [key: string]: any; // Added index signature
 }
 
 export type ReviewVibe = 'chill' | 'deep' | 'intense' | 'new_concept' | 'review' | 'quiz' | null;

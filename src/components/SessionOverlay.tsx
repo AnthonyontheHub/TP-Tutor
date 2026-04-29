@@ -8,7 +8,7 @@ import { PhilosophySorter } from './activities/PhilosophySorter';
 import WordScramble from './WordScramble';
 
 export const SessionOverlay: React.FC = () => {
-  const { activeActivity, setActiveActivity, recordActivityCompletion, profile } = useMasteryStore();
+  const { activeActivity, setActiveActivity, recordActivityCompletion, profile, curriculums } = useMasteryStore();
   const [showConfirm, setShowConfirm] = useState(false);
 
   if (!activeActivity) return null;
@@ -33,6 +33,10 @@ export const SessionOverlay: React.FC = () => {
     const { type, nodeId } = activeActivity;
     const isHubLaunch = nodeId === 'hub';
     
+    // Find node details if not a hub launch
+    const sourceNode = isHubLaunch ? null : curriculums.flatMap(l => l.nodes).find(n => n.id === nodeId);
+    const vocabList = sourceNode?.requiredVocabIds || [];
+    
     // For Hub launches, we might want to pass a 'global' context
     const curriculumContext = isHubLaunch ? "Entire unlocked curriculum and general philosophy" : `Node ID: ${nodeId}`;
 
@@ -42,9 +46,9 @@ export const SessionOverlay: React.FC = () => {
       case 'thought-translation':
         return <Essentializer userProfile={profile} curriculumContext={curriculumContext} onSessionEnd={handleComplete} />;
       case 'drag-drop':
-        return <PhilosophySorter userProfile={profile} curriculumContext={curriculumContext} onSessionEnd={handleComplete} />;
+        return <PhilosophySorter userProfile={profile} curriculumContext={curriculumContext} vocabList={vocabList} onSessionEnd={handleComplete} />;
       case 'word-scramble':
-        return <WordScramble nodeId={isHubLaunch ? undefined : nodeId} onComplete={handleComplete} />;
+        return <WordScramble nodeId={isHubLaunch ? undefined : nodeId} vocabList={vocabList} onComplete={handleComplete} />;
       default:
         return (
           <div className="text-white text-center">

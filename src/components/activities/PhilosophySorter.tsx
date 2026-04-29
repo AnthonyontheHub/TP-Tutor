@@ -11,10 +11,11 @@ interface SortItem {
 interface PhilosophySorterProps {
   userProfile: any;
   curriculumContext?: string;
+  vocabList?: string[];
   onSessionEnd: (results: { score: number; total: number }) => void;
 }
 
-export const PhilosophySorter: React.FC<PhilosophySorterProps> = ({ userProfile, curriculumContext, onSessionEnd }) => {
+export const PhilosophySorter: React.FC<PhilosophySorterProps> = ({ userProfile, curriculumContext, vocabList, onSessionEnd }) => {
   const [items, setItems] = useState<SortItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [score, setScore] = useState(0);
@@ -24,7 +25,11 @@ export const PhilosophySorter: React.FC<PhilosophySorterProps> = ({ userProfile,
   const loadItems = async () => {
     setLoading(true);
     try {
-      const newItems = await generateSortItems(userProfile, curriculumContext);
+      const context = vocabList && vocabList.length > 0 
+        ? `${curriculumContext}. Focus vocabulary: ${vocabList.join(', ')}`
+        : curriculumContext;
+
+      const newItems = await generateSortItems(userProfile, context);
       setItems(newItems);
       setCurrentIndex(0);
     } catch (error) {

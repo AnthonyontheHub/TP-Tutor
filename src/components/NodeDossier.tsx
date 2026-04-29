@@ -37,6 +37,8 @@ export default function NodeDossier({ node, onBack, onAskLina, isSandboxMode }: 
   const isReady = readiness >= 100 || checkNodeReadiness(node.id);
   const activities = completedActivities[node.id] || [];
 
+  const effectiveSandbox = isSandboxMode || localStorage.getItem('tp_sandbox_mode') === 'true';
+
   const handlePracticeLina = () => {
     const contextStr = node.richContent?.map(c => c.content).join(' ') || '';
     const vocabStr = node.requiredVocabIds.length > 0 
@@ -112,7 +114,22 @@ export default function NodeDossier({ node, onBack, onAskLina, isSandboxMode }: 
             pointerEvents: isLocked ? 'none' : 'auto'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '20px', marginBottom: '16px' }}>
-              <h1 style={{ color: 'white', fontWeight: 900, fontSize: '2rem', margin: 0, letterSpacing: '-0.02em' }}>
+              <h1 
+                onClick={() => {
+                  if (effectiveSandbox) {
+                    useMasteryStore.getState().devUnlockNode(node.id);
+                  }
+                }}
+                style={{ 
+                  color: 'white', 
+                  fontWeight: 900, 
+                  fontSize: '2rem', 
+                  margin: 0, 
+                  letterSpacing: '-0.02em',
+                  cursor: effectiveSandbox ? 'pointer' : 'default',
+                  pointerEvents: 'auto' 
+                }}
+              >
                 {node.title}
               </h1>
               <div style={{ textAlign: 'right' }}>

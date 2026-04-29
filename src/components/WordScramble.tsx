@@ -13,10 +13,20 @@ const defaultWords = [
 
 interface ScrambledLetter { id: string; char: string; }
 
-export default function WordScramble({ nodeId, onComplete }: { nodeId?: string, onComplete?: (stats: { score: number, total: number }) => void }) {
+export default function WordScramble({ nodeId, vocabList, onComplete }: { nodeId?: string, vocabList?: string[], onComplete?: (stats: { score: number, total: number }) => void }) {
   const { vocabulary, curriculums } = useMasteryStore();
 
   const words = React.useMemo(() => {
+    if (vocabList && vocabList.length > 0) {
+      const nodeWords = vocabulary.filter(v => vocabList.includes(v.id) || vocabList.includes(v.word));
+      if (nodeWords.length > 0) {
+        return nodeWords.map(v => ({
+          tokiPona: v.word,
+          english: v.meanings
+        }));
+      }
+    }
+
     if (!nodeId) return defaultWords;
     const node = curriculums.flatMap(l => l.nodes).find(n => n.id === nodeId);
     if (!node) return defaultWords;
@@ -30,7 +40,7 @@ export default function WordScramble({ nodeId, onComplete }: { nodeId?: string, 
       tokiPona: v.word,
       english: v.meanings
     }));
-  }, [nodeId, vocabulary, curriculums]);
+  }, [nodeId, vocabulary, curriculums, vocabList]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   
