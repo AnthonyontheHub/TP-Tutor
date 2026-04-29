@@ -31,18 +31,18 @@ export default function ProgressSummary({ activeFilter, onFilterClick }: Props) 
             <button
               key={item.status}
               onClick={() => onFilterClick(isActive ? null : item.status)}
-              className={`status-card-mobile ${isActive ? 'neon-border-gold' : ''}`}
+              className="status-card-mobile"
               style={{
-                background: isActive ? 'rgba(255, 191, 0, 0.05)' : 'var(--surface)',
-                border: isActive ? '1px solid var(--gold)' : `1px solid ${item.color}33`,
+                background: isActive ? `${item.color}11` : 'var(--surface)',
+                border: isActive ? `1px solid ${item.color}` : `1px solid ${item.color}33`,
                 padding: '12px 6px',
                 borderRadius: '4px',
                 cursor: 'pointer',
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 opacity: isDimmed ? 0.3 : 1,
-                boxShadow: isActive 
-                  ? '0 0 15px rgba(255, 191, 0, 0.2)' 
-                  : (isDimmed ? 'none' : `0 0 10px ${item.glow}`),
+                boxShadow: isDimmed 
+                  ? 'none' 
+                  : (isActive ? `0 0 15px ${item.glow}` : `0 0 10px ${item.glow}`),
                 transform: isActive ? 'translateY(-2px)' : 'none',
                 display: 'flex',
                 flexDirection: 'column',
@@ -50,13 +50,13 @@ export default function ProgressSummary({ activeFilter, onFilterClick }: Props) 
                 gap: '6px',
               }}
             >
-              <div style={{ color: isActive ? 'var(--gold)' : item.color, transition: 'color 0.3s' }}>
+              <div style={{ color: item.color, transition: 'color 0.3s' }}>
                 {item.icon}
               </div>
               <span style={{ 
                 fontSize: '1.1rem', 
                 fontWeight: 900, 
-                color: isActive ? 'var(--gold)' : 'white', 
+                color: isActive ? item.color : 'white', 
                 lineHeight: 1,
                 letterSpacing: '0.1em',
                 transition: 'color 0.3s'
@@ -65,7 +65,7 @@ export default function ProgressSummary({ activeFilter, onFilterClick }: Props) 
               </span>
               <span style={{
                 fontSize: '0.55rem',
-                color: isActive ? 'var(--gold)' : 'var(--text-muted)',
+                color: isActive ? item.color : 'var(--text-muted)',
                 fontWeight: 800,
                 letterSpacing: '0.1em',
                 textTransform: 'uppercase',
