@@ -1914,8 +1914,8 @@ export const useMasteryStore = create<MasteryStore>()(
           }
           
           const hasTelo = Array.isArray(state.songs) && state.songs.some((a: Album) => a.id === 'telo-lon-kiwen');
-          if (!Array.isArray(state.songs) || state.songs.length === 0 || !hasTelo) {
-            console.log('Force-syncing songs to latest albumData (telo-lon-kiwen missing or empty)...');
+          if (!Array.isArray(state.songs) || state.songs.length < 6 || !hasTelo) {
+            console.log('Force-syncing songs to latest albumData (missing albums or telo-lon-kiwen missing)...');
             state.songs = defaultSongs;
           }
 
