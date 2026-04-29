@@ -145,13 +145,20 @@ export interface PartOfSpeechScores {
   modifier: number;
 }
 
-// ─── New Linguistic & Teaching Types ────────────────────────────────────────
+// ─── Linguistic & Teaching Types ────────────────────────────────────────
 
 export type PosRole = 'noun' | 'verb' | 'modifier' | 'preverb' | 'preposition' | 'particle' | 'interjection';
 
 export type ExampleTier = 'simple' | 'intermediate' | 'advanced' | 'philosophical';
 
 export type Connotation = 'positive' | 'negative' | 'neutral' | 'contextual';
+
+export interface BoundaryNote {
+  id: string;
+  wordId: string;
+  note: string;
+  timestamp: string;
+}
 
 export interface PosRoleEntry {
   role: PosRole;
@@ -176,14 +183,6 @@ export interface Collocation {
   phrase: string;
   translation: string;
   wordIds: string[];
-}
-
-// BoundaryNote interface
-export interface BoundaryNote {
-  id: string;
-  wordId: string;
-  note: string;
-  timestamp: string;
 }
 
 export interface TeachingObjective {

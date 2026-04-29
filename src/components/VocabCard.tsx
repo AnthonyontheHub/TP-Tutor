@@ -10,6 +10,8 @@ interface Props {
   onClick?: (word: VocabWord) => void;
   isSandboxMode: boolean;
   isDimmed?: boolean;
+  isSelected?: boolean;
+  isRelated?: boolean;
 }
 
 const STATUS_ICONS: Record<MasteryStatus, string> = {
@@ -33,10 +35,10 @@ const GLOW_COLOR: Record<MasteryStatus, string> = {
   introduced: 'rgba(168, 85, 247, 0.6)',
   practicing: 'rgba(59, 130, 246, 0.6)',
   confident: 'rgba(245, 158, 11, 0.6)',
-  mastered: 'rgba(34, 197, 94, 0.65)',
+  mastered: 'rgba(34, 197, 94, 0.85)',
 };
 
-export default function VocabCard({ word, onLongPress, onClick, isSandboxMode, isDimmed }: Props) {
+export default function VocabCard({ word, onLongPress, onClick, isSandboxMode, isDimmed, isSelected, isRelated }: Props) {
   const { cycleWordStatus } = useMasteryStore();
   const status = word.status;
 
@@ -118,14 +120,21 @@ export default function VocabCard({ word, onLongPress, onClick, isSandboxMode, i
 
   return (
     <div
-      className={`vocab-card vocab-card--${status}`}
+      className={`vocab-card vocab-card--${status} ${isSelected ? 'is-selected' : ''} ${isRelated ? 'is-related' : ''}`}
       style={{ 
         touchAction: 'none', 
         borderLeftColor: isDimmed ? 'transparent' : RING_COLOR[status],
-        background: isDimmed ? 'rgba(0,0,0,0.5)' : undefined,
-        borderColor: isDimmed ? '#222' : undefined,
-        boxShadow: isDimmed ? 'none' : (hasSavedInfo ? `0 0 15px ${GLOW_COLOR[status]}, 0 0 5px ${GLOW_COLOR[status]}` : undefined),
-        transition: 'all 0.3s ease'
+        background: isDimmed ? 'rgba(0,0,0,0.5)' : (isSelected ? 'rgba(255,255,255,0.08)' : undefined),
+        borderColor: isSelected ? 'var(--gold)' : (isDimmed ? '#222' : undefined),
+        boxShadow: isDimmed 
+          ? 'none' 
+          : (isSelected 
+              ? `0 0 25px ${GLOW_COLOR[status]}, 0 0 10px ${GLOW_COLOR[status]}, inset 0 0 10px ${GLOW_COLOR[status]}`
+              : `0 0 15px ${GLOW_COLOR[status]}, 0 0 5px ${GLOW_COLOR[status]}`
+            ),
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        transform: isSelected ? 'scale(1.02)' : 'none',
+        zIndex: isSelected ? 10 : (isRelated ? 5 : 1)
       }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
@@ -145,8 +154,6 @@ export default function VocabCard({ word, onLongPress, onClick, isSandboxMode, i
         className="vocab-card__word" 
         style={{ 
           transition: 'all 0.3s ease', 
-          color: (hasSavedInfo && !isDimmed) ? 'var(--gold)' : undefined,
-          textShadow: isDimmed ? 'none' : (hasSavedInfo ? `0 0 10px ${GLOW_COLOR[status]}` : undefined)
         }}
       >
         {word.type === 'grammar' ? word.sessionNotes : word.word}

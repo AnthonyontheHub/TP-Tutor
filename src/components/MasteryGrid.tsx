@@ -52,7 +52,7 @@ const Row = memo(({ index, style, data }: ListChildComponentProps) => {
         const isSelected = positions.length > 0;
 
         let isSelectionDimmed = false;
-        if (selectedWords.length === 1) {
+        if (selectedWords.length > 0) {
           if (!isSelected && !isRelated) {
             isSelectionDimmed = true;
           }
@@ -80,6 +80,8 @@ const Row = memo(({ index, style, data }: ListChildComponentProps) => {
               onLongPress={handleCardLongPress}
               isSandboxMode={isSandboxMode}
               isDimmed={isFilterDimmed || isSelectionDimmed}
+              isSelected={isSelected}
+              isRelated={isRelated}
             />
 
             {positions.length > 0 && (
@@ -150,11 +152,13 @@ export default function MasteryGrid({
 
   const relatedWordIds = useMemo(() => {
     const ids = new Set<string>();
-    if (selectedWords.length === 1) {
-      const w = selectedWords[0].toLowerCase();
-      if (WORD_RELATIONSHIPS[w]) {
-        WORD_RELATIONSHIPS[w].forEach(r => ids.add(r));
-      }
+    if (selectedWords.length > 0) {
+      selectedWords.forEach(word => {
+        const w = word.toLowerCase();
+        if (WORD_RELATIONSHIPS[w]) {
+          WORD_RELATIONSHIPS[w].forEach(r => ids.add(r));
+        }
+      });
     }
     return ids;
   }, [selectedWords]);

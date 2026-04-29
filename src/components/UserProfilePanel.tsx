@@ -98,7 +98,7 @@ export default function UserProfilePanel({ onClose }: Props) {
   const handleSave = async () => {
     if (imageSrc && croppedAreaPixels) {
       const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
-      setProfileImage(croppedImage);
+      await setProfileImage(croppedImage);
       setImageSrc(null);
     }
     
@@ -107,7 +107,7 @@ export default function UserProfilePanel({ onClose }: Props) {
        setStudentName(editableProfile.firstName);
     }
     
-    updateProfile(editableProfile);
+    await updateProfile(editableProfile);
     setIsEditing(false);
   };
 

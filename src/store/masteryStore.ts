@@ -134,15 +134,15 @@ interface MasteryActions {
   savePhrase: (phrase: string | SavedPhrase) => void;
   recordActivity: () => void;
   setStudentName: (name: string) => void;
-  updateProfile: (profile: Partial<UserProfile>) => void;
-  setReviewVibe: (vibe: ReviewVibe) => void;
-  setProfileImage: (url: string) => void;
-  updatePhraseNote: (id: string, notes: string) => void;
-  deletePhrase: (id: string) => void;
+  updateProfile: (profile: Partial<UserProfile>) => Promise<void>;
+  setReviewVibe: (vibe: ReviewVibe) => Promise<void>;
+  setProfileImage: (url: string) => Promise<void>;
+  updatePhraseNote: (id: string, notes: string) => Promise<void>;
+  deletePhrase: (id: string) => Promise<void>;
   resetAsNewUser: () => Promise<void>;
   resetProfileAndRunSetup: () => Promise<void>;
-  randomizeVocab: () => void;
-  masterAllVocab: () => void;
+  randomizeVocab: () => Promise<void>;
+  masterAllVocab: () => Promise<void>;
   clearLocalData: () => void;
   syncFromCloud: (userId: string, initialName?: string, initialProfileImage?: string) => Promise<Unsubscribe | void>;
   syncToCloud: (userId?: string, merge?: boolean, force?: boolean) => Promise<void>;
@@ -157,15 +157,15 @@ interface MasteryActions {
   setWidgetDensity: (val: 'Compact' | 'Expanded') => void;
   setFogOfWar: (val: 'Strict' | 'Visible') => void;
   setShowCircuitPaths: (val: boolean) => void;
-  setKnowledgeCheckFrequency: (freq: 'daily' | 'session' | 'never') => void;
-  setLastKnowledgeCheckDate: (date: string) => void;
+  setKnowledgeCheckFrequency: (freq: 'daily' | 'session' | 'never') => Promise<void>;
+  setLastKnowledgeCheckDate: (date: string) => Promise<void>;
   setSelectedWords: (words: string[]) => void;
   addWordToSelection: (word: string) => void;
   removeWordFromSelection: (word: string) => void;
   toggleWordSelection: (word: string) => void;
   setLessonFilter: (wordIds: string[] | null) => void;
-  hardenWord: (wordId: string) => void;
-  clearAllSavedPhrases: () => void;
+  hardenWord: (wordId: string) => Promise<void>;
+  clearAllSavedPhrases: () => Promise<void>;
   checkAssessments: (onTrigger: (word: VocabWord) => void) => void;
   switchProfile: (name: string) => void;
   updateVocabAIContent: (wordId: string, content: { aiExplanation?: string; aiExamples?: Record<string, string> }) => void;
@@ -628,17 +628,17 @@ export const useMasteryStore = create<MasteryStore>()(
         void get().syncToCloud();
       },
 
-      hardenWord: (wordId) => {
+      hardenWord: async (wordId) => {
         set(state => ({
           vocabulary: state.vocabulary.map(w => (w.id === wordId || w.word === wordId) ? { ...w, hardened: true, baseScore: 1000, status: 'mastered' } : w)
         }));
         get().awardBadge('first_hardened');
-        void get().syncToCloud();
+        await get().syncToCloud();
       },
 
-      clearAllSavedPhrases: () => {
+      clearAllSavedPhrases: async () => {
         set({ savedPhrases: [] });
-        void get().syncToCloud();
+        await get().syncToCloud();
       },
 
       checkAssessments: (onTrigger) => {
@@ -750,7 +750,6 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       cycleWordStatus: (wordId) => {
-        if (localStorage.getItem('tp_sandbox_mode') !== 'true') return;
         const now = new Date().toISOString();
         set((state) => ({
           vocabulary: state.vocabulary.map((w) => {
@@ -1321,33 +1320,33 @@ export const useMasteryStore = create<MasteryStore>()(
 
       clearRankAcknowledgement: () => set({ pendingRankAcknowledgement: null }),
 
-      setStudentName: (name) => { set({ studentName: name }); get().updateProfile({ firstName: name }); },
-      updateProfile: (profileUpdate) => { 
+      setStudentName: (name) => { set({ studentName: name }); void get().updateProfile({ firstName: name }); },
+      updateProfile: async (profileUpdate) => { 
         set((state) => ({ 
           profile: { ...state.profile, ...profileUpdate } 
         })); 
-        void get().syncToCloud(); 
+        await get().syncToCloud(); 
       },
-      setReviewVibe: (vibe) => { set({ reviewVibe: vibe }); void get().syncToCloud(); },
-      setProfileImage: (url) => { set({ profileImage: url }); void get().syncToCloud(); },
+      setReviewVibe: async (vibe) => { set({ reviewVibe: vibe }); await get().syncToCloud(); },
+      setProfileImage: async (url) => { set({ profileImage: url }); await get().syncToCloud(); },
 
-      updatePhraseNote: (id, notes) => {
+      updatePhraseNote: async (id, notes) => {
         set((state) => ({
           savedPhrases: state.savedPhrases.map(p => {
             if (typeof p === 'string') return p === id ? { id, tp: p, en: 'Saved Phrase *', notes } : p;
             return p.id === id ? { ...p, notes } : p;
           })
         }));
-        void get().syncToCloud();
+        await get().syncToCloud();
       },
 
-      deletePhrase: (id) => {
+      deletePhrase: async (id) => {
         set((state) => ({
           savedPhrases: state.savedPhrases.filter(p =>
             typeof p === 'string' ? p !== id : p.id !== id
           )
         }));
-        void get().syncToCloud();
+        await get().syncToCloud();
       },
 
       resetAsNewUser: async () => {
@@ -1438,8 +1437,7 @@ export const useMasteryStore = create<MasteryStore>()(
         await get().syncToCloud(undefined, false, true);
       },
 
-      randomizeVocab: () => {
-        if (localStorage.getItem('tp_sandbox_mode') !== 'true') return;
+      randomizeVocab: async () => {
         set((state) => ({
           vocabulary: state.vocabulary.map(w => {
             const score = Math.floor(Math.random() * 1001);
@@ -1447,11 +1445,10 @@ export const useMasteryStore = create<MasteryStore>()(
           })
         }));
         get().refreshCurriculumStatus();
-        void get().syncToCloud();
+        await get().syncToCloud();
       },
 
-      masterAllVocab: () => {
-        if (localStorage.getItem('tp_sandbox_mode') !== 'true') return;
+      masterAllVocab: async () => {
         set((state) => ({
           vocabulary: state.vocabulary.map(w => ({ ...w, baseScore: 975, confidenceScore: 975, status: 'mastered' as MasteryStatus })),
           curriculums: state.curriculums.map(level => ({
@@ -1460,7 +1457,7 @@ export const useMasteryStore = create<MasteryStore>()(
           }))
         }));
         get().refreshCurriculumStatus();
-        void get().syncToCloud();
+        await get().syncToCloud();
       },
 
       clearLocalData: () => {
@@ -1486,8 +1483,8 @@ export const useMasteryStore = create<MasteryStore>()(
       setWidgetDensity: (val) => { set({ widgetDensity: val }); void get().syncToCloud(); },
       setFogOfWar: (val) => { set({ fogOfWar: val }); void get().syncToCloud(); },
       setShowCircuitPaths: (val) => { set({ showCircuitPaths: val }); void get().syncToCloud(); },
-      setKnowledgeCheckFrequency: (freq) => { set({ knowledgeCheckFrequency: freq }); void get().syncToCloud(); },
-      setLastKnowledgeCheckDate: (date) => { set({ lastKnowledgeCheckDate: date }); void get().syncToCloud(); },
+      setKnowledgeCheckFrequency: async (freq) => { set({ knowledgeCheckFrequency: freq }); await get().syncToCloud(); },
+      setLastKnowledgeCheckDate: async (date) => { set({ lastKnowledgeCheckDate: date }); await get().syncToCloud(); },
 
       setSelectedWords: (words) => set({ selectedWords: words }),
       addWordToSelection: (word) => set((state) => ({ selectedWords: [...state.selectedWords, word] })),

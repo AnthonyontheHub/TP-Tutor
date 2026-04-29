@@ -33,47 +33,45 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
 
   const isMainUser = isMainProfile;
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsSandboxMode(localSandbox);
     localStorage.setItem('TP_GEMINI_KEY', localApiKey);
-    setKnowledgeCheckFrequency(localFreq);
+    await setKnowledgeCheckFrequency(localFreq);
     onClose();
   };
 
   const handleResetLearning = async () => {
     if(confirm("Reset learning progress? Your profile will be kept, but vocabulary and streaks will be reset to zero.")) {
       await resetLearningProgress();
-      setIsSandboxMode(false);
       onClose();
     }
   };
 
   const handleReset = async () => {
-    if(confirm("Wipe all local and cloud data? This will also sign you out.")) {
+    if(confirm("Wipe all local and cloud data? Your profile and learning history will be cleared, but you will stay signed in.")) {
       await resetAsNewUser();
-      setIsSandboxMode(false);
-      await logout();
+      onClose();
     }
   };
 
   const handleRandomize = async () => {
-    if(confirm("Randomize all vocabulary mastery? This will also sign you out.")) {
-      randomizeVocab();
-      await logout();
+    if(confirm("Randomize all vocabulary mastery? This will update your progress across all devices (unless Sandbox is ON).")) {
+      await randomizeVocab();
+      onClose();
     }
   };
 
   const handleMasterAll = async () => {
-    if(confirm("Master all vocabulary? This will also sign you out.")) {
-      masterAllVocab();
-      await logout();
+    if(confirm("Master all vocabulary? This will update your progress across all devices (unless Sandbox is ON).")) {
+      await masterAllVocab();
+      onClose();
     }
   };
 
   const handleClearPhrases = async () => {
-    if(confirm("Clear all saved phrases? This will also sign you out.")) {
-      clearAllSavedPhrases();
-      await logout();
+    if(confirm("Clear all saved phrases? This will update your progress across all devices (unless Sandbox is ON).")) {
+      await clearAllSavedPhrases();
+      onClose();
     }
   };
 
@@ -124,7 +122,7 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
                 cursor: isMainUser ? 'pointer' : 'not-allowed'
               }}
             >
-              {localSandbox ? 'ACTIVE' : 'OFFLINE'}
+              {localSandbox ? 'ON' : 'OFF'}
             </button>
           </div>
 
