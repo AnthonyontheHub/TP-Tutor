@@ -107,18 +107,43 @@ export const albumData: Album[] = [
     ]
   },
   {
-    id: 'toki-nasa',
-    title: "toki nasa, kalama pona",
+    id: 'toki-nasa-ep',
+    title: "toki nasa ep",
     year: 2025,
     artist: "jan Ansoni",
-    description: "An absurdist K-pop project built on synth bass and stadium-scale sound. A deliberate arc from anticipation to euphoria.",
-    songs: [
-      { id: 'o-tawa-wawa', title: "o tawa wawa", blocks: [] },
-      { id: 'lukin-sama', title: "lukin sama", blocks: [] },
-      { id: 'o-kule-e-kon', title: "o kule e kon", blocks: [] },
-      { id: 'kulupu-pona', title: "KULUPU PONA", blocks: [] },
-      { id: 'alasa-tawa-sin', title: "alasa tawa sin", blocks: [] },
-      { id: 'kili-wawa', title: "kili wawa (Bonus Track)", blocks: [] }
-    ]
+    description: "An absurdist K-pop project built on synth bass and stadium-scale sound.",
+    songs: []
+  },
+  {
+    id: 'kalama-pona-ep',
+    title: "kalama pona ep",
+    year: 2025,
+    artist: "jan Ansoni",
+    description: "An absurdist K-pop project built on synth bass and stadium-scale sound.",
+    songs: []
+  },
+  {
+    id: 'kalama-pi-kon-mi',
+    title: "kalama pi kon mi",
+    year: 2025,
+    artist: "jan Ansoni",
+    description: "A new journey into the sounds of the soul.",
+    songs: []
+  },
+  {
+    id: 'utala-kon',
+    title: "utala kon",
+    year: 2025,
+    artist: "jan Ansoni",
+    description: "The battle of spirits in the ethereal realm.",
+    songs: []
+  },
+  {
+    id: 'pini-o-awen',
+    title: "pini o awen",
+    year: 2025,
+    artist: "jan Ansoni",
+    description: "The end that stays, the remaining silence.",
+    songs: []
   }
 ];
