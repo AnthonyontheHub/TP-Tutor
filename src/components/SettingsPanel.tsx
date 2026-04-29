@@ -13,21 +13,23 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
   const {
     resetAsNewUser, masterAllVocab, randomizeVocab, isMainProfile,
     knowledgeCheckFrequency, setKnowledgeCheckFrequency, clearAllSavedPhrases,
-    resetLearningProgress
+    resetLearningProgress, fogOfWar, setFogOfWar
   } = useMasteryStore();
   const { logout } = useAuthStore();
 
   const [localSandbox, setLocalSandbox] = useState(isSandboxMode);
   const [localApiKey, setLocalApiKey] = useState(localStorage.getItem('TP_GEMINI_KEY') || '');
   const [localFreq, setLocalFreq] = useState(knowledgeCheckFrequency);
+  const [localFogOfWar, setLocalFogOfWar] = useState(fogOfWar);
 
   useEffect(() => {
     if (isOpen) {
       setLocalSandbox(isSandboxMode);
       setLocalApiKey(localStorage.getItem('TP_GEMINI_KEY') || '');
       setLocalFreq(knowledgeCheckFrequency);
+      setLocalFogOfWar(fogOfWar);
     }
-  }, [isOpen, isSandboxMode, knowledgeCheckFrequency]);
+  }, [isOpen, isSandboxMode, knowledgeCheckFrequency, fogOfWar]);
 
   if (!isOpen) return null;
 
@@ -37,6 +39,7 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
     setIsSandboxMode(localSandbox);
     localStorage.setItem('TP_GEMINI_KEY', localApiKey);
     await setKnowledgeCheckFrequency(localFreq);
+    setFogOfWar(localFogOfWar);
     onClose();
   };
 
@@ -150,6 +153,24 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
               <option value="session">Every Session</option>
               <option value="never">Never</option>
             </select>
+          </div>
+
+          <div className="settings-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>FOG OF WAR</span>
+            <button 
+              onClick={() => setLocalFogOfWar(localFogOfWar === 'Strict' ? 'Visible' : 'Strict')} 
+              className="btn-settings" 
+              style={{ 
+                margin: 0,
+                width: 'auto',
+                padding: '8px 16px',
+                background: '#1a1a1a',
+                border: '1px solid #d4af37',
+                color: '#d4af37',
+              }}
+            >
+              {localFogOfWar.toUpperCase()}
+            </button>
           </div>
 
           <button onClick={handleSave} className="btn-review" style={{ width: '100%', marginTop: '10px' }}>

@@ -36,6 +36,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   const [focusPhraseId, setFocusPhraseId] = useState<string | null>(null);
   const [assessmentWord, setAssessmentWord] = useState<VocabWord | null>(null);
   const [hasShownCheck, setHasShownCheck] = useState(false);
+  const [isSmallScreen, setIsSmallScreen] = useState(false); // New state for small screen detection
 
   // Translation & Builder State
   const [translation, setTranslation] = useState<string | null>(null);
@@ -61,6 +62,15 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
     }, 60000); // Check every minute
     return () => clearInterval(interval);
   }, [knowledgeCheckFrequency, lastKnowledgeCheckDate, hasShownCheck, checkAssessments, setLastKnowledgeCheckDate, calculateDecay]);
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsSmallScreen(window.innerWidth < 480); // Define small screen breakpoint
+    };
+    checkScreenSize(); // Initial check
+    window.addEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
 
   useEffect(() => {
     setTranslation(null);
@@ -330,24 +340,24 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
                  '⚡ ARCHIVE PRACTICE'
                ) : '🚀 ROADMAP LESSON'}
             </button>
-            <div className="w-full" style={{ display: 'flex', background: 'var(--surface)', borderRadius: '4px', padding: '4px', border: '1px solid var(--border)', flex: 1.5 }}>
+            <div className="w-full dashboard__vibe-selector-container" style={{ display: 'flex', background: 'var(--surface)', borderRadius: '4px', padding: '4px', border: '1px solid var(--border)', flex: 1.5 }}>
               <button 
                 onClick={() => setReviewVibe(reviewVibe === 'chill' ? null : 'chill')}
                 style={{ flex: 1, border: 'none', background: reviewVibe === 'chill' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'chill' ? 'black' : '#666', borderRadius: '2px', padding: '6px 4px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
               >
-                {activeView === 'vocab' ? 'CHILL' : activeView === 'archive' ? 'MY SAVES' : 'NEW CONCEPT'}
+                {activeView === 'vocab' ? (isSmallScreen ? 'CHILL' : 'CHILL') : activeView === 'archive' ? (isSmallScreen ? 'SAVES' : 'MY SAVES') : (isSmallScreen ? 'NEW' : 'NEW CONCEPT')}
               </button>
               <button 
                 onClick={() => setReviewVibe(reviewVibe === 'deep' ? null : 'deep')}
                 style={{ flex: 1, border: 'none', background: reviewVibe === 'deep' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'deep' ? 'black' : '#666', borderRadius: '2px', padding: '6px 4px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
               >
-                {activeView === 'vocab' ? 'DEEP' : activeView === 'archive' ? 'EVERYDAY' : 'REVIEW'}
+                {activeView === 'vocab' ? (isSmallScreen ? 'DEEP' : 'DEEP') : activeView === 'archive' ? (isSmallScreen ? 'EVERYDAY' : 'EVERYDAY') : (isSmallScreen ? 'REVIEW' : 'REVIEW')}
               </button>
               <button 
                 onClick={() => setReviewVibe(reviewVibe === 'intense' ? null : 'intense')}
                 style={{ flex: 1, border: 'none', background: reviewVibe === 'intense' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'intense' ? 'black' : '#666', borderRadius: '2px', padding: '6px 4px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
               >
-                {activeView === 'vocab' ? 'INTENSE' : activeView === 'archive' ? 'DISCOGRAPHY' : 'QUIZ / LEVEL UP'}
+                {activeView === 'vocab' ? (isSmallScreen ? 'INTENSE' : 'INTENSE') : activeView === 'archive' ? (isSmallScreen ? 'DISCO' : 'DISCOGRAPHY') : (isSmallScreen ? 'QUIZ' : 'QUIZ / LEVEL UP')}
               </button>
             </div>
           </div>
@@ -358,8 +368,6 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
           marginBottom: '16px', 
           display: 'grid', 
           gridTemplateColumns: '1fr 1fr 1fr', 
-          gap: '4px', 
-          padding: '4px', 
           background: 'var(--surface)', 
           borderRadius: '4px', 
           border: '1px solid var(--border)',

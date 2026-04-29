@@ -208,12 +208,19 @@ select {
 
 .dashboard__view-toggle {
   display: flex;
-  gap: 2px;
+  gap: 4px; /* Default gap */
   margin-bottom: 20px;
   background: rgba(255,255,255,0.03);
-  padding: 2px;
+  padding: 4px; /* Default padding */
   border-radius: 2px;
 }
+
+@media (max-width: 768px) {
+  .dashboard__view-toggle {
+    gap: 2px; /* Reduce gap on mobile */
+    padding: 2px; /* Reduce padding on mobile */
+  }
+} /* Closing brace for @media (max-width: 768px) */
 
 /* ─── Side Panels Stack ────────────────────────────────────────────────── */
 .side-panels-container {
@@ -590,5 +597,27 @@ button:active { transform: scale(0.96); }
   .btn-review {
     padding: 12px 10px;
     font-size: 0.75rem;
+    white-space: normal; /* Allow text to wrap */
+    letter-spacing: 0.05em; /* Reduce letter spacing on mobile */
   }
+
+  .btn-toggle {
+    padding: 8px 6px; /* Reduced padding */
+    font-size: 0.65rem; /* Slightly smaller font for toggle buttons */
+    white-space: normal; /* Allow text to wrap */
+    letter-spacing: 0.05em; /* Reduce letter spacing on mobile */
+  }
+}
+
+@media (max-width: 380px) {
+  .dashboard__vibe-selector-container {
+    flex-wrap: wrap; /* Allow items to wrap */
+    gap: 4px; /* Reduce gap */
+    padding: 2px; /* Reduce padding */
+  }
+}
+
+/* Ensure dashboard__main has overflow-x hidden for overall layout stability */
+.dashboard__main {
+  overflow-x: hidden;
 }

@@ -13,7 +13,7 @@ interface Props {
 }
 
 export default function CurriculumRoadmap({ onAskLina, isSandboxMode }: Props) {
-  const { curriculums, currentPositionNodeId, sessionLog, vocabulary } = useMasteryStore();
+  const { curriculums, currentPositionNodeId, sessionLog, vocabulary, fogOfWar } = useMasteryStore();
   const [selectedNode, setSelectedNode] = useState<CurriculumNode | null>(null);
   const [hoveredSession, setHoveredSession] = useState<SessionLogEntry | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -345,9 +345,11 @@ export default function CurriculumRoadmap({ onAskLina, isSandboxMode }: Props) {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    cursor: 'pointer',
+                    cursor: isLocked && fogOfWar === 'Strict' ? 'not-allowed' : 'pointer',
                     boxShadow: isCurrent ? '0 0 20px var(--gold)' : 'none',
-                    position: 'relative'
+                    position: 'relative',
+                    filter: isLocked && fogOfWar === 'Strict' ? 'blur(8px)' : 'none',
+                    pointerEvents: isLocked && fogOfWar === 'Strict' ? 'none' : 'auto'
                   }}
                 >
                   {isLocked ? (
@@ -374,13 +376,13 @@ export default function CurriculumRoadmap({ onAskLina, isSandboxMode }: Props) {
                   )}
                 </motion.button>
 
-                <div style={{ 
-                  marginTop: '12px', 
-                  textAlign: 'center', 
+                <div style={{
+                  marginTop: '12px',
+                  textAlign: 'center',
                   width: '120px',
-                  opacity: isLocked ? 0.4 : 1
-                }}>
-                  <div style={{ 
+                  opacity: isLocked ? 0.4 : 1,
+                  filter: isLocked && fogOfWar === 'Strict' ? 'blur(8px)' : 'none'
+                }}>                  <div style={{ 
                     fontSize: '0.65rem', 
                     fontWeight: 900, 
                     color: isCurrent ? 'white' : '#888',
