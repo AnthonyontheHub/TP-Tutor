@@ -1848,44 +1848,18 @@ export const useMasteryStore = create<MasteryStore>()(
           if (data.studentName) update.studentName = data.studentName;
           if (data.profileImage) update.profileImage = data.profileImage;
           if (data.profile) {
-            const incomingProfile = data.profile || {};
-            update.profile = { 
-              ...get().profile, 
+            const incomingProfile = data.profile as Partial<UserProfile>;
+            // Merge order: local state first, then Firestore values override only
+            // fields that are actually present (not undefined) in the cloud doc.
+            // Explicit field-by-field || fallbacks must NOT be used here because
+            // `incomingProfile.field === undefined` (absent from Firestore) would
+            // evaluate to `defaultProfile.field`, silently wiping anything the user
+            // had saved only to localStorage.
+            update.profile = {
+              ...get().profile,
               ...incomingProfile,
-              firstName: incomingProfile.firstName || data.studentName || defaultProfile.firstName,
-              lastName: incomingProfile.lastName || defaultProfile.lastName,
-              tpName: incomingProfile.tpName || defaultProfile.tpName,
-              age: incomingProfile.age || defaultProfile.age,
-              sex: incomingProfile.sex || defaultProfile.sex,
-              locationString: incomingProfile.locationString || defaultProfile.locationString,
-              difficulty: incomingProfile.difficulty || defaultProfile.difficulty,
-              interests: incomingProfile.interests || defaultProfile.interests,
-              mbti: incomingProfile.mbti || defaultProfile.mbti,
-              enneagram: incomingProfile.enneagram || defaultProfile.enneagram,
-              bigFiveOpenness: incomingProfile.bigFiveOpenness || defaultProfile.bigFiveOpenness,
-              bigFiveConscientiousness: incomingProfile.bigFiveConscientiousness || defaultProfile.bigFiveConscientiousness,
-              bigFiveExtraversion: incomingProfile.bigFiveExtraversion || defaultProfile.bigFiveExtraversion,
-              bigFiveAgreeableness: incomingProfile.bigFiveAgreeableness || defaultProfile.bigFiveAgreeableness,
-              bigFiveNeuroticism: incomingProfile.bigFiveNeuroticism || defaultProfile.bigFiveNeuroticism,
-              attachmentStyle: incomingProfile.attachmentStyle || defaultProfile.attachmentStyle,
-              religion: incomingProfile.religion || defaultProfile.religion,
-              religionOther: incomingProfile.religionOther || defaultProfile.religionOther,
-              politicalIdentity: incomingProfile.politicalIdentity || defaultProfile.politicalIdentity,
-              politicalIdentityOther: incomingProfile.politicalIdentityOther || defaultProfile.politicalIdentityOther,
-              bloodType: incomingProfile.bloodType || defaultProfile.bloodType,
-              dietPattern: incomingProfile.dietPattern || defaultProfile.dietPattern,
-              workoutStyle: incomingProfile.workoutStyle || defaultProfile.workoutStyle,
-              activityLevel: incomingProfile.activityLevel || defaultProfile.activityLevel,
-              chronicConditions: incomingProfile.chronicConditions || defaultProfile.chronicConditions,
-              bookGenres: incomingProfile.bookGenres || defaultProfile.bookGenres,
-              tvGenres: incomingProfile.tvGenres || defaultProfile.tvGenres,
-              musicGenres: incomingProfile.musicGenres || defaultProfile.musicGenres,
-              gamingGenres: incomingProfile.gamingGenres || defaultProfile.gamingGenres,
-              gamingPlatforms: incomingProfile.gamingPlatforms || defaultProfile.gamingPlatforms,
-              chronotype: incomingProfile.chronotype || defaultProfile.chronotype,
-              workSchedule: incomingProfile.workSchedule || defaultProfile.workSchedule,
-              livingSituation: incomingProfile.livingSituation || defaultProfile.livingSituation,
-              socialPreference: incomingProfile.socialPreference || defaultProfile.socialPreference,
+              // firstName has a special fallback to studentName when absent
+              firstName: incomingProfile.firstName ?? data.studentName ?? get().profile.firstName,
             };
           }
 
