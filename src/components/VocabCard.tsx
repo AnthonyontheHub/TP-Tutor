@@ -3,42 +3,44 @@ import { useRef } from 'react';
 import type { VocabWord, MasteryStatus } from '../types/mastery';
 import { useMasteryStore } from '../store/masteryStore';
 import { soundService } from '../services/soundService';
+import { Circle, Sparkles, Zap, ShieldCheck, Crown, Info, MessageSquare } from 'lucide-react';
 
 interface Props {
   word: VocabWord;
   onLongPress?: (word: VocabWord) => void;
   onClick?: (word: VocabWord) => void;
+  onAskLina?: (prompt: string) => void;
   isSandboxMode: boolean;
   isDimmed?: boolean;
   isSelected?: boolean;
   isRelated?: boolean;
 }
 
-const STATUS_ICONS: Record<MasteryStatus, string> = {
-  not_started: '⬜',
-  introduced: '🟣',
-  practicing: '🔵',
-  confident: '🟡',
-  mastered: '✅',
+const STATUS_ICONS: Record<MasteryStatus, React.ReactNode> = {
+  not_started: <Circle size={14} />,
+  introduced: <Sparkles size={14} />,
+  practicing: <Zap size={14} />,
+  confident: <ShieldCheck size={14} />,
+  mastered: <Crown size={14} />,
 };
 
-const RING_COLOR: Record<MasteryStatus, string> = {
-  not_started: '#ffffff',
+const STATUS_COLORS: Record<MasteryStatus, string> = {
+  not_started: '#6b7280',
   introduced: '#a855f7',
   practicing: '#3b82f6',
-  confident: '#f59e0b',
+  confident: '#eab308',
   mastered: '#22c55e',
 };
 
-const GLOW_COLOR: Record<MasteryStatus, string> = {
-  not_started: 'rgba(255, 255, 255, 0.4)',
+const STATUS_GLOWS: Record<MasteryStatus, string> = {
+  not_started: 'rgba(107, 114, 128, 0.4)',
   introduced: 'rgba(168, 85, 247, 0.6)',
   practicing: 'rgba(59, 130, 246, 0.6)',
-  confident: 'rgba(245, 158, 11, 0.6)',
-  mastered: 'rgba(34, 197, 94, 0.85)',
+  confident: 'rgba(234, 179, 8, 0.6)',
+  mastered: 'rgba(34, 197,  green, 0.85)',
 };
 
-export default function VocabCard({ word, onLongPress, onClick, isSandboxMode, isDimmed, isSelected, isRelated }: Props) {
+export default function VocabCard({ word, onLongPress, onClick, onAskLina, isSandboxMode, isDimmed, isSelected, isRelated }: Props) {
   const { cycleWordStatus } = useMasteryStore();
   const status = word.status;
 
@@ -100,40 +102,40 @@ export default function VocabCard({ word, onLongPress, onClick, isSandboxMode, i
 
   const handleCardClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    
-    // If it was a long press or a significant move, don't trigger a tap
     if (isLongPressActive.current || hasMovedSignificant.current) {
       isLongPressActive.current = false;
       hasMovedSignificant.current = false;
       return;
     }
-
     onClick?.(word);
   };
 
-  const hasSavedInfo = !!(
-    (word.notes && word.notes.trim() !== '') || 
-    (word.customDefinition && word.customDefinition.trim() !== '') ||
-    (word.sessionNotes && word.sessionNotes.trim() !== '') ||
-    (word.userNotes && word.userNotes.trim() !== '')
-  );
+  const handleDeepDive = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onAskLina) {
+      onAskLina(`[SYSTEM: Deep-dive explanation for the word: '${word.word}']. Please explain its nuance and give me a unique example sentence.`);
+    }
+  };
+
+  const hasAIContent = !!(word.aiExplanation || (word.sessionNotes && word.sessionNotes.length > 0));
+  const statusColor = STATUS_COLORS[status];
 
   return (
     <div
-      className={`vocab-card vocab-card--${status} ${isSelected ? 'is-selected' : ''} ${isRelated ? 'is-related' : ''}`}
+      className={`glass-panel vocab-card ${isSelected ? 'neon-border-gold active-pulse' : ''} ${isRelated ? 'is-related' : ''}`}
       style={{ 
         touchAction: 'none', 
-        borderLeftColor: isDimmed ? 'transparent' : RING_COLOR[status],
-        background: isDimmed ? 'rgba(0,0,0,0.5)' : (isSelected ? 'rgba(255,255,255,0.08)' : undefined),
-        borderColor: isSelected ? 'var(--gold)' : (isDimmed ? '#222' : undefined),
-        boxShadow: isDimmed 
-          ? 'none' 
-          : (isSelected 
-              ? `0 0 25px ${GLOW_COLOR[status]}, 0 0 10px ${GLOW_COLOR[status]}, inset 0 0 10px ${GLOW_COLOR[status]}`
-              : `0 0 15px ${GLOW_COLOR[status]}, 0 0 5px ${GLOW_COLOR[status]}`
-            ),
+        padding: '12px 10px',
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '4px',
         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        transform: isSelected ? 'scale(1.02)' : 'none',
+        opacity: isDimmed ? 0.3 : 1,
+        borderColor: isSelected ? 'var(--gold)' : (isDimmed ? '#222' : statusColor),
+        boxShadow: isSelected 
+          ? '0 0 20px rgba(255, 191, 0, 0.2)'
+          : (isDimmed ? 'none' : `0 0 10px ${STATUS_GLOWS[status]}`),
         zIndex: isSelected ? 10 : (isRelated ? 5 : 1)
       }}
       onPointerDown={handlePointerDown}
@@ -142,35 +144,66 @@ export default function VocabCard({ word, onLongPress, onClick, isSandboxMode, i
       onPointerCancel={handlePointerCancel}
       onClick={handleCardClick}
     >
+      <style>{`
+        @keyframes activePulse {
+          0% { box-shadow: 0 0 10px rgba(255, 191, 0, 0.2); }
+          50% { box-shadow: 0 0 20px rgba(255, 191, 0, 0.4); }
+          100% { box-shadow: 0 0 10px rgba(255, 191, 0, 0.2); }
+        }
+        .active-pulse { animation: activePulse 2s infinite; }
+        .vocab-card__quick-action {
+          opacity: 0;
+          transition: opacity 0.2s ease;
+        }
+        .vocab-card:hover .vocab-card__quick-action {
+          opacity: 1;
+        }
+      `}</style>
+
+      {/* Top Right Icons */}
+      <div style={{ position: 'absolute', top: '8px', right: '8px', display: 'flex', gap: '6px', alignItems: 'center' }}>
+        {hasAIContent && (
+          <MessageSquare size={12} className="neon-text-gold" style={{ opacity: 0.8 }} />
+        )}
+        <div 
+          className="vocab-card__status"
+          onClick={handleStatusClick}
+          style={{ color: statusColor, background: 'rgba(255,255,255,0.03)', padding: '4px', borderRadius: '4px' }}
+        >
+          {STATUS_ICONS[status]}
+        </div>
+      </div>
+
+      {/* Quick Action */}
       <div 
-        className="vocab-card__status"
-        onClick={handleStatusClick}
-        onPointerDown={(e) => e.stopPropagation()}
+        className="vocab-card__quick-action"
+        onClick={handleDeepDive}
+        style={{ position: 'absolute', bottom: '8px', right: '8px', color: 'var(--gold)', cursor: 'pointer' }}
       >
-        {STATUS_ICONS[status]}
+        <Info size={14} />
       </div>
 
       <div 
         className="vocab-card__word" 
         style={{ 
-          transition: 'all 0.3s ease', 
+          fontWeight: 900,
+          textTransform: 'uppercase',
+          letterSpacing: '0.15em',
+          fontSize: '0.85rem',
+          color: 'var(--text)',
+          wordBreak: 'break-word',
+          marginTop: '4px'
         }}
       >
         {word.type === 'grammar' ? word.sessionNotes : word.word}
       </div>
-      <div className="vocab-card__pos" style={{ opacity: isDimmed ? 0.7 : 1, transition: 'all 0.3s ease' }}>
+
+      <div className="vocab-card__pos" style={{ fontSize: '0.6rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
         {word.type === 'grammar' ? 'GRAMMAR' : word.partOfSpeech}
       </div>
+
       {word.pinnedExample && (
-        <div style={{
-          fontSize: '0.65rem',
-          color: 'var(--gold)',
-          fontStyle: 'italic',
-          marginTop: '4px',
-          opacity: isDimmed ? 0.3 : 0.8,
-          lineHeight: 1.2,
-          transition: 'all 0.3s ease'
-        }}>
+        <div style={{ fontSize: '0.65rem', color: 'var(--gold)', fontStyle: 'italic', marginTop: '2px', opacity: 0.6, lineHeight: 1.2 }}>
           "{word.pinnedExample}"
         </div>
       )}

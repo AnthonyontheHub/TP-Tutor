@@ -204,19 +204,18 @@ export default function MasteryGrid({
       });
   }, [vocabulary, lessonFilter, selectedPOS, searchQuery, sortMode, sortDirection]);
 
-  const itemData = useMemo(() => {
+  const combinedData = useMemo(() => {
      return {
         items: displayed,
-        // Wait, columnCount depends on width which comes from AutoSizer
-        // I will pass handleCardClick/LongPress here though
         selectedWords,
         activeFilter,
         relatedWordIds,
         isSandboxMode,
         handleCardClick,
-        handleCardLongPress
+        handleCardLongPress,
+        onAskLina
      };
-  }, [displayed, selectedWords, activeFilter, relatedWordIds, isSandboxMode, handleCardClick, handleCardLongPress]);
+  }, [displayed, selectedWords, activeFilter, relatedWordIds, isSandboxMode, handleCardClick, handleCardLongPress, onAskLina]);
 
   return (
     <div
@@ -304,19 +303,12 @@ export default function MasteryGrid({
             renderProp={({ height, width }: { height: number; width: number }) => {
               if (!height || !width) return null;
 
-              const gap = 10;
-              const minColWidth = 100;
+              const gap = 12;
+              const minColWidth = 110;
               const columnCount = Math.max(1, Math.floor((width + gap) / (minColWidth + gap)));
               const itemWidth = Math.floor((width - (gap * (columnCount - 1))) / columnCount);
               const rowCount = Math.ceil(displayed.length / columnCount);
-              const rowHeight = 115;
-
-              const combinedData = {
-                ...itemData,
-                columnCount,
-                gap,
-                itemWidth,
-              };
+              const rowHeight = 125;
 
               return (
                 <List
@@ -324,7 +316,7 @@ export default function MasteryGrid({
                   itemCount={rowCount}
                   itemSize={rowHeight}
                   width={width}
-                  itemData={combinedData}
+                  itemData={{ ...combinedData, columnCount, gap, itemWidth }}
                   overscanCount={3}
                   style={{ WebkitOverflowScrolling: 'touch', overflowX: 'hidden' }}
                 >
