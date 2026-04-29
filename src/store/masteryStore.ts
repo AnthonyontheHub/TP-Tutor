@@ -1567,7 +1567,8 @@ export const useMasteryStore = create<MasteryStore>()(
             earnedCeremonialRanks, lastSmallRankTitle, earnedBadges, totalProveItSubmitted,
             streakShields, xpMultiplier, lastStreakMilestone, pendingComebackBonus, sessionXPRecord,
             sessionLog, currentChallenge, completedChallenges, pendingRankAcknowledgement, newRankUnlocked,
-            activeCurriculumId, activeModuleId, selectedWords, lessonFilter } = get();
+            activeCurriculumId, activeModuleId, selectedWords, lessonFilter,
+            completedNodeIds, seenIntroductions, completedActivities, masteryHistory } = get();
         const targetId = explicitUserId || userId;
 
         // Block premature syncs before cloud data has loaded — prevents stale
