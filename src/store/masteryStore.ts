@@ -1608,8 +1608,9 @@ export const useMasteryStore = create<MasteryStore>()(
             sessionLog, currentChallenge, completedChallenges, pendingRankAcknowledgement, newRankUnlocked,
             activeCurriculumId, activeModuleId, selectedWords, lessonFilter, completedActivities, masteryHistory
           }), { merge });
+          console.log('[syncToCloud] ✓ Firestore write succeeded. profile:', JSON.stringify(profile));
         } catch (err) {
-          console.error('Firebase Sync Error:', err);
+          console.error('[syncToCloud] ✗ Firestore write FAILED:', err);
         }
       },
 
