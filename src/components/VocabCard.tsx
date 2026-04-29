@@ -123,8 +123,8 @@ export default function VocabCard({ word, onLongPress, onClick, isSandboxMode, i
         touchAction: 'none', 
         borderLeftColor: isDimmed ? 'transparent' : RING_COLOR[status],
         background: isDimmed ? 'rgba(0,0,0,0.5)' : undefined,
-        borderColor: isDimmed ? '#222' : RING_COLOR[status],
-        boxShadow: isDimmed ? 'none' : `0 0 15px ${GLOW_COLOR[status]}, 0 0 5px ${GLOW_COLOR[status]}`,
+        borderColor: isDimmed ? '#222' : undefined,
+        boxShadow: isDimmed ? 'none' : (hasSavedInfo ? `0 0 15px ${GLOW_COLOR[status]}, 0 0 5px ${GLOW_COLOR[status]}` : undefined),
         transition: 'all 0.3s ease'
       }}
       onPointerDown={handlePointerDown}
@@ -146,7 +146,7 @@ export default function VocabCard({ word, onLongPress, onClick, isSandboxMode, i
         style={{ 
           transition: 'all 0.3s ease', 
           color: (hasSavedInfo && !isDimmed) ? 'var(--gold)' : undefined,
-          textShadow: isDimmed ? 'none' : `0 0 10px ${GLOW_COLOR[status]}`
+          textShadow: isDimmed ? 'none' : (hasSavedInfo ? `0 0 10px ${GLOW_COLOR[status]}` : undefined)
         }}
       >
         {word.type === 'grammar' ? word.sessionNotes : word.word}

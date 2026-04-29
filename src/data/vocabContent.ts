@@ -1,3 +1,4 @@
+// Cache invalidation
 import type { VocabWord } from '../types/mastery';
 
 export type VocabContentEntry = Pick<VocabWord, 

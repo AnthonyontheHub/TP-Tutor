@@ -80,15 +80,15 @@ export interface ProgressSnapshot {
 }
 
 export interface UserProfile {
-  firstName: string;
-  lastName: string;
-  tpName: string;
+  firstName?: string;
+  lastName?: string;
+  tpName?: string;
   age?: string;
   sex?: 'Male' | 'Female' | 'Other' | null;
   locationString?: string;
-  difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
-  interests: string[];
-  history: ProgressSnapshot[];
+  difficulty?: 'Beginner' | 'Intermediate' | 'Advanced';
+  interests?: string[];
+  history?: ProgressSnapshot[];
 
   // Personality
   mbti?: string | null;
@@ -178,6 +178,7 @@ export interface Collocation {
   wordIds: string[];
 }
 
+// BoundaryNote interface
 export interface BoundaryNote {
   id: string;
   wordId: string;
