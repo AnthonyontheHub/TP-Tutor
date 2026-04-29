@@ -16,6 +16,7 @@ import { scoreToStatus, STATUS_MIDPOINT } from '../types/mastery';
 import { initialMasteryMap } from '../data/initialMasteryMap';
 import { curriculumRoadmap } from '../data/curriculum';
 import { vocabContent } from '../data/vocabContent';
+import { albumData } from '../data/albumData';
 import { TOKI_PONA_DICTIONARY, WORD_FREQUENCY } from '../data/tokiPonaDictionary';
 
 function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: MasteryStatus; type: 'word' | 'grammar'; sessionNotes: string; frequencyRank?: number; weight?: 'pillar' | 'working' | 'bonus' }): VocabWord {
@@ -87,18 +88,7 @@ const defaultSongs: Album[] = [
       { id: "pini-ala", title: "08 pini ala", blocks: [] }
     ]
   },
-  {
-    id: 'toki-nasa',
-    title: "toki nasa, kalama pona",
-    songs: [
-      { id: "o-tawa-wawa", title: "o tawa wawa", blocks: [] },
-      { id: "lukin-sama", title: "lukin sama", blocks: [] },
-      { id: "o-kule-e-kon", title: "o kule e kon", blocks: [] },
-      { id: "kulupu-pona", title: "KULUPU PONA", blocks: [] },
-      { id: "alasa-tawa-sin", title: "alasa tawa sin", blocks: [] },
-      { id: "kili-wawa", title: "kili wawa (Bonus Track)", blocks: [] }
-    ]
-  }
+  ...albumData
 ];
 
 const defaultCommonPhrases = [
@@ -1910,8 +1900,16 @@ export const useMasteryStore = create<MasteryStore>()(
           }
           if (!Array.isArray(state.songs) || state.songs.length === 0) {
             state.songs = defaultSongs;
-          }
-          if (!Array.isArray(state.savedPhrases)) {
+          } else {
+            // Migration check: If local song count is less than the count in albumData.ts, or missing specific albums
+            const hasTelo = state.songs.some((a: Album) => a.id === 'telo-lon-kiwen');
+            const needsUpdate = !hasTelo || state.songs.length < defaultSongs.length;
+
+            if (needsUpdate) {
+              console.log('Migrating songs to latest albumData...');
+              state.songs = defaultSongs;
+            }
+          }          if (!Array.isArray(state.savedPhrases)) {
             state.savedPhrases = [];
           }
 
