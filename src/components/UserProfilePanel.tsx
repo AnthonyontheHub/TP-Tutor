@@ -70,10 +70,11 @@ const SOCIAL_PREFERENCES = ['Strong Introvert', 'Mild Introvert', 'Ambivert', 'M
 type TabID = 'IDENTITY' | 'PERSONA' | 'BELIEFS' | 'HEALTH' | 'MEDIA' | 'DAILY';
 
 export default function UserProfilePanel({ onClose }: Props) {
-  const { 
+  const {
     studentName, setStudentName, profile, updateProfile, setProfileImage,
     profileImage, getStatusSummary,
-    earnedCeremonialRanks, streakShields
+    earnedCeremonialRanks, streakShields,
+    lore, setLore
   } = useMasteryStore();
   const { logout, user, isGuest } = useAuthStore();
   
@@ -83,12 +84,14 @@ export default function UserProfilePanel({ onClose }: Props) {
   const [isEditing, setIsEditing] = useState(false);
   const [showLedger, setShowLedger] = useState(false);
   const [editableProfile, setEditableProfile] = useState(profile);
+  const [editableLore, setEditableLore] = useState(lore);
 
   useEffect(() => {
     if (!isEditing) {
       setEditableProfile(profile);
+      setEditableLore(lore);
     }
-  }, [profile, isEditing]);
+  }, [profile, lore, isEditing]);
 
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
@@ -108,6 +111,7 @@ export default function UserProfilePanel({ onClose }: Props) {
     }
     
     updateProfile(editableProfile);
+    setLore(editableLore);
     setIsEditing(false);
   };
 
@@ -356,11 +360,21 @@ export default function UserProfilePanel({ onClose }: Props) {
               </div>
               <div className="field-group">
                 <label>Interests (comma separated)</label>
-                <input 
-                  type="text" 
-                  value={(editableProfile.interests || []).join(', ')} 
+                <input
+                  type="text"
+                  value={(editableProfile.interests || []).join(', ')}
                   readOnly={!isEditing}
-                  onChange={(e) => handleFieldChange('interests', e.target.value.split(',').map(s => s.trim()))} 
+                  onChange={(e) => handleFieldChange('interests', e.target.value.split(',').map(s => s.trim()))}
+                />
+              </div>
+              <div className="field-group">
+                <label>Background Lore</label>
+                <textarea
+                  value={editableLore}
+                  readOnly={!isEditing}
+                  onChange={(e) => setEditableLore(e.target.value)}
+                  placeholder="Tell jan Lina about your life — job, hobbies, relationships, goals. The more context, the more personal your lessons."
+                  style={{ width: '100%', padding: '10px', background: isEditing ? '#111' : 'transparent', color: 'white', border: isEditing ? '1px solid #333' : '1px solid transparent', borderRadius: '4px', minHeight: '120px', resize: 'vertical', boxSizing: 'border-box', fontSize: '0.85rem', paddingLeft: isEditing ? '10px' : 0 }}
                 />
               </div>
             </div>

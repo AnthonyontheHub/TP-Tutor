@@ -136,6 +136,7 @@ interface MasteryActions {
   setStudentName: (name: string) => void;
   updateProfile: (profile: Partial<UserProfile>) => void;
   setReviewVibe: (vibe: ReviewVibe) => void;
+  setLore: (lore: string) => void;
   setProfileImage: (url: string) => void;
   updatePhraseNote: (id: string, notes: string) => void;
   deletePhrase: (id: string) => void;
@@ -216,6 +217,7 @@ interface MasteryState {
   studentName: string;
   profile: UserProfile;
   reviewVibe: ReviewVibe;
+  lore: string;
   profileImage: string;
   lastUpdated: string;
   vocabulary: VocabWord[];
@@ -330,6 +332,7 @@ export const useMasteryStore = create<MasteryStore>()(
       studentName: '',
       profile: defaultProfile,
       reviewVibe: null,
+      lore: '',
       profileImage: '',
       lastUpdated: '',
       vocabulary: mappedVocabulary,
@@ -1329,6 +1332,7 @@ export const useMasteryStore = create<MasteryStore>()(
         void get().syncToCloud(); 
       },
       setReviewVibe: (vibe) => { set({ reviewVibe: vibe }); void get().syncToCloud(); },
+      setLore: (lore) => { set({ lore }); void get().syncToCloud(); },
       setProfileImage: (url) => { set({ profileImage: url }); void get().syncToCloud(); },
 
       updatePhraseNote: (id, notes) => {
@@ -1563,11 +1567,12 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       syncToCloud: async (explicitUserId, merge = true, force = false) => {
-        const { vocabulary, curriculums, lastUpdated, studentName, profile, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, isMainProfile, widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, cloudSynced, songs, commonPhrases, lastStreakCheck, learningDays, confusionPairs, pendingProveItResponses,
+        const { vocabulary, curriculums, lastUpdated, studentName, profile, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, isMainProfile, widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, cloudSynced, songs, commonPhrases, lastStreakCheck, learningDays, completedNodeIds, seenIntroductions, confusionPairs, pendingProveItResponses,
             earnedCeremonialRanks, lastSmallRankTitle, earnedBadges, totalProveItSubmitted,
             streakShields, xpMultiplier, lastStreakMilestone, pendingComebackBonus, sessionXPRecord,
             sessionLog, currentChallenge, completedChallenges, pendingRankAcknowledgement, newRankUnlocked,
-            activeCurriculumId, activeModuleId, selectedWords, lessonFilter } = get();
+            activeCurriculumId, activeModuleId, selectedWords, lessonFilter, completedActivities, masteryHistory,
+            reviewVibe, lore } = get();
         const targetId = explicitUserId || userId;
 
         // Block premature syncs before cloud data has loaded — prevents stale
@@ -1605,7 +1610,8 @@ export const useMasteryStore = create<MasteryStore>()(
             earnedCeremonialRanks, lastSmallRankTitle, earnedBadges, totalProveItSubmitted,
             streakShields, xpMultiplier, lastStreakMilestone, pendingComebackBonus, sessionXPRecord,
             sessionLog, currentChallenge, completedChallenges, pendingRankAcknowledgement, newRankUnlocked,
-            activeCurriculumId, activeModuleId, selectedWords, lessonFilter, completedActivities, masteryHistory
+            activeCurriculumId, activeModuleId, selectedWords, lessonFilter, completedActivities, masteryHistory,
+            reviewVibe, lore
           }), { merge });
         } catch (err) {
           console.error('Firebase Sync Error:', err);
@@ -1842,6 +1848,8 @@ export const useMasteryStore = create<MasteryStore>()(
             lessonFilter: data.lessonFilter || null,
             completedActivities: data.completedActivities || {},
             masteryHistory: data.masteryHistory || [],
+            reviewVibe: data.reviewVibe ?? null,
+            lore: data.lore || '',
           };
 
           if (data.studentName) update.studentName = data.studentName;
