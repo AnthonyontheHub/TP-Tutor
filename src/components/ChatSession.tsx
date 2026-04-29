@@ -100,7 +100,7 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
   const earnedBadges            = useMasteryStore(s => s.earnedBadges);
   const earnedCeremonialRanks   = useMasteryStore(s => s.earnedCeremonialRanks);
 
-  const displayName = profile.tpName || profile.tokiPonaName || studentName || 'ANTHONY';
+  const displayName = profile.tpName || profile.tokiPonaName || studentName || 'USER';
 
   const messagesEndRef  = useRef<HTMLDivElement>(null);
 

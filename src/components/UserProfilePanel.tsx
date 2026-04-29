@@ -1,5 +1,5 @@
 /* src/components/UserProfilePanel.tsx */
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Cropper from 'react-easy-crop';
 import type { Point, Area } from 'react-easy-crop';
@@ -71,7 +71,7 @@ type TabID = 'IDENTITY' | 'PERSONA' | 'BELIEFS' | 'HEALTH' | 'MEDIA' | 'DAILY';
 
 export default function UserProfilePanel({ onClose }: Props) {
   const { 
-    studentName, profile, updateProfile, setProfileImage,
+    studentName, setStudentName, profile, updateProfile, setProfileImage,
     profileImage, getStatusSummary,
     earnedCeremonialRanks, streakShields
   } = useMasteryStore();
@@ -84,6 +84,12 @@ export default function UserProfilePanel({ onClose }: Props) {
   const [showLedger, setShowLedger] = useState(false);
   const [editableProfile, setEditableProfile] = useState(profile);
 
+  useEffect(() => {
+    if (!isEditing) {
+      setEditableProfile(profile);
+    }
+  }, [profile, isEditing]);
+
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -95,6 +101,12 @@ export default function UserProfilePanel({ onClose }: Props) {
       setProfileImage(croppedImage);
       setImageSrc(null);
     }
+    
+    // First, sync local user alias if firstName was changed
+    if (editableProfile.firstName !== profile.firstName && editableProfile.firstName) {
+       setStudentName(editableProfile.firstName);
+    }
+    
     updateProfile(editableProfile);
     setIsEditing(false);
   };
@@ -156,7 +168,7 @@ export default function UserProfilePanel({ onClose }: Props) {
       style={{ display: 'flex', flexDirection: 'column' }}
     >
       <header className="side-panel-header" style={{ justifyContent: 'space-between', flexShrink: 0 }}>
-        <h2 style={{ fontSize: '0.9rem', fontWeight: 900, letterSpacing: '0.15em', color: 'var(--gold)' }}>{studentName?.toUpperCase() || 'ANTHONY'} PROFILE</h2>
+        <h2 style={{ fontSize: '0.9rem', fontWeight: 900, letterSpacing: '0.15em', color: 'var(--gold)' }}>{studentName?.toUpperCase() || 'USER'} PROFILE</h2>
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
           {isEditing ? (
             <div className="edit-controls">

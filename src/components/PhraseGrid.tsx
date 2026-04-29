@@ -40,7 +40,7 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
   }, [focusPhraseId, safeSavedPhrases]);
 
   const normalizedSaved = (safeSavedPhrases || []).map(p => 
-    typeof p === 'string' ? { id: p, tp: p, en: `${studentName || 'Anthony'} Saved Phrase *`, notes: '' } : p
+    typeof p === 'string' ? { id: p, tp: p, en: `${studentName || 'User'} Saved Phrase *`, notes: '' } : p
   );
 
   const filteredSaves = normalizedSaved.filter(p => {

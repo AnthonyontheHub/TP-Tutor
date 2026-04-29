@@ -115,7 +115,7 @@ const defaultCommonPhrases = [
   { category: "GREETINGS", tp: "toki!", en: "Hello / Hi" },
   { category: "GREETINGS", tp: "sina pilin seme?", en: "How are you?" },
   { category: "GREETINGS", tp: "mi tawa", en: "Goodbye (I am leaving)" },
-  { category: "SOCIAL", tp: "nimi mi li Anthony", en: "My name is Anthony" },
+  { category: "SOCIAL", tp: "nimi mi li jan User", en: "My name is User" },
   { category: "SOCIAL", tp: "mi kama sona e toki pona", en: "I'm learning Toki Pona" },
   { category: "POLITE", tp: "sina pona", en: "Thank you / You are good" },
   { category: "POLITE", tp: "mi pakala", en: "I'm sorry / I messed up" },
@@ -275,39 +275,39 @@ const STATUS_ORDER: MasteryStatus[] = ['not_started', 'introduced', 'practicing'
 const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
 
 const defaultProfile: UserProfile = {
-  firstName: 'Anthony',
+  firstName: '',
   lastName: '',
   tpName: '',
   difficulty: 'Beginner',
   interests: [],
   history: [],
   
-  age: undefined,
-  sex: undefined,
-  locationString: undefined,
+  age: '',
+  sex: null,
+  locationString: '',
   
   // Personality
-  mbti: undefined,
-  enneagram: undefined,
-  bigFiveOpenness: undefined,
-  bigFiveConscientiousness: undefined,
-  bigFiveExtraversion: undefined,
-  bigFiveAgreeableness: undefined,
-  bigFiveNeuroticism: undefined,
-  attachmentStyle: undefined,
+  mbti: '',
+  enneagram: '',
+  bigFiveOpenness: null,
+  bigFiveConscientiousness: null,
+  bigFiveExtraversion: null,
+  bigFiveAgreeableness: null,
+  bigFiveNeuroticism: null,
+  attachmentStyle: '',
 
   // Beliefs
-  religion: undefined,
-  religionOther: undefined,
+  religion: '',
+  religionOther: '',
   politicalIdentity: [],
-  politicalIdentityOther: undefined,
+  politicalIdentityOther: '',
 
   // Health
-  bloodType: undefined,
-  dietPattern: undefined,
-  workoutStyle: undefined,
-  activityLevel: undefined,
-  chronicConditions: undefined,
+  bloodType: '',
+  dietPattern: '',
+  workoutStyle: '',
+  activityLevel: '',
+  chronicConditions: '',
 
   // Media
   bookGenres: [],
@@ -317,17 +317,17 @@ const defaultProfile: UserProfile = {
   gamingPlatforms: [],
 
   // Daily Life
-  chronotype: undefined,
-  workSchedule: undefined,
-  livingSituation: undefined,
-  socialPreference: undefined,
+  chronotype: '',
+  workSchedule: '',
+  livingSituation: '',
+  socialPreference: '',
 };
 
 export const useMasteryStore = create<MasteryStore>()(
   persist(
     (set, get) => ({
       userId: null,
-      studentName: 'Anthony',
+      studentName: '',
       profile: defaultProfile,
       reviewVibe: null,
       profileImage: '',
@@ -1334,7 +1334,7 @@ export const useMasteryStore = create<MasteryStore>()(
       updatePhraseNote: (id, notes) => {
         set((state) => ({
           savedPhrases: state.savedPhrases.map(p => {
-            if (typeof p === 'string') return p === id ? { id, tp: p, en: 'Anthony Saved Phrase *', notes } : p;
+            if (typeof p === 'string') return p === id ? { id, tp: p, en: 'Saved Phrase *', notes } : p;
             return p.id === id ? { ...p, notes } : p;
           })
         }));
@@ -1466,7 +1466,7 @@ export const useMasteryStore = create<MasteryStore>()(
       clearLocalData: () => {
         set({
           userId: null,
-          studentName: 'Anthony',
+          studentName: '',
           profile: defaultProfile,
           reviewVibe: null,
           profileImage: '',
@@ -1624,7 +1624,7 @@ export const useMasteryStore = create<MasteryStore>()(
           if (!docSnap.exists()) {
             const localName = get().studentName;
             const isOtherUsersData = initialName && localName &&
-              localName !== 'Anthony' &&
+              localName !== '' &&
               localName.toLowerCase() !== initialName.toLowerCase();
 
             if (isOtherUsersData) {
@@ -1647,7 +1647,7 @@ export const useMasteryStore = create<MasteryStore>()(
                 commonPhrases: defaultCommonPhrases,
               });
             } else {
-              if (initialName && (localName === 'Anthony' || !localName)) {
+              if (initialName && (localName === '' || !localName)) {
                 set({ studentName: initialName });
                 get().updateProfile({ firstName: initialName });
               }
@@ -1847,7 +1847,45 @@ export const useMasteryStore = create<MasteryStore>()(
           if (data.studentName) update.studentName = data.studentName;
           if (data.profileImage) update.profileImage = data.profileImage;
           if (data.profile) {
-            update.profile = { ...get().profile, ...(data.profile || {}) };
+            const incomingProfile = data.profile || {};
+            update.profile = { 
+              ...get().profile, 
+              ...incomingProfile,
+              firstName: incomingProfile.firstName || data.studentName || defaultProfile.firstName,
+              lastName: incomingProfile.lastName || defaultProfile.lastName,
+              tpName: incomingProfile.tpName || defaultProfile.tpName,
+              age: incomingProfile.age || defaultProfile.age,
+              sex: incomingProfile.sex || defaultProfile.sex,
+              locationString: incomingProfile.locationString || defaultProfile.locationString,
+              difficulty: incomingProfile.difficulty || defaultProfile.difficulty,
+              interests: incomingProfile.interests || defaultProfile.interests,
+              mbti: incomingProfile.mbti || defaultProfile.mbti,
+              enneagram: incomingProfile.enneagram || defaultProfile.enneagram,
+              bigFiveOpenness: incomingProfile.bigFiveOpenness || defaultProfile.bigFiveOpenness,
+              bigFiveConscientiousness: incomingProfile.bigFiveConscientiousness || defaultProfile.bigFiveConscientiousness,
+              bigFiveExtraversion: incomingProfile.bigFiveExtraversion || defaultProfile.bigFiveExtraversion,
+              bigFiveAgreeableness: incomingProfile.bigFiveAgreeableness || defaultProfile.bigFiveAgreeableness,
+              bigFiveNeuroticism: incomingProfile.bigFiveNeuroticism || defaultProfile.bigFiveNeuroticism,
+              attachmentStyle: incomingProfile.attachmentStyle || defaultProfile.attachmentStyle,
+              religion: incomingProfile.religion || defaultProfile.religion,
+              religionOther: incomingProfile.religionOther || defaultProfile.religionOther,
+              politicalIdentity: incomingProfile.politicalIdentity || defaultProfile.politicalIdentity,
+              politicalIdentityOther: incomingProfile.politicalIdentityOther || defaultProfile.politicalIdentityOther,
+              bloodType: incomingProfile.bloodType || defaultProfile.bloodType,
+              dietPattern: incomingProfile.dietPattern || defaultProfile.dietPattern,
+              workoutStyle: incomingProfile.workoutStyle || defaultProfile.workoutStyle,
+              activityLevel: incomingProfile.activityLevel || defaultProfile.activityLevel,
+              chronicConditions: incomingProfile.chronicConditions || defaultProfile.chronicConditions,
+              bookGenres: incomingProfile.bookGenres || defaultProfile.bookGenres,
+              tvGenres: incomingProfile.tvGenres || defaultProfile.tvGenres,
+              musicGenres: incomingProfile.musicGenres || defaultProfile.musicGenres,
+              gamingGenres: incomingProfile.gamingGenres || defaultProfile.gamingGenres,
+              gamingPlatforms: incomingProfile.gamingPlatforms || defaultProfile.gamingPlatforms,
+              chronotype: incomingProfile.chronotype || defaultProfile.chronotype,
+              workSchedule: incomingProfile.workSchedule || defaultProfile.workSchedule,
+              livingSituation: incomingProfile.livingSituation || defaultProfile.livingSituation,
+              socialPreference: incomingProfile.socialPreference || defaultProfile.socialPreference,
+            };
           }
 
           set(update);
