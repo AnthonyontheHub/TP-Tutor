@@ -128,6 +128,8 @@ interface MasteryActions {
   syncToCloud: (userId?: string, merge?: boolean, force?: boolean) => Promise<void>;
   getStatusSummary: () => StatusSummary & { xp: number; level: number; rankTitle: string };
   setHasCompletedSetup: (val: boolean) => void;
+  setSongs: (songs: Album[]) => void;
+  syncSongsWithData: () => void;
   updateNodeStatus: (nodeId: string, status: NodeStatus) => void;
   awardBadge: (badgeId: string) => void;
   checkAndAwardRanks: () => void;
@@ -362,7 +364,17 @@ export const useMasteryStore = create<MasteryStore>()(
       pendingRankAcknowledgement: null,
 
       setHasCompletedSetup: (val) => { set({ hasCompletedSetup: val }); void get().syncToCloud(); },
-
+      setSongs: (songs) => { set({ songs }); void get().syncToCloud(); },
+      syncSongsWithData: () => {
+        const { songs } = get();
+        console.log("Current songs in store:", songs);
+        const hasTelo = Array.isArray(songs) && songs.some(a => a.id === 'telo-lon-kiwen');
+        if (!Array.isArray(songs) || songs.length === 0 || !hasTelo) {
+          console.log('Force-syncing songs to latest albumData...');
+          set({ songs: defaultSongs });
+          void get().syncToCloud();
+        }
+      },
       refreshCurriculumStatus: () => {
         set((state) => {
           let lastNodeMastery = 0; // Conceptual nodes stay active until sign-off
@@ -1894,24 +1906,24 @@ export const useMasteryStore = create<MasteryStore>()(
       },
       onRehydrateStorage: () => (state) => {
         if (state) {
+          console.log("Current songs in store (pre-hydration):", state.songs);
+
           // Ensure critical array fields are always arrays and not empty if defaults exist
           if (!Array.isArray(state.commonPhrases) || state.commonPhrases.length === 0) {
             state.commonPhrases = defaultCommonPhrases;
           }
-          if (!Array.isArray(state.songs) || state.songs.length === 0) {
+          
+          const hasTelo = Array.isArray(state.songs) && state.songs.some((a: Album) => a.id === 'telo-lon-kiwen');
+          if (!Array.isArray(state.songs) || state.songs.length === 0 || !hasTelo) {
+            console.log('Force-syncing songs to latest albumData (telo-lon-kiwen missing or empty)...');
             state.songs = defaultSongs;
-          } else {
-            // Migration check: If local song count is less than the count in albumData.ts, or missing specific albums
-            const hasTelo = state.songs.some((a: Album) => a.id === 'telo-lon-kiwen');
-            const needsUpdate = !hasTelo || state.songs.length < defaultSongs.length;
+          }
 
-            if (needsUpdate) {
-              console.log('Migrating songs to latest albumData...');
-              state.songs = defaultSongs;
-            }
-          }          if (!Array.isArray(state.savedPhrases)) {
+          if (!Array.isArray(state.savedPhrases)) {
             state.savedPhrases = [];
           }
+
+          console.log("Current songs in store (post-hydration):", state.songs);
 
           // Merge static content on rehydration
           const mergedCurriculums = curriculumRoadmap.map(staticLevel => {

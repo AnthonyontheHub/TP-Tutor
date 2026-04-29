@@ -22,8 +22,13 @@ export type AppPanel = 'profile' | 'settings' | 'instructions' | 'achievements' 
 
 export default function App() {
   const { user, loading } = useAuthStore();
-  const { hasCompletedSetup, isMainProfile } = useMasteryStore();
+  const { hasCompletedSetup, isMainProfile, syncSongsWithData } = useMasteryStore();
   const rawSessions = useChatStore(s => s.sessions);
+
+  useEffect(() => {
+    syncSongsWithData();
+  }, [syncSongsWithData]);
+
   const { addSession, removeSession, updateSession } = useChatStore();
 
   const chatSessions = Array.isArray(rawSessions) ? rawSessions : [];
