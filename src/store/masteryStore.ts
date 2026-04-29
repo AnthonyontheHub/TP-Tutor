@@ -70,25 +70,101 @@ const mappedVocabulary: VocabWord[] = initialMasteryMap.initialVocabulary.map(to
 
 const defaultSongs: Album[] = [
   {
-    id: "utala-kon",
-    title: "utala kon",
+    id: 'telo-lon-kiwen',
+    title: "telo lon kiwen",
+    year: 2022,
     songs: [
-      { id: "wawa-kama", title: "01 wawa kama", blocks: [
-        { title: "Verse 1", tp: "mi tawa / mi tawa / mi tawa lon nasin / nasin li pini", en: "I go / I go / I go on the path / The path ends" },
-        { title: "Chorus", tp: "ona li lon / pini li kama / mi ken ala pini e tawa", en: "It is here / The end is coming / I cannot stop the movement" }
-      ]},
-      { id: "nasin-li-ken-ala", title: "02 nasin li ken ala", blocks: [
-        { title: "Chorus", tp: "nasin li ken ala", en: "The path is not possible" }
-      ]},
-      { id: "pini-li-kama", title: "03 pini li kama", blocks: [] },
-      { id: "toki-ike", title: "04 toki ike", blocks: [] },
-      { id: "lukin-moli", title: "05 lukin moli", blocks: [] },
-      { id: "mi-olin-e-ike", title: "06 mi olin e ike", blocks: [] },
-      { id: "mi-awen-lon-ni", title: "07 mi awen lon ni", blocks: [] },
-      { id: "pini-ala", title: "08 pini ala", blocks: [] }
+      { id: 'suno-lon-insa', title: 'suno lon insa', blocks: [] },
+      { id: 'telo-lon-kiwen-track', title: 'telo lon kiwen', blocks: [] },
+      { id: 'tenpo-li-moku-e-mi', title: 'tenpo li moku e mi', blocks: [] },
+      { id: 'eijelo-ilo', title: 'eijelo ilo', blocks: [] },
+      { id: 'kon-li-pini-e-moli', title: 'kon li pini e moli', blocks: [] },
+      { id: 'ma-suli-lon-monsi', title: 'ma suli lon monsi', blocks: [] },
+      { id: 'nasin-pi-pakala-ken', title: 'nasin pi pakala ken', blocks: [] },
+      { id: 'kalama-pi-pini-ala', title: 'kalama pi pini ala', blocks: [] },
+      { id: 'ante-suli-track', title: 'ante Suli', blocks: [] },
+      { id: 'pana-pi-wawa-pimeja', title: 'pana pi wawa pimeja', blocks: [] },
+      { id: 'suno-sewi', title: 'suno sewi', blocks: [] },
+      { id: 'awen-lape', title: 'awen lape', blocks: [] },
+      { id: 'kon-pi-sewi', title: 'kon pi sewi', blocks: [] },
+      { id: 'kon-kalama', title: 'kon kalama', blocks: [] },
+      { id: 'o-lon-poka-mi', title: 'o lon poka mi', blocks: [] },
+      { id: 'luka-mama', title: 'luka mama', blocks: [] },
+      { id: 'tenpo-awen-pini-ala', title: 'tenpo awen pini ala', blocks: [] },
+      { id: 'telo-suno', title: 'telo suno', blocks: [] }
     ]
   },
-  ...albumData
+  {
+    id: 'kalama-pi-kon-mi',
+    title: "kalama pi kon mi",
+    year: 2023,
+    songs: [
+      { id: 'mi-awen-lon-pimeja', title: 'mi awen lon pimeja', blocks: [] },
+      { id: 'mi-lon-ma-lili', title: 'mi lon ma lili', blocks: [] },
+      { id: 'seli-pi-sijelo', title: 'seli pi sijelo', blocks: [] },
+      { id: 'oko-pikon-sewi', title: 'oko pikon sewi', blocks: [] },
+      { id: 'mi-wile-pona', title: 'mi wile pona', blocks: [] },
+      { id: 'toki-ala', title: 'toki ala', blocks: [] },
+      { id: 'awa-en-awen', title: 'awa en awen', blocks: [] },
+      { id: 'noka-en-ma', title: 'noka en ma', blocks: [] },
+      { id: 'ni-li-nasa', title: 'ni li nasa', blocks: [] },
+      { id: 'mi-mute-o-musi', title: 'mi mute o musi', blocks: [] },
+      { id: 'mi-lon-ni-li-pona', title: 'mi lon ni li pona', blocks: [] },
+      { id: 'kalama-pi-kon-mi-track', title: 'kalama pi kon mi', blocks: [] }
+    ]
+  },
+  {
+    id: 'utala-kon',
+    title: "utala kon",
+    year: 2024,
+    songs: [
+      { id: 'wawa-kama', title: 'wawa kama', blocks: [] },
+      { id: 'nasin-li-ken-ala', title: 'nasin li ken ala', blocks: [] },
+      { id: 'pini-li-kama', title: 'pini li kama', blocks: [] },
+      { id: 'toki-ike', title: 'toki ike', blocks: [] },
+      { id: 'lukin-moli', title: 'lukin moli', blocks: [] },
+      { id: 'mi-olin-e-ike', title: 'mi olin e ike', blocks: [] },
+      { id: 'mi-awen-lon-ni', title: 'mi awen lon ni', blocks: [] },
+      { id: 'pini-ala', title: 'pini ala', blocks: [] },
+      { id: 'pini-lon-tomo', title: 'pini lon tomo', blocks: [] }
+    ]
+  },
+  {
+    id: 'toki-nasa-kalama-pona-ep',
+    title: "toki nasa, kalama pona ep",
+    year: 2025,
+    songs: [
+      { id: 'o-tawa-wawa', title: 'o tawa wawa', blocks: [] },
+      { id: 'lukin-sama', title: 'lukin sama', blocks: [] },
+      { id: 'o-kule-e-kon', title: 'o kule e kon', blocks: [] },
+      { id: 'kulupupona', title: 'KULUPUPONA', blocks: [] },
+      { id: 'alasa-tawa-sin', title: 'alasa tawa sin', blocks: [] },
+      { id: 'kili-wawa', title: 'kili wawa', blocks: [] }
+    ]
+  },
+  {
+    id: 'pini-o-awen',
+    title: "pini o awen",
+    year: 2026,
+    songs: [
+      { id: 'lon-pimeja', title: 'lon pimeja', blocks: [] },
+      { id: 'mi-olin-e-tenpo', title: 'mi olin e tenpo', blocks: [] },
+      { id: 'mi-ala', title: 'mi ala', blocks: [] },
+      { id: 'olin-li-awen', title: 'olin li awen', blocks: [] },
+      { id: 'sona-pi-tenpo-pini', title: 'sona pi tenpo pini', blocks: [] },
+      { id: 'toki-lon-kon', title: 'toki lon kon', blocks: [] },
+      { id: 'tawa-awen', title: 'tawa awen', blocks: [] },
+      { id: 'utala-insa', title: 'utala insa', blocks: [] },
+      { id: 'ike-li-lawa', title: 'ike li lawa', blocks: [] },
+      { id: 'toki-pi-utala', title: 'toki pi utala', blocks: [] },
+      { id: 'lape-suli', title: 'lape suli', blocks: [] },
+      { id: 'ale-li-lon-mi', title: 'ale li lon mi', blocks: [] },
+      { id: 'sama-anu-seme', title: 'sama anu seme', blocks: [] },
+      { id: 'olin-pi-pini', title: 'olin pi pini', blocks: [] },
+      { id: 'tenpo-suno-tu', title: 'tenpo suno tu', blocks: [] },
+      { id: 'pona-li-kama', title: 'pona li kama', blocks: [] }
+    ]
+  }
 ];
 
 const defaultCommonPhrases = [
