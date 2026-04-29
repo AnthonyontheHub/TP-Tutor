@@ -1145,9 +1145,22 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       resetLearningProgress: async () => {
-        set({
-          profile: defaultProfile,
-          vocabulary: mappedVocabulary.map(v => ({ ...v, baseScore: 0, confidenceScore: 0, status: 'not_started' as MasteryStatus })),
+        set((state) => ({
+          vocabulary: state.vocabulary.map(v => ({ 
+            ...v, 
+            baseScore: 0, 
+            confidenceScore: 0, 
+            status: 'not_started' as MasteryStatus,
+            useCount: 0,
+            scoreHistory: [],
+            rolesMastered: {},
+            hardened: false,
+            isBleeding: false,
+            recentPerformance: [],
+            productionStatus: undefined,
+            recognitionStatus: undefined,
+            pinnedExample: undefined
+          })),
           curriculums: curriculumRoadmap,
           activeCurriculumId: null,
           activeModuleId: null,
@@ -1175,8 +1188,9 @@ export const useMasteryStore = create<MasteryStore>()(
           lastStreakCheck: '',
           pendingProveItResponses: [],
           totalProveItSubmitted: 0,
-          completedActivities: {}
-        });
+          completedActivities: {},
+          masteryHistory: []
+        }));
         localStorage.setItem('tp_sandbox_mode', 'false');
         get().refreshCurriculumStatus();
         await get().syncToCloud(undefined, false, true);
