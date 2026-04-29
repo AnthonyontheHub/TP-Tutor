@@ -1,10 +1,10 @@
-/* src/components/CurriculumRoadmap.tsx */
+/* src/components/Roadmap.tsx */
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import NodeDossier from './NodeDossier';
 import ChallengeWidget from './ChallengeWidget';
-import type { CurriculumNode, SessionLogEntry } from '../types/mastery';
+import type { CurriculumNode, SessionLogEntry, ReviewVibe } from '../types/mastery';
 import { STATUS_META } from '../types/mastery';
 
 interface Props {
@@ -12,8 +12,23 @@ interface Props {
   isSandboxMode: boolean;
 }
 
-export default function CurriculumRoadmap({ onAskLina, isSandboxMode }: Props) {
-  const { curriculums, currentPositionNodeId, sessionLog, vocabulary, fogOfWar } = useMasteryStore();
+export function getRoadmapLessonPrompt(curriculums: any[], currentPositionNodeId: string, reviewVibe: ReviewVibe | null) {
+  const activeNode = curriculums.flatMap(l => l.nodes).find(n => n.id === currentPositionNodeId);
+  const nodeTitle = activeNode?.title || 'Current Module';
+
+  if (reviewVibe === 'chill') { // NEW CONCEPT
+    return `[SYSTEM: Roadmap Lesson - NEW CONCEPT. Focus strictly on current module items for "${nodeTitle}".]`;
+  } else if (reviewVibe === 'deep') { // REVIEW
+    return `[SYSTEM: Roadmap Lesson - REVIEW. Mix items from "${nodeTitle}" with previously introduced words.]`;
+  } else if (reviewVibe === 'intense') { // QUIZ
+    return `[SYSTEM: Roadmap Lesson - QUIZ / LEVEL UP. Conduct a proficiency test on the current module "${nodeTitle}".]`;
+  } else {
+    return `[SYSTEM: Roadmap Lesson. Continue "${nodeTitle}" with a mix of new material and past review.]`;
+  }
+}
+
+export default function Roadmap({ onAskLina, isSandboxMode }: Props) {
+  const { curriculums, currentPositionNodeId, sessionLog, vocabulary, fogOfWar, setActiveActivity } = useMasteryStore();
   const [selectedNode, setSelectedNode] = useState<CurriculumNode | null>(null);
   const [hoveredSession, setHoveredSession] = useState<SessionLogEntry | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });

@@ -5,7 +5,7 @@ import ProgressSummary from './ProgressSummary';
 import MasteryGrid from './MasteryGrid';
 import PhraseGrid from './PhraseGrid';
 import Discography from './Discography';
-import CurriculumRoadmap from './CurriculumRoadmap';
+import Roadmap, { getRoadmapLessonPrompt } from './Roadmap';
 import SentenceBuilder from './SentenceBuilder';
 import ProveIt from './ProveIt';
 import ChallengeWidget from './ChallengeWidget';
@@ -155,18 +155,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
 
       onAskLina(prompt);
     } else if (activeView === 'roadmap') {
-      const activeNode = curriculums.flatMap(l => l.nodes).find(n => n.id === useMasteryStore.getState().currentPositionNodeId);
-      const nodeTitle = activeNode?.title || 'Current Module';
-
-      if (reviewVibe === 'chill') { // NEW CONCEPT
-        onAskLina(`[SYSTEM: Roadmap Lesson - NEW CONCEPT. Focus strictly on current module items for "${nodeTitle}".]`);
-      } else if (reviewVibe === 'deep') { // REVIEW
-        onAskLina(`[SYSTEM: Roadmap Lesson - REVIEW. Mix items from "${nodeTitle}" with previously introduced words.]`);
-      } else if (reviewVibe === 'intense') { // QUIZ
-        onAskLina(`[SYSTEM: Roadmap Lesson - QUIZ / LEVEL UP. Conduct a proficiency test on the current module "${nodeTitle}".]`);
-      } else {
-        onAskLina(`[SYSTEM: Roadmap Lesson. Continue "${nodeTitle}" with a mix of new material and past review.]`);
-      }
+      onAskLina(getRoadmapLessonPrompt(curriculums, currentPositionNodeId, reviewVibe));
     }
   };
 
@@ -449,12 +438,9 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
                 />
               )}
               {activeView === 'roadmap' && (
-                <CurriculumRoadmap 
+                <Roadmap 
                   onAskLina={onAskLina} 
                   isSandboxMode={isSandboxMode} 
-                  onLaunchActivity={(nodeId, type) => {
-                    setActiveActivity({ type, nodeId });
-                  }}
                 />
               )}
               {activeView === 'archive' && (
