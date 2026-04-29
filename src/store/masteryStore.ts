@@ -9,9 +9,10 @@ import {
   type UserProfile, type ReviewVibe,
   type CurriculumLevel, type NodeStatus, type CommonPhrase, type PosRole,
   type SmallRank, type CeremonialRank, type Badge, SMALL_RANKS,
-  CEREMONIAL_RANKS, ALL_BADGES, type SessionLogEntry, type WeeklyChallenge
+  CEREMONIAL_RANKS, ALL_BADGES, type SessionLogEntry, type WeeklyChallenge,
+  type Album
 } from '../types/mastery';
-import { scoreToStatus, STATUS_MIDPOINT, Album } from '../types/mastery';
+import { scoreToStatus, STATUS_MIDPOINT } from '../types/mastery';
 import { initialMasteryMap } from '../data/initialMasteryMap';
 import { curriculumRoadmap } from '../data/curriculum';
 import { vocabContent } from '../data/vocabContent';
