@@ -1,7 +1,7 @@
 /* src/components/Discography.tsx */
 import React, { useState } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
-import type { Song, SongBlock } from '../types/mastery';
+import type { Song, SongBlock } from '../types/discography';
 
 interface Props {
   onAskLina: (prompt: string) => void;

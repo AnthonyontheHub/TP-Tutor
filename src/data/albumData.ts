@@ -1,4 +1,4 @@
-import { Album } from '../types/mastery';
+import type { Album } from '../types/discography';
 
 export const albumData: Album[] = [
   {
