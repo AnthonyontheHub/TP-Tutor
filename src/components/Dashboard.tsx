@@ -4,6 +4,7 @@ import { useMasteryStore } from '../store/masteryStore';
 import ProgressSummary from './ProgressSummary';
 import MasteryGrid from './MasteryGrid';
 import PhraseGrid from './PhraseGrid';
+import Discography from './Discography';
 import CurriculumRoadmap from './CurriculumRoadmap';
 import SentenceBuilder from './SentenceBuilder';
 import ProveIt from './ProveIt';
@@ -458,13 +459,17 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
               )}
               {activeView === 'archive' && (
                 <div style={{ padding: '0' }}>
-                  <PhraseGrid
-                    onAskLina={onAskLina}
-                    activeFilter={activeFilter}
-                    selectedWords={selectedWords}
-                    focusPhraseId={focusPhraseId}
-                    clearFocusPhrase={() => setFocusPhraseId(null)}
-                  />
+                  {reviewVibe === 'intense' ? (
+                    <Discography onAskLina={onAskLina} selectedWords={selectedWords} />
+                  ) : (
+                    <PhraseGrid
+                      onAskLina={onAskLina}
+                      activeFilter={activeFilter}
+                      selectedWords={selectedWords}
+                      focusPhraseId={focusPhraseId}
+                      clearFocusPhrase={() => setFocusPhraseId(null)}
+                    />
+                  )}
                 </div>
               )}
             </motion.div>
