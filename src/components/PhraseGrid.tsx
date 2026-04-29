@@ -1,7 +1,7 @@
 /* src/components/PhraseGrid.tsx */
 import React, { useState, useMemo, useEffect } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
-import type { MasteryStatus, CommonPhrase } from '../types/mastery';
+import type { MasteryStatus, CommonPhrase, Song, SongBlock } from '../types/mastery';
 import { phraseData } from '../data/phraseData';
 import type { Phrase, PhraseCategory } from '../data/phraseData';
 import PhraseCard from './PhraseCard';
@@ -239,7 +239,7 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
               </button>
               <h3 style={{ fontSize: '1rem', fontWeight: 900, color: 'var(--gold)', letterSpacing: '0.2em', marginBottom: '24px', textTransform: 'uppercase' }}>TRACKLIST: {safeSongs.find(a => a.id === selectedAlbumId)?.title}</h3>
               <div style={{ display: 'grid', gap: '12px', maxWidth: '600px' }}>
-                {safeSongs.find(a => a.id === selectedAlbumId)?.tracks?.map((track: { title?: string; blocks?: Array<unknown> }) => (
+                {safeSongs.find(a => a.id === selectedAlbumId)?.songs?.map((track: Song, idx: number) => (
                   <button 
                     key={track.title} 
                     onClick={() => setSelectedTrackTitle(track.title)}
@@ -259,13 +259,13 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
                </button>
                {(() => {
                  const album = safeSongs.find(a => a.id === selectedAlbumId);
-                 const track = (album?.tracks || []).find((t: any) => t.title === selectedTrackTitle);
+                 const track = (album?.songs || []).find((t: Song) => t.title === selectedTrackTitle);
                  if (!track) return null;
                  
                  // If selected words are active, filter blocks. If not, show all.
                  const blocks = track.blocks || [];
                  const filteredBlocks = (selectedWords && selectedWords.length > 0)
-                   ? blocks.filter((b: { tp?: string }) => {
+                   ? blocks.filter((b: SongBlock) => {
                        const ws = (b.tp || '').split(/[ /]+/).map(clean);
                        return selectedWords.every(sw => ws.includes(clean(sw)));
                      })
@@ -275,7 +275,7 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
                    <div style={{ background: 'rgba(5,5,5,0.8)', padding: '32px', borderRadius: '16px', border: '1px solid #222', boxShadow: '0 20px 40px rgba(0,0,0,0.4)' }}>
                      <h4 style={{ color: 'white', fontSize: '1.5rem', marginBottom: '32px', borderLeft: '6px solid var(--gold)', paddingLeft: '20px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{track.title}</h4>
                      <div style={{ display: 'grid', gap: '20px' }}>
-                        {filteredBlocks.length > 0 ? filteredBlocks.map((block: { title?: string; tp?: string; en?: string }, bi: number) => (
+                        {filteredBlocks.length > 0 ? filteredBlocks.map((block: SongBlock, bi: number) => (
                           <div key={bi} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', background: 'rgba(255,255,255,0.02)', padding: '24px', borderRadius: '12px', border: '1px solid #1a1a1a' }}>
                             <div style={{ flex: 1 }}>
                               <div style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--gold)', textTransform: 'uppercase', marginBottom: '10px', opacity: 0.6 }}>{block.title || 'BLOCK'}</div>

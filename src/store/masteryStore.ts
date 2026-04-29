@@ -11,7 +11,7 @@ import {
   type SmallRank, type CeremonialRank, type Badge, SMALL_RANKS,
   CEREMONIAL_RANKS, ALL_BADGES, type SessionLogEntry, type WeeklyChallenge
 } from '../types/mastery';
-import { scoreToStatus, STATUS_MIDPOINT } from '../types/mastery';
+import { scoreToStatus, STATUS_MIDPOINT, Album } from '../types/mastery';
 import { initialMasteryMap } from '../data/initialMasteryMap';
 import { curriculumRoadmap } from '../data/curriculum';
 import { vocabContent } from '../data/vocabContent';
@@ -66,47 +66,36 @@ function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: Maste
 
 const mappedVocabulary: VocabWord[] = initialMasteryMap.initialVocabulary.map(toFullVocabWord);
 
-const defaultSongs = [
+const defaultSongs: Album[] = [
   {
     id: "utala-kon",
     title: "utala kon",
-    tracks: [
-      { title: "01 wawa kama", blocks: [
+    songs: [
+      { id: "wawa-kama", title: "01 wawa kama", blocks: [
         { title: "Verse 1", tp: "mi tawa / mi tawa / mi tawa lon nasin / nasin li pini", en: "I go / I go / I go on the path / The path ends" },
         { title: "Chorus", tp: "ona li lon / pini li kama / mi ken ala pini e tawa", en: "It is here / The end is coming / I cannot stop the movement" }
       ]},
-      { title: "02 nasin li ken ala", blocks: [
+      { id: "nasin-li-ken-ala", title: "02 nasin li ken ala", blocks: [
         { title: "Chorus", tp: "nasin li ken ala", en: "The path is not possible" }
       ]},
-      { title: "03 pini li kama", blocks: [] },
-      { title: "04 toki ike", blocks: [] },
-      { title: "05 lukin moli", blocks: [] },
-      { title: "06 mi olin e ike", blocks: [] },
-      { title: "07 mi awen lon ni", blocks: [] },
-      { title: "08 pini ala", blocks: [] }
-    ]
-  },
-  {
-    id: 'jan-olami',
-    title: "jan olin mi",
-    tracks: [
-      { title: "jan olin mi", blocks: [] },
-      { title: "tomo pona", blocks: [] },
-      { title: "suno li suli", blocks: [] },
-      { title: "tenpo pi olin ni", blocks: [] },
-      { title: "mi mute", blocks: [] }
+      { id: "pini-li-kama", title: "03 pini li kama", blocks: [] },
+      { id: "toki-ike", title: "04 toki ike", blocks: [] },
+      { id: "lukin-moli", title: "05 lukin moli", blocks: [] },
+      { id: "mi-olin-e-ike", title: "06 mi olin e ike", blocks: [] },
+      { id: "mi-awen-lon-ni", title: "07 mi awen lon ni", blocks: [] },
+      { id: "pini-ala", title: "08 pini ala", blocks: [] }
     ]
   },
   {
     id: 'toki-nasa',
     title: "toki nasa, kalama pona",
-    tracks: [
-      { title: "o tawa wawa", blocks: [] },
-      { title: "lukin sama", blocks: [] },
-      { title: "o kule e kon", blocks: [] },
-      { title: "KULUPU PONA", blocks: [] },
-      { title: "alasa tawa sin", blocks: [] },
-      { title: "kili wawa (Bonus Track)", blocks: [] }
+    songs: [
+      { id: "o-tawa-wawa", title: "o tawa wawa", blocks: [] },
+      { id: "lukin-sama", title: "lukin sama", blocks: [] },
+      { id: "o-kule-e-kon", title: "o kule e kon", blocks: [] },
+      { id: "kulupu-pona", title: "KULUPU PONA", blocks: [] },
+      { id: "alasa-tawa-sin", title: "alasa tawa sin", blocks: [] },
+      { id: "kili-wawa", title: "kili wawa (Bonus Track)", blocks: [] }
     ]
   }
 ];
@@ -232,7 +221,7 @@ interface MasteryState {
   activeActivity: { type: string, nodeId: string } | null;
   isMainProfile: boolean;
   cloudSynced: boolean;
-  songs: { id: string; title: string; tracks: { title: string; blocks: { title: string; tp: string; en: string }[] }[] }[];
+  songs: Album[];
   commonPhrases: CommonPhrase[];
   // Dashboard settings
   widgetDensity: 'Compact' | 'Expanded';

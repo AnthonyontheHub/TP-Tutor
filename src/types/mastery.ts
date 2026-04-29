@@ -317,7 +317,7 @@ export interface SavedPhrase {
 // ─── Discography ──────────────────────────────────────────────────────────────
 
 export interface SongBlock {
-  type: 'verse' | 'chorus' | 'bridge' | 'outro';
+  title: string;
   tp: string;
   en: string;
 }
@@ -331,6 +331,9 @@ export interface Song {
 export interface Album {
   id: string;
   title: string;
+  year?: number;
+  artist?: string;
+  description?: string;
   songs: Song[];
 }
 
