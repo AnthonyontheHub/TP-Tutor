@@ -218,6 +218,8 @@ export interface Chapter {
 
 export type ItemType = 'word' | 'grammar';
 
+export type MasteryWeight = 'pillar' | 'working' | 'bonus';
+
 export interface VocabWord {
   id: string;
   word: string;
@@ -229,6 +231,7 @@ export interface VocabWord {
   baseScore: number;
   confidenceScore: number; // Legacy support
   status: MasteryStatus;
+  weight?: MasteryWeight;
   useCount: number;
   frequencyRank: number;
   isMasteryCandidate: boolean;
@@ -291,6 +294,7 @@ export interface CurriculumNode {
   requiredWordIds?: string[];
   suggestedMethod?: 'Jan Lina Chat' | 'Builder Drill' | 'Quiz';
   type?: 'Topic' | 'Drill' | 'Checkpoint';
+  activities?: string[];
 }
 
 export interface CurriculumLevel {
@@ -449,5 +453,11 @@ export interface WeeklyChallenge {
   completed: boolean;
   xpReward: number;
   expiresDate: string;
+}
+
+export interface MasteryEvent {
+  label: string;
+  change: number;
+  timestamp: string; // ISO timestamp
 }
 

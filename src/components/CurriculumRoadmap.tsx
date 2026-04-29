@@ -20,6 +20,21 @@ export default function CurriculumRoadmap({ onAskLina, isSandboxMode }: Props) {
 
   const currentPositionRef = useRef<HTMLDivElement>(null);
 
+  // Global Progress Calculation
+  const globalMastery = useMemo(() => {
+    if (vocabulary.length === 0) return 0;
+    const totalPoints = vocabulary.reduce((acc, word) => {
+      // Base score 0-1000
+      let score = word.baseScore;
+      // Exposure bonus: 10% of max value (100 points) if status is not 'not_started'
+      if (word.status !== 'not_started') {
+        score = Math.min(1000, score + 100);
+      }
+      return acc + score;
+    }, 0);
+    return Math.round((totalPoints / (vocabulary.length * 1000)) * 100);
+  }, [vocabulary]);
+
   useEffect(() => {
     if (currentPositionRef.current) {
       currentPositionRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -141,8 +156,24 @@ export default function CurriculumRoadmap({ onAskLina, isSandboxMode }: Props) {
         )}
       </AnimatePresence>
 
-      <header style={{ textAlign: 'center', marginBottom: '60px' }}>
-        <h1 style={{ color: 'var(--gold)', fontWeight: 900, fontSize: '1.2rem', letterSpacing: '0.2em', margin: 0 }}>NEURAL PATHWAY</h1>
+      <header style={{ textAlign: 'center', marginBottom: '60px', width: '100%', padding: '0 20px' }}>
+        <h1 style={{ color: 'var(--gold)', fontWeight: 900, fontSize: '1.2rem', letterSpacing: '0.2em', margin: '0 0 20px 0' }}>NEURAL PATHWAY</h1>
+        
+        <div style={{ maxWidth: '400px', margin: '0 auto 12px auto' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <span style={{ fontSize: '0.6rem', color: '#666', fontWeight: 900, letterSpacing: '0.1em' }}>TOTAL CURRICULUM MASTERY</span>
+            <span style={{ fontSize: '0.6rem', color: 'var(--gold)', fontWeight: 900 }}>{globalMastery}%</span>
+          </div>
+          <div style={{ height: '6px', background: '#111', borderRadius: '3px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <motion.div 
+              initial={{ width: 0 }}
+              animate={{ width: `${globalMastery}%` }}
+              transition={{ duration: 1.5, ease: "easeOut" }}
+              style={{ height: '100%', background: 'var(--gold)', boxShadow: '0 0 10px var(--gold)' }} 
+            />
+          </div>
+        </div>
+
         <p style={{ color: '#666', fontSize: '0.7rem', fontWeight: 800, marginTop: '8px' }}>SEQUENTIAL MASTERY MAP</p>
       </header>
       
@@ -302,10 +333,9 @@ export default function CurriculumRoadmap({ onAskLina, isSandboxMode }: Props) {
                 )}
 
                 <motion.button
-                  whileHover={isLocked ? {} : { scale: 1.1 }}
-                  whileTap={isLocked ? {} : { scale: 0.9 }}
-                  onClick={() => !isLocked && handleNodeClick(node)}
-                  disabled={isLocked}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => handleNodeClick(node)}
                   style={{
                     width: isCurrent ? '80px' : '64px',
                     height: isCurrent ? '80px' : '64px',
@@ -315,7 +345,7 @@ export default function CurriculumRoadmap({ onAskLina, isSandboxMode }: Props) {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    cursor: isLocked ? 'default' : 'pointer',
+                    cursor: 'pointer',
                     boxShadow: isCurrent ? '0 0 20px var(--gold)' : 'none',
                     position: 'relative'
                   }}

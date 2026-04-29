@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { RefreshCcw, CheckCircle2, ChevronRight, Trophy } from 'lucide-react';
+import { useMasteryStore } from '../store/masteryStore';
 
-const words = [
+const defaultWords = [
   { tokiPona: "pona", english: "good, simple" },
   { tokiPona: "suno", english: "sun, light" },
   { tokiPona: "telo", english: "water, liquid" },
@@ -12,14 +13,44 @@ const words = [
 
 interface ScrambledLetter { id: string; char: string; }
 
-export default function WordScramble() {
+export default function WordScramble({ nodeId, onComplete }: { nodeId?: string, onComplete?: (stats: { score: number, total: number }) => void }) {
+  const { vocabulary, curriculums } = useMasteryStore();
+
+  const words = React.useMemo(() => {
+    if (!nodeId) return defaultWords;
+    const node = curriculums.flatMap(l => l.nodes).find(n => n.id === nodeId);
+    if (!node) return defaultWords;
+    
+    const nodeWordIds = [...node.requiredVocabIds, ...(node.requiredWordIds || [])];
+    const nodeWords = vocabulary.filter(v => nodeWordIds.includes(v.id) || nodeWordIds.includes(v.word));
+    
+    if (nodeWords.length === 0) return defaultWords;
+    
+    return nodeWords.map(v => ({
+      tokiPona: v.word,
+      english: v.meanings
+    }));
+  }, [nodeId, vocabulary, curriculums]);
+
   const [currentIndex, setCurrentIndex] = useState(0);
+  
+  useEffect(() => {
+    setCurrentIndex(0);
+    setShowFinished(false);
+  }, [words]);
+
   const [scrambled, setScrambled] = useState<ScrambledLetter[]>([]);
   const [selected, setSelected] = useState<ScrambledLetter[]>([]);
   const [isCorrect, setIsCorrect] = useState(false);
   const [showFinished, setShowFinished] = useState(false);
 
   const currentWord = words[currentIndex];
+
+  useEffect(() => {
+    if (showFinished && nodeId && onComplete) {
+      onComplete({ score: words.length, total: words.length });
+    }
+  }, [showFinished, nodeId, onComplete, words.length]);
 
   useEffect(() => {
     const letters = currentWord.tokiPona.split('').map((char, index) => ({
@@ -69,7 +100,10 @@ export default function WordScramble() {
         <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center">
           <div className="mb-6 flex justify-center"><Trophy className="w-20 h-20 text-[#D4AF37]" /></div>
           <h1 className="text-4xl font-bold mb-4 tracking-tight">O kama sona!</h1>
-          <p className="text-gray-400 mb-8 max-w-xs">You've mastered these words.</p>
+          <p className="text-gray-400 mb-2 max-w-xs">You've mastered these words.</p>
+          <div className="mb-8 p-3 bg-[#D4AF371a] border border-[#D4AF3733] rounded-lg">
+            <p className="text-[#D4AF37] text-xs font-mono uppercase tracking-widest font-bold">Node Activity Requirement Met! +30% Readiness</p>
+          </div>
           <button onClick={resetGame} className="px-8 py-3 bg-[#D4AF37] text-black font-bold rounded-full transition-all hover:scale-105">Play Again</button>
         </motion.div>
       </div>

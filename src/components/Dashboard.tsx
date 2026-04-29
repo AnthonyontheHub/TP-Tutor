@@ -9,13 +9,14 @@ import SentenceBuilder from './SentenceBuilder';
 import ProveIt from './ProveIt';
 import ChallengeWidget from './ChallengeWidget';
 import OperationalIntelligenceWidget from './OperationalIntelligenceWidget';
-import WordScramble from './WordScramble';
+import { SessionOverlay } from './SessionOverlay';
+import TrainingHub from './TrainingHub';
 import { fetchQuickTranslation, resolveApiKey, buildOfflineTranslation } from '../services/linaService';
 import type { MasteryStatus, VocabWord } from '../types/mastery';
 import type { AppPanel } from '../App';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export type DashboardView = 'vocab' | 'roadmap' | 'archive' | 'games';
+export type DashboardView = 'vocab' | 'roadmap' | 'archive';
 
 export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSandboxMode, chatCount }: {
   onTogglePanel: (p: AppPanel) => void;
@@ -24,9 +25,10 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   isSandboxMode: boolean;
   chatCount: number;
 }) {
-  const { studentName, profile, profileImage, currentStreak, vocabulary, curriculums, reviewVibe, setReviewVibe, selectedWords, setSelectedWords, savePhrase, lessonFilter, setLessonFilter, calculateDecay, checkAssessments, knowledgeCheckFrequency, lastKnowledgeCheckDate, setLastKnowledgeCheckDate } = useMasteryStore();
+  const { studentName, profile, profileImage, currentStreak, vocabulary, curriculums, reviewVibe, setReviewVibe, selectedWords, setSelectedWords, savePhrase, lessonFilter, setLessonFilter, calculateDecay, checkAssessments, knowledgeCheckFrequency, lastKnowledgeCheckDate, setLastKnowledgeCheckDate, currentPositionNodeId, recordActivityCompletion, activeActivity, setActiveActivity } = useMasteryStore();
 
   const [activeView, setActiveView] = useState<DashboardView>('vocab');
+  const [showTrainingHub, setShowTrainingHub] = useState(false);
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
   const [posFilter, setPosFilter] = useState('All');
   const [sortMode, setSortMode] = useState<string>('alphabetical');
@@ -262,10 +264,9 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
           </button>
 
           <button 
-            onClick={() => setActiveView('games')} 
+            onClick={() => setShowTrainingHub(true)} 
             className="dashboard__icon-btn" 
             style={{ 
-              ...activeView === 'games' ? { borderColor: 'var(--gold)', color: 'var(--gold)', boxShadow: '0 0 10px var(--gold-glow)' } : {},
               width: '38px',
               height: '38px',
               display: 'flex',
@@ -273,9 +274,10 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
               justifyContent: 'center',
               fontSize: '1.2rem',
               background: 'rgba(255,255,255,0.03)',
-              borderRadius: '50%'
+              borderRadius: '50%',
+              border: '1px solid var(--border)'
             }}
-            title="Games"
+            title="Training Hub"
           >
             🎮
           </button>
@@ -438,7 +440,13 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
                 />
               )}
               {activeView === 'roadmap' && (
-                <CurriculumRoadmap onAskLina={onAskLina} isSandboxMode={isSandboxMode} />
+                <CurriculumRoadmap 
+                  onAskLina={onAskLina} 
+                  isSandboxMode={isSandboxMode} 
+                  onLaunchActivity={(nodeId, type) => {
+                    setActiveActivity({ type, nodeId });
+                  }}
+                />
               )}
               {activeView === 'archive' && (
                 <div style={{ padding: '0' }}>
@@ -450,9 +458,6 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
                     clearFocusPhrase={() => setFocusPhraseId(null)}
                   />
                 </div>
-              )}
-              {activeView === 'games' && (
-                <WordScramble />
               )}
             </motion.div>
           </AnimatePresence>
@@ -547,6 +552,12 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
           )}
         </AnimatePresence>
       </main>
+
+      <SessionOverlay />
+      
+      {showTrainingHub && (
+        <TrainingHub onClose={() => setShowTrainingHub(false)} />
+      )}
     </div>
   );
 }

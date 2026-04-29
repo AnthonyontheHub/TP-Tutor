@@ -11,6 +11,7 @@ import {
   fetchQuickTranslation, stringifyUserContext, detectSessionTitle
 } from '../services/linaService';
 import SessionRecap from './SessionRecap';
+import SummaryReport from './SummaryReport';
 import { WORD_FREQUENCY } from '../data/tokiPonaDictionary';
 
 interface Props {
@@ -31,6 +32,7 @@ const SANDBOX_RESPONSE = '[OFFLINE PROTOCOL]: o toki! I am in sandbox mode. Inte
 export default function ChatSession({ sessionId, onEndSession, onMinimize, isActive, isMinimized, pendingPrompt, clearPrompt, isSandboxMode, style }: Props) {
   const session = useChatStore(state => state.sessions.find(s => s.id === sessionId));
   const updateSession = useChatStore(state => state.updateSession);
+  const removeSession = useChatStore(state => state.removeSession);
 
   const messages = session?.messages || [];
   const history = session?.history || [];
@@ -40,6 +42,8 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showRecap, setShowRecap] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
+  const [summaryText, setSummaryText] = useState('');
   const [sessionXP, setSessionXP] = useState(0);
   const [startingTotalXP, setStartingTotalXP] = useState(0);
   const [userMsgCount, setUserMsgCount] = useState(0);
@@ -60,6 +64,8 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
   const studentName         = useMasteryStore(s => s.studentName);
   const profile             = useMasteryStore(s => s.profile);
   const lore                = useMasteryStore(s => s.lore);
+  const checkNodeReadiness  = useMasteryStore(s => s.checkNodeReadiness);
+  const curriculums         = useMasteryStore(s => s.curriculums);
 
   const runMorningStreakCheck = useMasteryStore(s => s.runMorningStreakCheck);
   const getRegressionCandidates = useMasteryStore(s => s.getRegressionCandidates);
@@ -296,9 +302,15 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
     } finally { setIsLoading(false); }
   }
 
-  async function handleEndSession() {
-    if (!window.confirm("Are you sure you want to end this session? Conversation history will be lost.")) return;
-    
+  async function handleCloseWithoutSaving() {
+    if (messages.length > 0) {
+      if (!window.confirm("Abandon chat session? Progress and history will not be saved.")) return;
+    }
+    removeSession(sessionId);
+    onEndSession();
+  }
+
+  async function finalizeSessionAndSave() {
     const lastAsstMsg = messages.filter(m => m.role === 'assistant').pop();
     if (lastAsstMsg && lastAsstMsg.raw) {
        const summaryNotes = parseSessionSummaryNotes(lastAsstMsg.raw);
@@ -397,6 +409,49 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
 
     clearRankAcknowledgement();
     setShowRecap(true);
+  }
+
+  async function handleEndLesson() {
+    if (isLoading) return;
+    setIsLoading(true);
+
+    const summaryPrompt = "[SYSTEM: The student has ended the lesson. Please provide a brief (2-3 sentence) summary of what was covered and what they improved on this session. Keep it in your jan Lina personality.]";
+    
+    try {
+      const key = resolveApiKey();
+      if (!key && !isSandboxMode) return;
+
+      if (isSandboxMode) {
+        setSummaryText("Great session! You've made good progress with your vocabulary.");
+        setShowSummary(true);
+        setIsLoading(false);
+        return;
+      }
+
+      const state = useMasteryStore.getState();
+      const userContext = stringifyUserContext(state.profile, state.lore);
+      const currentSession = useChatStore.getState().sessions.find(s => s.id === sessionId) as any;
+      const latestChatContext = currentSession?.context || 'GENERAL';
+      const vibe = currentSession?.vibe ?? 'chill';
+      const activeNodes = state.curriculums.flatMap(l => l.nodes.map(n => ({ id: n.id, title: n.title, status: n.status, sessionNotes: '' })));
+
+      const sys = buildTutorPrompt(state.vocabulary, activeNodes, displayName, userContext, undefined, undefined, vibe, yesterdayWasActive.current, getRegressionCandidates(7), getTopConfusionPairs(5), pendingProveItResponses, xpMultiplier, currentChallenge, pendingRankAcknowledgement);
+
+      const windowedHistory = [...history, { role: 'user', content: summaryPrompt }].slice(-HISTORY_WINDOW);
+      let full = '';
+      for await (const chunk of streamCompletion(key, sys, windowedHistory)) {
+        full += chunk;
+      }
+      
+      setSummaryText(stripProposedChanges(full));
+      setShowSummary(true);
+    } catch (e) {
+      console.error(e);
+      setSummaryText("Session complete! You did a great job today.");
+      setShowSummary(true);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   async function sendToLina(txt: string, overrideKey?: string) {
@@ -538,7 +593,7 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
               {isMinimized ? 'EXPAND' : 'MINIMIZE'}
             </button>
             <button 
-              onClick={handleEndSession} 
+              onClick={handleCloseWithoutSaving} 
               style={{ 
                 background: 'none', 
                 border: 'none', 
@@ -603,16 +658,59 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
           <div ref={messagesEndRef} />
         </div>
 
-        <div style={{ padding: '16px', background: 'rgba(5,5,5,0.5)', borderTop: '1px solid var(--border)', display: isMinimized ? 'none' : 'flex', gap: '8px' }}>
-          <input 
-            value={input} 
-            onChange={(e) => setInput(e.target.value)} 
-            onKeyDown={(e) => e.key === 'Enter' && sendToLina(input)} 
-            placeholder={chatContext === 'GENERAL' ? "Ask jan Lina something..." : "Type your response..."} 
-            style={{ flex: 1, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: '2px', padding: '12px', color: 'white', outline: 'none', fontSize: '0.9rem' }} 
-          />
-          <button onClick={() => sendToLina(input)} disabled={isLoading} style={{ background: 'var(--gold)', border: 'none', borderRadius: '2px', padding: '0 20px', color: 'black', fontWeight: 900, cursor: 'pointer', opacity: isLoading ? 0.6 : 1 }}>{isLoading ? '...' : 'SEND'}</button>
+        <div style={{ padding: '16px', background: 'rgba(5,5,5,0.5)', borderTop: '1px solid var(--border)', display: isMinimized ? 'none' : 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <input 
+              value={input} 
+              onChange={(e) => setInput(e.target.value)} 
+              onKeyDown={(e) => e.key === 'Enter' && sendToLina(input)} 
+              placeholder={chatContext === 'GENERAL' ? "Ask jan Lina something..." : "Type your response..."} 
+              style={{ flex: 1, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: '2px', padding: '12px', color: 'white', outline: 'none', fontSize: '0.9rem' }} 
+            />
+            <button onClick={() => sendToLina(input)} disabled={isLoading} style={{ background: 'var(--gold)', border: 'none', borderRadius: '2px', padding: '0 20px', color: 'black', fontWeight: 900, cursor: 'pointer', opacity: isLoading ? 0.6 : 1 }}>{isLoading ? '...' : 'SEND'}</button>
+          </div>
+          <button 
+            onClick={handleEndLesson} 
+            disabled={isLoading}
+            style={{ 
+              width: '100%',
+              background: 'rgba(255,255,255,0.05)', 
+              border: '1px solid var(--border)', 
+              borderRadius: '2px', 
+              padding: '8px', 
+              color: 'var(--text-muted)', 
+              fontWeight: 900, 
+              cursor: 'pointer', 
+              fontSize: '0.7rem',
+              letterSpacing: '0.1em'
+            }}
+          >
+            O PINI (END LESSON)
+          </button>
         </div>
+
+        {showSummary && (
+          <SummaryReport 
+            summaryText={summaryText}
+            improvedItems={sessionDeltas.filter(d => !!d.newStatus).map(d => {
+              const v = vocabulary.find(word => word.id === d.id || word.word === d.id);
+              return { word: v?.word || d.id, status: d.newStatus! };
+            })}
+            isNodeReady={currentPositionNodeId ? checkNodeReadiness(currentPositionNodeId) : false}
+            nextNodeTitle={(() => {
+              const allNodes = curriculums.flatMap(l => l.nodes);
+              const currentIndex = allNodes.findIndex(n => n.id === currentPositionNodeId);
+              if (currentIndex !== -1 && currentIndex < allNodes.length - 1) {
+                return allNodes[currentIndex + 1].title;
+              }
+              return undefined;
+            })()}
+            onClose={() => {
+              setShowSummary(false);
+              finalizeSessionAndSave();
+            }}
+          />
+        )}
 
         {showRecap && (
           <SessionRecap

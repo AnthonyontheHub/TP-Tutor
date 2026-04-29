@@ -7,6 +7,7 @@ import { useMasteryStore } from '../store/masteryStore';
 import { useAuthStore } from '../store/authStore';
 import { auth, googleProvider } from '../services/firebase';
 import { signInWithPopup } from 'firebase/auth';
+import InsightLedger from './InsightLedger';
 
 interface Props {
   isOpen: boolean;
@@ -80,6 +81,7 @@ export default function UserProfilePanel({ onClose }: Props) {
   
   const [activeTab, setActiveTab] = useState<TabID>('IDENTITY');
   const [isEditing, setIsEditing] = useState(false);
+  const [showLedger, setShowLedger] = useState(false);
   const [editableProfile, setEditableProfile] = useState(profile);
 
   const [imageSrc, setImageSrc] = useState<string | null>(null);
@@ -198,6 +200,56 @@ export default function UserProfilePanel({ onClose }: Props) {
           <h1 className="profile-name" style={{ fontSize: '1.2rem', margin: '4px 0' }}>{profile.firstName} {profile.lastName}</h1>
           <div style={{ color: 'var(--gold)', fontSize: '0.5rem', fontWeight: 900, letterSpacing: '0.1em', opacity: 0.8 }}>
             SYNC MODE: {isGuest ? 'LOCAL' : 'CLOUD'}
+          </div>
+        </div>
+
+        <div style={{ padding: '20px', flexShrink: 0 }}>
+          <div className="profile-section" style={{ border: '1px solid var(--gold)', borderRadius: '8px', padding: '16px' }}>
+            <h3 className="section-title" style={{ color: 'var(--gold)', margin: '0 0 16px 0', fontSize: '0.7rem' }}>Ranks & Badges</h3>
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div>
+                <div style={{ fontSize: '0.6rem', letterSpacing: '0.1em', opacity: 0.5, marginBottom: '4px' }}>CURRENT RANK</div>
+                <div style={{ fontSize: '1rem', fontWeight: 900, color: 'white' }}>{summary.rankTitle}</div>
+                <motion.button 
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowLedger(true)}
+                  style={{ background: 'rgba(255,191,0,0.1)', border: '1px solid var(--gold)', borderRadius: '4px', padding: '4px 8px', marginTop: '4px', cursor: 'pointer' }}
+                >
+                  <div style={{ fontSize: '0.7rem', color: 'var(--gold)', fontWeight: 800 }}>Level {summary.level} • {summary.xp} XP</div>
+                </motion.button>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: '0.6rem', letterSpacing: '0.1em', opacity: 0.5, marginBottom: '4px' }}>STREAK SHIELDS</div>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'flex-end' }}>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--gold)', marginRight: '4px' }}>{streakShields} / 2</span>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    {[0, 1].map(i => (
+                      <div key={i} style={{ 
+                        fontSize: '1.1rem', 
+                        opacity: i < streakShields ? 1 : 0.1, 
+                        filter: i < streakShields ? 'none' : 'grayscale(100%) brightness(0.4)',
+                        transition: 'all 0.3s ease'
+                      }}>🛡️</div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {earnedCeremonialRanks.length > 0 && (
+              <div style={{ marginTop: '16px' }}>
+                <div style={{ fontSize: '0.6rem', letterSpacing: '0.1em', opacity: 0.5, marginBottom: '8px' }}>CEREMONIAL TITLES</div>
+                <div style={{ display: 'grid', gap: '6px' }}>
+                  {earnedCeremonialRanks.map(r => (
+                    <div key={r.id} style={{ fontSize: '0.7rem', background: 'rgba(255,191,0,0.1)', padding: '4px 8px', borderRadius: '4px', borderLeft: '2px solid var(--gold)' }}>
+                      <span style={{ fontWeight: 800 }}>{r.title}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -517,47 +569,6 @@ export default function UserProfilePanel({ onClose }: Props) {
 
         {/* Persistent Sections at bottom of each tab */}
         <div style={{ padding: '0 20px 20px 20px', flexShrink: 0 }}>
-          <div className="profile-section" style={{ border: '1px solid var(--gold)', borderRadius: '8px', padding: '16px', marginBottom: '24px' }}>
-            <h3 className="section-title" style={{ color: 'var(--gold)', margin: '0 0 16px 0', fontSize: '0.7rem' }}>Ranks & Badges</h3>
-            
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <div>
-                <div style={{ fontSize: '0.6rem', letterSpacing: '0.1em', opacity: 0.5, marginBottom: '4px' }}>CURRENT RANK</div>
-                <div style={{ fontSize: '1rem', fontWeight: 900, color: 'white' }}>{summary.rankTitle}</div>
-                <div style={{ fontSize: '0.7rem', color: 'var(--gold)', marginTop: '2px' }}>Level {summary.level} • {summary.xp} XP</div>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: '0.6rem', letterSpacing: '0.1em', opacity: 0.5, marginBottom: '4px' }}>STREAK SHIELDS</div>
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'flex-end' }}>
-                  <span style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--gold)', marginRight: '4px' }}>{streakShields} / 2</span>
-                  <div style={{ display: 'flex', gap: '4px' }}>
-                    {[0, 1].map(i => (
-                      <div key={i} style={{ 
-                        fontSize: '1.1rem', 
-                        opacity: i < streakShields ? 1 : 0.1, 
-                        filter: i < streakShields ? 'none' : 'grayscale(100%) brightness(0.4)',
-                        transition: 'all 0.3s ease'
-                      }}>🛡️</div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {earnedCeremonialRanks.length > 0 && (
-              <div style={{ marginTop: '16px' }}>
-                <div style={{ fontSize: '0.6rem', letterSpacing: '0.1em', opacity: 0.5, marginBottom: '8px' }}>CEREMONIAL TITLES</div>
-                <div style={{ display: 'grid', gap: '6px' }}>
-                  {earnedCeremonialRanks.map(r => (
-                    <div key={r.id} style={{ fontSize: '0.7rem', background: 'rgba(255,191,0,0.1)', padding: '4px 8px', borderRadius: '4px', borderLeft: '2px solid var(--gold)' }}>
-                      <span style={{ fontWeight: 800 }}>{r.title}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
           {isEditing && (
             <button onClick={handleSave} style={{ width: '100%', padding: '16px', background: 'var(--gold)', color: 'black', border: 'none', borderRadius: '8px', fontWeight: 900, letterSpacing: '1px', cursor: 'pointer' }}>
               SAVE PROFILE
@@ -577,6 +588,10 @@ export default function UserProfilePanel({ onClose }: Props) {
         </div>
       </div>
       
+      {showLedger && (
+        <InsightLedger onClose={() => setShowLedger(false)} />
+      )}
+
       <style>{`
         .field-group {
           margin-bottom: 16px;

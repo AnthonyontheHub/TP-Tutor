@@ -17,7 +17,7 @@ import { curriculumRoadmap } from '../data/curriculum';
 import { vocabContent } from '../data/vocabContent';
 import { TOKI_PONA_DICTIONARY, WORD_FREQUENCY } from '../data/tokiPonaDictionary';
 
-function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: MasteryStatus; type: 'word' | 'grammar'; sessionNotes: string; frequencyRank?: number }): VocabWord {
+function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: MasteryStatus; type: 'word' | 'grammar'; sessionNotes: string; frequencyRank?: number; weight?: 'pillar' | 'working' | 'bonus' }): VocabWord {
   const score = STATUS_MIDPOINT[v.status];
   const staticData = vocabContent[v.word] || {};
 
@@ -30,6 +30,7 @@ function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: Maste
     baseScore: score,
     confidenceScore: score,
     status: v.status,
+    weight: v.weight,
     useCount: 0,
     frequencyRank: v.frequencyRank ?? 999,
     isMasteryCandidate: false,
@@ -196,6 +197,11 @@ interface MasteryActions {
   markRoleMastered: (wordId: string, role: PosRole) => void;
   resetLearningProgress: () => Promise<void>;
   completeNode: (nodeId: string) => void;
+  checkNodeReadiness: (nodeId: string) => boolean;
+  getNodeReadinessPercentage: (nodeId: string) => number;
+  recordActivityCompletion: (nodeId: string, activityId: string, stats?: { score: number, total: number }) => void;
+  setActiveActivity: (act: { type: string, nodeId: string } | null) => void;
+  recordInsight: (label: string, change: number) => void;
 
   // Prompt C Actions
   startSessionTimer: () => void;
@@ -223,6 +229,7 @@ interface MasteryState {
   activeModuleId: string | null;
   selectedWords: string[];
   lessonFilter: string[] | null;
+  activeActivity: { type: string, nodeId: string } | null;
   isMainProfile: boolean;
   cloudSynced: boolean;
   songs: { id: string; title: string; tracks: { title: string; blocks: { title: string; tp: string; en: string }[] }[] }[];
@@ -235,6 +242,7 @@ interface MasteryState {
   lastKnowledgeCheckDate: string;
 
   // New Features
+  completedActivities: Record<string, { id: string, stats?: { score: number, total: number } }[]>;
   lastStreakCheck: string;
   learningDays: string[];
   completedNodeIds: string[];
@@ -251,6 +259,7 @@ interface MasteryState {
   lastStreakMilestone: number;
   pendingComebackBonus: boolean;
   sessionXPRecord: number;
+  masteryHistory: MasteryEvent[];
 
   // Prompt C State
   sessionLog: SessionLogEntry[];
@@ -334,6 +343,7 @@ export const useMasteryStore = create<MasteryStore>()(
           activeModuleId: null,
       selectedWords: [],
       lessonFilter: null,
+      activeActivity: null,
       widgetDensity: 'Expanded',
       isMainProfile: true,
       fogOfWar: 'Visible',
@@ -345,6 +355,7 @@ export const useMasteryStore = create<MasteryStore>()(
       songs: defaultSongs,
 
       // New Features Defaults
+      completedActivities: {},
       lastStreakCheck: '',
       learningDays: [],
       completedNodeIds: [],
@@ -361,6 +372,7 @@ export const useMasteryStore = create<MasteryStore>()(
       lastStreakMilestone: 0,
       pendingComebackBonus: false,
       sessionXPRecord: 0,
+      masteryHistory: [],
 
       // Prompt C Defaults
       sessionLog: [],
@@ -391,17 +403,29 @@ export const useMasteryStore = create<MasteryStore>()(
                 (vocabReqs.length === 0 && lastNodeMastery >= 950 && nIdx > 0);
 
               const isUnlocked = lastNodeMastery > 700 || (lIdx === 0 && nIdx === 0);
-              
+
               let newStatus: NodeStatus = 'locked';
               if (isMastered) newStatus = 'mastered';
               else if (isUnlocked) newStatus = 'active';
 
+              // Activity Mapping Logic
+              let activities = node.activities || [];
+              if (node.id === 'phi_sim') {
+                activities = ['true-false', 'thought-translation'];
+              } else if (node.id === 'vowels') {
+                activities = ['word-scramble', 'drag-drop'];
+              } else if (node.id === 'consonants') {
+                activities = ['word-scramble'];
+              } else if ((allReqs.length > 0 || node.type === 'Drill' || node.type === 'Checkpoint') && !activities.includes('word-scramble')) {
+                // Ensure nodes with vocab/grammar requirements have word-scramble
+                activities = [...new Set([...activities, 'word-scramble'])];
+              }
+
               lastNodeMastery = isMastered ? 1000 : avgScore;
 
-              return { ...node, status: newStatus };
+              return { ...node, status: newStatus, activities };
             })
           }));
-
           const allNodes = newCurriculums.flatMap(l => l.nodes);
           const firstActive = allNodes.find(n => n.status === 'active')?.id || state.currentPositionNodeId;
 
@@ -417,15 +441,129 @@ export const useMasteryStore = create<MasteryStore>()(
         void get().syncToCloud();
       },
 
+      checkNodeReadiness: (nodeId) => {
+        return get().getNodeReadinessPercentage(nodeId) >= 100;
+      },
+
+      getNodeReadinessPercentage: (nodeId) => {
+        const { vocabulary, curriculums, completedActivities } = get();
+        const node = curriculums.flatMap(l => l.nodes).find(n => n.id === nodeId);
+        if (!node) return 0;
+
+        const allReqs = [...node.requiredVocabIds, ...node.requiredGrammarIds];
+        const words = vocabulary.filter(v => allReqs.includes(v.id) || allReqs.includes(v.word));
+
+        const pillars = words.filter(v => v.weight === 'pillar');
+        const working = words.filter(v => v.weight === 'working');
+
+        const getStatusWeight = (status: string) => {
+          switch(status) {
+            case 'mastered': return 10;
+            case 'confident': return 10;
+            case 'practicing': return 5;
+            case 'introduced': return 2;
+            default: return 0;
+          }
+        };
+
+        let currentPoints = 0;
+        let maxPoints = 0;
+
+        pillars.forEach(v => {
+          maxPoints += 20; // 2 * 10
+          currentPoints += 2 * getStatusWeight(v.status);
+        });
+
+        working.forEach(v => {
+          maxPoints += 10; // 1 * 10
+          currentPoints += 1 * getStatusWeight(v.status);
+        });
+
+        let basePercentage = 0;
+        if (maxPoints > 0) {
+          basePercentage = (currentPoints / maxPoints) * 100;
+        } else {
+          basePercentage = node.status === 'mastered' ? 100 : 0;
+        }
+
+        const nodeActivities = node.activities || [];
+        let activityBonus = 0;
+        if (nodeActivities.length > 0) {
+          const completions = completedActivities[nodeId] || [];
+          const slicePerActivity = 30 / nodeActivities.length;
+
+          nodeActivities.forEach(actId => {
+            const record = completions.find(c => c.id === actId);
+            if (record) {
+              if (record.stats) {
+                // Award based on accuracy: (score/total) * slice
+                const accuracy = record.stats.total > 0 ? (record.stats.score / record.stats.total) : 1;
+                activityBonus += accuracy * slicePerActivity;
+              } else {
+                activityBonus += slicePerActivity;
+              }
+            }
+          });
+        }
+        
+        return Math.min(100, Math.round(basePercentage * 0.7 + activityBonus));
+      },
+
+      recordActivityCompletion: (nodeId, activityId, stats) => {
+        set((state) => {
+          const current = state.completedActivities[nodeId] || [];
+          const existingIdx = current.findIndex(a => a.id === activityId);
+          
+          let updated;
+          if (existingIdx !== -1) {
+            updated = [...current];
+            const prev = updated[existingIdx];
+            const newAccuracy = stats ? (stats.score / stats.total) : 1;
+            const oldAccuracy = prev.stats ? (prev.stats.score / prev.stats.total) : (prev ? 1 : 0);
+            
+            if (newAccuracy >= oldAccuracy) {
+              updated[existingIdx] = { id: activityId, stats };
+            }
+          } else {
+            updated = [...current, { id: activityId, stats }];
+          }
+
+          const newState = {
+            completedActivities: {
+              ...state.completedActivities,
+              [nodeId]: updated
+            }
+          };
+
+          if (stats) {
+            const insightEntry = {
+              label: activityId.toUpperCase().replace('-', ' '),
+              change: Math.round(stats.score),
+              timestamp: new Date().toISOString()
+            };
+            (newState as any).masteryHistory = [insightEntry, ...(state.masteryHistory || [])].slice(0, 50);
+          }
+
+          return newState;
+        });
+        get().refreshCurriculumStatus();
+        void get().syncToCloud();
+      },
+
+      setActiveActivity: (act) => set({ activeActivity: act }),
+
+      recordInsight: (label, change) => set(state => ({
+        masteryHistory: [{ label, change, timestamp: new Date().toISOString() }, ...(state.masteryHistory || [])].slice(0, 50)
+      })),
+
       applyScoreUpdate: (nodeId, points, context) => {
         const now = new Date().toISOString();
-        set((state) => ({
-          vocabulary: state.vocabulary.map((w) => {
+        set((state) => {
+          const vocab = state.vocabulary.map((w) => {
             if (w.id !== nodeId && w.word.toLowerCase() !== nodeId.toLowerCase()) return w;
             const newScore = clamp(w.baseScore + points, 0, 1000);
             const historyEntry = { date: now, change: points, reason: context };
             
-            // Bleed Detection: >50 drop in 48hrs
             const recentDrops = [historyEntry, ...(w.scoreHistory || [])]
               .filter(h => h.change < 0 && (new Date(now).getTime() - new Date(h.date).getTime() < 48 * 3600000));
             const totalDrop = Math.abs(recentDrops.reduce((acc, h) => acc + h.change, 0));
@@ -434,15 +572,26 @@ export const useMasteryStore = create<MasteryStore>()(
             return {
               ...w,
               baseScore: newScore,
-              confidenceScore: newScore, // Keep legacy in sync
+              confidenceScore: newScore,
               status: scoreToStatus(newScore),
               lastReviewed: now,
               scoreHistory: [historyEntry, ...(w.scoreHistory || [])].slice(0, 5),
               useCount: w.useCount + 1,
               isBleeding
             };
-          })
-        }));
+          });
+
+          const insightEntry = {
+            label: nodeId.toUpperCase(),
+            change: points,
+            timestamp: now
+          };
+
+          return {
+            vocabulary: vocab,
+            masteryHistory: [insightEntry, ...(state.masteryHistory || [])].slice(0, 50)
+          };
+        });
         get().refreshCurriculumStatus();
         get().recordActivity();
         void get().syncToCloud();
@@ -504,9 +653,10 @@ export const useMasteryStore = create<MasteryStore>()(
         const now = new Date().toISOString();
         const { xpMultiplier, pendingComebackBonus } = get();
         let comebackApplied = false;
+        let totalXPChange = 0;
 
-        set((state) => ({
-          vocabulary: state.vocabulary.map((w, idx) => {
+        set((state) => {
+          const updatedVocab = state.vocabulary.map((w, idx) => {
             const d = deltas.find(
               (delta) =>
                 delta.wordId === w.id ||
@@ -517,16 +667,16 @@ export const useMasteryStore = create<MasteryStore>()(
             const multiplier = WORD_FREQUENCY[w.word.toLowerCase()] ?? 1.0;
             let effectiveDelta = d.delta * multiplier;
             
-            // Apply streak multiplier to positive deltas
             if (effectiveDelta > 0) {
               effectiveDelta *= xpMultiplier;
             }
 
-            // Apply comeback bonus to first word
             if (pendingComebackBonus && !comebackApplied) {
                effectiveDelta += 100;
                comebackApplied = true;
             }
+
+            totalXPChange += effectiveDelta;
 
             const newScore = clamp((w.baseScore ?? 0) + effectiveDelta, 0, 1000);
             const historyReason = (pendingComebackBonus && idx === 0) ? 'manual_delta + comeback_bonus' : 'manual_delta';
@@ -548,9 +698,20 @@ export const useMasteryStore = create<MasteryStore>()(
               lastReviewed: now,
               scoreHistory: [{ date: now, change: effectiveDelta, reason: historyReason }, ...(w.scoreHistory || [])].slice(0, 5)
             };
-          }),
-          pendingComebackBonus: false // Reset after application
-        }));
+          });
+
+          const insightEntry = {
+            label: deltas.length === 1 ? deltas[0].wordId.toUpperCase() : "SESSION INSIGHTS",
+            change: Math.round(totalXPChange),
+            timestamp: now
+          };
+
+          return {
+            vocabulary: updatedVocab,
+            masteryHistory: [insightEntry, ...(state.masteryHistory || [])].slice(0, 50),
+            pendingComebackBonus: false
+          };
+        });
 
         if (comebackApplied) {
           get().awardBadge('comeback');
@@ -1014,7 +1175,8 @@ export const useMasteryStore = create<MasteryStore>()(
           pendingRankAcknowledgement: null,
           lastStreakCheck: '',
           pendingProveItResponses: [],
-          totalProveItSubmitted: 0
+          totalProveItSubmitted: 0,
+          completedActivities: {}
         });
         localStorage.setItem('tp_sandbox_mode', 'false');
         get().refreshCurriculumStatus();
@@ -1225,7 +1387,8 @@ export const useMasteryStore = create<MasteryStore>()(
           pendingRankAcknowledgement: null,
           lastStreakCheck: '',
           pendingProveItResponses: [],
-          totalProveItSubmitted: 0
+          totalProveItSubmitted: 0,
+          completedActivities: {}
         });
         localStorage.setItem('tp_sandbox_mode', 'false');
         get().refreshCurriculumStatus();
@@ -1267,7 +1430,8 @@ export const useMasteryStore = create<MasteryStore>()(
           pendingRankAcknowledgement: null,
           lastStreakCheck: '',
           pendingProveItResponses: [],
-          totalProveItSubmitted: 0
+          totalProveItSubmitted: 0,
+          completedActivities: {}
         });
         localStorage.setItem('tp_sandbox_mode', 'false');
         get().refreshCurriculumStatus();
@@ -1441,7 +1605,7 @@ export const useMasteryStore = create<MasteryStore>()(
             earnedCeremonialRanks, lastSmallRankTitle, earnedBadges, totalProveItSubmitted,
             streakShields, xpMultiplier, lastStreakMilestone, pendingComebackBonus, sessionXPRecord,
             sessionLog, currentChallenge, completedChallenges, pendingRankAcknowledgement, newRankUnlocked,
-            activeCurriculumId, activeModuleId, selectedWords, lessonFilter
+            activeCurriculumId, activeModuleId, selectedWords, lessonFilter, completedActivities, masteryHistory
           }), { merge });
         } catch (err) {
           console.error('Firebase Sync Error:', err);
@@ -1546,6 +1710,7 @@ export const useMasteryStore = create<MasteryStore>()(
               const useCount = typeof w.useCount === 'number' ? w.useCount : 0;
               const frequencyRank = typeof w.frequencyRank === 'number' ? w.frequencyRank : (base?.frequencyRank ?? 999);
               const type = w.type || (base?.type ?? 'word');
+              const weight = w.weight || base?.weight;
               
               let sessionNotes = w.sessionNotes || '';
               let meanings = w.meanings || (base?.meanings ?? '');
@@ -1579,6 +1744,7 @@ export const useMasteryStore = create<MasteryStore>()(
                 useCount, 
                 frequencyRank, 
                 type,
+                weight,
                 meanings,
                 sessionNotes,
                 partOfSpeech: w.partOfSpeech || (base?.partOfSpeech ?? ''),
@@ -1674,6 +1840,8 @@ export const useMasteryStore = create<MasteryStore>()(
             activeModuleId: data.activeModuleId || null,
             selectedWords: data.selectedWords || [],
             lessonFilter: data.lessonFilter || null,
+            completedActivities: data.completedActivities || {},
+            masteryHistory: data.masteryHistory || [],
           };
 
           if (data.studentName) update.studentName = data.studentName;
