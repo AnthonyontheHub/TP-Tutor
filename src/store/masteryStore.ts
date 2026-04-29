@@ -134,12 +134,80 @@ const defaultSongs: Album[] = [
     title: "toki nasa, kalama pona ep",
     year: 2025,
     songs: [
-      { id: 'o-tawa-wawa', title: 'o tawa wawa', blocks: [] },
-      { id: 'lukin-sama', title: 'lukin sama', blocks: [] },
-      { id: 'o-kule-e-kon', title: 'o kule e kon', blocks: [] },
-      { id: 'kulupupona', title: 'KULUPUPONA', blocks: [] },
-      { id: 'alasa-tawa-sin', title: 'alasa tawa sin', blocks: [] },
-      { id: 'kili-wawa', title: 'kili wawa', blocks: [] }
+      { 
+        id: 'o-tawa-wawa', 
+        title: 'o tawa wawa', 
+        blocks: [
+          { title: "Intro", tp: "(Hey!) (Hey!) (Hey!)", en: "(Hey!) (Hey!) (Hey!)" },
+          { title: "Verse 1", tp: "kalama li open / mi kute e wawa / sijelo mi li seli / tenpo ni li wawa / (wawa!) / mi pali ala / musi li lawa / sina seli mute / mi seli kin", en: "The sound begins / I hear the power / My body is hot / This moment is powerful / (wawa!) / I am not doing anything / The music is leading / You are very hot / I am hot too" },
+          { title: "Pre-Chorus", tp: "mi ken ala lawa e pilin / telo loje li seli mute / sina tawa lon kon mi / (lon kon mi) / musi li lon insa mi / (insa mi) / ona li wawa!", en: "I cannot control the feeling / My blood is very warm / You move in my spirit / (in my spirit) / The music is inside me / (inside me) / It is powerful!" },
+          { title: "Chorus", tp: "o tawa! / musi li wawa / (musi li wawa) / o tawa! / seli li tawa / (seli li tawa) / mi musi / mi wawa / o tawa! / (TAWA!)", en: "Move! / The music is power / (the music is power) / Move! / The heat moves / (the heat moves) / I am having fun / I am strong / Move! / (MOVE!)" },
+          { title: "Verse 2", tp: "musi li kute / mi kute e musi / ona li uta / li uta e mi / wan, tu, tawa! / mi tawa mute / ona li wawa / mi tawa mute / (tawa mute!)", en: "The music is hearing / I hear the music / It is a mouth / And it kisses me / One, two, move! / I move a lot / It is powerful / I move a lot / (move a lot!)" },
+          { title: "Bridge", tp: "o kute e pilin / o kute e kalama / mi pali ala / musi li tawa e mi! / (ona li tawa e mi!) / mi seli! / mi wawa! / AH!", en: "Listen to the heart / Listen to the sound / I am not acting / The music moves me! / (it moves me!) / I'm burning! / I'm powerful! / AH!" },
+          { title: "Outro", tp: "musi li wawa / (wawa!) / seli li tawa / (tawa!) / o tawa! / musi!", en: "The music is power / (power!) / The heat moves / (moves!) / Move! / Music!" }
+        ] 
+      },
+      { 
+        id: 'lukin-sama', 
+        title: 'lukin sama', 
+        blocks: [
+          { title: "Intro", tp: "(Ooh-woah) (Ooh-woah)", en: "(Ooh-woah) (Ooh-woah)" },
+          { title: "Verse 1", tp: "mi lon tomo musi suli ni / suno mute li suli e kon / jan mute li musi li kalama / taso lukin mi li tawa sina / (tawa sina, tawa sina)", en: "I am at this big, fun house / Many lights make the air feel big / Many people are having fun and making noise / But my gaze goes to you / (to you, to you)" },
+          { title: "Pre-Chorus", tp: "tenpo li pona li open / pilin mi li wile e sina / o lukin tawa ma mi ni / o kama tawa mi", en: "The time is good and it is beginning / My heart wants you / Look toward this place of mine / Come to me" },
+          { title: "Chorus", tp: "jan pona o, o lukin e mi / mi wile e ni: sina pona / pilin olin li kama suli / lukin sina li sama mi anu seme? / (anu seme? anu seme?) / o lukin e mi, jan pona o", en: "O good person, look at me / I want this: for you to be good / The feeling of love is becoming great / Is your gaze like mine, or what? / (or what? or what?) / Look at me, good person" },
+          { title: "Post-Chorus", tp: "lukin, lukin, lukin / (o lukin e mi) / pona, pona, pona / (o pona e mi) / sama, sama, sama / (o sama e mi)", en: "Look, look, look / (look at me) / Good, good, good / (make me good) / Same, same, same / (make me the same)" },
+          { title: "Verse 2", tp: "lipu kasi li open lon insa / kili lili li suli e olin / mi utala ala e tenpo / mi olin e toki pi lukin sina / (lukin sina, lukin sina)", en: "A book of plants opens inside / Small fruits make love grow / I don't fight against time / I love the language of your gaze / (your gaze, your gaze)" },
+          { title: "Bridge", tp: "mu... mu... mu... (kalama pi pilin mi) / mu... mu... mu... (kalama pi pilin sina) / tenpo li awen lili / suno li tawa sike / o open e pilin pona", en: "mu... mu... mu... (sound of my heart) / mu... mu... mu... (sound of your heart) / Time stays a little while / The sun moves in a circle / Open up the good feeling" },
+          { title: "Outro", tp: "jan pona o / (o lukin) / lukin sama / (o pona) / mi olin e sina / (o open) / sama... / pona...", en: "Good person / (look) / Looking the same / (good) / I love you / (open) / Same... / Good..." }
+        ] 
+      },
+      { 
+        id: 'o-kule-e-kon', 
+        title: 'o kule e kon', 
+        blocks: [
+          { title: "Intro", tp: "Shimmering synth wash — no drums", en: "Shimmering synth wash — no drums" },
+          { title: "Verse 1", tp: "lili li lon, o lukin. / kule li wawa, li sewi. / suno li pini, li kama. / pini la, kon li tawa. / mi lili, mi lon poka. / (mi lon poka...)", en: "Smallness exists, look at it. / Color is strong, it is divine. / The light fades, and it returns. / When it ends, the air moves. / I am small, I am right beside you. / (right beside you...)" },
+          { title: "Chorus", tp: "o kule e kon! / o suno e wawa! / lili li sewi! / lete li pona! / mi mute li lon! / o pilin e ijo! / o pilin e ijo!", en: "Color the air! / Light up the energy! / Smallness is divine! / The cold is good! / We exist! / Feel something! / Feel something!" },
+          { title: "Verse 2", tp: "lete li moku e sijelo. / kon li moku e kon mi. / kule li lon, li pini ala. / lili o, o tawa insa. / o kute e toki pi lili.", en: "The cold bites the body. / The air consumes my breath. / Color is present, it does not end. / Oh small things, move within. / Listen to the voice of smallness." },
+          { title: "Outro", tp: "suno li lon. / (suno li lon.) / o lili. / (o lili.) / o kule.", en: "Light exists. / (light exists.) / Be small. / (be small.) / Be colorful." }
+        ] 
+      },
+      { 
+        id: 'kulupupona', 
+        title: 'KULUPUPONA', 
+        blocks: [
+          { title: "Intro", tp: "(o!) (o!) (mi mute o!) / tenpo ni li pona mute / (ni li pona!)", en: "(oh!) (oh!) (all of us oh!) / This time is so good / (this is good!)" },
+          { title: "Verse 1", tp: "o lukin e mi mute / mi lon ma pona / o pana e seli / (o pana!) / o moku e telo / (o moku!) / mi mute li tawa mute / nasin ante li ike / sina jo e suli / (sina jo!) / mi pana e wawa / (mi pana!)", en: "Look at all of us / We are in a good place / Give the warmth / (give!) / Drink the water / (drink!) / We are moving a lot / Other ways are bad / You have greatness / (you have!) / I give the strength / (I give!)" },
+          { title: "Pre-Chorus", tp: "ma li pimeja lon poka / la ni li seli li suno / mi mute li ken ala pakala / tan ni: sina lon poka mi", en: "The world is dark outside / But here is warm and glowing / We cannot be broken / Because you are here by my side" },
+          { title: "Chorus", tp: "kulupu pona li lon! / (li lon!) / mi mute li jo e mute! / (e mute!) / moku li pona / telo li pona / kalama ni li seli e pilin / kulupu pona li lon!", en: "The good community is here! / (is here!) / We have so much! / (so much!) / The food is good / The drink is good / This sound warms the heart / The good community is here!" },
+          { title: "Verse 2", tp: "sina moku e telo / mi pana e moku / mi jo e kon pona / mi mute li kulupu / (a!) / o kalama mute / o tawa suli / tenpo li tawa / la mi mute li awen / (awen!) (awen!) / mi pana e pona tawa sina / sina pana e pona tawa mi", en: "You drink / I give the food / I have a good spirit / We are a community / (ah!) / Make a lot of noise / Move big / As time goes by / We remain / (remain!) (remain!) / I give goodness to you / You give goodness to me" },
+          { title: "Bridge", tp: "ma li tawa mute / mi mute li lili / taso lon kulupu / mi suli / mi mute li jo e ni / ni li ale", en: "The world moves fast / We are small / But in the community / I am big / We have this / This is everything" },
+          { title: "Outro", tp: "pona! (pona!) / mi mute li lon! (o!) / ni li ale!", en: "Good! (good!) / We are here! (oh!) / This is everything!" }
+        ] 
+      },
+      { 
+        id: 'alasa-tawa-sin', 
+        title: 'alasa tawa sin', 
+        blocks: [
+          { title: "Verse 1", tp: "mi wile e wawa olin. / alasa li open lon poka. / mi utala e kon moku. / o awen lili, o lukin sin.", en: "I want the power of love. / The hunt begins nearby. / I fight against the consuming air. / Wait a little, look anew." },
+          { title: "Chorus", tp: "o alasa! o awen ala! / pini li lon poka ala! / wile li tawa suli! / kon sin li lon poka! / lon! tawa! sin! / (lon tawa sin!)", en: "Hunt! Do not wait! / The end is nowhere near! / Wanting becomes motion! / A new spirit is near! / Real! Motion! New! / (real motion new!)" },
+          { title: "Verse 2", tp: "pini li moku e wawa. / awen li moku e pilin. / mi wile e tawa suli. / alasa li suno sin.", en: "Endings consume strength. / Waiting consumes feeling. / I want great momentum. / The chase is a new sun." },
+          { title: "Bridge", tp: "tenpo pini li moli. / tenpo sin li lon. / mi alasa e suli olin. / pini li lon ala!", en: "Past time is dead. / New time is alive. / I chase the greatness of love. / There is no end!" },
+          { title: "Outro", tp: "alasa sin. / awen tawa. / (pona tawa mi.)", en: "A new hunt. / Keep moving. / (good for me.)" }
+        ] 
+      },
+      { 
+        id: 'kili-wawa', 
+        title: 'kili wawa', 
+        blocks: [
+          { title: "Intro", tp: "(O! O! O!)", en: "(O! O! O!)" },
+          { title: "Verse 1", tp: "moku li suli (suli) / kili li loje (loje) / mi pali e ni (mi pali) / tenpo li awen (awen)", en: "Eating is important (important) / The fruit is red (red) / I am doing this (I am doing) / Time remains (remains)" },
+          { title: "Chorus", tp: "o kalama nasa mute! / (o kalama!) / o tawa wawa suli! / (o tawa!) / mi moku e kili lili / ona li suli tawa mi / (li suli!) / moku! wawa! / (moku! wawa!) / nasa! pona! / (nasa! pona!)", en: "Make a lot of strange noise! / (noise!) / Move with great strength! / (move!) / I am eating a tiny fruit / It is huge to me / (is huge!) / Food! Power! / (food! power!) / Strange! Good! / (strange! good!)" },
+          { title: "Verse 2", tp: "wawa li pona (pona) / tawa li suli (suli) / mi lukin e ni (mi lukin) / tenpo li nasa (nasa)", en: "Power is good (good) / Movement is grand (grand) / I am looking at this (I am looking) / Time is strange (strange)" },
+          { title: "Middle 8", tp: "sina lukin ala lukin? / kili ni li wawa. / mi lon. / mi suli. / tenpo li pini. / moku.", en: "Are you looking or not? / This fruit is powerful. / I am here. / I am important. / Time is finished. / Eat." },
+          { title: "Outro", tp: "moku suli (moku suli) / mi wawa (mi wawa) / nasa (nasa) / pona (pona)", en: "Grand eating (grand eating) / I am strong (I am strong) / Strange (strange) / Good (good)" }
+        ] 
+      }
     ]
   },
   {
