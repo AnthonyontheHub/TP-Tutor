@@ -55,6 +55,54 @@ export const albumData: Album[] = [
         id: "ante-suli",
         title: "Ante Suli",
         blocks: [{ title: "Verse", tp: "ante suli li kama. mi ante e mi.", en: "The big change comes. I change myself." }]
+      },
+      {
+        id: "pana-pi-wawa-pimeja",
+        title: "pana pi wawa pimeja",
+        blocks: [{ title: "Verse", tp: "pana pi wawa pimeja li kama. mi pilin e ona.", en: "The giving of dark energy comes. I feel it." }]
+      },
+      {
+        id: "suno-sewi",
+        title: "suno sewi",
+        blocks: [{ title: "Verse", tp: "suno sewi li suno e ali. mi lukin e suno.", en: "The divine sun lights everything. I look at the light." }]
+      },
+      {
+        id: "awen-lape",
+        title: "Awen Lape",
+        blocks: [{ title: "Verse", tp: "awen lape li pona. mi lape lon pini.", en: "Remaining in sleep is good. I sleep at the end." }]
+      },
+      {
+        id: "kon-pi-sewi",
+        title: "kon pi sewi",
+        blocks: [{ title: "Verse", tp: "kon pi sewi li pona tawa mi. ona li suli.", en: "The divine air is good to me. It is great." }]
+      },
+      {
+        id: "kon-kalama",
+        title: "Kon Kalama",
+        blocks: [{ title: "Verse", tp: "kon kalama li suli. mi kute e ona.", en: "The air of sound is great. I hear it." }]
+      },
+      {
+        id: "o-lon-poka-mi",
+        title: "o lon poka mi",
+        blocks: [{ title: "Verse", tp: "o lon poka mi. mi wile e sina.", en: "Be at my side. I want you." }]
+      },
+      {
+        id: "luka-mama",
+        title: "luka mama",
+        blocks: [{ title: "Verse", tp: "luka mama li seli. ona li pona.", en: "The mother's hand is warm. It is good." }]
+      },
+      {
+        id: "tenpo-awen-pini-ala",
+        title: "tenpo awen pini ala",
+        blocks: [{ title: "Verse", tp: "tenpo awen pini ala li lon. mi awen.", en: "The remaining time that does not end exists. I wait." }]
+      },
+      {
+        id: "telo-suno-song",
+        title: "Telo Suno",
+        blocks: [
+          { title: "SECTION A", tp: "suno pi pona li kama lon ma\ntelo pi suno li seli e mi\nnasin pi pini li weka tan mi\nmi pilin e ni lon insa mi\nkon pi tenpo li sin tawa mi\ntelo pi pini li weka tan ni\noko mi li lukin e suno\noko mi li lukin e sin", en: "The sun of good comes to the land / The liquid light warms me / The path of the end is away from me / I feel this inside me / The air of time is new to me / The water of the end is away from here / My eyes look at the light / My eyes look at the new." },
+          { title: "SECTION B", tp: "sona li lon la mi pilin pona\nwile pi sona li weka tan mi\nmi pali ala e ni lon tenpo\ntenpo li seli e pilin mi\ntoki pi pini li weka lon kon\nmi pali ala e pali pi suli\nmi lon insa pi sona ni\nmi sona ala e wile pini", en: "When knowledge exists I feel good / The desire to know has left me / I don't do this in time / Time warms my feelings / The talk of the end is away in the air / I don't do the work of greatness / I am inside this knowledge / I do not remember the old questions." }
+        ]
       }
     ]
   },
