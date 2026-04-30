@@ -366,10 +366,15 @@ export interface Badge {
 
 export const SMALL_RANKS: SmallRank[] = [
   { xpThreshold: 0,       title: 'jan lili' },
+  { xpThreshold: 500,     title: 'jan pi toki' },
   { xpThreshold: 1500,    title: 'jan toki' },
+  { xpThreshold: 3000,    title: 'jan sona lili' },
+  { xpThreshold: 5000,    title: 'jan sona' },
   { xpThreshold: 8000,    title: 'jan sona mute' },
+  { xpThreshold: 12000,   title: 'jan pona pi toki pona' },
+  { xpThreshold: 18000,   title: 'jan pi nasin toki' },
   { xpThreshold: 25000,   title: 'jan wawa pi toki pona' },
-  { xpThreshold: 50000,   title: 'jan sona sewi' },
+  { xpThreshold: 35000,   title: 'jan sona sewi' },
   { xpThreshold: 100000,  title: 'jan Sonja' },
 ];
 

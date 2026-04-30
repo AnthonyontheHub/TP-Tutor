@@ -710,8 +710,19 @@ export const useMasteryStore = create<MasteryStore>()(
         set((state) => {
           const vocab = state.vocabulary.map((w) => {
             if (w.id !== nodeId && w.word.toLowerCase() !== nodeId.toLowerCase()) return w;
-            const newScore = clamp(w.baseScore + points, 0, 1000);
-            const historyEntry = { date: now, change: points, reason: context };
+            
+            // Distribute points across roles while maintaining balance
+            const perRole = Math.floor(points / 3);
+            const remainder = points % 3;
+            const updatedMatrix = { ...w.roleMatrix };
+            
+            updatedMatrix.noun = clamp(updatedMatrix.noun + perRole + (remainder > 0 ? 1 : 0), 0, 333);
+            updatedMatrix.verb = clamp(updatedMatrix.verb + perRole + (remainder > 1 ? 1 : 0), 0, 333);
+            updatedMatrix.mod = clamp(updatedMatrix.mod + perRole, 0, 333);
+            
+            const newScore = Object.values(updatedMatrix).reduce((a, b) => a + b, 0);
+            const actualPoints = newScore - w.baseScore;
+            const historyEntry = { date: now, change: actualPoints, reason: context };
             
             const recentDrops = [historyEntry, ...(w.scoreHistory || [])]
               .filter(h => h.change < 0 && (new Date(now).getTime() - new Date(h.date).getTime() < 48 * 3600000));
@@ -720,6 +731,7 @@ export const useMasteryStore = create<MasteryStore>()(
 
             return {
               ...w,
+              roleMatrix: updatedMatrix,
               baseScore: newScore,
               confidenceScore: newScore,
               status: scoreToStatus(newScore),
@@ -798,7 +810,13 @@ export const useMasteryStore = create<MasteryStore>()(
 
       hardenWord: async (wordId) => {
         set(state => ({
-          vocabulary: state.vocabulary.map(w => (w.id === wordId || w.word === wordId) ? { ...w, hardened: true, baseScore: 1000, status: 'mastered' } : w)
+          vocabulary: state.vocabulary.map(w => (w.id === wordId || w.word === wordId) ? { 
+            ...w, 
+            hardened: true, 
+            baseScore: 1000, 
+            status: 'mastered',
+            roleMatrix: { noun: 334, verb: 333, mod: 333 } 
+          } : w)
         }));
         get().awardBadge('first_hardened');
         await get().syncToCloud();
@@ -854,7 +872,7 @@ export const useMasteryStore = create<MasteryStore>()(
             }
 
             const updatedMatrix = { ...w.roleMatrix };
-            updatedMatrix[targetRole] = clamp(updatedMatrix[targetRole] + effectiveDelta, 0, 333); // Each role ~1/3 of 1000
+            updatedMatrix[targetRole] = clamp(updatedMatrix[targetRole] + effectiveDelta, 0, 334);
             const newScore = Object.values(updatedMatrix).reduce((a, b) => a + b, 0);
             
             sessionXPChange += effectiveDelta;
@@ -903,8 +921,15 @@ export const useMasteryStore = create<MasteryStore>()(
           vocabulary: state.vocabulary.map((w) => {
             if (w.id !== wordIdOrText && w.word.toLowerCase() !== wordIdOrText.toLowerCase()) return w;
             
+            let effectivePoints = points;
+            const lowestRoleScore = Math.min(w.roleMatrix.noun, w.roleMatrix.verb, w.roleMatrix.mod);
+            if (effectivePoints > 0 && w.roleMatrix[role] >= lowestRoleScore + 100) {
+              console.log(`Node Locked: ${w.word} ${role} is too far ahead.`);
+              effectivePoints = 0;
+            }
+
             const updatedMatrix = { ...w.roleMatrix };
-            updatedMatrix[role] = clamp(updatedMatrix[role] + points, 0, 333);
+            updatedMatrix[role] = clamp(updatedMatrix[role] + effectivePoints, 0, 334);
             const newScore = Object.values(updatedMatrix).reduce((a, b) => a + b, 0);
 
             return { 
@@ -913,7 +938,7 @@ export const useMasteryStore = create<MasteryStore>()(
               baseScore: newScore, 
               status: scoreToStatus(newScore),
               lastReviewed: now,
-              scoreHistory: [{ date: now, change: points, reason: 'neural_override' }, ...(w.scoreHistory || [])].slice(0, 5)
+              scoreHistory: [{ date: now, change: effectivePoints, reason: 'neural_override' }, ...(w.scoreHistory || [])].slice(0, 5)
             };
           }),
         }));
@@ -930,9 +955,20 @@ export const useMasteryStore = create<MasteryStore>()(
             const currentIndex = STATUS_ORDER.indexOf(w.status);
             const nextStatus = STATUS_ORDER[(currentIndex + 1) % STATUS_ORDER.length];
             const targetScore = STATUS_MIDPOINT[nextStatus];
+            
+            // Force balance roles to targetScore
+            const perRole = Math.floor(targetScore / 3);
+            const remainder = targetScore % 3;
+            const updatedMatrix = {
+              noun: perRole + (remainder > 0 ? 1 : 0),
+              verb: perRole + (remainder > 1 ? 1 : 0),
+              mod: perRole
+            };
+
             const diff = targetScore - (w.baseScore || 0);
             return { 
               ...w, 
+              roleMatrix: updatedMatrix,
               baseScore: targetScore, 
               confidenceScore: targetScore, 
               status: nextStatus,
