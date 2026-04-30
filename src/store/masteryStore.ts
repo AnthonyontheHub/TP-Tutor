@@ -23,7 +23,7 @@ import aiVocabCache from '../data/aiVocabCache.json';
 function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: MasteryStatus; type: 'word' | 'grammar'; sessionNotes: string; frequencyRank?: number; weight?: 'pillar' | 'working' | 'bonus' }): VocabWord {
   const score = STATUS_MIDPOINT[v.status];
   const staticData = vocabContent[v.word] || {};
-  const aiData = (aiVocabCache as Record<string, any>)[v.word];
+  const aiData = (aiVocabCache as Record<string, any>)[v.word.toLowerCase()] || {};
 
   return {
     id: v.word,
@@ -39,8 +39,8 @@ function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: Maste
     frequencyRank: v.frequencyRank ?? 999,
     isMasteryCandidate: false,
     sessionNotes: v.sessionNotes,
-    aiExplanation: aiData?.aiExplanation || '',
-    aiExamples: aiData?.aiExamples,
+    aiExplanation: aiData.aiExplanation || '',
+    aiExamples: aiData.aiExamples,
     partOfSpeechScores: { noun: 0, verb: 0, modifier: 0 },
     lastReviewed: new Date().toISOString(),
     scoreHistory: [],
@@ -1859,7 +1859,8 @@ export const useMasteryStore = create<MasteryStore>()(
             (w: { word?: string; useCount?: number; frequencyRank?: number; type?: string; status?: MasteryStatus; [key: string]: unknown }) => {
               const base = mappedVocabulary.find(iv => iv.word === w.word);
               const staticData = vocabContent[w.word || ''] || {};
-              const aiData = (aiVocabCache as Record<string, any>)[w.word || ''];
+              const wordLower = (w.word || '').toLowerCase();
+              const aiData = (aiVocabCache as Record<string, any>)[wordLower] || {};
               const useCount = typeof w.useCount === 'number' ? w.useCount : 0;
               const frequencyRank = typeof w.frequencyRank === 'number' ? w.frequencyRank : (base?.frequencyRank ?? 999);
               const type = w.type || (base?.type ?? 'word');
@@ -2091,6 +2092,19 @@ export const useMasteryStore = create<MasteryStore>()(
             };
           });
           state.curriculums = mergedCurriculums;
+
+          // Inject AI Cache Data on rehydration if missing
+          if (Array.isArray(state.vocabulary)) {
+            state.vocabulary = state.vocabulary.map(v => {
+              if (v.aiExplanation) return v;
+              const aiData = (aiVocabCache as Record<string, any>)[v.word.toLowerCase()] || {};
+              if (aiData.aiExplanation) {
+                return { ...v, aiExplanation: aiData.aiExplanation, aiExamples: aiData.aiExamples };
+              }
+              return v;
+            });
+          }
+
           state.refreshCurriculumStatus();
         }
       }
