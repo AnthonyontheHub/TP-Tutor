@@ -33,7 +33,7 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
   const primaryMeaning = word?.meanings?.split(',')[0].trim() || word?.meanings;
   const extra = word ? WORD_EXTRA_DATA[word.word] : null;
 
-  const triggerGeneration = async () => {
+  const triggerGeneration = async (_force?: boolean) => {
     if (!word) return;
 
     const key = resolveApiKey();

@@ -440,7 +440,8 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
 
       const sys = buildTutorPrompt(state.vocabulary, activeNodes, displayName, userContext, undefined, undefined, vibe, yesterdayWasActive.current, getRegressionCandidates(7), getTopConfusionPairs(5), pendingProveItResponses, xpMultiplier, currentChallenge, pendingRankAcknowledgement);
 
-      const windowedHistory = [...history, { role: 'user', content: summaryPrompt }].slice(-HISTORY_WINDOW);
+      const windowedHistory: { role: 'user' | 'assistant'; content: string }[] =
+        [...history, { role: 'user' as const, content: summaryPrompt }].slice(-HISTORY_WINDOW);
       let full = '';
       for await (const chunk of streamCompletion(key, sys, windowedHistory)) {
         full += chunk;
@@ -498,7 +499,8 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
           ? buildTutorPrompt(state.vocabulary, activeNodes, displayName, userContext, undefined, undefined, vibe, yesterdayWasActive.current, getRegressionCandidates(7), getTopConfusionPairs(5), pendingProveItResponses, xpMultiplier, currentChallenge, pendingRankAcknowledgement)
           : buildChatPrompt(state.vocabulary, displayName, userContext, latestChatContext, payload, yesterdayWasActive.current, getTopConfusionPairs(5), xpMultiplier, pendingRankAcknowledgement);
 
-      const windowedHistory = [...history, { role: 'user', content: txt }].slice(-HISTORY_WINDOW);
+      const windowedHistory: { role: 'user' | 'assistant'; content: string }[] =
+        [...history, { role: 'user' as const, content: txt }].slice(-HISTORY_WINDOW);
       let full = '';
       for await (const chunk of streamCompletion(key, sys, windowedHistory)) {
         full += chunk;
@@ -520,7 +522,17 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
       if (changes && changes.length > 0) {
         if (latestChatContext === 'MASTERY_COURT') {
           for (const change of changes) {
-            if (change.type === 'vocab' && change.newStatus) updateVocabStatus(change.id, change.newStatus);
+            if (change.type === 'vocab' && change.newStatus) {
+              const targetScore = STATUS_MIDPOINT[change.newStatus];
+              const v = vocabulary.find(vw => vw.id === change.id || vw.word.toLowerCase() === change.id.toLowerCase());
+              const currentScore = v?.baseScore ?? 0;
+              const delta = Math.round((targetScore - currentScore) / 3);
+              if (delta !== 0) {
+                updateVocabStatus(change.id, 'noun', delta);
+                updateVocabStatus(change.id, 'verb', delta);
+                updateVocabStatus(change.id, 'mod', delta);
+              }
+            }
             if (change.type === 'vocab_production' && change.newStatus) updateProductionStatus(change.id, change.newStatus);
             if (change.type === 'vocab_recognition' && change.newStatus) updateRecognitionStatus(change.id, change.newStatus);
             if (change.type === 'confusion' && change.wordB) recordConfusion(change.id, change.wordB);

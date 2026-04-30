@@ -82,12 +82,11 @@ export const PhilosophySorter: React.FC<PhilosophySorterProps> = ({ userProfile,
               }}
               initial={{ opacity: 0, scale: 0.8, x: 0 }}
               animate={{ opacity: 1, scale: 1, x: 0 }}
-              exit={(custom) => ({
+              exit={{
                 opacity: 0,
                 scale: 0.5,
-                x: custom === 'ike' ? 200 : -200,
                 transition: { duration: 0.2 }
-              })}
+              }}
               className="w-64 h-40 bg-black/60 backdrop-blur-2xl border border-white/10 rounded-3xl flex items-center justify-center p-6 text-center cursor-grab active:cursor-grabbing shadow-2xl"
             >
               <p className="text-lg font-light italic text-white/90">"{items[currentIndex].label}"</p>

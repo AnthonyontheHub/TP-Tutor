@@ -3,7 +3,9 @@ class SoundService {
 
   private init() {
     if (!this.ctx) {
-      const AudioContextClass = window.AudioContext || (window as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      const AudioContextClass =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       this.ctx = new AudioContextClass();
     }
   }

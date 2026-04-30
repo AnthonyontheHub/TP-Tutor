@@ -9,8 +9,10 @@ import {
   type UserProfile, type ReviewVibe,
   type CurriculumLevel, type NodeStatus, type CommonPhrase, type PosRole,
   type SmallRank, type CeremonialRank, type Badge, SMALL_RANKS,
-  CEREMONIAL_RANKS, ALL_BADGES, type SessionLogEntry, type WeeklyChallenge
+  CEREMONIAL_RANKS, ALL_BADGES, type SessionLogEntry, type WeeklyChallenge,
+  type RoleMatrix, type MasteryEvent, type ScoreHistoryEntry
 } from '../types/mastery';
+import type { VocabContentEntry } from '../data/vocabContent';
 import { scoreToStatus, STATUS_MIDPOINT } from '../types/mastery';
 import type { Album } from '../types/discography';
 import { initialMasteryMap } from '../data/initialMasteryMap';
@@ -19,10 +21,11 @@ import { vocabContent } from '../data/vocabContent';
 import { TOKI_PONA_DICTIONARY, WORD_FREQUENCY } from '../data/tokiPonaDictionary';
 import aiVocabCache from '../data/aiVocabCache.json';
 
-function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: MasteryStatus; type: 'word' | 'grammar'; sessionNotes: string; frequencyRank?: number; weight?: 'pillar' | 'working' | 'bonus' }): VocabWord {
+function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: MasteryStatus; type: 'word' | 'grammar'; sessionNotes: string; frequencyRank?: number; weight?: string }): VocabWord {
   const score = STATUS_MIDPOINT[v.status];
-  const staticData = vocabContent[v.word] || {};
-  const aiData = (aiVocabCache as Record<string, any>)[v.word.toLowerCase()] || {};
+  const staticData: Partial<VocabContentEntry> = vocabContent[v.word] || {};
+  const aiData = (aiVocabCache as Record<string, { aiExplanation?: string; aiExamples?: Record<string, string> }>)[v.word.toLowerCase()] || {};
+  const weight = (v.weight === 'pillar' || v.weight === 'working' || v.weight === 'bonus') ? v.weight : undefined;
 
   // Distribute initial score across roles
   const perRole = Math.floor(score / 3);
@@ -37,7 +40,7 @@ function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: Maste
     confidenceScore: score,
     roleMatrix: { noun: perRole, verb: perRole, mod: perRole },
     status: v.status,
-    weight: v.weight,
+    weight,
     useCount: 0,
     frequencyRank: v.frequencyRank ?? 999,
     isMasteryCandidate: false,
@@ -1069,7 +1072,6 @@ export const useMasteryStore = create<MasteryStore>()(
           let newShields = state.streakShields;
           let newLastStreakMilestone = state.lastStreakMilestone;
           let newPendingComebackBonus = state.pendingComebackBonus;
-          let _shieldWasUsed = false;
 
           if (wasActiveYesterday) {
             newStreak += 1;
@@ -1083,7 +1085,6 @@ export const useMasteryStore = create<MasteryStore>()(
             // Missed a day
             if (newShields > 0) {
               newShields -= 1;
-              _shieldWasUsed = true;
               // Streak maintained by shield
             } else {
               // Comeback bonus check
@@ -1728,7 +1729,7 @@ export const useMasteryStore = create<MasteryStore>()(
             ...level,
             nodes: level.nodes.map(node => {
               const rand = Math.random();
-              const status = rand > 0.6 ? 'mastered' : (rand > 0.3 ? 'active' : 'locked');
+              const status: NodeStatus = rand > 0.6 ? 'mastered' : (rand > 0.3 ? 'active' : 'locked');
               return { ...node, status };
             })
           }));
@@ -2042,19 +2043,22 @@ export const useMasteryStore = create<MasteryStore>()(
             return;
           }
 
-          const vocabulary = (data.vocabulary || mappedVocabulary).map(
-            (w: { word?: string; useCount?: number; frequencyRank?: number; type?: string; status?: MasteryStatus; confidenceScore?: number; [key: string]: unknown }) => {
+          type RawCloudVocab = Partial<VocabWord> & Record<string, unknown>;
+          const cloudVocabSource = (data.vocabulary as RawCloudVocab[] | undefined)
+            ?? (mappedVocabulary as unknown as RawCloudVocab[]);
+          const vocabulary: VocabWord[] = cloudVocabSource.map(
+            (w: RawCloudVocab) => {
               const base = mappedVocabulary.find(iv => iv.word === w.word);
-              const staticData = vocabContent[w.word || ''] || {};
+              const staticData: Partial<VocabContentEntry> = vocabContent[w.word || ''] || {};
               const wordLower = (w.word || '').toLowerCase();
-              const aiData = (aiVocabCache as Record<string, any>)[wordLower] || {};
+              const aiData = (aiVocabCache as Record<string, { aiExplanation?: string; aiExamples?: Record<string, string> }>)[wordLower] || {};
               const useCount = typeof w.useCount === 'number' ? w.useCount : 0;
               const frequencyRank = typeof w.frequencyRank === 'number' ? w.frequencyRank : (base?.frequencyRank ?? 999);
-              const type = w.type || (base?.type ?? 'word');
-              const weight = w.weight || base?.weight;
-              
-              let sessionNotes = w.sessionNotes || '';
-              let meanings = w.meanings || (base?.meanings ?? '');
+              const type = (w.type as 'word' | 'grammar') || (base?.type ?? 'word');
+              const weight = (w.weight as VocabWord['weight']) || base?.weight;
+
+              let sessionNotes = (typeof w.sessionNotes === 'string' ? w.sessionNotes : '') || '';
+              let meanings = (typeof w.meanings === 'string' ? w.meanings : '') || (base?.meanings ?? '');
 
               // DATA MIGRATION: If meanings is missing/generic and sessionNotes contains definition-like text
               if ((!meanings || meanings === '') && sessionNotes.includes('.')) {
@@ -2090,6 +2094,9 @@ export const useMasteryStore = create<MasteryStore>()(
 
               return {
                 ...w,
+                id: (w.id as string) || w.word || '',
+                word: w.word || '',
+                isMasteryCandidate: w.isMasteryCandidate ?? false,
                 baseScore,
                 status,
                 roleMatrix,

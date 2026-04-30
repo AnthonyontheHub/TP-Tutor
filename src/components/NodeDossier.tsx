@@ -118,7 +118,7 @@ export default function NodeDossier({ node, onBack, onAskLina, isSandboxMode }: 
               <h1 
                 onClick={() => {
                   if (effectiveSandbox) {
-                    useMasteryStore.getState().devUnlockNode(node.id);
+                    useMasteryStore.getState().updateNodeStatus(node.id, 'active');
                   }
                 }}
                 style={{ 

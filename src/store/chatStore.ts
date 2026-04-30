@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { ProposedChange } from '../services/linaService';
+import type { ReviewVibe } from '../types/mastery';
 
 export interface ChatMessage {
   id: string;
@@ -19,7 +20,7 @@ export interface ChatSessionData {
   history: { role: 'user' | 'assistant'; content: string }[];
   sessionDeltas: ProposedChange[];
   context: 'GENERAL' | 'DAILY_REVIEW' | 'GRAMMAR_CHECK' | 'LESSON' | 'PHRASE_PRACTICE' | 'VOCAB_PANEL' | 'MASTERY_COURT';
-  vibe?: string;
+  vibe?: ReviewVibe;
   contextPayload?: string;
 }
 

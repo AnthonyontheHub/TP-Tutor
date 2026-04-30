@@ -227,10 +227,12 @@ export interface VocabWord {
   word: string;
   partOfSpeech: string;
   meanings: string;
-  type: ItemType; 
+  type: ItemType;
   // baseScore is the source of truth (0–1000).
   // status is derived from it via scoreToStatus() and kept in sync.
   baseScore: number;
+  // legacy field kept for migration of cloud/local data; prefer baseScore.
+  confidenceScore?: number;
   roleMatrix: RoleMatrix;
   status: MasteryStatus;
   weight?: MasteryWeight;

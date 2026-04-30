@@ -56,15 +56,15 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
     return groups;
   }, [commonPhrases]);
 
-  const filterPhrasesBySelectedWords = (phrases: { tokiPona: string, english: string }[]) => {
+  function filterPhrasesBySelectedWords<T>(phrases: T[], getTp: (p: T) => string): T[] {
     if (!selectedWords || selectedWords.length === 0) {
       return phrases;
     }
     return phrases.filter(p => {
-      const ws = (p.tokiPona || '').split(/[ /]+/).map(clean);
+      const ws = (getTp(p) || '').split(/[ /]+/).map(clean);
       return selectedWords.every(sw => ws.includes(clean(sw)));
     });
-  };
+  }
 
   const handlePhraseClick = (category: PhraseCategory, phrase: Phrase) => {
     setSelectedPhraseCategory(category);
@@ -140,7 +140,7 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
               {phraseData.map((category) => {
-                const filteredPhrases = filterPhrasesBySelectedWords(category.phrases);
+                const filteredPhrases = filterPhrasesBySelectedWords(category.phrases, (p) => p.tokiPona);
                 if (filteredPhrases.length === 0 && selectedWords && selectedWords.length > 0) return null;
                 return (
                   <div key={category.title} className="glass-panel" style={{ background: 'rgba(255,255,255,0.01)', padding: '24px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
@@ -178,7 +178,7 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}> 
               {Object.entries(groupedCommonPhrases).map(([cat, phrases]) => {
-                const filtered = filterPhrasesBySelectedWords(phrases);
+                const filtered = filterPhrasesBySelectedWords(phrases, (p) => p.tp);
                 if (filtered.length === 0 && selectedWords && selectedWords.length > 0) return null;
                 return (
                   <div key={cat}>

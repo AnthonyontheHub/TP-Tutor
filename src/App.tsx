@@ -201,7 +201,7 @@ export default function App() {
       <AnimatePresence>
         {activePanels.map(panel => (
           <ModalWrapper key={panel} onClose={() => togglePanel(panel)}>
-             {panel === 'profile' && <UserProfilePanel onClose={() => togglePanel('profile')} />}
+             {panel === 'profile' && <UserProfilePanel isOpen={true} onClose={() => togglePanel('profile')} />}
              {panel === 'settings' && <SettingsPanel isOpen={true} onClose={() => togglePanel('settings')} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} onOpenLogbook={() => togglePanel('logbook')} onOpenMasteryCourt={() => { togglePanel('settings'); handleAskLina('[SYSTEM: The student has opened Mastery Court. You know why they\'re here. Greet them briefly, acknowledge your role, and ask what they\'d like to petition.]'); }} />}
              {panel === 'achievements' && <AchievementsPanel onClose={() => togglePanel('achievements')} />}
              {panel === 'instructions' && <InstructionsPanel isOpen={true} onClose={() => togglePanel('instructions')} />}

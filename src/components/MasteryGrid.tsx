@@ -18,6 +18,8 @@ interface Props {
   sortDirection: 'asc' | 'desc';
   setSortMode: (mode: string) => void;
   setSortDirection: (dir: 'asc' | 'desc') => void;
+  posFilter?: string;
+  setPosFilter?: (pos: string) => void;
 }
 
 const STATUS_RANK: Record<MasteryStatus, number> = {

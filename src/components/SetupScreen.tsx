@@ -91,7 +91,10 @@ export default function SetupScreen() {
                 </div>
                 <div>
                   <label className="section-title">Sex</label>
-                  <input value={sex} onChange={(e) => setSex(e.target.value)} placeholder="M/F/X" className="settings-input" />
+                  <input value={sex} onChange={(e) => {
+                    const v = e.target.value;
+                    setSex(v === 'Male' || v === 'Female' || v === 'Other' ? v : '');
+                  }} placeholder="Male/Female/Other" className="settings-input" />
                 </div>
               </div>
               <label className="section-title">Location</label>
