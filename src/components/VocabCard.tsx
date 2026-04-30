@@ -144,6 +144,7 @@ export default function VocabCard({ word, onLongPress, onClick, onAskLina, isSan
       onPointerCancel={handlePointerCancel}
       onClick={handleCardClick}
     >
+      <div className="vocab-card__bg-symbol">{word.word}</div>
       <style>{`
         @keyframes activePulse {
           0% { box-shadow: 0 0 10px rgba(255, 191, 0, 0.2); }
@@ -159,8 +160,6 @@ export default function VocabCard({ word, onLongPress, onClick, onAskLina, isSan
           opacity: 1;
         }
       `}</style>
-
-      <div className="vocab-card__bg-symbol">{word.word}</div>
 
       {/* Top Right Icons */}
       <div style={{ position: 'absolute', top: '8px', right: '8px', display: 'flex', gap: '6px', alignItems: 'center' }}>
