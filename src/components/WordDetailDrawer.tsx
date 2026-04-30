@@ -113,24 +113,48 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
             </div>
 
             <div style={{ marginBottom: '32px' }}>
-              <div className="progress-bar-track" style={{ height: '10px', background: 'rgba(255,255,255,0.05)' }}>
-                <div
-                  className="progress-bar-fill"
-                  style={{
-                    width: `${tierProgress(word.baseScore ?? 0, word.status) * 100}%`,
-                    background: NEXT_COLOR[word.status],
-                    boxShadow: `0 0 15px ${NEXT_COLOR[word.status]}44`
-                  }}
-                />
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span style={{ fontSize: '0.75rem', color: 'white', fontWeight: 900 }}>NEURAL RESONANCE: {word.baseScore}/1000</span>
+                <span style={{ fontSize: '0.65rem', color: 'var(--gold)', fontWeight: 800 }}>{STATUS_META[word.status].label}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
-                <span style={{ fontSize: '0.75rem', color: 'white', fontWeight: 900 }}>{word.baseScore} NEURAL PTS</span>
-                {word.status !== 'mastered' && (
-                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700 }}>
+              
+              <div style={{ display: 'grid', gap: '12px' }}>
+                {(['noun', 'verb', 'mod'] as const).map(role => {
+                  const score = word.roleMatrix?.[role] || 0;
+                  const lowest = Math.min(word.roleMatrix.noun, word.roleMatrix.verb, word.roleMatrix.mod);
+                  const isLocked = score >= lowest + 100 && score < 333;
+                  const progress = (score / 333) * 100;
+                  const color = role === 'noun' ? 'var(--blue)' : role === 'verb' ? 'var(--pink)' : 'var(--amber)';
+
+                  return (
+                    <div key={role}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.55rem', textTransform: 'uppercase', marginBottom: '4px', fontWeight: 900, letterSpacing: '0.1em' }}>
+                        <span style={{ color: isLocked ? '#666' : 'white' }}>{role === 'mod' ? 'modifier' : role} {isLocked && '🔒'}</span>
+                        <span style={{ color }}>{score} / 333</span>
+                      </div>
+                      <div className="progress-bar-track" style={{ height: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '100px', overflow: 'hidden' }}>
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${progress}%` }}
+                          style={{
+                            height: '100%',
+                            background: color,
+                            boxShadow: `0 0 10px ${color}44`
+                          }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              
+              {word.status !== 'mastered' && (
+                <div style={{ marginTop: '12px', textAlign: 'right' }}>
+                  <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 700 }}>
                     NEXT SYNC: {STATUS_META[NEXT_STATUS[word.status]!].label.toUpperCase()}
                   </span>
-                )}
-              </div>
+                </div>
+              )}
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '32px' }}>

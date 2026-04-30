@@ -172,8 +172,13 @@ export default function InstructionsPanel({ onClose }: Props) {
         </Section>
 
         <Section title="YOUR WORDS" emoji="📖">
-          <p style={{ marginBottom: '16px' }}>Every word has a score from 0 to 1000. <span style={{ color: 'white', fontWeight: 800 }}>Score = status.</span></p>
+          <p style={{ marginBottom: '16px' }}>The <span style={{ color: 'var(--gold)', fontWeight: 800 }}>Neural Resonance System</span> tracks your brain's connection to each word across three distinct nodes: <span style={{ color: 'white' }}>Noun</span>, <span style={{ color: 'white' }}>Verb</span>, and <span style={{ color: 'white' }}>Modifier</span>.</p>
           
+          <div style={{ background: 'rgba(255,255,255,0.02)', padding: '16px', borderRadius: '8px', border: '1px solid #222', marginBottom: '24px' }}>
+             <div style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--gold)', marginBottom: '10px' }}>TRI-NODE MATRIX</div>
+             <p style={{ fontSize: '0.75rem', margin: 0 }}>Total Mastery (0-1000) is the sum of these three nodes. To master a word, you must use it in all three roles.</p>
+          </div>
+
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '24px' }}>
             {[
               { s: 'not_started', r: '0–200' },
@@ -191,40 +196,35 @@ export default function InstructionsPanel({ onClose }: Props) {
           </div>
 
           <div style={{ display: 'grid', gap: '10px', marginBottom: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'rgba(34,197,94,0.05)', borderRadius: '4px' }}>
-              <span style={{ color: '#22c55e', fontWeight: 900 }}>✅ CORRECT USAGE</span>
-              <span style={{ color: '#22c55e' }}>SCORE UP</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'rgba(239,68,68,0.05)', borderRadius: '4px' }}>
-              <span style={{ color: '#ef4444', fontWeight: 900 }}>❌ ERRORS / STRUGGLES</span>
-              <span style={{ color: '#ef4444' }}>SCORE DOWN</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'rgba(255,255,255,0.02)', borderRadius: '4px' }}>
-              <span style={{ color: '#888', fontWeight: 900 }}>⏰ 48HRS IDLE</span>
-              <span style={{ color: '#888' }}>-15 PTS (DECAY)</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', padding: '10px 12px', background: 'rgba(34,197,94,0.05)', borderRadius: '4px', borderLeft: '3px solid #22c55e' }}>
+              <span style={{ color: '#22c55e', fontWeight: 900, fontSize: '0.65rem' }}>SYNC RATE (XP BONUSES)</span>
+              <ul style={{ margin: 0, paddingLeft: '15px', fontSize: '0.7rem', color: '#ccc' }}>
+                <li><span style={{ color: 'white' }}>Base Sync (+10):</span> Standard correct usage.</li>
+                <li><span style={{ color: 'white' }}>Structural Sync (+25):</span> Correct use of 'e', 'la', or 'pi'.</li>
+                <li><span style={{ color: 'white' }}>Lore Sync (2.0x):</span> Referencing your personal background.</li>
+              </ul>
             </div>
           </div>
 
           <div style={{ display: 'flex', gap: '10px', marginBottom: '24px' }}>
-            <div style={{ flex: 1, padding: '10px', borderRadius: '4px', background: 'rgba(239,68,68,0.1)', border: '1px solid #ef4444' }}>
-              <div style={{ fontSize: '0.6rem', fontWeight: 900, color: '#ef4444', marginBottom: '2px' }}>🩸 BLEEDING</div>
-              <div style={{ fontSize: '0.65rem', opacity: 0.7 }}>Lost 50+ pts in 48hrs. Needs attention.</div>
+            <div style={{ flex: 1, padding: '10px', borderRadius: '4px', background: 'rgba(239,68,68,0.05)', border: '1px solid #7f1d1d' }}>
+              <div style={{ fontSize: '0.6rem', fontWeight: 900, color: '#f87171', marginBottom: '2px' }}>🔒 NODE LOCK</div>
+              <div style={{ fontSize: '0.65rem', opacity: 0.7 }}>A node stops gaining points if it's 100+ ahead of your lowest node for that word. Balance is mandatory.</div>
             </div>
-            <div style={{ flex: 1, padding: '10px', borderRadius: '4px', background: 'rgba(34,197,94,0.1)', border: '1px solid #22c55e' }}>
-              <div style={{ fontSize: '0.6rem', fontWeight: 900, color: '#22c55e', marginBottom: '2px' }}>🛡️ HARDENED</div>
-              <div style={{ fontSize: '0.65rem', opacity: 0.7 }}>Mastered + immune to decay. Earned.</div>
+            <div style={{ flex: 1, padding: '10px', borderRadius: '4px', background: 'rgba(34,197,94,0.05)', border: '1px solid #166534' }}>
+              <div style={{ fontSize: '0.6rem', fontWeight: 900, color: '#4ade80', marginBottom: '2px' }}>🛡️ HARDENING</div>
+              <div style={{ fontSize: '0.65rem', opacity: 0.7 }}>Nodes at 950+ pts are immune to neural decay.</div>
             </div>
           </div>
 
-          <ul style={{ paddingLeft: '16px', fontSize: '0.8rem', color: '#888', display: 'grid', gap: '10px' }}>
-            <li><strong style={{ color: 'white' }}>ROLE MASTERY:</strong> Words can be used as nouns, verbs, or modifiers. Demonstrate all roles → bonus points.</li>
-            <li><strong style={{ color: 'white' }}>🎯 PROVE IT:</strong> Find it on the Dashboard. Get a word, write a sentence offline. jan Lina reviews it next session.</li>
-            <li><strong style={{ color: 'white' }}>CONFUSION PAIRS:</strong> If you mix up two words repeatedly, jan Lina flags them for separation practice.</li>
-          </ul>
+          <div style={{ padding: '12px', borderRadius: '8px', background: 'rgba(59,130,246,0.1)', border: '1px solid #3b82f6' }}>
+            <div style={{ fontSize: '0.6rem', fontWeight: 900, color: '#60a5fa', marginBottom: '4px' }}>⚡ GRID CHARGE</div>
+            <p style={{ fontSize: '0.65rem', margin: 0, opacity: 0.8 }}>Completing a Roadmap node "charges" your grid, freezing all decay for 24 hours.</p>
+          </div>
         </Section>
 
         <Section title="YOUR PROGRESS" emoji="🏆">
-          <p style={{ marginBottom: '20px' }}><span style={{ color: 'var(--gold)', fontWeight: 800 }}>XP</span> = the sum of all your word scores × frequency multipliers. Common words like 'li' and 'mi' are worth more.</p>
+          <p style={{ marginBottom: '20px' }}>Your <span style={{ color: 'var(--gold)', fontWeight: 800 }}>XP</span> represents your total resonance with the language. It scales up to 100,000 for the highest honor.</p>
           
           <div style={{ textAlign: 'center', marginBottom: '12px', fontSize: '0.7rem', color: '#666', fontWeight: 800 }}>
             CURRENT XP: <span style={{ color: 'white' }}>{summary.xp.toLocaleString()}</span>
@@ -254,11 +254,6 @@ export default function InstructionsPanel({ onClose }: Props) {
           </div>
 
           <div style={{ marginBottom: '32px' }}>
-             <h4 style={{ fontSize: '0.65rem', color: 'var(--gold)', letterSpacing: '0.1em', marginBottom: '8px' }}>CEREMONIAL RANKS</h4>
-             <p style={{ fontSize: '0.8rem', color: '#888' }}>Some titles can't be bought with XP — they're earned. Master 10 words → <span style={{ color: 'white' }}>The Initiate</span>. 30-day streak → <span style={{ color: 'white' }}>The Consistent One</span>. Master all 137 → <span style={{ color: 'white' }}>jan Sonja</span>.</p>
-          </div>
-
-          <div style={{ marginBottom: '32px' }}>
             <h4 style={{ fontSize: '0.65rem', color: 'var(--gold)', letterSpacing: '0.1em', marginBottom: '12px' }}>🔥 STREAK BONUSES</h4>
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
               {[
@@ -273,27 +268,6 @@ export default function InstructionsPanel({ onClose }: Props) {
                 </div>
               ))}
             </div>
-            <p style={{ fontSize: '0.75rem', marginTop: '12px', opacity: 0.6 }}>🛡️ <strong style={{ color: 'white' }}>Streak Shields:</strong> Earn one every 7 days (max 2). Shield absorbs a missed day.</p>
-          </div>
-
-          <div style={{ marginBottom: '32px' }}>
-            <h4 style={{ fontSize: '0.65rem', color: 'var(--gold)', letterSpacing: '0.1em', marginBottom: '12px' }}>SESSION GRADES</h4>
-            <div style={{ display: 'flex', gap: '10px' }}>
-              {[
-                { l: 'S', c: 'var(--gold)' },
-                { l: 'A', c: '#22c55e' },
-                { l: 'B', c: '#3b82f6' },
-                { l: 'C', c: '#666' }
-              ].map(g => (
-                <div key={g.l} style={{ width: '32px', height: '32px', borderRadius: '50%', background: g.c, color: 'black', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '1rem' }}>{g.l}</div>
-              ))}
-            </div>
-            <p style={{ fontSize: '0.75rem', marginTop: '8px', opacity: 0.6 }}>S = 500+ XP or a new Mastered word.</p>
-          </div>
-
-          <div style={{ padding: '16px', borderRadius: '8px', background: 'rgba(255,255,255,0.02)', border: '1px solid #333' }}>
-            <div style={{ fontSize: '0.65rem', color: 'var(--gold)', fontWeight: 900, marginBottom: '4px' }}>WEEKLY CHALLENGES</div>
-            <p style={{ fontSize: '0.75rem', margin: 0, opacity: 0.8 }}>Every Monday, a new challenge appears on your Dashboard. Complete it for bonus XP. jan Lina knows about it and will help when she can.</p>
           </div>
         </Section>
 

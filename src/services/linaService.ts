@@ -83,6 +83,8 @@ export interface ProposedChange {
   type: 'vocab' | 'concept' | 'node' | 'vocab_production' | 'vocab_recognition' | 'confusion' | 'example';
   id: string;
   newStatus?: MasteryStatus;
+  role?: 'noun' | 'verb' | 'mod';
+  points?: number;
   wordB?: string;
   exampleSentence?: string;
 }
@@ -239,14 +241,24 @@ export function buildTutorPrompt(
 
     FORMAT FOR PROPOSED CHANGES:
     ---
-    CHANGE: vocab | [word_id] | [new_status]
+    CHANGE: vocab | [word_id] | [role] | [points]
     CHANGE: concept | [concept_id] | [new_status]
-    CHANGE: vocab_production | [word_id] | [new_status]
-    CHANGE: vocab_recognition | [word_id] | [new_status]
     CONFUSION: [wordA] | [wordB]
     EXAMPLE: [word_id] | [toki pona sentence] ([english translation])
     ---
-    Statuses: introduced, practicing, confident, mastered.
+    Roles: noun, verb, mod.
+    Points: typically 10-50 based on Sync Rate.
+
+    YOUR RULES FOR NEURAL RESONANCE (SCORING):
+    Identify which Role (noun, verb, or mod) the student used for a word and award points based on their "Sync Rate":
+    1. Base Sync (+10 pts): Standard correct usage.
+    2. Structural Sync (+25 pts): Correct use of 'e', 'la', or 'pi' in the same sentence.
+    3. Lore Sync (2.0x multiplier): Referencing their personal background/lore.
+    Example: CHANGE: vocab | moku | verb | 20 (Base + Lore Sync)
+    Example: CHANGE: vocab | tomo | noun | 35 (Base + Structural Sync)
+    
+    IMPORTANT: You have full visibility of the student's status. If a word role node is maxed (333), focus on other roles.
+
 
     YOUR RULES FOR CURRICULUM NODES:
     If the current session is a structured lesson, and the student has demonstrated mastery of the CONCEPT or TOPIC (even if no specific vocabulary was required), you may propose completing the node:
@@ -352,14 +364,24 @@ export function buildChatPrompt(
 
     FORMAT FOR PROPOSED CHANGES:
     ---
-    CHANGE: vocab | [word_id] | [new_status]
+    CHANGE: vocab | [word_id] | [role] | [points]
     CHANGE: concept | [concept_id] | [new_status]
-    CHANGE: vocab_production | [word_id] | [new_status]
-    CHANGE: vocab_recognition | [word_id] | [new_status]
     CONFUSION: [wordA] | [wordB]
     EXAMPLE: [word_id] | [toki pona sentence] ([english translation])
     ---
-    Statuses: introduced, practicing, confident, mastered.
+    Roles: noun, verb, mod.
+    Points: typically 10-50 based on Sync Rate.
+
+    YOUR RULES FOR NEURAL RESONANCE (SCORING):
+    Identify which Role (noun, verb, or mod) the student used for a word and award points based on their "Sync Rate":
+    1. Base Sync (+10 pts): Standard correct usage.
+    2. Structural Sync (+25 pts): Correct use of 'e', 'la', or 'pi' in the same sentence.
+    3. Lore Sync (2.0x multiplier): Referencing their personal background/lore.
+    Example: CHANGE: vocab | moku | verb | 20 (Base + Lore Sync)
+    Example: CHANGE: vocab | tomo | noun | 35 (Base + Structural Sync)
+    
+    IMPORTANT: You have full visibility of the student's status. If a word role node is maxed (333), focus on other roles.
+
 
     YOUR RULES FOR CURRICULUM NODES:
     If the current session is a structured lesson, and the student has demonstrated mastery of the CONCEPT or TOPIC (even if no specific vocabulary was required), you may propose completing the node:
@@ -403,14 +425,24 @@ export function buildMasteryCourtPrompt(vocabulary: any[], studentName: string, 
 
     FORMAT FOR PROPOSED CHANGES:
     ---
-    CHANGE: vocab | [word_id] | [new_status]
+    CHANGE: vocab | [word_id] | [role] | [points]
     CHANGE: concept | [concept_id] | [new_status]
-    CHANGE: vocab_production | [word_id] | [new_status]
-    CHANGE: vocab_recognition | [word_id] | [new_status]
     CONFUSION: [wordA] | [wordB]
     EXAMPLE: [word_id] | [toki pona sentence] ([english translation])
     ---
-    Statuses: introduced, practicing, confident, mastered.
+    Roles: noun, verb, mod.
+    Points: typically 10-50 based on Sync Rate.
+
+    YOUR RULES FOR NEURAL RESONANCE (SCORING):
+    Identify which Role (noun, verb, or mod) the student used for a word and award points based on their "Sync Rate":
+    1. Base Sync (+10 pts): Standard correct usage.
+    2. Structural Sync (+25 pts): Correct use of 'e', 'la', or 'pi' in the same sentence.
+    3. Lore Sync (2.0x multiplier): Referencing their personal background/lore.
+    Example: CHANGE: vocab | moku | verb | 20 (Base + Lore Sync)
+    Example: CHANGE: vocab | tomo | noun | 35 (Base + Structural Sync)
+    
+    IMPORTANT: You have full visibility of the student's status. If a word role node is maxed (333), focus on other roles.
+
 
     YOUR RULES FOR CURRICULUM NODES:
     If the current session is a structured lesson, and the student has demonstrated mastery of the CONCEPT or TOPIC (even if no specific vocabulary was required), you may propose completing the node:
@@ -519,7 +551,7 @@ export function stripProposedChanges(text: string) {
   return text.split('---')[0].trim();
 }
 
-// Parses "CHANGE: vocab | word_id | new_status" and "CHANGE: concept | id | new_status"
+// Parses "CHANGE: vocab | word_id | role | points", "CHANGE: concept | id | new_status", etc.
 export function parseProposedChanges(text: string): ProposedChange[] | null {
   const VALID_STATUSES: MasteryStatus[] = ['not_started', 'introduced', 'practicing', 'confident', 'mastered'];
   const changes: ProposedChange[] = [];
@@ -542,14 +574,26 @@ export function parseProposedChanges(text: string): ProposedChange[] | null {
 
     if (!/change:\s*(vocab|concept|node|vocab_production|vocab_recognition)/i.test(line)) continue;
     const parts = line.split('|').map(p => p.trim());
-    if (parts.length < 3) continue;
+    
     const typeMatch = parts[0].match(/change:\s*(vocab|concept|node|vocab_production|vocab_recognition)/i);
     if (!typeMatch) continue;
     const type = typeMatch[1].toLowerCase() as any;
     const id = parts[1];
-    const rawStatus = parts[2].toLowerCase().replace(/[^a-z_]/g, '') as MasteryStatus;
-    if (id && (VALID_STATUSES.includes(rawStatus) || rawStatus === 'mastered')) {
-      changes.push({ type, id, newStatus: rawStatus });
+
+    if (type === 'vocab' && parts.length >= 4) {
+      // New format: CHANGE: vocab | [word_id] | [role] | [points]
+      changes.push({
+        type: 'vocab',
+        id,
+        role: parts[2] as 'noun' | 'verb' | 'mod',
+        points: parseInt(parts[3], 10) || 0
+      });
+    } else if (parts.length >= 3) {
+      // legacy or other types: CHANGE: [type] | [id] | [new_status]
+      const rawStatus = parts[2].toLowerCase().replace(/[^a-z_]/g, '') as MasteryStatus;
+      if (id && (VALID_STATUSES.includes(rawStatus) || rawStatus === 'mastered')) {
+        changes.push({ type, id, newStatus: rawStatus });
+      }
     }
   }
   return changes.length > 0 ? changes : null;

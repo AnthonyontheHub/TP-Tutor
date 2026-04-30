@@ -25,6 +25,9 @@ function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: Maste
   const staticData = vocabContent[v.word] || {};
   const aiData = (aiVocabCache as Record<string, any>)[v.word.toLowerCase()] || {};
 
+  // Distribute initial score across roles
+  const perRole = Math.floor(score / 3);
+
   return {
     id: v.word,
     word: v.word,
@@ -32,7 +35,7 @@ function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: Maste
     meanings: TOKI_PONA_DICTIONARY[v.word.toLowerCase()] || '',
     type: v.type,
     baseScore: score,
-    confidenceScore: score,
+    roleMatrix: { noun: perRole, verb: perRole, mod: perRole },
     status: v.status,
     weight: v.weight,
     useCount: 0,
@@ -41,7 +44,6 @@ function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: Maste
     sessionNotes: v.sessionNotes,
     aiExplanation: aiData.aiExplanation || '',
     aiExamples: aiData.aiExamples,
-    partOfSpeechScores: { noun: 0, verb: 0, modifier: 0 },
     lastReviewed: new Date().toISOString(),
     scoreHistory: [],
     hardened: false,
@@ -255,8 +257,8 @@ const defaultCommonPhrases = [
 interface MasteryActions {
   applyScoreUpdate: (nodeId: string, points: number, context: string) => void;
   calculateDecay: () => void;
-  applyScoreDeltas: (deltas: { wordId: string; delta: number }[]) => void;
-  updateVocabStatus: (wordIdOrText: string, status: MasteryStatus) => void;
+  applyScoreDeltas: (deltas: { wordId: string; role?: keyof RoleMatrix; delta: number }[]) => void;
+  updateVocabStatus: (wordIdOrText: string, role: keyof RoleMatrix, points: number) => void;
   cycleWordStatus: (wordId: string) => void;
   setLastUpdated: (date: string) => void;
   savePhrase: (phrase: string | SavedPhrase) => void;
@@ -301,6 +303,7 @@ interface MasteryActions {
   updateVocabAIContent: (wordId: string, content: { aiExplanation?: string; aiExamples?: Record<string, string> }) => void;
   updateSessionNotes: (wordId: string, notes: string) => void;
   resetProgress: () => void;
+  chargeGrid: () => void;
 
   // Feature 5
   recordLearningDay: (date: string) => void;
@@ -345,6 +348,7 @@ interface MasteryActions {
 interface MasteryState {
   userId: string | null;
   studentName: string;
+  totalXP: number;
   profile: UserProfile;
   reviewVibe: ReviewVibe;
   profileImage: string;
@@ -371,6 +375,7 @@ interface MasteryState {
   showCircuitPaths: boolean;
   knowledgeCheckFrequency: 'daily' | 'session' | 'never';
   lastKnowledgeCheckDate: string;
+  gridChargeUntil: string | null;
 
   // New Features
   completedActivities: Record<string, { id: string, stats?: { score: number, total: number } }[]>;
@@ -459,6 +464,7 @@ export const useMasteryStore = create<MasteryStore>()(
     (set, get) => ({
       userId: null,
       studentName: '',
+      totalXP: 0,
       profile: defaultProfile,
       reviewVibe: null,
       profileImage: '',
@@ -481,6 +487,7 @@ export const useMasteryStore = create<MasteryStore>()(
       showCircuitPaths: true,
       knowledgeCheckFrequency: 'session',
       lastKnowledgeCheckDate: '',
+      gridChargeUntil: null,
       cloudSynced: false,
       commonPhrases: defaultCommonPhrases,
       songs: defaultSongs,
@@ -579,6 +586,7 @@ export const useMasteryStore = create<MasteryStore>()(
           completedNodeIds: [...new Set([...state.completedNodeIds, nodeId])]
         }));
         get().refreshCurriculumStatus();
+        get().chargeGrid();
         void get().syncToCloud();
       },
 
@@ -738,32 +746,51 @@ export const useMasteryStore = create<MasteryStore>()(
         void get().syncToCloud();
       },
 
+      chargeGrid: () => {
+        const until = new Date();
+        until.setHours(until.getHours() + 24);
+        set({ gridChargeUntil: until.toISOString() });
+        void get().syncToCloud();
+      },
+
       calculateDecay: () => {
         const now = new Date();
+        const chargeUntil = get().gridChargeUntil;
+        if (chargeUntil && now < new Date(chargeUntil)) {
+          console.log("Decay frozen: Grid is charged.");
+          return;
+        }
+
         const FORTY_EIGHT_HOURS = 48 * 60 * 60 * 1000;
         set((state) => ({
           vocabulary: state.vocabulary.map((w) => {
-            if (w.hardened) return w;
             const last = new Date(w.lastReviewed || 0).getTime();
-            if (now.getTime() - last > FORTY_EIGHT_HOURS) {
-              const decayAmount = -15; 
-              const newScore = clamp(w.baseScore - 15, 0, 1000);
-              if (newScore === w.baseScore) return w;
-              
-              const history = [{ date: now.toISOString(), change: decayAmount, reason: 'decay' }, ...(w.scoreHistory || [])].slice(0, 5);
-              const recentDrops = history.filter(h => h.change < 0 && (now.getTime() - new Date(h.date).getTime() < 48 * 3600000));
-              const totalDrop = Math.abs(recentDrops.reduce((acc, h) => acc + h.change, 0));
+            if (now.getTime() - last <= FORTY_EIGHT_HOURS) return w;
 
-              return {
-                ...w,
-                baseScore: newScore,
-                confidenceScore: newScore,
-                status: scoreToStatus(newScore),
-                scoreHistory: history,
-                isBleeding: totalDrop > 50
-              };
-            }
-            return w;
+            let updatedMatrix = { ...w.roleMatrix };
+            let totalDecay = 0;
+
+            (['noun', 'verb', 'mod'] as const).forEach(role => {
+              if (updatedMatrix[role] < 950) {
+                const prev = updatedMatrix[role];
+                updatedMatrix[role] = Math.max(0, prev - 5); // Decay 5 points per role if not hardened
+                totalDecay += (prev - updatedMatrix[role]);
+              }
+            });
+
+            if (totalDecay === 0) return w;
+
+            const newScore = Object.values(updatedMatrix).reduce((a, b) => a + b, 0);
+            const history = [{ date: now.toISOString(), change: -totalDecay, reason: 'neural_decay' }, ...(w.scoreHistory || [])].slice(0, 5);
+            
+            return {
+              ...w,
+              roleMatrix: updatedMatrix,
+              baseScore: newScore,
+              status: scoreToStatus(newScore),
+              scoreHistory: history,
+              isBleeding: totalDecay > 10
+            };
           })
         }));
         void get().syncToCloud();
@@ -794,7 +821,7 @@ export const useMasteryStore = create<MasteryStore>()(
         const now = new Date().toISOString();
         const { xpMultiplier, pendingComebackBonus } = get();
         let comebackApplied = false;
-        let totalXPChange = 0;
+        let sessionXPChange = 0;
 
         set((state) => {
           const updatedVocab = state.vocabulary.map((w, idx) => {
@@ -817,23 +844,32 @@ export const useMasteryStore = create<MasteryStore>()(
                comebackApplied = true;
             }
 
-            totalXPChange += effectiveDelta;
+            const targetRole = d.role || (w.partOfSpeech.toLowerCase().includes('verb') ? 'verb' : (w.partOfSpeech.toLowerCase().includes('adj') ? 'mod' : 'noun')) as keyof RoleMatrix;
+            
+            // NODE LOCKING: Role cannot gain points if > 100 ahead of lowest
+            const lowestRoleScore = Math.min(w.roleMatrix.noun, w.roleMatrix.verb, w.roleMatrix.mod);
+            if (effectiveDelta > 0 && w.roleMatrix[targetRole] >= lowestRoleScore + 100) {
+              console.log(`Node Locked: ${w.word} ${targetRole} is too far ahead.`);
+              effectiveDelta = 0;
+            }
 
-            const newScore = clamp((w.baseScore ?? 0) + effectiveDelta, 0, 1000);
-            const historyReason = (pendingComebackBonus && idx === 0) ? 'manual_delta + comeback_bonus' : 'manual_delta';
+            const updatedMatrix = { ...w.roleMatrix };
+            updatedMatrix[targetRole] = clamp(updatedMatrix[targetRole] + effectiveDelta, 0, 333); // Each role ~1/3 of 1000
+            const newScore = Object.values(updatedMatrix).reduce((a, b) => a + b, 0);
+            
+            sessionXPChange += effectiveDelta;
+
+            const historyReason = (pendingComebackBonus && idx === 0) ? 'neural_resonance + comeback_bonus' : 'neural_resonance';
             
             const newStatus = scoreToStatus(newScore);
             if (newStatus === 'mastered' && w.status !== 'mastered') {
                setTimeout(() => get().awardBadge('first_master'), 0);
             }
-            if (newStatus === 'practicing' && w.status === 'introduced') {
-               setTimeout(() => get().progressChallenge(1, 'word_progression'), 0);
-            }
 
             return {
               ...w,
+              roleMatrix: updatedMatrix,
               baseScore: newScore,
-              confidenceScore: newScore,
               status: newStatus,
               useCount: (w.useCount ?? 0) + 1,
               lastReviewed: now,
@@ -842,46 +878,42 @@ export const useMasteryStore = create<MasteryStore>()(
           });
 
           const insightEntry = {
-            label: deltas.length === 1 ? deltas[0].wordId.toUpperCase() : "SESSION INSIGHTS",
-            change: Math.round(totalXPChange),
+            label: deltas.length === 1 ? deltas[0].wordId.toUpperCase() : "SESSION SYNC",
+            change: Math.round(sessionXPChange),
             timestamp: now
           };
 
           return {
             vocabulary: updatedVocab,
+            totalXP: state.totalXP + Math.round(sessionXPChange),
             masteryHistory: [insightEntry, ...(state.masteryHistory || [])].slice(0, 50),
             pendingComebackBonus: false
           };
         });
 
-        if (comebackApplied) {
-          get().awardBadge('comeback');
-        }
-
+        if (comebackApplied) get().awardBadge('comeback');
         get().refreshCurriculumStatus();
         get().recordActivity();
         void get().syncToCloud();
       },
 
-      updateVocabStatus: (wordIdOrText, status) => {
+      updateVocabStatus: (wordIdOrText, role, points) => {
         const now = new Date().toISOString();
         set((state) => ({
           vocabulary: state.vocabulary.map((w) => {
             if (w.id !== wordIdOrText && w.word.toLowerCase() !== wordIdOrText.toLowerCase()) return w;
             
-            if (status === 'practicing' && w.status === 'introduced') {
-              setTimeout(() => get().progressChallenge(1, 'word_progression'), 0);
-            }
+            const updatedMatrix = { ...w.roleMatrix };
+            updatedMatrix[role] = clamp(updatedMatrix[role] + points, 0, 333);
+            const newScore = Object.values(updatedMatrix).reduce((a, b) => a + b, 0);
 
-            const targetScore = STATUS_MIDPOINT[status];
-            const diff = targetScore - (w.baseScore || 0);
             return { 
               ...w, 
-              baseScore: targetScore, 
-              confidenceScore: targetScore, 
-              status,
+              roleMatrix: updatedMatrix,
+              baseScore: newScore, 
+              status: scoreToStatus(newScore),
               lastReviewed: now,
-              scoreHistory: [{ date: now, change: diff, reason: 'status_override' }, ...(w.scoreHistory || [])].slice(0, 5)
+              scoreHistory: [{ date: now, change: points, reason: 'neural_override' }, ...(w.scoreHistory || [])].slice(0, 5)
             };
           }),
         }));
@@ -1704,17 +1736,16 @@ export const useMasteryStore = create<MasteryStore>()(
       setLessonFilter: (wordIds) => set({ lessonFilter: wordIds }),
 
       getStatusSummary: () => {
-        const { vocabulary } = get();
-        const summary = { not_started: 0, introduced: 0, practicing: 0, confident: 0, mastered: 0, xp: 0 };
+        const { vocabulary, totalXP } = get();
+        const summary = { not_started: 0, introduced: 0, practicing: 0, confident: 0, mastered: 0, xp: totalXP };
         for (const word of vocabulary) {
           summary[word.status]++;
-          const multiplier = WORD_FREQUENCY[word.word.toLowerCase()] ?? 1.0;
-          summary.xp += (word.baseScore || 0) * multiplier;
         }
-        summary.xp = Math.round(summary.xp);
-        const level = Math.floor(summary.xp / 500) + 1;
         
-        const rank = [...SMALL_RANKS].reverse().find(r => summary.xp >= r.xpThreshold) || SMALL_RANKS[0];
+        // 100,000 XP scale level calculation
+        const level = Math.floor(totalXP / 1000) + 1;
+        
+        const rank = [...SMALL_RANKS].reverse().find(r => totalXP >= r.xpThreshold) || SMALL_RANKS[0];
         const rankTitle = rank.title;
 
         return { ...summary, level, rankTitle };
@@ -1791,9 +1822,9 @@ export const useMasteryStore = create<MasteryStore>()(
 
           await setDoc(doc(db, 'users', targetId), sanitize({
             vocabulary: partialVocab,
-            curriculums, lastUpdated, studentName, profile, profileImage,
+            curriculums, lastUpdated, studentName, totalXP, profile, profileImage,
             savedPhrases, currentStreak, lastActiveDate, hasCompletedSetup, currentPositionNodeId, isMainProfile,
-            widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, songs, commonPhrases,
+            widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, gridChargeUntil, songs, commonPhrases,
             lastStreakCheck, learningDays, completedNodeIds, seenIntroductions, confusionPairs, pendingProveItResponses,
             earnedCeremonialRanks, lastSmallRankTitle, earnedBadges, totalProveItSubmitted,
             streakShields, xpMultiplier, lastStreakMilestone, pendingComebackBonus, sessionXPRecord,
@@ -1922,7 +1953,7 @@ export const useMasteryStore = create<MasteryStore>()(
               }
 
               // Handle Migration to baseScore (0-1000)
-              let baseScore = w.baseScore;
+              let baseScore = (w.baseScore as number);
               if (baseScore === undefined) {
                 // If we only have confidenceScore (0-500), map it
                 if (typeof w.confidenceScore === 'number') {
@@ -1932,12 +1963,14 @@ export const useMasteryStore = create<MasteryStore>()(
                 }
               }
 
-              return { 
-                ...w, 
+              const roleMatrix = (w.roleMatrix as RoleMatrix) || { noun: Math.floor(baseScore / 3), verb: Math.floor(baseScore / 3), mod: Math.floor(baseScore / 3) };
+
+              return {
+                ...w,
                 baseScore,
-                confidenceScore: baseScore, // sync legacy
-                useCount, 
-                frequencyRank, 
+                roleMatrix,
+                useCount,
+                frequencyRank,
                 type,
                 weight,
                 meanings,
@@ -1945,10 +1978,8 @@ export const useMasteryStore = create<MasteryStore>()(
                 aiExplanation: (w.aiExplanation as string) || aiData?.aiExplanation || '',
                 aiExamples: (w.aiExamples as Record<string, string>) || aiData?.aiExamples,
                 partOfSpeech: w.partOfSpeech || (base?.partOfSpeech ?? ''),
-                partOfSpeechScores: w.partOfSpeechScores || { noun: 0, verb: 0, modifier: 0 },
                 lastReviewed: w.lastReviewed || new Date().toISOString(),
                 scoreHistory: w.scoreHistory || [],
-
                 // Always hydrate from ground truth in code
                 phonetic: staticData.phonetic || '',
                 syllables: staticData.syllables || [],
@@ -1999,6 +2030,8 @@ export const useMasteryStore = create<MasteryStore>()(
             cloudSynced: true,
             vocabulary,
             curriculums: mergedCurriculums,
+            totalXP: data.totalXP || 0,
+            gridChargeUntil: data.gridChargeUntil || null,
             lastUpdated: data.lastUpdated || '',
             savedPhrases: data.savedPhrases || [],
             currentStreak: data.currentStreak || 0,

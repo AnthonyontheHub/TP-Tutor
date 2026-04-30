@@ -311,6 +311,13 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
   }
 
   async function finalizeSessionAndSave() {
+    const sessionData = useChatStore.getState().sessions.find(s => s.id === sessionId);
+    if (!sessionData) return;
+    const deltas = sessionData.sessionDeltas;
+    
+    // Clear deltas in store immediately to prevent double application
+    updateSession(sessionId, { sessionDeltas: [] });
+
     const lastAsstMsg = messages.filter(m => m.role === 'assistant').pop();
     if (lastAsstMsg && lastAsstMsg.raw) {
        const summaryNotes = parseSessionSummaryNotes(lastAsstMsg.raw);
@@ -319,30 +326,23 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
        }
     }
 
-    const deltas = sessionDeltas;
-
     // XP Calculation for Recap
     let totalXP = 0;
     const wordsMoved: { word: string; oldStatus: MasteryStatus; newStatus: MasteryStatus; hardened?: boolean; roleMastered: boolean }[] = [];
     
     for (const change of deltas) {
       const vocabWord = vocabulary.find(v => v.id === change.id || v.word.toLowerCase() === change.id.toLowerCase());
-      const multiplier = WORD_FREQUENCY[vocabWord?.word.toLowerCase() || ''] ?? 1.0;
       
-      if (change.newStatus) {
-         const oldScore = vocabWord?.baseScore || 0;
-         const newScore = STATUS_MIDPOINT[change.newStatus];
-         let diff = newScore - oldScore;
-         if (diff > 0) diff *= xpMultiplier;
-         totalXP += diff * multiplier;
-         
-         wordsMoved.push({
-           word: vocabWord?.word || change.id,
-           oldStatus: vocabWord?.status || 'not_started',
-           newStatus: change.newStatus,
-           hardened: vocabWord?.hardened,
-           roleMastered: false // Simplified for now
-         });
+      if (change.type === 'vocab' && change.points) {
+        totalXP += change.points;
+        if (vocabWord) {
+          wordsMoved.push({
+            word: vocabWord.word,
+            oldStatus: vocabWord.status,
+            newStatus: vocabWord.status, // will be updated after application
+            roleMastered: false
+          });
+        }
       }
     }
     totalXP = Math.round(totalXP);
@@ -359,12 +359,17 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
     }
     
     for (const change of deltas) {
-      if (change.type === 'vocab' && change.newStatus) updateVocabStatus(change.id, change.newStatus);
-      if (change.type === 'vocab_production' && change.newStatus) updateProductionStatus(change.id, change.newStatus);
-      if (change.type === 'vocab_recognition' && change.newStatus) updateRecognitionStatus(change.id, change.newStatus);
-      if (change.type === 'confusion' && change.wordB) recordConfusion(change.id, change.wordB);
-      if (change.type === 'example' && change.exampleSentence) setPinnedExample(change.id, change.exampleSentence);
-      if (change.type === 'node' && (change.newStatus === 'mastered' || change.newStatus === 'confident')) completeNode(change.id);
+      if (change.type === 'vocab' && change.role && change.points) {
+        updateVocabStatus(change.id, change.role, change.points);
+      } else if (change.type === 'concept' && change.newStatus) {
+        // Concept updates still use status for now
+      } else if (change.type === 'confusion' && change.wordB) {
+        recordConfusion(change.id, change.wordB);
+      } else if (change.type === 'example' && change.exampleSentence) {
+        setPinnedExample(change.id, change.exampleSentence);
+      } else if (change.type === 'node' && (change.newStatus === 'mastered' || change.newStatus === 'confident')) {
+        completeNode(change.id);
+      }
     }
     
     setLastUpdated(new Date().toLocaleDateString());
@@ -393,10 +398,10 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
       title: session?.title || 'Session Summary',
       context: chatContext,
       xpEarned: totalXP,
-      grade: totalXP > 500 || wordsMoved.some(w => w.newStatus === 'mastered') ? 'S' : totalXP > 250 ? 'A' : totalXP > 100 ? 'B' : totalXP > 0 ? 'C' : null,
-      wordsChanged: wordsMoved.map(w => ({ word: w.word, fromStatus: w.oldStatus, toStatus: w.newStatus })),
+      grade: totalXP > 300 ? 'S' : totalXP > 150 ? 'A' : totalXP > 50 ? 'B' : totalXP > 0 ? 'C' : null,
+      wordsChanged: wordsMoved.map(w => ({ word: w.word, fromStatus: w.oldStatus, toStatus: vocabulary.find(v => v.word === w.word)?.status || w.oldStatus })),
       smallRankAtClose: getStatusSummary().rankTitle,
-      sessionRecapText: '', // Will be filled if needed, but SessionRecap doesn't strictly need it from log
+      sessionRecapText: '', 
       badgesEarned: newBadges,
       ceremonialRanksEarned: newRanks,
       streakAtClose: currentStreak,

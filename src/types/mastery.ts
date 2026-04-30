@@ -139,10 +139,10 @@ export interface ScoreHistoryEntry {
   reason: string;
 }
 
-export interface PartOfSpeechScores {
+export interface RoleMatrix {
   noun: number;
   verb: number;
-  modifier: number;
+  mod: number;
 }
 
 // ─── Linguistic & Teaching Types ────────────────────────────────────────
@@ -231,7 +231,7 @@ export interface VocabWord {
   // baseScore is the source of truth (0–1000).
   // status is derived from it via scoreToStatus() and kept in sync.
   baseScore: number;
-  confidenceScore: number; // Legacy support
+  roleMatrix: RoleMatrix;
   status: MasteryStatus;
   weight?: MasteryWeight;
   useCount: number;
@@ -242,7 +242,6 @@ export interface VocabWord {
   aiExamples?: Record<string, string>;
 
   // Deep Knowledge Scoring
-  partOfSpeechScores: PartOfSpeechScores;
   lastReviewed: string; // ISO timestamp
   scoreHistory: ScoreHistoryEntry[];
   hardened: boolean;
@@ -366,16 +365,12 @@ export interface Badge {
 }
 
 export const SMALL_RANKS: SmallRank[] = [
-  { xpThreshold: 0,      title: 'jan lili' },
-  { xpThreshold: 500,    title: 'jan pi toki' },
-  { xpThreshold: 1500,   title: 'jan toki' },
-  { xpThreshold: 3000,   title: 'jan sona lili' },
-  { xpThreshold: 5000,   title: 'jan sona' },
-  { xpThreshold: 8000,   title: 'jan sona mute' },
-  { xpThreshold: 12000,  title: 'jan pona pi toki pona' },
-  { xpThreshold: 18000,  title: 'jan pi nasin toki' },
-  { xpThreshold: 25000,  title: 'jan wawa pi toki pona' },
-  { xpThreshold: 35000,  title: 'jan sona sewi' },
+  { xpThreshold: 0,       title: 'jan lili' },
+  { xpThreshold: 1500,    title: 'jan toki' },
+  { xpThreshold: 8000,    title: 'jan sona mute' },
+  { xpThreshold: 25000,   title: 'jan wawa pi toki pona' },
+  { xpThreshold: 50000,   title: 'jan sona sewi' },
+  { xpThreshold: 100000,  title: 'jan Sonja' },
 ];
 
 export const CEREMONIAL_RANKS: CeremonialRank[] = [
