@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, LogOut, Loader2 } from 'lucide-react';
 import { generateChallenge, evaluateInput } from '../../services/geminiService';
 

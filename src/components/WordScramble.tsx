@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCcw, CheckCircle2, ChevronRight, Trophy } from 'lucide-react';
 import { useMasteryStore } from '../store/masteryStore';
 
