@@ -593,6 +593,19 @@ export function detectSessionTitle(prompt: string): string {
   return 'jan LINA LINK';
 }
 
+export async function fetchEnglishToTokiPona(apiKey: string, text: string) {
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
+  const prompt = `Translate this English sentence to Toki Pona: "${text}". Provide ONLY the direct Toki Pona translation, no other text, quotes, or explanation.`;
+  try {
+    const result = await model.generateContent(prompt);
+    return result.response.text().trim();
+  } catch (e) {
+    console.error('jan Lina EN->TP Translation Error:', e);
+    return null;
+  }
+}
+
 export async function fetchSessionRecap(
   apiKey: string,
   changes: ProposedChange[]

@@ -12,10 +12,13 @@ import ChallengeWidget from './ChallengeWidget';
 import OperationalIntelligenceWidget from './OperationalIntelligenceWidget';
 import { SessionOverlay } from './SessionOverlay';
 import TrainingHub from './TrainingHub';
+import DailyStoicPopup from './DailyStoicPopup';
+import DailyStoicHistory from './DailyStoicHistory';
 import { fetchQuickTranslation, resolveApiKey, buildOfflineTranslation } from '../services/linaService';
 import type { MasteryStatus, VocabWord } from '../types/mastery';
 import type { AppPanel } from '../App';
 import { motion, AnimatePresence } from 'framer-motion';
+import { BookOpen } from 'lucide-react';
 
 export type DashboardView = 'vocab' | 'roadmap' | 'archive';
 
@@ -30,6 +33,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
 
   const [activeView, setActiveView] = useState<DashboardView>('vocab');
   const [showTrainingHub, setShowTrainingHub] = useState(false);
+  const [isStoicHistoryOpen, setIsStoicHistoryOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
   const [posFilter, setPosFilter] = useState('All');
   const [sortMode, setSortMode] = useState<string>('alphabetical');
@@ -309,9 +313,16 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
             )}
           </div>
           <button onClick={() => onTogglePanel('settings')} className="dashboard__icon-btn" style={getActiveStyle('settings')}>⚙️</button>
+          <button 
+            onClick={() => setIsStoicHistoryOpen(true)} 
+            className="dashboard__icon-btn" 
+            title="Stoic Archive"
+            style={{ ...getActiveStyle('archive' as any) }}
+          >
+            <BookOpen size={18} />
+          </button>
         </div>
       </header>
-
       <main className="dashboard__main" style={{ paddingBottom: '12rem' }}>
         <div style={{ marginBottom: '20px' }}>
           <ChallengeWidget />
@@ -557,6 +568,13 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
       {showTrainingHub && (
         <TrainingHub onClose={() => setShowTrainingHub(false)} />
       )}
+
+      <DailyStoicPopup />
+      <DailyStoicHistory 
+        isOpen={isStoicHistoryOpen} 
+        onClose={() => setIsStoicHistoryOpen(false)} 
+        onAskLina={onAskLina} 
+      />
     </div>
   );
 }
