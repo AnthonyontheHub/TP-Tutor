@@ -35,6 +35,7 @@ function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: Maste
     meanings: TOKI_PONA_DICTIONARY[v.word.toLowerCase()] || '',
     type: v.type,
     baseScore: score,
+    confidenceScore: score,
     roleMatrix: { noun: perRole, verb: perRole, mod: perRole },
     status: v.status,
     weight: v.weight,
@@ -1563,10 +1564,11 @@ export const useMasteryStore = create<MasteryStore>()(
         await get().syncToCloud();
       },
 
-      resetProgress: () => {
+      resetProgress: async () => {
         set({
           vocabulary: mappedVocabulary,
           curriculums: curriculumRoadmap,
+          totalXP: 0,
           activeCurriculumId: null,
           activeModuleId: null,
           currentPositionNodeId: 'phi_sim',
@@ -1592,7 +1594,7 @@ export const useMasteryStore = create<MasteryStore>()(
           earnedCeremonialRanks: [],
         });
         get().refreshCurriculumStatus();
-        void get().syncToCloud();
+        await get().syncToCloud(undefined, true, true);
       },
 
       deletePhrase: async (id) => {
@@ -1609,6 +1611,7 @@ export const useMasteryStore = create<MasteryStore>()(
         set({
           studentName: '',
           profile: defaultProfile,
+          totalXP: 0,
           reviewVibe: null,
           profileImage: '',
           savedPhrases: [],
@@ -1655,6 +1658,7 @@ export const useMasteryStore = create<MasteryStore>()(
         set({
           studentName: '',
           profile: defaultProfile,
+          totalXP: 0,
           reviewVibe: null,
           profileImage: '',
           curriculums: curriculumRoadmap,
@@ -1865,6 +1869,7 @@ export const useMasteryStore = create<MasteryStore>()(
         set({
           studentName: name,
           profile: { ...defaultProfile, firstName: name },
+          totalXP: 0,
           reviewVibe: null,
           profileImage: '',
           savedPhrases: [],
@@ -1896,7 +1901,7 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       syncToCloud: async (explicitUserId, merge = true, force = false) => {
-        const { vocabulary, curriculums, lastUpdated, studentName, profile, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, isMainProfile, widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, cloudSynced, songs, commonPhrases, lastStreakCheck, learningDays, confusionPairs, pendingProveItResponses,
+        const { vocabulary, curriculums, lastUpdated, studentName, totalXP, profile, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, isMainProfile, widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, cloudSynced, gridChargeUntil, songs, commonPhrases, lastStreakCheck, learningDays, confusionPairs, pendingProveItResponses,
             earnedCeremonialRanks, lastSmallRankTitle, earnedBadges, totalProveItSubmitted,
             streakShields, xpMultiplier, lastStreakMilestone, pendingComebackBonus, sessionXPRecord,
             sessionLog, currentChallenge, completedChallenges, pendingRankAcknowledgement, newRankUnlocked,
@@ -2019,6 +2024,7 @@ export const useMasteryStore = create<MasteryStore>()(
             set({
               studentName: initialName,
               profile: { ...defaultProfile, firstName: initialName },
+              totalXP: 0,
               profileImage: initialProfileImage || '',
               savedPhrases: [],
               currentStreak: 0,
