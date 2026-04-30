@@ -390,7 +390,7 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
     // Commit Log
     commitSessionLog({
       date: new Date().toISOString(),
-      title: currentSession?.title || 'Session Summary',
+      title: session?.title || 'Session Summary',
       context: chatContext,
       xpEarned: totalXP,
       grade: totalXP > 500 || wordsMoved.some(w => w.newStatus === 'mastered') ? 'S' : totalXP > 250 ? 'A' : totalXP > 100 ? 'B' : totalXP > 0 ? 'C' : null,

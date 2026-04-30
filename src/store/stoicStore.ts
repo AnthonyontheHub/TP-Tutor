@@ -57,10 +57,14 @@ export const useStoicStore = create<StoicStore>()(
           const data = docSnap.data() as StoicQuote;
           set({ todayQuote: data, lastFetchedDate: today });
         } else {
-          // Fetch from API
+          // Fetch from API via proxy to bypass CORS
           try {
-            const response = await fetch('https://dailystoic.pl/quote/text_en.json');
-            const quoteData = await response.json();
+            const apiUrl = 'https://dailystoic.pl/quote/text_en.json';
+            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`;
+            
+            const response = await fetch(proxyUrl);
+            const proxyData = await response.json();
+            const quoteData = JSON.parse(proxyData.contents);
             const english = quoteData.text;
 
             // Translate via Lina
