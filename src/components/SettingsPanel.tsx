@@ -183,8 +183,8 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
         <h2 style={{ fontSize: '0.8rem', fontWeight: 900, opacity: 0.5, marginBottom: '20px', color: '#ef4444' }}>DANGER ZONE</h2>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px' }}>
           <button onClick={handleResetProgress} className="btn-settings" style={{ background: '#1a1a1a', border: '1px solid #d4af37', color: '#d4af37' }}>Reset Progress (Keep Profile)</button>
-          <button onClick={handleRandomize} className="btn-settings" style={{ background: '#1a1a1a', border: '1px solid #d4af37', color: '#d4af37' }}>Randomize Everything</button>
-          <button onClick={handleMasterAll} className="btn-settings" style={{ background: '#1a1a1a', border: '1px solid #d4af37', color: '#d4af37' }}>Master Everything</button>
+          <button onClick={handleRandomize} className="btn-settings" style={{ background: '#1a1a1a', border: '1px solid #d4af37', color: '#d4af37' }}>Randomize Word XP Points</button>
+          <button onClick={handleMasterAll} className="btn-settings" style={{ background: '#1a1a1a', border: '1px solid #d4af37', color: '#d4af37' }}>Master Everything (Full XP)</button>
           
           <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px dashed #7f1d1d' }}>
             <p className="settings-label" style={{ color: '#7f1d1d', marginBottom: '12px' }}>TOTAL WIPE</p>

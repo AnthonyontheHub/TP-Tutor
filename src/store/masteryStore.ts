@@ -1693,32 +1693,106 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       randomizeVocab: async () => {
-        set((state) => ({
-          vocabulary: state.vocabulary.map(w => {
+        const now = new Date().toISOString();
+        set((state) => {
+          let newTotalXP = 0;
+          const updatedVocab = state.vocabulary.map(w => {
             const score = Math.floor(Math.random() * 1001);
-            return { ...w, baseScore: score, confidenceScore: score, status: scoreToStatus(score) };
-          }),
-          curriculums: state.curriculums.map(level => ({
+            newTotalXP += score;
+            
+            // Distribute score across roles fairly randomly but capped at 334
+            let remaining = score;
+            const noun = clamp(Math.floor(Math.random() * Math.min(remaining, 335)), 0, 334);
+            remaining -= noun;
+            const verb = clamp(Math.floor(Math.random() * Math.min(remaining, 335)), 0, 334);
+            remaining -= verb;
+            const mod = clamp(remaining, 0, 334);
+            
+            const balancedScore = noun + verb + mod; // Sum might be slightly different due to clamps
+
+            return { 
+              ...w, 
+              baseScore: balancedScore, 
+              confidenceScore: balancedScore, 
+              status: scoreToStatus(balancedScore),
+              roleMatrix: { noun, verb, mod },
+              lastReviewed: now,
+              useCount: Math.floor(Math.random() * 50)
+            };
+          });
+
+          const updatedCurriculums = state.curriculums.map(level => ({
             ...level,
             nodes: level.nodes.map(node => {
               const rand = Math.random();
               const status = rand > 0.6 ? 'mastered' : (rand > 0.3 ? 'active' : 'locked');
               return { ...node, status };
             })
-          }))
-        }));
+          }));
+
+          const insightEntry = {
+            label: "CHAOS INJECTION",
+            change: 0,
+            timestamp: now
+          };
+
+          return {
+            vocabulary: updatedVocab,
+            totalXP: newTotalXP,
+            curriculums: updatedCurriculums,
+            masteryHistory: [insightEntry, ...(state.masteryHistory || [])].slice(0, 50)
+          };
+        });
         get().refreshCurriculumStatus();
         await get().syncToCloud();
       },
 
       masterAllVocab: async () => {
-        set((state) => ({
-          vocabulary: state.vocabulary.map(w => ({ ...w, baseScore: 975, confidenceScore: 975, status: 'mastered' as MasteryStatus })),
-          curriculums: state.curriculums.map(level => ({
+        const now = new Date().toISOString();
+        set((state) => {
+          let newTotalXP = 0;
+          const updatedVocab = state.vocabulary.map(w => {
+            // Mastered range is 950-1000
+            const score = 950 + Math.floor(Math.random() * 51);
+            newTotalXP += score;
+            
+            const perRole = Math.floor(score / 3);
+            const remainder = score % 3;
+            const roleMatrix = {
+              noun: perRole + (remainder > 0 ? 1 : 0),
+              verb: perRole + (remainder > 1 ? 1 : 0),
+              mod: perRole
+            };
+
+            return { 
+              ...w, 
+              baseScore: score, 
+              confidenceScore: score, 
+              status: 'mastered' as MasteryStatus,
+              roleMatrix,
+              lastReviewed: now,
+              hardened: true
+            };
+          });
+
+          const updatedCurriculums = state.curriculums.map(level => ({
             ...level,
             nodes: level.nodes.map(node => ({ ...node, status: 'mastered' as const }))
-          }))
-        }));
+          }));
+
+          const insightEntry = {
+            label: "ASCENSION",
+            change: 0,
+            timestamp: now
+          };
+
+          return {
+            vocabulary: updatedVocab,
+            totalXP: newTotalXP,
+            curriculums: updatedCurriculums,
+            masteryHistory: [insightEntry, ...(state.masteryHistory || [])].slice(0, 50)
+          };
+        });
         get().refreshCurriculumStatus();
         await get().syncToCloud();
       },
