@@ -13,7 +13,7 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
   const {
     resetAsNewUser, masterAllVocab, randomizeVocab, isMainProfile,
     knowledgeCheckFrequency, setKnowledgeCheckFrequency, clearAllSavedPhrases,
-    resetLearningProgress, fogOfWar, setFogOfWar
+    resetLearningProgress, fogOfWar, setFogOfWar, resetProgress
   } = useMasteryStore();
   const { logout } = useAuthStore();
 
@@ -43,15 +43,15 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
     onClose();
   };
 
-  const handleResetLearning = async () => {
-    if(confirm("Reset learning progress? Your profile will be kept, but vocabulary and streaks will be reset to zero.")) {
-      await resetLearningProgress();
+  const handleResetProgress = async () => {
+    if(confirm("Reset all lesson progress and vocabulary? Your profile and saved phrases will be kept.")) {
+      resetProgress();
       onClose();
     }
   };
 
-  const handleReset = async () => {
-    if(confirm("Wipe all local and cloud data? Your profile and learning history will be cleared, but you will stay signed in.")) {
+  const handleNukeAccount = async () => {
+    if(confirm("WARNING: Reset EVERYTHING and start over as a new user? All progress, phrases, and your profile will be completely erased.")) {
       await resetAsNewUser();
       onClose();
     }
@@ -182,17 +182,20 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
       <section style={{ marginBottom: '40px' }}>
         <h2 style={{ fontSize: '0.8rem', fontWeight: 900, opacity: 0.5, marginBottom: '20px', color: '#ef4444' }}>DANGER ZONE</h2>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px' }}>
-          <button onClick={handleRandomize} className="btn-settings" style={{ background: '#1a1a1a', border: '1px solid #d4af37', color: '#d4af37' }}>RANDOMIZE NEURAL SYNC</button>
-          <button onClick={handleMasterAll} className="btn-settings" style={{ background: '#1a1a1a', border: '1px solid #d4af37', color: '#d4af37' }}>FORCE TOTAL MASTERY</button>
-          <button onClick={handleClearPhrases} className="btn-settings" style={{ background: '#1a1a1a', border: '1px solid #d4af37', color: '#d4af37' }}>CLEAR ALL SAVED PHRASES</button>
-          <button onClick={handleResetLearning} className="btn-settings" style={{ background: '#1a1a1a', border: '1px solid #d4af37', color: '#d4af37' }}>RESET LEARNING PROGRESS</button>
-          <button 
-            onClick={handleReset} 
-            className="btn-settings" 
-            style={{ background: '#1a1a1a', border: '1px solid #d4af37', color: '#d4af37' }}
-          >
-            WIPE EVERYTHING
-          </button>
+          <button onClick={handleResetProgress} className="btn-settings" style={{ background: '#1a1a1a', border: '1px solid #d4af37', color: '#d4af37' }}>Reset Progress (Keep Profile)</button>
+          <button onClick={handleRandomize} className="btn-settings" style={{ background: '#1a1a1a', border: '1px solid #d4af37', color: '#d4af37' }}>Randomize Everything</button>
+          <button onClick={handleMasterAll} className="btn-settings" style={{ background: '#1a1a1a', border: '1px solid #d4af37', color: '#d4af37' }}>Master Everything</button>
+          
+          <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px dashed #7f1d1d' }}>
+            <p className="settings-label" style={{ color: '#7f1d1d', marginBottom: '12px' }}>TOTAL WIPE</p>
+            <button 
+              onClick={handleNukeAccount} 
+              className="btn-settings" 
+              style={{ background: '#450a0a', color: '#f87171', border: '1px solid #7f1d1d' }}
+            >
+              Nuke Account & Erase Profile
+            </button>
+          </div>
         </div>
       </section>
 

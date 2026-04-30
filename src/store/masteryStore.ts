@@ -300,6 +300,7 @@ interface MasteryActions {
   switchProfile: (name: string) => void;
   updateVocabAIContent: (wordId: string, content: { aiExplanation?: string; aiExamples?: Record<string, string> }) => void;
   updateSessionNotes: (wordId: string, notes: string) => void;
+  resetProgress: () => void;
 
   // Feature 5
   recordLearningDay: (date: string) => void;
@@ -1494,6 +1495,38 @@ export const useMasteryStore = create<MasteryStore>()(
         await get().syncToCloud();
       },
 
+      resetProgress: () => {
+        set({
+          vocabulary: mappedVocabulary,
+          curriculums: curriculumRoadmap,
+          activeCurriculumId: null,
+          activeModuleId: null,
+          currentPositionNodeId: 'phi_sim',
+          completedNodeIds: [],
+          completedActivities: {},
+          currentStreak: 0,
+          lastActiveDate: '',
+          lastStreakCheck: '',
+          learningDays: [],
+          seenIntroductions: [],
+          confusionPairs: [],
+          sessionLog: [],
+          currentChallenge: null,
+          completedChallenges: [],
+          pendingRankAcknowledgement: null,
+          pendingProveItResponses: [],
+          totalProveItSubmitted: 0,
+          sessionXPRecord: 0,
+          masteryHistory: [],
+          newRankUnlocked: null,
+          lastSmallRankTitle: 'jan lili',
+          earnedBadges: [],
+          earnedCeremonialRanks: [],
+        });
+        get().refreshCurriculumStatus();
+        void get().syncToCloud();
+      },
+
       deletePhrase: async (id) => {
         set((state) => ({
           savedPhrases: state.savedPhrases.filter(p =>
@@ -1596,7 +1629,15 @@ export const useMasteryStore = create<MasteryStore>()(
           vocabulary: state.vocabulary.map(w => {
             const score = Math.floor(Math.random() * 1001);
             return { ...w, baseScore: score, confidenceScore: score, status: scoreToStatus(score) };
-          })
+          }),
+          curriculums: state.curriculums.map(level => ({
+            ...level,
+            nodes: level.nodes.map(node => {
+              const rand = Math.random();
+              const status = rand > 0.6 ? 'mastered' : (rand > 0.3 ? 'active' : 'locked');
+              return { ...node, status };
+            })
+          }))
         }));
         get().refreshCurriculumStatus();
         await get().syncToCloud();

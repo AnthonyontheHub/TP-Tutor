@@ -65,6 +65,13 @@ export default function Roadmap({ onAskLina, isSandboxMode }: Props) {
     }
   };
 
+  const handleNodeClick = (node: CurriculumNode) => {
+    const isCurrent = node.id === currentPositionNodeId;
+    const isLocked = node.status === 'locked' && !isCurrent;
+    if (isLocked && fogOfWar === 'Strict') return;
+    setSelectedNode(node);
+  };
+
   return (
     <div className="roadmap-viewport" style={{ position: 'relative', width: '100%', overflow: 'hidden' }}>
       <style>{`
