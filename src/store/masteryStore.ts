@@ -716,9 +716,9 @@ export const useMasteryStore = create<MasteryStore>()(
             const remainder = points % 3;
             const updatedMatrix = { ...w.roleMatrix };
             
-            updatedMatrix.noun = clamp(updatedMatrix.noun + perRole + (remainder > 0 ? 1 : 0), 0, 333);
-            updatedMatrix.verb = clamp(updatedMatrix.verb + perRole + (remainder > 1 ? 1 : 0), 0, 333);
-            updatedMatrix.mod = clamp(updatedMatrix.mod + perRole, 0, 333);
+            updatedMatrix.noun = clamp(updatedMatrix.noun + perRole + (remainder > 0 ? 1 : 0), 0, 334);
+            updatedMatrix.verb = clamp(updatedMatrix.verb + perRole + (remainder > 1 ? 1 : 0), 0, 334);
+            updatedMatrix.mod = clamp(updatedMatrix.mod + perRole, 0, 334);
             
             const newScore = Object.values(updatedMatrix).reduce((a, b) => a + b, 0);
             const actualPoints = newScore - w.baseScore;
@@ -1964,29 +1964,90 @@ export const useMasteryStore = create<MasteryStore>()(
           }
 
           const vocabulary = (data.vocabulary || mappedVocabulary).map(
-            (w: any) => {
+            (w: { word?: string; useCount?: number; frequencyRank?: number; type?: string; status?: MasteryStatus; confidenceScore?: number; [key: string]: unknown }) => {
               const base = mappedVocabulary.find(iv => iv.word === w.word);
+              const staticData = vocabContent[w.word || ''] || {};
+              const wordLower = (w.word || '').toLowerCase();
+              const aiData = (aiVocabCache as Record<string, any>)[wordLower] || {};
               const useCount = typeof w.useCount === 'number' ? w.useCount : 0;
               const frequencyRank = typeof w.frequencyRank === 'number' ? w.frequencyRank : (base?.frequencyRank ?? 999);
+              const type = w.type || (base?.type ?? 'word');
+              const weight = w.weight || base?.weight;
               
-              // If it has a score, trust the score and force the label to match
-              if (typeof w.confidenceScore === 'number') {
-                return { 
-                  ...w, 
-                  useCount, 
-                  frequencyRank, 
-                  status: scoreToStatus(w.confidenceScore) 
-                };
+              let sessionNotes = w.sessionNotes || '';
+              let meanings = w.meanings || (base?.meanings ?? '');
+
+              // DATA MIGRATION: If meanings is missing/generic and sessionNotes contains definition-like text
+              if ((!meanings || meanings === '') && sessionNotes.includes('.')) {
+                const parts = sessionNotes.split('.');
+                const firstPart = parts[0].trim();
+                // Check if the first part looks like a dictionary definition (no "Study Session" or "Learning" keywords)
+                if (!firstPart.match(/session|improvement|accuracy|mastery|learned/i)) {
+                   meanings = firstPart;
+                   sessionNotes = parts.slice(1).join('.').trim();
+                }
               }
-              
-              // Fallback if no score exists
-              const status: MasteryStatus = w.status || 'not_started';
-              return { 
-                ...w, 
-                confidenceScore: STATUS_MIDPOINT[status], 
-                status, 
-                useCount, 
-                frequencyRank 
+
+              // Handle Migration to baseScore (0-1000)
+              let baseScore = (w.baseScore as number);
+              let status: MasteryStatus;
+
+              // STRICT DERIVATION FROM CONFIDENCE SCORE
+              if (typeof w.confidenceScore === 'number') {
+                baseScore = w.confidenceScore;
+                status = scoreToStatus(w.confidenceScore);
+              } else if (baseScore !== undefined) {
+                status = scoreToStatus(baseScore);
+              } else {
+                status = w.status || 'not_started';
+                baseScore = STATUS_MIDPOINT[status];
+              }
+
+              const roleMatrix = (w.roleMatrix as RoleMatrix) || { 
+                noun: Math.floor(baseScore / 3), 
+                verb: Math.floor(baseScore / 3), 
+                mod: Math.floor(baseScore / 3) 
+              };
+
+              return {
+                ...w,
+                baseScore,
+                status,
+                roleMatrix,
+                useCount,
+                frequencyRank,
+                type,
+                weight,
+                meanings,
+                sessionNotes,
+                aiExplanation: (w.aiExplanation as string) || aiData?.aiExplanation || '',
+                aiExamples: (w.aiExamples as Record<string, string>) || aiData?.aiExamples,
+                partOfSpeech: w.partOfSpeech || (base?.partOfSpeech ?? ''),
+                lastReviewed: (w.lastReviewed as string) || new Date().toISOString(),
+                scoreHistory: (w.scoreHistory as ScoreHistoryEntry[]) || [],
+                // Always hydrate from ground truth in code
+                phonetic: staticData.phonetic || '',
+                syllables: staticData.syllables || [],
+                anchor: staticData.anchor || '',
+                semanticCluster: staticData.semanticCluster || [],
+                connotation: staticData.connotation || 'neutral',
+                roles: staticData.roles || [],
+                examples: staticData.examples || [],
+                collocations: staticData.collocations || [],
+                relatedWordIds: staticData.relatedWordIds || [],
+                boundaryNotes: staticData.boundaryNotes || [],
+                etymology: staticData.etymology || '',
+                mnemonic: staticData.mnemonic || '',
+                // User fields should remain as loaded from data
+                userMnemonic: w.userMnemonic || '',
+                userNotes: w.userNotes || '',
+                notes: w.notes || '',
+                customDefinition: w.customDefinition || '',
+                culturalNotes: staticData.culturalNotes || '',
+                avoidWhen: staticData.avoidWhen || '',
+                rolesMastered: w.rolesMastered || {},
+                hardened: !!w.hardened,
+                isBleeding: !!w.isBleeding
               };
             }
           );
