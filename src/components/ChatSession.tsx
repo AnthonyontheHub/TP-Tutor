@@ -303,8 +303,8 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
   }
 
   async function handleCloseWithoutSaving() {
-    if (messages.length > 0) {
-      if (!window.confirm("Abandon chat session? Progress and history will not be saved.")) return;
+    if (messages.length > 0 || sessionDeltas.length > 0) {
+      if (!window.confirm("Abandon chat session? Any pending progress calibrations will not be saved.")) return;
     }
     removeSession(sessionId);
     onEndSession();
@@ -585,10 +585,27 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
               </div>
             )}
           </div>
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <button 
+              onClick={finalizeSessionAndSave}
+              disabled={isLoading}
+              style={{ 
+                background: 'rgba(255, 191, 0, 0.1)', 
+                border: '1px solid var(--gold)', 
+                color: 'var(--gold)', 
+                fontSize: '0.65rem', 
+                cursor: 'pointer', 
+                fontWeight: 900,
+                padding: '4px 8px',
+                borderRadius: '4px',
+                letterSpacing: '0.05em'
+              }}
+            >
+              FINISH
+            </button>
             <button 
               onClick={onMinimize}
-              style={{ background: 'none', border: 'none', color: 'var(--gold)', fontSize: '0.8rem', cursor: 'pointer', fontWeight: 900 }}
+              style={{ background: 'none', border: 'none', color: '#666', fontSize: '0.8rem', cursor: 'pointer', fontWeight: 900 }}
             >
               {isMinimized ? 'EXPAND' : 'MINIMIZE'}
             </button>
@@ -597,7 +614,7 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
               style={{ 
                 background: 'none', 
                 border: 'none', 
-                color: 'var(--gold)', 
+                color: '#666', 
                 fontSize: '1.2rem', 
                 cursor: 'pointer',
                 padding: '8px',
@@ -685,7 +702,7 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
               letterSpacing: '0.1em'
             }}
           >
-            O PINI (END LESSON)
+            O PINI (GET SUMMARY & FINISH)
           </button>
         </div>
 
@@ -705,9 +722,9 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
               }
               return undefined;
             })()}
-            onClose={() => {
+            onClose={async () => {
+              await finalizeSessionAndSave();
               setShowSummary(false);
-              finalizeSessionAndSave();
             }}
           />
         )}

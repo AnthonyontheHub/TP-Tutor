@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const API_KEY = process.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
+const API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_MODEL = "gemini-2.5-flash"; // User specifically requested 2.5-flash
 
 async function getWords() {
@@ -46,7 +46,7 @@ Return ONLY a valid JSON object matching this exact format:
 
 async function main() {
   if (!API_KEY) {
-    console.error("No API key found. Please set VITE_GEMINI_API_KEY or GEMINI_API_KEY in .env");
+    console.error("No API key found. Please set GEMINI_API_KEY in .env");
     process.exit(1);
   }
 
