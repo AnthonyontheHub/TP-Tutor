@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Sparkles, ArrowRight, RotateCcw, CheckCircle2, XCircle, LogOut } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 
 interface Statement {
   statement: string;

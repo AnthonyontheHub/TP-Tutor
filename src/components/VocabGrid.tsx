@@ -15,7 +15,7 @@ interface Props {
 export default function VocabGrid({
   onAskLina, isSandboxMode, filterIds, hideToolbar = false
 }: Props) {
-  const { vocabulary, selectedWords, toggleWordSelection, addWordToSelection, setSelectedWords } = useMasteryStore();
+  const { vocabulary, selectedWords, toggleWordSelection, setSelectedWords } = useMasteryStore();
   const [drawerId, setDrawerId] = useState<string | null>(null);
 
   const handleCardClick = (word: VocabWord) => {

@@ -6,25 +6,11 @@ import { STATUS_META } from '../types/mastery';
 import type { VocabWord, MasteryStatus } from '../types/mastery';
 import { fetchDeepDiveExamples, resolveApiKey, stringifyUserContext } from '../services/linaService';
 
-const TIER_RANGES: Record<MasteryStatus, [number, number]> = {
-  not_started: [0,   200],
-  introduced:  [201, 500],
-  practicing:  [501, 750],
-  confident:   [751, 949],
-  mastered:    [950, 1000],
-};
 const NEXT_STATUS: Partial<Record<MasteryStatus, MasteryStatus>> = {
   not_started: 'introduced',
   introduced:  'practicing',
   practicing:  'confident',
   confident:   'mastered',
-};
-const NEXT_COLOR: Record<MasteryStatus, string> = {
-  not_started: '#a855f7',
-  introduced:  '#3b82f6',
-  practicing:  '#f59e0b',
-  confident:   '#22c55e',
-  mastered:    '#22c55e',
 };
 
 const WORD_EXTRA_DATA: Record<string, { etymology: string, neighbors: string[], compounds: string[] }> = {
@@ -38,14 +24,9 @@ const WORD_EXTRA_DATA: Record<string, { etymology: string, neighbors: string[], 
   'sona': { etymology: 'From Georgian: ცოდな (tsodna)', neighbors: ['nasa (Antonym-ish)', 'kute (Neighbor)'], compounds: ['sona pona (wisdom)', 'jan sona (expert)'] },
 };
 
-function tierProgress(score: number, status: MasteryStatus): number {
-  const [lo, hi] = TIER_RANGES[status];
-  if (hi === lo) return 1;
-  return Math.min(1, Math.max(0, (score - lo) / (hi - lo)));
-}
 
 export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isSandboxMode }: { isOpen: boolean; word?: VocabWord | null; onClose: () => void; onAskLina: (p: string) => void; isSandboxMode: boolean }) {
-  const { studentName, profile, lore, updateVocabAIContent } = useMasteryStore();
+  const { studentName, profile, updateVocabAIContent } = useMasteryStore();
   const [deepDive, setDeepDive] = useState<Record<string, string> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -58,7 +39,7 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
     const key = resolveApiKey();
     if (key && !isSandboxMode) {
       setIsLoading(true);
-      const userContext = stringifyUserContext(profile, lore);
+      const userContext = stringifyUserContext(profile);
       try {
         const results = await fetchDeepDiveExamples(key, word.word, userContext);
         if (results) {

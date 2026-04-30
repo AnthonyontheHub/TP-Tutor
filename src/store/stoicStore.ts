@@ -4,7 +4,6 @@ import { persist } from 'zustand/middleware';
 import { db } from '../services/firebase';
 import { doc, setDoc, getDoc, collection, query, orderBy, getDocs, limit } from 'firebase/firestore';
 import { resolveApiKey, fetchEnglishToTokiPona } from '../services/linaService';
-import { useMasteryStore } from './masteryStore';
 
 export interface StoicQuote {
   id: string; // YYYY-MM-DD

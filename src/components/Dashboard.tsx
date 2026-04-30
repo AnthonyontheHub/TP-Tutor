@@ -29,7 +29,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   isSandboxMode: boolean;
   chatCount: number;
 }) {
-  const { studentName, profile, profileImage, currentStreak, vocabulary, curriculums, reviewVibe, setReviewVibe, selectedWords, setSelectedWords, savePhrase, lessonFilter, setLessonFilter, calculateDecay, checkAssessments, knowledgeCheckFrequency, lastKnowledgeCheckDate, setLastKnowledgeCheckDate, currentPositionNodeId, recordActivityCompletion, activeActivity, setActiveActivity } = useMasteryStore();
+  const { studentName, profile, profileImage, currentStreak, vocabulary, curriculums, reviewVibe, setReviewVibe, selectedWords, setSelectedWords, savePhrase, lessonFilter, setLessonFilter, calculateDecay, checkAssessments, knowledgeCheckFrequency, lastKnowledgeCheckDate, setLastKnowledgeCheckDate, currentPositionNodeId } = useMasteryStore();
 
   const [activeView, setActiveView] = useState<DashboardView>('vocab');
   const [showTrainingHub, setShowTrainingHub] = useState(false);
@@ -48,7 +48,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   const [isAutoTranslating, setIsAutoTranslating] = useState(false);
   const [showSaveNote, setShowSaveNote] = useState(false);
   const [saveNoteInput, setSaveNoteInput] = useState('');
-  const [savedConfirm, setSavedConfirm] = useState(false);
+  const [, setSavedConfirm] = useState(false);
   const [showProveIt, setShowProveIt] = useState(false);
   const confirmTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 

@@ -1,5 +1,5 @@
 /* src/components/Discography.tsx */
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import type { Song, SongBlock } from '../types/discography';
 import { Music, ChevronLeft, Play } from 'lucide-react';

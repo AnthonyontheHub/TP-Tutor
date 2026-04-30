@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
-import { useAuthStore } from '../store/authStore';
-
 export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSandboxMode, onOpenLogbook, onOpenMasteryCourt }: {
   isOpen: boolean;
   onClose: () => void;
@@ -12,10 +10,9 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
 }) {
   const {
     resetAsNewUser, masterAllVocab, randomizeVocab, isMainProfile,
-    knowledgeCheckFrequency, setKnowledgeCheckFrequency, clearAllSavedPhrases,
-    resetLearningProgress, fogOfWar, setFogOfWar, resetProgress
+    knowledgeCheckFrequency, setKnowledgeCheckFrequency,
+    fogOfWar, setFogOfWar, resetProgress
   } = useMasteryStore();
-  const { logout } = useAuthStore();
 
   const [localSandbox, setLocalSandbox] = useState(isSandboxMode);
   const [localApiKey, setLocalApiKey] = useState(localStorage.getItem('TP_GEMINI_KEY') || '');
@@ -71,12 +68,6 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
     }
   };
 
-  const handleClearPhrases = async () => {
-    if(confirm("Clear all saved phrases? This will update your progress across all devices (unless Sandbox is ON).")) {
-      await clearAllSavedPhrases();
-      onClose();
-    }
-  };
 
   return (
     <div style={{ padding: '40px', background: 'var(--surface-opaque)', height: '100%', overflowY: 'auto' }}>
@@ -145,7 +136,7 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
             <span style={{ fontSize: '0.8rem', fontWeight: 900, opacity: 0.5 }}>KNOWLEDGE CHECK FREQUENCY</span>
             <select 
               value={localFreq}
-              onChange={(e) => setLocalFreq(e.target.value as any)}
+              onChange={(e) => setLocalFreq(e.target.value as 'daily' | 'session' | 'never')}
               className="settings-input"
               style={{ width: '100%', cursor: 'pointer', background: 'rgba(255,255,255,0.05)' }}
             >

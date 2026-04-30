@@ -5,6 +5,7 @@ import { useMasteryStore } from '../store/masteryStore';
 import { useChatStore } from '../store/chatStore';
 import type { ChatMessage } from '../store/chatStore';
 import { STATUS_MIDPOINT } from '../types/mastery';
+import type { MasteryStatus } from '../types/mastery';
 import {
   buildTutorPrompt, buildChatPrompt, buildMasteryCourtPrompt, streamCompletion, stripProposedChanges,
   parseProposedChanges, parseSessionSummaryNotes, resolveApiKey,
@@ -46,7 +47,6 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
   const [summaryText, setSummaryText] = useState('');
   const [sessionXP, setSessionXP] = useState(0);
   const [startingTotalXP, setStartingTotalXP] = useState(0);
-  const [userMsgCount, setUserMsgCount] = useState(0);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const yesterdayWasActive = useRef(false);
 
@@ -63,7 +63,6 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
   const setLastUpdated      = useMasteryStore(s => s.setLastUpdated);
   const studentName         = useMasteryStore(s => s.studentName);
   const profile             = useMasteryStore(s => s.profile);
-  const lore                = useMasteryStore(s => s.lore);
   const checkNodeReadiness  = useMasteryStore(s => s.checkNodeReadiness);
   const curriculums         = useMasteryStore(s => s.curriculums);
 
@@ -245,8 +244,8 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
     try {
       const key = resolveApiKey(overrideKey);
       const state = useMasteryStore.getState();
-      const userContext = stringifyUserContext(state.profile, state.lore);
-      const currentSession = useChatStore.getState().sessions.find(s => s.id === sessionId) as any;
+      const userContext = stringifyUserContext(state.profile);
+      const currentSession = useChatStore.getState().sessions.find(s => s.id === sessionId);
       const latestChatContext = currentSession?.context || 'GENERAL';
       const payload = currentSession?.contextPayload;
       const vibe = currentSession?.vibe ?? 'chill';
@@ -434,9 +433,8 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
       }
 
       const state = useMasteryStore.getState();
-      const userContext = stringifyUserContext(state.profile, state.lore);
-      const currentSession = useChatStore.getState().sessions.find(s => s.id === sessionId) as any;
-      const latestChatContext = currentSession?.context || 'GENERAL';
+      const userContext = stringifyUserContext(state.profile);
+      const currentSession = useChatStore.getState().sessions.find(s => s.id === sessionId);
       const vibe = currentSession?.vibe ?? 'chill';
       const activeNodes = state.curriculums.flatMap(l => l.nodes.map(n => ({ id: n.id, title: n.title, status: n.status, sessionNotes: '' })));
 
@@ -486,8 +484,8 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
     try {
       const key = resolveApiKey(overrideKey);
       const state = useMasteryStore.getState();
-      const userContext = stringifyUserContext(state.profile, state.lore);
-      const currentSession = useChatStore.getState().sessions.find(s => s.id === sessionId) as any;
+      const userContext = stringifyUserContext(state.profile);
+      const currentSession = useChatStore.getState().sessions.find(s => s.id === sessionId);
       const latestChatContext = currentSession?.context || 'GENERAL';
       const payload = currentSession?.contextPayload;
       const vibe = currentSession?.vibe ?? 'chill';
@@ -736,7 +734,7 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
 
         {showRecap && (
           <SessionRecap
-            sessionTitle={currentSession?.title || 'Session Summary'}
+            sessionTitle={session?.title || 'Session Summary'}
             totalXPEarned={sessionXP}
             prevTotalXP={startingTotalXP}
             xpMultiplier={xpMultiplier}

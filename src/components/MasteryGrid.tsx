@@ -132,7 +132,7 @@ export default function MasteryGrid({
   onAskLina, isSandboxMode, activeFilter, sortMode, sortDirection,
   setSortMode, setSortDirection
 }: Props) {
-  const { vocabulary, selectedWords, toggleWordSelection, addWordToSelection, setSelectedWords, lessonFilter } = useMasteryStore();
+  const { vocabulary, selectedWords, toggleWordSelection, setSelectedWords, lessonFilter } = useMasteryStore();
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [selectedPOS, setSelectedPOS] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');

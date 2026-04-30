@@ -1,5 +1,4 @@
 /* src/components/SentenceBuilder.tsx */
-import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
 

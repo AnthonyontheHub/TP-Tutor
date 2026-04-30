@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Sparkles, ArrowRight, CheckCircle2, XCircle, LogOut, Loader2, Brain, Send } from 'lucide-react';
+import { ArrowRight, LogOut, Loader2 } from 'lucide-react';
 import { generateChallenge, evaluateInput } from '../../services/geminiService';
 
 export const Essentializer = ({ userProfile, curriculumContext, onSessionEnd }) => {

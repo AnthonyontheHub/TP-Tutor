@@ -16,7 +16,6 @@ import type { Album } from '../types/discography';
 import { initialMasteryMap } from '../data/initialMasteryMap';
 import { curriculumRoadmap } from '../data/curriculum';
 import { vocabContent } from '../data/vocabContent';
-import { albumData } from '../data/albumData';
 import { TOKI_PONA_DICTIONARY, WORD_FREQUENCY } from '../data/tokiPonaDictionary';
 import aiVocabCache from '../data/aiVocabCache.json';
 
@@ -780,7 +779,7 @@ export const useMasteryStore = create<MasteryStore>()(
             const last = new Date(w.lastReviewed || 0).getTime();
             if (now.getTime() - last <= FORTY_EIGHT_HOURS) return w;
 
-            let updatedMatrix = { ...w.roleMatrix };
+            const updatedMatrix = { ...w.roleMatrix };
             let totalDecay = 0;
 
             (['noun', 'verb', 'mod'] as const).forEach(role => {
@@ -1070,7 +1069,7 @@ export const useMasteryStore = create<MasteryStore>()(
           let newShields = state.streakShields;
           let newLastStreakMilestone = state.lastStreakMilestone;
           let newPendingComebackBonus = state.pendingComebackBonus;
-          let shieldWasUsed = false;
+          let _shieldWasUsed = false;
 
           if (wasActiveYesterday) {
             newStreak += 1;
@@ -1084,7 +1083,7 @@ export const useMasteryStore = create<MasteryStore>()(
             // Missed a day
             if (newShields > 0) {
               newShields -= 1;
-              shieldWasUsed = true;
+              _shieldWasUsed = true;
               // Streak maintained by shield
             } else {
               // Comeback bonus check

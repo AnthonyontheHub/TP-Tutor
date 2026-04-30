@@ -1,5 +1,5 @@
 /* src/components/OperationalIntelligenceWidget.tsx */
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
 import type { MasteryStatus } from '../types/mastery';

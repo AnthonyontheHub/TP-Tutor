@@ -1,7 +1,6 @@
 /* src/components/TrainingHub.tsx */
-import React from 'react';
 import { motion } from 'framer-motion';
-import { X, Shield, Brain, Zap, Layers } from 'lucide-react';
+import { X, Shield } from 'lucide-react';
 import { useMasteryStore } from '../store/masteryStore';
 
 interface Props {

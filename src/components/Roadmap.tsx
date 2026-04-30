@@ -3,8 +3,7 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import NodeDossier from './NodeDossier';
-import ChallengeWidget from './ChallengeWidget';
-import type { CurriculumNode, SessionLogEntry, ReviewVibe } from '../types/mastery';
+import type { CurriculumNode, ReviewVibe } from '../types/mastery';
 import { Crown, Map, Lock, Sparkles, Brain, Zap } from 'lucide-react';
 
 interface Props {
@@ -12,7 +11,8 @@ interface Props {
   isSandboxMode: boolean;
 }
 
-export function getRoadmapLessonPrompt(curriculums: any[], currentPositionNodeId: string, reviewVibe: ReviewVibe | null) {
+type RoadmapLevelLite = { nodes: { id: string; title: string }[] };
+export function getRoadmapLessonPrompt(curriculums: RoadmapLevelLite[], currentPositionNodeId: string, reviewVibe: ReviewVibe | null) {
   const activeNode = curriculums.flatMap(l => l.nodes).find(n => n.id === currentPositionNodeId);
   const nodeTitle = activeNode?.title || 'Current Module';
 
@@ -28,10 +28,8 @@ export function getRoadmapLessonPrompt(curriculums: any[], currentPositionNodeId
 }
 
 export default function Roadmap({ onAskLina, isSandboxMode }: Props) {
-  const { curriculums, currentPositionNodeId, sessionLog, vocabulary, fogOfWar, showCircuitPaths } = useMasteryStore();
+  const { curriculums, currentPositionNodeId, vocabulary, fogOfWar, showCircuitPaths } = useMasteryStore();
   const [selectedNode, setSelectedNode] = useState<CurriculumNode | null>(null);
-  const [hoveredSession, setHoveredSession] = useState<SessionLogEntry | null>(null);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   const containerRef = useRef<HTMLDivElement>(null);
   const currentPositionRef = useRef<HTMLDivElement>(null);

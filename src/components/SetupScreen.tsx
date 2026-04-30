@@ -7,7 +7,7 @@ export default function SetupScreen() {
   const [step, setStep] = useState(1);
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
-  const [sex, setSex] = useState('');
+  const [sex, setSex] = useState<'Male' | 'Female' | 'Other' | ''>('');
   const [location, setLocation] = useState('');
   const [tempImg, setTempImg] = useState('');
   
@@ -20,7 +20,7 @@ export default function SetupScreen() {
   const handleFinish = () => {
     if (name.trim()) {
       setStudentName(name.trim());
-      updateProfile({ age, sex, locationString: location });
+      updateProfile({ age, sex: sex || null, locationString: location });
       if (tempImg) setProfileImage(tempImg);
       setHasCompletedSetup(true);
     }

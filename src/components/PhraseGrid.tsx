@@ -1,5 +1,5 @@
 /* src/components/PhraseGrid.tsx */
-import React, { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import type { MasteryStatus, CommonPhrase } from '../types/mastery';
 import { phraseData } from '../data/phraseData';
