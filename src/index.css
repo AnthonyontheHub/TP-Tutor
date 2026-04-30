@@ -1,9 +1,6 @@
 @font-face {
-  font-family: 'linja-pona';
-  src: url('https://cdn.jsdelivr.net/gh/jan-Lope/linja-pona@4.9/font/linja-pona.woff2') format('woff2');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
+  font-family: 'nasin-nanpa';
+  src: url('https://cdn.jsdelivr.net/gh/etbcor/nasin-nanpa@4.0.0/nasin-nanpa.otf') format('opentype');
 }
 
 @tailwind base;
@@ -44,7 +41,7 @@ html, body {
   color: var(--text);
   font-family: var(--font);
   height: 100%;
-  overflow: hidden;
+  overflow: visible;
 }
 
 #root {
@@ -75,7 +72,8 @@ select {
   flex: 1;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: auto;
+  min-height: 100dvh;
   width: 100%;
   background: var(--bg);
   background-image: 
@@ -209,7 +207,7 @@ select {
 
 .dashboard__main {
   flex: 1;
-  overflow-y: auto;
+  overflow-y: visible;
   padding: 20px;
   -webkit-overflow-scrolling: touch;
 }
@@ -391,7 +389,7 @@ select {
 .vocab-card {
   padding: 12px 10px;
   border-radius: 0;
-  border: 1px solid var(--border);
+  border: 0.5px solid var(--border);
   background: #111111;
   user-select: none;
   cursor: pointer;
@@ -404,9 +402,12 @@ select {
 }
 
 .vocab-card__bg-symbol {
-  font-family: 'linja-pona';
+  font-family: 'nasin-nanpa', sans-serif;
+  font-variant-ligatures: discretionary-ligatures;
+  font-feature-settings: "liga" on, "clig" on;
+  text-transform: lowercase;
   position: absolute;
-  top: 55%;
+  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 4.5rem;
@@ -414,7 +415,7 @@ select {
   color: white;
   pointer-events: none;
   z-index: 0;
-  text-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 }
 
 .vocab-card:hover {
@@ -642,10 +643,6 @@ button:active { transform: scale(0.96); }
 }
 
 /* Ensure dashboard__main has overflow-x hidden for overall layout stability */
-.dashboard__main {
-  overflow-x: hidden;
-}
-s overflow-x hidden for overall layout stability */
 .dashboard__main {
   overflow-x: hidden;
 }
