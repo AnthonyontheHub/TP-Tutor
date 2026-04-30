@@ -1,6 +1,6 @@
 /* src/components/NodeDossier.tsx */
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
 import type { CurriculumNode } from '../types/mastery';
 import WordDetailDrawer from './WordDetailDrawer';
@@ -16,6 +16,7 @@ interface Props {
 export default function NodeDossier({ node, onBack, onAskLina, isSandboxMode }: Props) {
   const { vocabulary, currentPositionNodeId, checkNodeReadiness, getNodeReadinessPercentage, completedActivities, setActiveActivity } = useMasteryStore();
   const [drawerId, setDrawerId] = useState<string | null>(null);
+  const [showInfographicModal, setShowInfographicModal] = useState(false);
 
   const isLocked = node.status === 'locked' && node.id !== currentPositionNodeId;
 
@@ -326,6 +327,42 @@ export default function NodeDossier({ node, onBack, onAskLina, isSandboxMode }: 
             </section>
           )}
 
+          {node.infographicUrl && (
+            <section>
+              <h3 style={{ color: '#888', fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.15em', marginBottom: '16px', borderBottom: '1px solid #222', paddingBottom: '8px' }}>ADDITIONAL TOOLS</h3>
+              <button 
+                onClick={() => setShowInfographicModal(true)}
+                style={{ 
+                  width: '100%', 
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  color: 'white',
+                  fontWeight: 900,
+                  fontSize: '0.9rem',
+                  padding: '16px',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '10px',
+                  transition: 'all 0.2s',
+                  letterSpacing: '0.05em'
+                }}
+                onMouseOver={e => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                  e.currentTarget.style.borderColor = 'var(--gold)';
+                }}
+                onMouseOut={e => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                }}
+              >
+                🖼️ VIEW INFOGRAPHIC
+              </button>
+            </section>
+          )}
+
           <section style={{ marginTop: '20px', paddingBottom: '60px' }}>
             <button 
               onClick={handlePracticeLina}
@@ -366,6 +403,75 @@ export default function NodeDossier({ node, onBack, onAskLina, isSandboxMode }: 
         onAskLina={onAskLina}
         isSandboxMode={isSandboxMode}
       />
+
+      <AnimatePresence>
+        {showInfographicModal && node.infographicUrl && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowInfographicModal(false)}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0, 0, 0, 0.9)',
+              backdropFilter: 'blur(20px)',
+              zIndex: 10000,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '40px',
+              cursor: 'zoom-out'
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              style={{
+                position: 'relative',
+                maxWidth: '100%',
+                maxHeight: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '20px'
+              }}
+            >
+              <img
+                src={node.infographicUrl}
+                alt="Infographic"
+                style={{
+                  maxWidth: '100%',
+                  maxHeight: 'calc(100vh - 120px)',
+                  objectFit: 'contain',
+                  borderRadius: '12px',
+                  boxShadow: '0 30px 60px rgba(0,0,0,0.5)',
+                  border: '1px solid rgba(255,255,255,0.1)'
+                }}
+              />
+              <button
+                onClick={(e) => { e.stopPropagation(); setShowInfographicModal(false); }}
+                style={{
+                  background: 'white',
+                  color: 'black',
+                  border: 'none',
+                  padding: '12px 32px',
+                  borderRadius: '100px',
+                  fontWeight: 900,
+                  fontSize: '0.8rem',
+                  letterSpacing: '0.1em',
+                  cursor: 'pointer',
+                  boxShadow: '0 10px 20px rgba(0,0,0,0.3)'
+                }}
+              >
+                CLOSE
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

@@ -110,3 +110,20 @@ Error for word "sewi": [GoogleGenerativeAI Error]: Error fetching from https://g
 [105/123] Generating for: supa
 [106/123] Generating for: suwi
 [107/123] Generating for: tan
+[108/123] Generating for: taso
+[109/123] Generating for: tawa
+[110/123] Generating for: telo
+[111/123] Generating for: tenpo
+[112/123] Generating for: tomo
+[113/123] Generating for: tonsi
+[114/123] Generating for: tu
+[115/123] Generating for: unpa
+[116/123] Generating for: uta
+[117/123] Generating for: utala
+[118/123] Generating for: walo
+[119/123] Generating for: wan
+[120/123] Generating for: waso
+[121/123] Generating for: wawa
+[122/123] Generating for: weka
+[123/123] Generating for: wile
+Done! Cache saved to /home/anthonyguera/TP-Tutor/src/data/aiVocabCache.json

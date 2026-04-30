@@ -294,6 +294,7 @@ export interface CurriculumNode {
   richContent?: ContentBlock[];
   visualFramework?: string;
   requiredWordIds?: string[];
+  infographicUrl?: string;
   suggestedMethod?: 'Jan Lina Chat' | 'Builder Drill' | 'Quiz';
   type?: 'Topic' | 'Drill' | 'Checkpoint';
   activities?: string[];

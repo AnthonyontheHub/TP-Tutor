@@ -854,5 +854,141 @@
       "advanced": "jan li moku e kili suwi mute la, ona li pilin pona. (When a person eats a lot of sweet fruit, they feel good.)"
     },
     "aiExplanation": "The word \"suwi\" extends beyond just the taste \"sweet.\" It also means cute, lovely, attractive, or pleasant. It can describe anything that brings a gentle, positive feeling, whether it's a taste, a sight, a sound, or a general sensation, making it a versatile term for 'delightful' or 'charming'."
+  },
+  "tan": {
+    "aiExamples": {
+      "simple": "ona li tan ma. (They are from the land.)",
+      "intermediate": "mi kama jo e wawa tan suno suli. (I get power from the big sun.)",
+      "advanced": "tan telo ike la, mi pakala e kon mi. (Because of bad water, I harm my spirit/breath.)"
+    },
+    "aiExplanation": "The word \"tan\" fundamentally points to origin, source, or cause. It can indicate a physical location something comes *from*, or explain *why* something happened by introducing the reason. Think of \"tan\" as answering the questions \"where did it come from?\" or \"what caused it?\""
+  },
+  "taso": {
+    "aiExamples": {
+      "simple": "mi taso. (Only me.)",
+      "intermediate": "mi pali, taso mi wile lape. (I work, but I want to sleep.)",
+      "advanced": "kili mute li lon supa la, mi moku taso e kili jelo. (If many fruits are on the table, I only eat the yellow fruit.)"
+    },
+    "aiExplanation": "taso is a versatile particle used to express contrast, limitation, or exclusivity. It can mean \"but\" or \"however,\" connecting two differing ideas, or \"only\" and \"just,\" indicating that something is restricted or unique. This flexibility allows it to both introduce exceptions and narrow the focus of a statement."
+  },
+  "tawa": {
+    "aiExamples": {
+      "simple": "mi tawa. (I go.)",
+      "intermediate": "ona li tawa tomo mi. (He/She goes to my house.)",
+      "advanced": "jan pona mi li tawa tomo sina la, sina pana e moku tawa ona. (If my friend goes to your house, you give food to him/her.)"
+    },
+    "aiExplanation": "tawa is a dynamic and incredibly versatile word. Its core meaning relates to movement, direction, and purpose, allowing it to function as a verb ('to move/go'), a preposition ('to/for/towards'), or even a modifier indicating motion. It's essential for expressing travel, giving things to someone, or indicating a recipient or beneficiary."
+  },
+  "telo": {
+    "aiExamples": {
+      "simple": "ni li telo. (This is water.)",
+      "intermediate": "telo seli li pona. (Hot water is good.)",
+      "advanced": "mi wile telo e kili la, mi tawa tomo telo. (If I want to water the fruit/vegetable, I go to the water building.)"
+    },
+    "aiExplanation": "telo primarily refers to water or any liquid. It can also act as a verb meaning \"to water,\" \"to wash with water,\" or \"to dilute.\" Due to its broad meaning, telo often needs modifiers like \"telo seli\" (hot water) or \"telo wawa\" (alcohol, strong liquid) to specify its type or context."
+  },
+  "tenpo": {
+    "aiExamples": {
+      "simple": "ni li tenpo. (This is time/a moment.)",
+      "intermediate": "tenpo suli li lon. (A long duration exists.)",
+      "advanced": "tenpo suno la mi musi e jan pona. (During the day, I play with friends.)"
+    },
+    "aiExplanation": "tenpo is a fundamental Toki Pona word meaning \"time, moment, period, duration, or event.\" It's incredibly versatile, acting as both a general concept of time and a specific instance. When combined with other words like \"suno\" (sun/light) or \"pimeja\" (dark), it specifies \"daytime\" or \"nighttime,\" respectively, illustrating its role in forming precise temporal expressions."
+  },
+  "tomo": {
+    "aiExamples": {
+      "simple": "ni li tomo. (This is a building.)",
+      "intermediate": "tomo telo li pona mute tawa mi. (The water building is very good for me.)",
+      "advanced": "mi lukin e tomo suli lon ma ni la mi pilin pona. (When I see a big building in this place, I feel good.)"
+    },
+    "aiExplanation": "toki! The word 'tomo' is quite broad, referring to any enclosed structure, be it a house, a room, a building, or even a tent. It primarily conveys the idea of a contained space that offers shelter or serves a particular purpose. Its exact meaning often becomes clear through context or by adding a modifying word, such as 'tomo moku' for a kitchen or restaurant, or 'tomo lape' for a bedroom."
+  },
+  "tonsi": {
+    "aiExamples": {
+      "simple": "mi tonsi. (I am non-binary.)",
+      "intermediate": "ona li tonsi suli. (They are very gender-nonconforming.)",
+      "advanced": "jan li pilin ante lon nasin tonsi la, ona li ken pana e sona sin tawa jan ale. (If a person feels different in a queer way, they can give new knowledge to everyone.)"
+    },
+    "aiExplanation": "tonsi describes someone who is non-binary, gender-nonconforming, or broadly queer. It signifies an identity that goes beyond traditional gender roles and expectations, embracing a diverse spectrum of expression. It can be used as both a noun (e.g., jan tonsi, a non-binary person) and an adjective to describe aspects related to gender diversity."
+  },
+  "tu": {
+    "aiExamples": {
+      "simple": "mi tu. (We two.)",
+      "intermediate": "soweli tu li lape. (Two animals are sleeping.)",
+      "advanced": "sina wile e tomo tu la, mi ken pana. (If you want two buildings/houses, I can give them.)"
+    },
+    "aiExplanation": "In Toki Pona, \"tu\" primarily means \"two.\" However, it extends beyond a mere numeral to often imply a pair or a small duo, emphasizing the concept of two items or individuals existing together. It functions as a modifier, placed after the noun it quantifies, like \"jan tu\" for \"two people.\""
+  },
+  "unpa": {
+    "aiExamples": {
+      "simple": "ona li unpa. (They have intimacy/sex.)",
+      "intermediate": "ona li unpa wawa. (They have strong intimacy/sex.)",
+      "advanced": "ona li unpa e jan ante la, ona li pilin pona. (If they have intimacy/sex with another person, they feel good.)"
+    },
+    "aiExplanation": "\"unpa\" often refers to sexual activity or deep physical intimacy. However, its core meaning is more about a very close, intimate interaction or connection, which can be sexual or non-sexual depending on context and modifiers. It describes a shared, profound experience between individuals."
+  },
+  "uta": {
+    "aiExamples": {
+      "simple": "ona li uta. (It is a mouth.)",
+      "intermediate": "uta pona li lon. (There is a good mouth / Good speech exists.)",
+      "advanced": "jan li kepeken e uta tawa toki la mi pilin e wawa. (When a person uses their mouth to speak, I feel power.)"
+    },
+    "aiExplanation": "In Toki Pona, 'uta' literally means mouth, lips, or jaw. However, it extends conceptually to encompass speech and communication, as the mouth is the primary organ for verbal expression. Thus, it can refer to both the physical structure and the act or output of speaking."
+  },
+  "utala": {
+    "aiExamples": {
+      "simple": "mi utala. (I fight.)",
+      "intermediate": "ona li utala wawa. (They fight strongly.)",
+      "advanced": "mi wile ala utala e jan ike la ona li utala e mi. (When I do not want to fight bad people, they fight me.)"
+    },
+    "aiExplanation": "utala is a versatile word in Toki Pona, encompassing actions of fighting, struggling, hitting, attacking, or competing. It describes any forceful or opposing action, not solely aggressive violence. While it can refer to physical combat, it also applies to overcoming challenges or engaging in spirited competition."
+  },
+  "walo": {
+    "aiExamples": {
+      "simple": "suno li walo. (The sun is light/white.)",
+      "intermediate": "mun walo li kama pona. (The bright moon arrives well/pleasantly.)",
+      "advanced": "mi tawa tomo la mi lukin e kon walo. (When I go to the house, I see the light air/bright spirit.)"
+    },
+    "aiExplanation": "pona, we're talking about 'walo'! This word fundamentally means white or light in color. However, its meaning extends beyond just a color to encompass brightness, illumination, or the very concept of lightness. It can describe anything from a white object to a bright light source or even the clear, light feeling of a space."
+  },
+  "wan": {
+    "aiExamples": {
+      "simple": "mi wan. (I am one/united.)",
+      "intermediate": "ijo wan li suli. (One thing is big.)",
+      "advanced": "mi lukin e kala wan la, mi toki e nimi ike. (When I see one fish, I speak bad words.)"
+    },
+    "aiExplanation": "In Toki Pona, \"wan\" represents more than just the number 'one.' It encompasses the concepts of unity, singularity, and being a single unit or whole. It can also imply a small amount or a brief instance, conveying uniqueness or togetherness."
+  },
+  "waso": {
+    "aiExamples": {
+      "simple": "waso li lon. (A bird exists.)",
+      "intermediate": "waso suli li utala. (A big bird fights.)",
+      "advanced": "kon li telo la waso li pana e kalama. (When the air is wet, birds give sound / Birds sing when it's humid.)"
+    },
+    "aiExplanation": "The word \"waso\" primarily translates to 'bird'. However, in Toki Pona's minimalist spirit, it can broadly encompass any flying animal, including insects like bees or even bats, especially when specific categorization isn't necessary. It focuses on the characteristic of flight rather than strict biological classification, often implying smaller, winged creatures."
+  },
+  "wawa": {
+    "aiExamples": {
+      "simple": "mi wawa. (I am strong.)",
+      "intermediate": "suno wawa li kama. (The strong sun comes.)",
+      "advanced": "jan pona li pana e wawa tawa mi. (Good friends give strength to me.)"
+    },
+    "aiExplanation": "Wawa fundamentally conveys the idea of strength, power, and energy. It can refer to physical might, the force of natural elements like the sun or wind, or even the intensity of feelings or ideas. This word often emphasizes vitality, capability, and the ability to effect change or influence."
+  },
+  "weka": {
+    "aiExamples": {
+      "simple": "ona weka. (They are away.)",
+      "intermediate": "ijo weka lili. (The small thing is removed.)",
+      "advanced": "jan li weka e telo ike. (The person removes the bad water.)"
+    },
+    "aiExplanation": "Weka describes the state of being absent, removed, or far away. It can also act as a verb, meaning to remove or get rid of something. This word often implies a deliberate action of causing something to be 'away' from a specific location or context, or simply denoting its distance or non-presence."
+  },
+  "wile": {
+    "aiExamples": {
+      "simple": "mi wile. (I want/need.)",
+      "intermediate": "mi wile tawa tomo. (I want to go home/to the building.)",
+      "advanced": "mi wile e ni: sina sona e toki pona. (I want this: you know Toki Pona.)"
+    },
+    "aiExplanation": "In Toki Pona, 'wile' encapsulates concepts of desire, need, and intention. It most commonly functions as a verb meaning 'to want' or 'to need,' often taking a noun or a verb phrase as its object. Beyond this, 'wile' can also act as an adjective ('desired,' 'necessary') or a noun ('will,' 'desire'), with its precise meaning heavily reliant on the surrounding context."
   }
 }

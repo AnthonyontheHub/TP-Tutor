@@ -5,6 +5,7 @@ const stage1Nodes: CurriculumNode[] = [
   { 
     id: "phi_sim", title: "Philosophy of Simplicity", requiredVocabIds: [], requiredGrammarIds: [], status: 'active', suggestedMethod: 'Jan Lina Chat', type: 'Topic',
     activities: ['true-false', 'thought-translation'],
+    infographicUrl: '/infographics/1 The Phonetic Foundations.png',
     richContent: [
       { type: 'text', content: "Conceptual intro to Toki Pona's design — ~120 words, intentional ambiguity, minimalism as a worldview." },
       { type: 'structural', content: "jan Lina explains the 'why' conversationally; discuss what simplicity means to the student personally." },
@@ -63,6 +64,7 @@ const stage1Nodes: CurriculumNode[] = [
 const stage2Nodes: CurriculumNode[] = [
   { 
     id: "svo_intro", title: "SVO Sentence Structure", requiredVocabIds: ["mi", "sina", "ona"], requiredGrammarIds: [], status: 'locked', activities: ['word-scramble'], suggestedMethod: 'Jan Lina Chat', type: 'Topic',
+    infographicUrl: '/infographics/2 Structural Foundations.png',
     richContent: [
       { type: 'text', content: "Toki Pona sentences follow Subject -> Verb -> Object order, like English." },
       { type: 'structural', content: "jan Lina introduces mi/sina/ona with simple action words." },
@@ -112,6 +114,7 @@ const stage2Nodes: CurriculumNode[] = [
 const stage3Nodes: CurriculumNode[] = [
   { 
     id: "head_initial", title: "Head-Initial Rule", requiredVocabIds: ["jan", "tomo", "toki", "pona", "ike", "suli", "lili"], requiredGrammarIds: [], status: 'locked', activities: ['word-scramble'], suggestedMethod: 'Jan Lina Chat', type: 'Topic',
+    infographicUrl: '/infographics/3 Syntactic Fluidity.png',
     richContent: [
       { type: 'text', content: "The main noun comes first; modifiers follow and narrow it. 'tomo pona' = good house (not 'good' + 'house' as equals)." },
       { type: 'structural', content: "Contrast with English adjective-first. jan Lina gives examples with words student knows." },
@@ -153,6 +156,7 @@ const stage3Nodes: CurriculumNode[] = [
 const stage4Nodes: CurriculumNode[] = [
   { 
     id: "pi_intro", title: "Intro to 'pi'", requiredVocabIds: ["pi", "jan", "tomo", "toki", "pona", "suli", "lili"], requiredGrammarIds: ["particle_pi"], status: 'locked', activities: ['word-scramble'], suggestedMethod: 'Jan Lina Chat', type: 'Topic',
+    infographicUrl: '/infographics/4 The Architecture of Pi.png',
     richContent: [
       { type: 'text', content: "'pi' regroups modifiers so that what follows it modifies the head as a unit, rather than stacking." },
       { type: 'structural', content: "'jan toki pona' vs 'jan pi toki pona' — person who speaks well vs. person of Toki Pona." },
@@ -194,6 +198,7 @@ const stage4Nodes: CurriculumNode[] = [
 const stage5Nodes: CurriculumNode[] = [
   { 
     id: "ala_negation", title: "Negation with 'ala'", requiredVocabIds: ["ala", "mi", "sina", "ona", "li", "pona", "toki", "moku"], requiredGrammarIds: ["particle_li"], status: 'locked', activities: ['word-scramble'], suggestedMethod: 'Builder Drill', type: 'Topic',
+    infographicUrl: '/infographics/5 The Grammar of Negation.png',
     richContent: [
       { type: 'text', content: "'ala' follows the verb to negate it — 'mi moku ala' = I don't eat." },
       { type: 'structural', content: "Position of ala matters; contrast with using ala as a noun modifier." },
@@ -235,6 +240,7 @@ const stage5Nodes: CurriculumNode[] = [
 const stage6Nodes: CurriculumNode[] = [
   { 
     id: "preverb_wile", title: "Desire: wile", requiredVocabIds: ["wile", "mi", "sina", "ona", "li", "moku", "toki", "pali", "tawa"], requiredGrammarIds: ["particle_li", "particle_e"], status: 'locked', activities: ['word-scramble'], suggestedMethod: 'Builder Drill', type: 'Drill',
+    infographicUrl: '/infographics/6 Preverbs and Prepositions .png',
     richContent: [
       { type: 'text', content: "'wile' precedes the main verb to mean want/need to — 'mi wile moku' (I want to eat)." },
       { type: 'structural', content: "Position before main verb; can also be a regular verb/noun." },
@@ -349,6 +355,7 @@ const stage7Nodes: CurriculumNode[] = [
 const stage8Nodes: CurriculumNode[] = [
   { 
     id: "think_tp", title: "Thinking in Toki Pona", requiredVocabIds: [], requiredGrammarIds: [], status: 'locked', activities: ['word-scramble'], suggestedMethod: 'Jan Lina Chat', type: 'Topic',
+    infographicUrl: '/infographics/8 The Fluid Lexicon.png',
     richContent: [
       { type: 'text', content: "Meta-cognitive stage — using Toki Pona's constraints to reframe complex ideas, accept ambiguity, and communicate intent over precision." },
       { type: 'structural', content: "jan Lina poses a complex topic (from student's lore) and they work through expressing it together." },
