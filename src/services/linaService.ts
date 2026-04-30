@@ -2,7 +2,7 @@ import type { VocabWord, MasteryStatus, UserProfile, ReviewVibe, WeeklyChallenge
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { TOKI_PONA_DICTIONARY } from '../data/tokiPonaDictionary';
 
-const GEMINI_MODEL = "gemini-2.5-flash";
+const GEMINI_MODEL = "gemma-4-31b-it";
 
 /**
  * Builds a simple literal translation for offline use or as a fallback.
