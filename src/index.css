@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'linja-pona';
+  src: url('https://cdn.jsdelivr.net/gh/jan-Lope/linja-pona@4.9/font/linja-pona.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -391,6 +399,20 @@ select {
   flex-direction: column;
   gap: 4px;
   transition: box-shadow 0.3s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.vocab-card__bg-symbol {
+  font-family: 'linja-pona';
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 4.5rem;
+  opacity: 0.12;
+  color: white;
+  pointer-events: none;
+  z-index: 0;
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
 }
 
 .vocab-card:hover {

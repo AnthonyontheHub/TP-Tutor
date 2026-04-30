@@ -160,6 +160,8 @@ export default function VocabCard({ word, onLongPress, onClick, onAskLina, isSan
         }
       `}</style>
 
+      <div className="vocab-card__bg-symbol">{word.word}</div>
+
       {/* Top Right Icons */}
       <div style={{ position: 'absolute', top: '8px', right: '8px', display: 'flex', gap: '6px', alignItems: 'center' }}>
         {hasAIContent && (
