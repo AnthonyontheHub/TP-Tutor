@@ -629,6 +629,15 @@ select {
 /* ─── Misc ──────────────────────────────────────────────────────────────── */
 button:active { transform: scale(0.96); }
 
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
 .glass-panel {
   background: var(--surface);
   backdrop-filter: var(--glass);

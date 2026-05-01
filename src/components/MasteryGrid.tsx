@@ -103,7 +103,7 @@ export default function MasteryGrid({
     <div
       className="mastery-grid-container"
       style={{ 
-        paddingBottom: selectedWords.length > 0 ? '280px' : undefined,
+        paddingBottom: selectedWords.length > 0 ? '160px' : '40px',
         touchAction: 'pan-y',
         display: 'flex',
         flexDirection: 'column'
@@ -123,8 +123,8 @@ export default function MasteryGrid({
           width: 100%;
         }
       `}</style>
-      <div className="grid-toolbar" style={{ flexShrink: 0 }}>
-        <div className="flex items-center gap-4 mb-6">
+      <div className="grid-toolbar" style={{ flexShrink: 0, flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
+        <div style={{ display: 'flex', gap: '8px', width: '100%', flexWrap: 'wrap' }}>
           <select 
             value={selectedPOS} 
             onChange={(e) => setSelectedPOS(e.target.value)}
@@ -135,7 +135,8 @@ export default function MasteryGrid({
               color: 'white', 
               padding: '0 12px',
               height: '40px',
-              fontSize: '0.9rem'
+              fontSize: '0.9rem',
+              flex: '1 1 150px'
             }}
           >
             <option value="All">All Parts of Speech</option>
@@ -160,47 +161,49 @@ export default function MasteryGrid({
               padding: '0 12px',
               height: '40px',
               fontSize: '0.9rem',
-              minWidth: '200px'
+              flex: '2 1 200px'
             }}
           />
         </div>
-        <select 
-          value={sortMode} 
-          onChange={(e) => setSortMode(e.target.value)} 
-          style={{ 
-            background: '#111', 
-            border: '1px solid #222', 
-            borderRadius: '10px', 
-            color: 'white', 
-            padding: '0 12px',
-            height: '40px',
-            fontSize: '0.9rem',
-            flex: 1
-          }}
-        >
-          <option value="alphabetical">A → Z</option>
-          <option value="status">Mastery Level</option>
-          <option value="length">Word Length</option>
-          <option value="partOfSpeech">Part of Speech</option>
-          <option value="useCount">Most Used</option>
-        </select>
-        <button
-          type="button"
-          onClick={(e) => { e.stopPropagation(); setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc'); }}
-          className="btn-toggle"
-          style={{ flex: 'none', width: '42px', height: '40px' }}
-        >
-          {sortDirection === 'asc' ? '↑' : '↓'}
-        </button>
-        <button
-          type="button"
-          onClick={() => setViewMode(prev => prev === 'card' ? 'table' : 'card')}
-          className="btn-toggle"
-          style={{ flex: 'none', width: '42px', height: '40px', fontSize: '1rem' }}
-          title={viewMode === 'card' ? 'Switch to Table View' : 'Switch to Card View'}
-        >
-          {viewMode === 'card' ? '📋' : '🎴'}
-        </button>
+        <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
+          <select 
+            value={sortMode} 
+            onChange={(e) => setSortMode(e.target.value)} 
+            style={{ 
+              background: '#111', 
+              border: '1px solid #222', 
+              borderRadius: '10px', 
+              color: 'white', 
+              padding: '0 12px',
+              height: '40px',
+              fontSize: '0.9rem',
+              flex: 1
+            }}
+          >
+            <option value="alphabetical">A → Z</option>
+            <option value="status">Mastery Level</option>
+            <option value="length">Word Length</option>
+            <option value="partOfSpeech">Part of Speech</option>
+            <option value="useCount">Most Used</option>
+          </select>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc'); }}
+            className="btn-toggle"
+            style={{ flex: 'none', width: '42px', height: '40px' }}
+          >
+            {sortDirection === 'asc' ? '↑' : '↓'}
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode(prev => prev === 'card' ? 'table' : 'card')}
+            className="btn-toggle"
+            style={{ flex: 'none', width: '42px', height: '40px', fontSize: '1rem' }}
+            title={viewMode === 'card' ? 'Switch to Table View' : 'Switch to Card View'}
+          >
+            {viewMode === 'card' ? '📋' : '🎴'}
+          </button>
+        </div>
       </div>
 
       {viewMode === 'card' ? (

@@ -203,7 +203,29 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
 
         .dashboard__header-title-area { grid-area: title; display: flex; align-items: center; }
         .dashboard__header-identity-area { grid-area: identity; display: flex; align-items: center; gap: 8px; }
-        .dashboard__header-actions-area { grid-area: actions; display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+        .dashboard__header-actions-area { 
+          grid-area: actions; 
+          display: flex; 
+          align-items: center; 
+          gap: 6px; 
+          justify-content: flex-end;
+          flex-wrap: nowrap;
+        }
+
+        @media (max-width: 480px) {
+          .dashboard__header-actions-area {
+            gap: 4px;
+          }
+          .dashboard__icon-btn {
+            width: 34px !important;
+            height: 34px !important;
+            font-size: 0.9rem !important;
+          }
+          .dashboard__streak {
+            font-size: 0.8rem !important;
+            padding: 4px 6px !important;
+          }
+        }
 
         @media (min-width: 768px) {
           .dashboard__header {
@@ -227,7 +249,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
         /* Adjust main content padding */
         @media (max-width: 767px) {
           .dashboard {
-            --header-offset: 108px;
+            padding-top: 8px;
           }
         }
       `}</style>
@@ -246,7 +268,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              padding: '4px 12px 4px 4px',
+              padding: '6px 12px 6px 6px',
               borderRadius: '20px',
               background: 'rgba(255,255,255,0.03)',
               border: '1px solid rgba(255,255,255,0.05)',
@@ -268,19 +290,19 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
             ) : (
               <span style={{ fontSize: '1.2rem', marginLeft: '4px' }}>👤</span>
             )} 
-            <span style={{ fontSize: '0.75rem', fontWeight: 900 }}>{(profile?.tpName || studentName)?.toUpperCase() || 'STUDENT'}</span>
+            <span style={{ fontSize: '0.8rem', fontWeight: 900 }}>{(profile?.tpName || studentName)?.toUpperCase() || 'STUDENT'}</span>
           </button>
 
           <button type="button" 
             onClick={() => setShowTrainingHub(true)} 
             className="dashboard__icon-btn" 
             style={{ 
-              width: '38px',
-              height: '38px',
+              width: '42px',
+              height: '42px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '1.2rem',
+              fontSize: '1.3rem',
               background: 'rgba(255,255,255,0.03)',
               borderRadius: '50%',
               border: '1px solid var(--border)'
@@ -301,33 +323,33 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
             <div 
               className="dashboard__streak" 
               onClick={() => onTogglePanel('achievements')}
-              style={{ ...getActiveStyle('achievements'), margin: 0 }}
+              style={{ ...getActiveStyle('achievements'), margin: 0, padding: '4px 8px', fontSize: '0.9rem' }}
             >
               🔥 {currentStreak}
             </div>
           )}
-          <button type="button" onClick={() => onTogglePanel('instructions')} className="dashboard__icon-btn" style={getActiveStyle('instructions')}>?</button>
-          <button type="button" onClick={() => setShowProveIt(true)} className="dashboard__icon-btn" title="Prove It Drill">🎯</button>
+          <button type="button" onClick={() => onTogglePanel('instructions')} className="dashboard__icon-btn" style={{ ...getActiveStyle('instructions'), fontSize: '1rem', width: '38px', height: '38px' }}>?</button>
+          <button type="button" onClick={() => setShowProveIt(true)} className="dashboard__icon-btn" style={{ fontSize: '1rem', width: '38px', height: '38px' }} title="Prove It Drill">🎯</button>
           <div style={{ position: 'relative' }}>
-            <button type="button" onClick={() => onAskLina('[SYSTEM: Start a general conversation.]')} className="dashboard__icon-btn" style={getActiveStyle('chat')}>💬</button>
+            <button type="button" onClick={() => onAskLina('[SYSTEM: Start a general conversation.]')} className="dashboard__icon-btn" style={{ ...getActiveStyle('chat'), fontSize: '1rem', width: '38px', height: '38px' }}>💬</button>
             {chatCount > 0 && (
-              <span style={{ position: 'absolute', top: '-5px', right: '-5px', background: 'var(--gold)', color: 'black', borderRadius: '50%', width: '18px', height: '18px', fontSize: '0.65rem', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--bg)', pointerEvents: 'none' }}>
+              <span style={{ position: 'absolute', top: '-5px', right: '-5px', background: 'var(--gold)', color: 'black', borderRadius: '50%', width: '20px', height: '20px', fontSize: '0.75rem', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--bg)', pointerEvents: 'none' }}>
                 {chatCount}
               </span>
             )}
           </div>
-          <button type="button" onClick={() => onTogglePanel('settings')} className="dashboard__icon-btn" style={getActiveStyle('settings')}>⚙️</button>
+          <button type="button" onClick={() => onTogglePanel('settings')} className="dashboard__icon-btn" style={{ ...getActiveStyle('settings'), fontSize: '1rem', width: '38px', height: '38px' }}>⚙️</button>
           <button type="button" 
             onClick={() => setIsStoicHistoryOpen(true)} 
             className="dashboard__icon-btn" 
             title="Stoic Archive"
-            style={{ ...getActiveStyle('archive') }}
+            style={{ ...getActiveStyle('archive'), width: '38px', height: '38px' }}
           >
-            <BookOpen size={18} />
+            <BookOpen size={20} />
           </button>
         </div>
       </header>
-      <main className="dashboard__main" style={{ paddingBottom: '12rem' }}>
+      <main className="dashboard__main" style={{ paddingBottom: '14rem' }}>
         <div style={{ marginBottom: '20px' }}>
           <ChallengeWidget />
         </div>
@@ -348,19 +370,19 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
             <div className="w-full dashboard__vibe-selector-container" style={{ display: 'flex', background: 'var(--surface)', borderRadius: '4px', padding: '4px', border: '1px solid var(--border)', flex: 1.5 }}>
               <button type="button" 
                 onClick={() => setReviewVibe(reviewVibe === 'chill' ? null : 'chill')}
-                style={{ flex: 1, border: 'none', background: reviewVibe === 'chill' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'chill' ? 'black' : '#666', borderRadius: '2px', padding: '6px 4px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
+                style={{ flex: 1, border: 'none', background: reviewVibe === 'chill' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'chill' ? 'black' : '#666', borderRadius: '2px', padding: '10px 4px', fontSize: '0.7rem', fontWeight: 900, cursor: 'pointer' }}
               >
                 {activeView === 'vocab' ? (isSmallScreen ? 'CHILL' : 'CHILL') : activeView === 'archive' ? (isSmallScreen ? 'SAVES' : 'MY SAVES') : (isSmallScreen ? 'NEW' : 'NEW CONCEPT')}
               </button>
               <button type="button" 
                 onClick={() => setReviewVibe(reviewVibe === 'deep' ? null : 'deep')}
-                style={{ flex: 1, border: 'none', background: reviewVibe === 'deep' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'deep' ? 'black' : '#666', borderRadius: '2px', padding: '6px 4px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
+                style={{ flex: 1, border: 'none', background: reviewVibe === 'deep' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'deep' ? 'black' : '#666', borderRadius: '2px', padding: '10px 4px', fontSize: '0.7rem', fontWeight: 900, cursor: 'pointer' }}
               >
                 {activeView === 'vocab' ? (isSmallScreen ? 'DEEP' : 'DEEP') : activeView === 'archive' ? (isSmallScreen ? 'EVERYDAY' : 'EVERYDAY') : (isSmallScreen ? 'REVIEW' : 'REVIEW')}
               </button>
               <button type="button" 
                 onClick={() => setReviewVibe(reviewVibe === 'intense' ? null : 'intense')}
-                style={{ flex: 1, border: 'none', background: reviewVibe === 'intense' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'intense' ? 'black' : '#666', borderRadius: '2px', padding: '6px 4px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
+                style={{ flex: 1, border: 'none', background: reviewVibe === 'intense' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'intense' ? 'black' : '#666', borderRadius: '2px', padding: '10px 4px', fontSize: '0.7rem', fontWeight: 900, cursor: 'pointer' }}
               >
                 {activeView === 'vocab' ? (isSmallScreen ? 'INTENSE' : 'INTENSE') : activeView === 'archive' ? (isSmallScreen ? 'DISCO' : 'DISCOGRAPHY') : (isSmallScreen ? 'QUIZ' : 'QUIZ / LEVEL UP')}
               </button>
@@ -370,9 +392,9 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
 
         {/* Row 3: 3-Way Navigation Switcher */}
         <div className="dashboard__view-toggle overflow-x-auto hide-scrollbar" style={{ 
-          marginBottom: '16px', 
+          marginBottom: '20px', 
           display: 'grid', 
-          gridTemplateColumns: '1fr 1fr 1fr', 
+          gridTemplateColumns: 'repeat(3, 1fr)', 
           background: 'var(--surface)', 
           borderRadius: '4px', 
           border: '1px solid var(--border)',
@@ -380,24 +402,24 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
         }}>
           <button type="button" 
             onClick={() => setActiveView('vocab')} 
-            className={`btn-toggle text-xs md:text-sm px-2 py-3 ${activeView === 'vocab' ? 'active' : ''}`}
-            style={{ margin: 0, width: '100%', background: activeView === 'vocab' ? 'var(--gold)' : 'transparent', color: activeView === 'vocab' ? 'black' : 'inherit' }}
+            className={`btn-toggle text-xs md:text-sm px-2 py-4 ${activeView === 'vocab' ? 'active' : ''}`}
+            style={{ margin: 0, width: '100%', background: activeView === 'vocab' ? 'var(--gold)' : 'transparent', color: activeView === 'vocab' ? 'black' : 'inherit', fontSize: '0.8rem' }}
           >
             VOCAB
           </button>
           <button type="button" 
             onClick={() => setActiveView('roadmap')} 
-            className={`btn-toggle text-xs md:text-sm px-2 py-3 ${activeView === 'roadmap' ? 'active' : ''}`}
-            style={{ margin: 0, width: '100%', background: activeView === 'roadmap' ? 'var(--gold)' : 'transparent', color: activeView === 'roadmap' ? 'black' : 'inherit' }}
+            className={`btn-toggle text-xs md:text-sm px-2 py-4 ${activeView === 'roadmap' ? 'active' : ''}`}
+            style={{ margin: 0, width: '100%', background: activeView === 'roadmap' ? 'var(--gold)' : 'transparent', color: activeView === 'roadmap' ? 'black' : 'inherit', fontSize: '0.8rem' }}
           >
             ROADMAP
           </button>
           <button type="button" 
             onClick={() => setActiveView('archive')} 
-            className={`btn-toggle text-xs md:text-sm px-2 py-3 ${activeView === 'archive' ? 'active' : ''}`}
-            style={{ margin: 0, width: '100%', background: activeView === 'archive' ? 'var(--gold)' : 'transparent', color: activeView === 'archive' ? 'black' : 'inherit' }}
+            className={`btn-toggle text-xs md:text-sm px-2 py-4 ${activeView === 'archive' ? 'active' : ''}`}
+            style={{ margin: 0, width: '100%', background: activeView === 'archive' ? 'var(--gold)' : 'transparent', color: activeView === 'archive' ? 'black' : 'inherit', fontSize: '0.8rem' }}
           >
-            THE ARCHIVE
+            ARCHIVE
           </button>
         </div>
 

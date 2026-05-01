@@ -122,7 +122,7 @@ export default function VocabCard({ word, onLongPress, onClick, onAskLina, isSan
 
   return (
     <div
-      className={`glass-panel vocab-card ${isSelected ? 'neon-border-gold active-pulse' : ''} ${isRelated ? 'is-related' : ''} touch-none flex flex-col gap-1 transition-all duration-300 ease-in-out`}
+      className={`glass-panel vocab-card ${isSelected ? 'neon-border-gold active-pulse' : ''} ${isRelated ? 'is-related' : ''} touch-pan-y flex flex-col gap-1 transition-all duration-300 ease-in-out`}
       style={{ 
         opacity: isDimmed ? 0.3 : 1,
         borderColor: isSelected ? 'var(--gold)' : (isDimmed ? '#222' : statusColor),

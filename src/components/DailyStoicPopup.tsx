@@ -57,7 +57,7 @@ export default function DailyStoicPopup() {
     let xp = 10; // Read/Attempted
     if (input.length > 5) xp += 10;
     
-    completePhase2(xp);
+    completePhase2();
     recordInsight('Daily Stoic Challenge', xp);
     setFeedback(`Great attempt! The original English was: "${todayQuote.english}"`);
     setTimeout(() => {

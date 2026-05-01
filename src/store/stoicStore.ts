@@ -24,7 +24,7 @@ export interface StoicState {
 export interface StoicActions {
   fetchTodayQuote: (userId: string) => Promise<void>;
   dismissPhase1: () => void;
-  completePhase2: (xpAwarded: number) => void;
+  completePhase2: () => void;
   completePhase3: () => void;
   fetchHistory: (userId: string) => Promise<void>;
   // Dev Testing
@@ -91,7 +91,7 @@ export const useStoicStore = create<StoicStore>()(
 
       dismissPhase1: () => set({ phase1DismissedAt: new Date().toISOString() }),
       
-      completePhase2: (xpAwarded: number) => {
+      completePhase2: () => {
         set({ phase2CompletedAt: new Date().toISOString() });
         // Award XP via masteryStore
         // Note: I'll assume applyScoreUpdate or similar can be used, but the prompt says arbitrary XP.
