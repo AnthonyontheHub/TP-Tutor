@@ -198,8 +198,8 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
       const sys = latestChatContext === 'MASTERY_COURT'
         ? buildMasteryCourtPrompt(state.vocabulary, displayName, userContext)
         : latestChatContext === 'LESSON' 
-          ? buildTutorPrompt(state.vocabulary, activeNodes, displayName, userContext, undefined, undefined, vibe, yesterdayWasActive.current, getRegressionCandidates(7), getTopConfusionPairs(5), pendingProveItResponses, xpMultiplier, currentChallenge, pendingRankAcknowledgement)
-          : buildChatPrompt(state.vocabulary, displayName, userContext, latestChatContext, payload, yesterdayWasActive.current, getTopConfusionPairs(5), xpMultiplier, pendingRankAcknowledgement);
+          ? buildTutorPrompt(state.vocabulary, activeNodes, displayName, userContext, undefined, undefined, vibe, yesterdayWasActive.current, getRegressionCandidates(7), getTopConfusionPairs(5), pendingProveItResponses, xpMultiplier, currentChallenge, pendingRankAcknowledgement, currentSession?.mode)
+          : buildChatPrompt(state.vocabulary, displayName, userContext, latestChatContext, payload, yesterdayWasActive.current, getTopConfusionPairs(5), xpMultiplier, pendingRankAcknowledgement, currentSession?.mode);
       
       let introId: string | null = null;
       if (latestChatContext === 'LESSON') {
@@ -282,8 +282,8 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
       const sys = latestChatContext === 'MASTERY_COURT'
         ? buildMasteryCourtPrompt(state.vocabulary, displayName, userContext)
         : latestChatContext === 'LESSON'
-          ? buildTutorPrompt(state.vocabulary, activeNodes, displayName, userContext, undefined, undefined, vibe, yesterdayWasActive.current, getRegressionCandidates(7), getTopConfusionPairs(5), pendingProveItResponses, xpMultiplier, currentChallenge, pendingRankAcknowledgement)
-          : buildChatPrompt(state.vocabulary, displayName, userContext, latestChatContext, payload, yesterdayWasActive.current, getTopConfusionPairs(5), xpMultiplier, pendingRankAcknowledgement);
+          ? buildTutorPrompt(state.vocabulary, activeNodes, displayName, userContext, undefined, undefined, vibe, yesterdayWasActive.current, getRegressionCandidates(7), getTopConfusionPairs(5), pendingProveItResponses, xpMultiplier, currentChallenge, pendingRankAcknowledgement, currentSession?.mode)
+          : buildChatPrompt(state.vocabulary, displayName, userContext, latestChatContext, payload, yesterdayWasActive.current, getTopConfusionPairs(5), xpMultiplier, pendingRankAcknowledgement, currentSession?.mode);
 
       const windowedHistory: { role: 'user' | 'assistant'; content: string }[] =
         [...history, { role: 'user' as const, content: txt }].slice(-HISTORY_WINDOW);
@@ -527,7 +527,7 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
       const vibe = currentSession?.vibe ?? 'chill';
       const activeNodes = state.curriculums.flatMap(l => l.nodes);
 
-      const sys = buildTutorPrompt(state.vocabulary, activeNodes, displayName, userContext, undefined, undefined, vibe, yesterdayWasActive.current, getRegressionCandidates(7), getTopConfusionPairs(5), pendingProveItResponses, xpMultiplier, currentChallenge, pendingRankAcknowledgement);
+      const sys = buildTutorPrompt(state.vocabulary, activeNodes, displayName, userContext, undefined, undefined, vibe, yesterdayWasActive.current, getRegressionCandidates(7), getTopConfusionPairs(5), pendingProveItResponses, xpMultiplier, currentChallenge, pendingRankAcknowledgement, currentSession?.mode);
 
       const windowedHistory: { role: 'user' | 'assistant'; content: string }[] =
         [...history, { role: 'user' as const, content: summaryPrompt }].slice(-HISTORY_WINDOW);

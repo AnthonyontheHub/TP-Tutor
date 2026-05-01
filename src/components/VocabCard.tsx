@@ -9,7 +9,7 @@ interface Props {
   word: VocabWord;
   onLongPress?: (word: VocabWord) => void;
   onClick?: (word: VocabWord) => void;
-  onAskLina?: (prompt: string) => void;
+  onAskLina?: (prompt: string, mode?: 'chat_buddy' | 'instructor') => void;
   isSandboxMode: boolean;
   isDimmed?: boolean;
   isSelected?: boolean;
@@ -113,7 +113,7 @@ export default function VocabCard({ word, onLongPress, onClick, onAskLina, isSan
   const handleDeepDive = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (onAskLina) {
-      onAskLina(`[SYSTEM: Deep-dive explanation for the word: '${word.word}']. Please explain its nuance and give me a unique example sentence.`);
+      onAskLina(`[SYSTEM: Deep-dive explanation for the word: '${word.word}']. Please explain its nuance and give me a unique example sentence.`, 'instructor');
     }
   };
 

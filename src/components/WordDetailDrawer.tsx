@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import { STATUS_META } from '../types/mastery';
 import type { VocabWord, MasteryStatus } from '../types/mastery';
-import { fetchDeepDiveExamples, resolveApiKey, stringifyUserContext } from '../services/linaService';
+import { fetchDeepDiveExamples, fetchExamplesForWord, resolveApiKey, stringifyUserContext } from '../services/linaService';
 import { WORD_RELATIONSHIPS } from '../data/wordRelationships';
 
 const NEXT_STATUS: Partial<Record<MasteryStatus, MasteryStatus>> = {
@@ -29,6 +29,7 @@ const WORD_EXTRA_DATA: Record<string, { etymology: string, neighbors: string[], 
 export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isSandboxMode }: { isOpen: boolean; word?: VocabWord | null; onClose: () => void; onAskLina: (p: string) => void; isSandboxMode: boolean }) {
   const { studentName, profile, updateVocabAIContent } = useMasteryStore();
   const [deepDive, setDeepDive] = useState<Record<string, string> | null>(null);
+  const [grammarExamples, setGrammarExamples] = useState<Record<string, string> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isNeighborsModalOpen, setIsNeighborsModalOpen] = useState(false);
 
@@ -56,11 +57,20 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
       setIsLoading(true);
       const userContext = stringifyUserContext(profile);
       try {
-        const results = await fetchDeepDiveExamples(key, word.word, userContext);
+        const partsOfSpeech = word.partOfSpeech.split(',').map(p => p.trim());
+        const [results, examples] = await Promise.all([
+          fetchDeepDiveExamples(key, word.word, userContext),
+          fetchExamplesForWord(key, word.word, partsOfSpeech, userContext)
+        ]);
+
         if (results) {
-          const { explanation, ...examples } = results;
+          const { explanation, ...aiExamples } = results;
           setDeepDive(results);
-          updateVocabAIContent(word.id, { aiExamples: examples, aiExplanation: explanation });
+          updateVocabAIContent(word.id, { aiExamples, aiExplanation: explanation });
+        }
+        
+        if (examples) {
+          setGrammarExamples(examples);
         }
       } catch (err) {
         console.error("Deep dive generation failed:", err);
@@ -74,14 +84,21 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
     if (isOpen && word) {
       // RESET STATE for new word
       setDeepDive(null);
+      setGrammarExamples(null);
       
       if (word.aiExamples && word.aiExplanation) {
         setDeepDive({ ...word.aiExamples, explanation: word.aiExplanation });
+        const key = resolveApiKey();
+        if (key && !isSandboxMode) {
+          const partsOfSpeech = word.partOfSpeech.split(',').map(p => p.trim());
+          const userContext = stringifyUserContext(profile);
+          fetchExamplesForWord(key, word.word, partsOfSpeech, userContext).then(res => setGrammarExamples(res));
+        }
       } else {
         triggerGeneration();
       }
     }
-  }, [isOpen, word, triggerGeneration]);
+  }, [isOpen, word, triggerGeneration, isSandboxMode, profile]);
 
   return (
     <AnimatePresence>
@@ -155,20 +172,41 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
               )}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '32px' }}>
-              <section className="glass-panel" style={{ padding: '12px' }}>
-                <h3 className="section-title" style={{ fontSize: '0.55rem' }}>Grammar</h3>
-                <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-                  {word.partOfSpeech.split(',').map(pos => (
-                    <div key={pos.trim()} style={{ fontSize: '0.65rem', color: 'white', fontWeight: 900, background: 'rgba(255,255,255,0.1)', padding: '2px 6px', borderRadius: '4px' }}>
-                      {pos.trim().toUpperCase()}
-                    </div>
-                  ))}
+            <div style={{ marginBottom: '32px' }}>
+              <section className="glass-panel" style={{ padding: '15px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                  <h3 className="section-title" style={{ fontSize: '0.6rem', margin: 0 }}>Grammar Roles</h3>
+                </div>
+                <div style={{ display: 'grid', gap: '8px' }}>
+                  {word.partOfSpeech.split(',').map(pos => {
+                    const cleanPos = pos.trim();
+                    return (
+                      <div key={cleanPos} style={{ background: 'rgba(255,255,255,0.03)', padding: '10px', borderRadius: '4px', borderLeft: '2px solid var(--gold)' }}>
+                        <div style={{ fontSize: '0.65rem', color: 'var(--gold)', fontWeight: 900, textTransform: 'uppercase', marginBottom: '4px' }}>{cleanPos}</div>
+                        {grammarExamples?.[cleanPos] ? (
+                          <div style={{ fontSize: '0.85rem', color: '#eee' }}>{grammarExamples[cleanPos]}</div>
+                        ) : (
+                          <div style={{ height: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '2px', width: '80%' }} />
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </section>
-              <section className="glass-panel" style={{ padding: '12px' }}>
-                <h3 className="section-title" style={{ fontSize: '0.55rem' }}>Neighbors</h3>
-                <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{neighbors.length > 0 ? neighbors.slice(0,2).join(', ') : '-'}</div>
+            </div>
+
+            <div style={{ marginBottom: '32px' }}>
+              <section className="glass-panel" style={{ padding: '15px' }}>
+                <h3 className="section-title" style={{ fontSize: '0.6rem' }}>Neighbors</h3>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{neighbors.length > 0 ? neighbors.slice(0, 4).join(', ') : '-'}</div>
+                {neighbors.length > 4 && (
+                  <button type="button"
+                    onClick={() => setIsNeighborsModalOpen(true)}
+                    style={{ background: 'none', border: 'none', color: 'var(--gold)', fontSize: '0.65rem', cursor: 'pointer', marginTop: '8px', padding: 0 }}
+                  >
+                    VIEW ALL
+                  </button>
+                )}
               </section>
             </div>
 

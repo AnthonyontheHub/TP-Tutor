@@ -128,7 +128,7 @@ export default function App() {
     );
   }, []);
 
-  const handleAskLina = useCallback((prompt: string) => {
+  const handleAskLina = useCallback((prompt: string, mode: 'chat_buddy' | 'instructor' = 'chat_buddy') => {
     addSession({
       id: generateId(),
       title: detectSessionTitle(prompt),
@@ -137,7 +137,8 @@ export default function App() {
       messages: [],
       history: [],
       sessionDeltas: [],
-      context: 'GENERAL'
+      context: 'GENERAL',
+      mode
     });
   }, [addSession]);
 

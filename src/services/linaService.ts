@@ -136,7 +136,8 @@ export function buildTutorPrompt(
   pendingProveIt?: { word: string, sentence: string, date: string }[],
   xpMultiplier: number = 1.0,
   currentChallenge?: WeeklyChallenge | null,
-  pendingRankAcknowledgement?: string | null
+  pendingRankAcknowledgement?: string | null,
+  mode: 'chat_buddy' | 'instructor' = 'chat_buddy'
 ) {
   const activeVocab = vocabulary
     .map(v => `${v.word} (overall: ${v.status}, production: ${v.productionStatus || 'same'}, recognition: ${v.recognitionStatus || 'same'}) - Notes: ${v.sessionNotes || 'None'}`)
@@ -185,7 +186,10 @@ export function buildTutorPrompt(
 
   return `
     You are jan Lina, an expert Toki Pona teacher.
-    Personality: You are like a cool older sister who happens to be fluent in Toki Pona. You're casual, a little playful, and keep it real. You're encouraging without being cheesy, and call things out directly but warmly. You never sound like a textbook.
+    ${mode === 'chat_buddy' 
+      ? `Personality: You are like a cool older sister who happens to be fluent in Toki Pona. You're casual, a little playful, and keep it real. You're encouraging without being cheesy, and call things out directly but warmly. You never sound like a textbook.`
+      : `Personality: You are a strict, focused instructor. Your goal is rigorous Q&A, providing exercises and translations based on the category. No small talk. Enforce a 2-strike rule for incorrect answers: the first wrong answer gets a simple "incorrect, try again" without explanation, and the second wrong answer gets a detailed explanation of what was wrong.`
+    }
     
     The student's name is ${studentName}.${contextStr}
 
@@ -275,7 +279,8 @@ export function buildChatPrompt(
   yesterdayWasActive?: boolean,
   confusionPairs?: { wordA: string, wordB: string }[],
   xpMultiplier: number = 1.0,
-  pendingRankAcknowledgement?: string | null
+  pendingRankAcknowledgement?: string | null,
+  mode: 'chat_buddy' | 'instructor' = 'chat_buddy'
 ) {
   const activeVocab = vocabulary
     .map(v => `${v.word} (overall: ${v.status}, production: ${v.productionStatus || 'same'}, recognition: ${v.recognitionStatus || 'same'}) - Notes: ${v.sessionNotes || 'None'}`)
@@ -310,7 +315,10 @@ export function buildChatPrompt(
 
   return `
     You are jan Lina, an expert Toki Pona teacher.
-    Personality: You are like a cool older sister who happens to be fluent in Toki Pona. You're casual, a little playful, and keep it real. You're encouraging without being cheesy, and call things out directly but warmly. You never sound like a textbook.
+    ${mode === 'chat_buddy' 
+      ? `Personality: You are like a cool older sister who happens to be fluent in Toki Pona. You're casual, a little playful, and keep it real. You're encouraging without being cheesy, and call things out directly but warmly. You never sound like a textbook.`
+      : `Personality: You are a strict, focused instructor. Your goal is rigorous Q&A, providing exercises and translations based on the category. No small talk. Enforce a 2-strike rule for incorrect answers: the first wrong answer gets a simple "incorrect, try again" without explanation, and the second wrong answer gets a detailed explanation of what was wrong.`
+    }
 
     The student's name is ${studentName}.${contextStr}
 

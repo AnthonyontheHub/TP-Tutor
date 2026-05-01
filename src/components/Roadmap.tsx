@@ -7,7 +7,7 @@ import type { CurriculumNode } from '../types/mastery';
 import { Crown, Map, Lock, Sparkles, Brain, Zap } from 'lucide-react';
 
 interface Props {
-  onAskLina: (p: string) => void;
+  onAskLina: (p: string, mode?: 'chat_buddy' | 'instructor') => void;
   isSandboxMode: boolean;
 }
 

@@ -9,7 +9,7 @@ import VocabGrid from './VocabGrid';
 interface Props {
   node: CurriculumNode;
   onBack: () => void;
-  onAskLina: (p: string) => void;
+  onAskLina: (p: string, mode?: 'chat_buddy' | 'instructor') => void;
   isSandboxMode: boolean;
 }
 
@@ -46,7 +46,7 @@ export default function NodeDossier({ node, onBack, onAskLina, isSandboxMode }: 
       ? ` The relevant vocabulary is: ${node.requiredVocabIds.join(', ')}.` 
       : '';
 
-    onAskLina(`[SYSTEM: Start a lesson on the concept: "${node.title}". Context: ${contextStr}${vocabStr}]`);
+    onAskLina(`[SYSTEM: Start a lesson on the concept: "${node.title}". Context: ${contextStr}${vocabStr}]`, 'instructor');
   };
 
   return (

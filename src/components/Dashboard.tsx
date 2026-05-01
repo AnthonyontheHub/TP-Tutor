@@ -25,7 +25,7 @@ export type DashboardView = 'vocab' | 'roadmap' | 'archive';
 export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSandboxMode, chatCount }: {
   onTogglePanel: (p: AppPanel) => void;
   activePanels: AppPanel[];
-  onAskLina: (p: string) => void;
+  onAskLina: (p: string, mode?: 'chat_buddy' | 'instructor') => void;
   isSandboxMode: boolean;
   chatCount: number;
 }) {
@@ -159,7 +159,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
 
       onAskLina(prompt);
     } else if (activeView === 'roadmap') {
-      onAskLina(getRoadmapLessonPrompt(curriculums, currentPositionNodeId, reviewVibe));
+      onAskLina(getRoadmapLessonPrompt(curriculums, currentPositionNodeId, reviewVibe), 'instructor');
     }
   };
 
@@ -331,7 +331,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
           <button type="button" onClick={() => onTogglePanel('instructions')} className="dashboard__icon-btn" style={{ ...getActiveStyle('instructions'), fontSize: '1rem', width: '38px', height: '38px' }}>?</button>
           <button type="button" onClick={() => setShowProveIt(true)} className="dashboard__icon-btn" style={{ fontSize: '1rem', width: '38px', height: '38px' }} title="Prove It Drill">🎯</button>
           <div style={{ position: 'relative' }}>
-            <button type="button" onClick={() => onAskLina('[SYSTEM: Start a general conversation.]')} className="dashboard__icon-btn" style={{ ...getActiveStyle('chat'), fontSize: '1rem', width: '38px', height: '38px' }}>💬</button>
+            <button type="button" onClick={() => onAskLina('[SYSTEM: Start a general conversation.]', 'chat_buddy')} className="dashboard__icon-btn" style={{ ...getActiveStyle('chat'), fontSize: '1rem', width: '38px', height: '38px' }}>💬</button>
             {chatCount > 0 && (
               <span style={{ position: 'absolute', top: '-5px', right: '-5px', background: 'var(--gold)', color: 'black', borderRadius: '50%', width: '20px', height: '20px', fontSize: '0.75rem', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--bg)', pointerEvents: 'none' }}>
                 {chatCount}

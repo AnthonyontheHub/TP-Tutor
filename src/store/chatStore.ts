@@ -22,6 +22,7 @@ export interface ChatSessionData {
   context: 'GENERAL' | 'DAILY_REVIEW' | 'GRAMMAR_CHECK' | 'LESSON' | 'PHRASE_PRACTICE' | 'VOCAB_PANEL' | 'MASTERY_COURT';
   vibe?: ReviewVibe;
   contextPayload?: string;
+  mode?: 'chat_buddy' | 'instructor';
 }
 
 interface ChatState {
