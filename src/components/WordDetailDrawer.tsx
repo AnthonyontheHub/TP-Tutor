@@ -194,6 +194,29 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
             </div>
 
             <div style={{ marginBottom: '32px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <h3 className="section-title" style={{ fontSize: '0.6rem', margin: 0 }}>AI Explanation</h3>
+                <button type="button"
+                  onClick={() => triggerGeneration(true)} 
+                  style={{ background: 'none', border: 'none', color: 'var(--gold)', fontSize: '0.7rem', cursor: 'pointer', opacity: 0.6 }}
+                >
+                  REFRESH ↻
+                </button>
+              </div>
+              <div className="glass-panel" style={{ padding: '15px', fontSize: '0.9rem', color: '#ccc', lineHeight: '1.6', borderLeft: '2px solid var(--gold)' }}>
+                {isLoading ? (
+                  <div style={{ display: 'grid', gap: '8px' }}>
+                    <div style={{ height: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '2px', width: '100%' }} />
+                    <div style={{ height: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '2px', width: '90%' }} />
+                    <div style={{ height: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '2px', width: '40%' }} />
+                  </div>
+                ) : (
+                  word.aiExplanation || deepDive?.explanation || 'No explanation generated yet.'
+                )}
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '32px' }}>
               <section className="glass-panel" style={{ padding: '15px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                   <h3 className="section-title" style={{ fontSize: '0.6rem', margin: 0 }}>Grammar Roles</h3>
@@ -229,29 +252,6 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
                   </button>
                 )}
               </section>
-            </div>
-
-            <div style={{ marginBottom: '32px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <h3 className="section-title" style={{ fontSize: '0.6rem', margin: 0 }}>AI Explanation</h3>
-                <button type="button"
-                  onClick={() => triggerGeneration(true)} 
-                  style={{ background: 'none', border: 'none', color: 'var(--gold)', fontSize: '0.7rem', cursor: 'pointer', opacity: 0.6 }}
-                >
-                  REFRESH ↻
-                </button>
-              </div>
-              <div className="glass-panel" style={{ padding: '15px', fontSize: '0.9rem', color: '#ccc', lineHeight: '1.6', borderLeft: '2px solid var(--gold)' }}>
-                {isLoading ? (
-                  <div style={{ display: 'grid', gap: '8px' }}>
-                    <div style={{ height: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '2px', width: '100%' }} />
-                    <div style={{ height: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '2px', width: '90%' }} />
-                    <div style={{ height: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '2px', width: '40%' }} />
-                  </div>
-                ) : (
-                  word.aiExplanation || deepDive?.explanation || 'No explanation generated yet.'
-                )}
-              </div>
             </div>
 
             <section style={{ marginBottom: '32px' }}>
