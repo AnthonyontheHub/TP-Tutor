@@ -22,7 +22,7 @@ export default function ProgressSummary({ activeFilter, onFilterClick }: Props) 
 
   return (
     <div className="glass-panel" style={{ padding: '16px', marginBottom: '20px', border: '1px solid var(--border)' }}>
-      <div className="status-grid-mobile overflow-x-auto hide-scrollbar" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '8px' }}>
+      <div className="status-grid status-grid-mobile overflow-x-auto hide-scrollbar">
         {statusItems.map((item) => {
           const isActive = activeFilter === item.status;
           const isDimmed = activeFilter !== null && !isActive;

@@ -526,10 +526,10 @@ export const useMasteryStore = create<MasteryStore>()(
       setSongs: (songs) => { set({ songs }); void get().syncToCloud(); },
       syncSongsWithData: () => {
         const { songs } = get();
-        console.log("Current songs in store:", songs);
+        if (import.meta.env.DEV) console.log("Current songs in store:", songs);
         const hasTelo = Array.isArray(songs) && songs.some(a => a.id === 'telo-lon-kiwen');
         if (!Array.isArray(songs) || songs.length === 0 || !hasTelo) {
-          console.log('Force-syncing songs to latest albumData...');
+          if (import.meta.env.DEV) console.log('Force-syncing songs to latest albumData...');
           set({ songs: defaultSongs });
           void get().syncToCloud();
         }
@@ -680,7 +680,7 @@ export const useMasteryStore = create<MasteryStore>()(
             updated = [...current, { id: activityId, stats }];
           }
 
-          const newState = {
+          const newState: Partial<MasteryStore> = {
             completedActivities: {
               ...state.completedActivities,
               [nodeId]: updated
@@ -688,12 +688,12 @@ export const useMasteryStore = create<MasteryStore>()(
           };
 
           if (stats) {
-            const insightEntry = {
+            const insightEntry: MasteryEvent = {
               label: activityId.toUpperCase().replace('-', ' '),
               change: Math.round(stats.score),
               timestamp: new Date().toISOString()
             };
-            (newState as any).masteryHistory = [insightEntry, ...(state.masteryHistory || [])].slice(0, 50);
+            newState.masteryHistory = [insightEntry, ...(state.masteryHistory || [])].slice(0, 50);
           }
 
           return newState;
@@ -772,7 +772,7 @@ export const useMasteryStore = create<MasteryStore>()(
         const now = new Date();
         const chargeUntil = get().gridChargeUntil;
         if (chargeUntil && now < new Date(chargeUntil)) {
-          console.log("Decay frozen: Grid is charged.");
+          if (import.meta.env.DEV) console.log("Decay frozen: Grid is charged.");
           return;
         }
 
@@ -870,7 +870,7 @@ export const useMasteryStore = create<MasteryStore>()(
             // NODE LOCKING: Role cannot gain points if > 100 ahead of lowest
             const lowestRoleScore = Math.min(w.roleMatrix.noun, w.roleMatrix.verb, w.roleMatrix.mod);
             if (effectiveDelta > 0 && w.roleMatrix[targetRole] >= lowestRoleScore + 100) {
-              console.log(`Node Locked: ${w.word} ${targetRole} is too far ahead.`);
+              if (import.meta.env.DEV) console.log(`Node Locked: ${w.word} ${targetRole} is too far ahead.`);
               effectiveDelta = 0;
             }
 
@@ -927,7 +927,7 @@ export const useMasteryStore = create<MasteryStore>()(
             let effectivePoints = points;
             const lowestRoleScore = Math.min(w.roleMatrix.noun, w.roleMatrix.verb, w.roleMatrix.mod);
             if (effectivePoints > 0 && w.roleMatrix[role] >= lowestRoleScore + 100) {
-              console.log(`Node Locked: ${w.word} ${role} is too far ahead.`);
+              if (import.meta.env.DEV) console.log(`Node Locked: ${w.word} ${role} is too far ahead.`);
               effectivePoints = 0;
             }
 
@@ -2263,7 +2263,7 @@ export const useMasteryStore = create<MasteryStore>()(
       },
       onRehydrateStorage: () => (state) => {
         if (state) {
-          console.log("Current songs in store (pre-hydration):", state.songs);
+          if (import.meta.env.DEV) console.log("Current songs in store (pre-hydration):", state.songs);
 
           // Ensure critical array fields are always arrays and not empty if defaults exist
           if (!Array.isArray(state.commonPhrases) || state.commonPhrases.length === 0) {
@@ -2272,7 +2272,7 @@ export const useMasteryStore = create<MasteryStore>()(
           
           const hasTelo = Array.isArray(state.songs) && state.songs.some((a: Album) => a.id === 'telo-lon-kiwen');
           if (!Array.isArray(state.songs) || state.songs.length < 6 || !hasTelo) {
-            console.log('Force-syncing songs to latest albumData (missing albums or telo-lon-kiwen missing)...');
+            if (import.meta.env.DEV) console.log('Force-syncing songs to latest albumData (missing albums or telo-lon-kiwen missing)...');
             state.songs = defaultSongs;
           }
 
@@ -2280,7 +2280,7 @@ export const useMasteryStore = create<MasteryStore>()(
             state.savedPhrases = [];
           }
 
-          console.log("Current songs in store (post-hydration):", state.songs);
+          if (import.meta.env.DEV) console.log("Current songs in store (post-hydration):", state.songs);
 
           // Merge static content on rehydration
           const mergedCurriculums = curriculumRoadmap.map(staticLevel => {

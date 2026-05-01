@@ -292,6 +292,7 @@ export interface CurriculumNode {
   requiredVocabIds: string[];
   requiredGrammarIds: string[];
   status: NodeStatus;
+  sessionNotes?: string;
   richContent?: ContentBlock[];
   visualFramework?: string;
   requiredWordIds?: string[];

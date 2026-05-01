@@ -1,4 +1,4 @@
-import type { VocabWord, MasteryStatus, UserProfile, ReviewVibe, WeeklyChallenge } from '../types/mastery';
+import type { VocabWord, MasteryStatus, UserProfile, ReviewVibe, WeeklyChallenge, CurriculumNode } from '../types/mastery';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { TOKI_PONA_DICTIONARY } from '../data/tokiPonaDictionary';
 
@@ -123,8 +123,8 @@ export function resolveApiKey(overrideKey?: string): string {
 }
 
 export function buildTutorPrompt(
-  vocabulary: any[],
-  concepts: any[],
+  vocabulary: VocabWord[],
+  concepts: CurriculumNode[],
   studentName: string,
   userContext?: string,
   activeCurriculumTitle?: string,
@@ -473,6 +473,22 @@ export async function* streamCompletion(
 // Strips markdown code fences before JSON.parse.
 function sanitizeJson(text: string): string {
   return text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
+}
+
+export type RoadmapLevelLite = { nodes: { id: string; title: string }[] };
+export function getRoadmapLessonPrompt(curriculums: RoadmapLevelLite[], currentPositionNodeId: string, reviewVibe: ReviewVibe | null) {
+  const activeNode = curriculums.flatMap(l => l.nodes).find(n => n.id === currentPositionNodeId);
+  const nodeTitle = activeNode?.title || 'Current Module';
+
+  if (reviewVibe === 'chill') {
+    return `[SYSTEM: Roadmap Lesson - NEW CONCEPT. Focus strictly on current module items for "${nodeTitle}".]`;
+  } else if (reviewVibe === 'deep') {
+    return `[SYSTEM: Roadmap Lesson - REVIEW. Mix items from "${nodeTitle}" with previously introduced words.]`;
+  } else if (reviewVibe === 'intense') {
+    return `[SYSTEM: Roadmap Lesson - QUIZ / LEVEL UP. Conduct a proficiency test on the current module "${nodeTitle}".]`;
+  } else {
+    return `[SYSTEM: Roadmap Lesson. Continue "${nodeTitle}" with a mix of new material and past review.]`;
+  }
 }
 
 export async function fetchSentenceSuggestions(apiKey: string, words: string[], userContext?: string) {

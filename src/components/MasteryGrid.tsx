@@ -301,6 +301,7 @@ export default function MasteryGrid({
           <option value="useCount">Most Used</option>
         </select>
         <button
+          type="button"
           onClick={(e) => { e.stopPropagation(); setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc'); }}
           className="btn-toggle"
           style={{ flex: 'none', width: '42px', height: '40px' }}
@@ -308,6 +309,7 @@ export default function MasteryGrid({
           {sortDirection === 'asc' ? '↑' : '↓'}
         </button>
         <button
+          type="button"
           onClick={() => setViewMode(prev => prev === 'card' ? 'table' : 'card')}
           className="btn-toggle"
           style={{ flex: 'none', width: '42px', height: '40px', fontSize: '1rem' }}

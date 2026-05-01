@@ -1,9 +1,10 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { resolveApiKey } from './linaService';
+import type { UserProfile } from '../types/mastery';
 
 const GEMINI_MODEL = "gemini-2.5-flash";
 
-export async function generateChallenge(mode: 'selection' | 'input', userProfile?: any, curriculumContext?: string) {
+export async function generateChallenge(mode: 'selection' | 'input', userProfile?: UserProfile, curriculumContext?: string) {
   const apiKey = resolveApiKey();
   if (!apiKey) throw new Error("API Key missing");
 

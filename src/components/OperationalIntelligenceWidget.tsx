@@ -132,7 +132,7 @@ export default function OperationalIntelligenceWidget({ onAskLina, onOpenAchieve
                       <span style={{ fontWeight: 800, color: 'white', fontSize: '0.85rem' }}>{w.word}</span>
                       <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: STATUS_COLORS[w.status] }} />
                     </div>
-                    <button 
+                    <button type="button" 
                       onClick={() => { onAskLina(`Let's review the word: ${w.word}`); setIsOpen(false); }}
                       style={{ background: 'none', border: 'none', color: 'var(--gold)', fontSize: '0.65rem', fontWeight: 900, cursor: 'pointer', padding: '4px 8px' }}
                     >
@@ -155,7 +155,7 @@ export default function OperationalIntelligenceWidget({ onAskLina, onOpenAchieve
                       <span style={{ fontWeight: 800, color: 'white', fontSize: '0.85rem' }}>{w.word}</span>
                       <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: STATUS_COLORS[w.status] }} />
                     </div>
-                    <button 
+                    <button type="button" 
                       onClick={() => { onAskLina(`Let's review the word: ${w.word}`); setIsOpen(false); }}
                       style={{ background: 'none', border: 'none', color: 'var(--gold)', fontSize: '0.65rem', fontWeight: 900, cursor: 'pointer', padding: '4px 8px' }}
                     >
@@ -191,7 +191,7 @@ export default function OperationalIntelligenceWidget({ onAskLina, onOpenAchieve
             </section>
 
             <footer style={{ borderTop: '1px solid #222', paddingTop: '12px', textAlign: 'center' }}>
-              <button 
+              <button type="button" 
                 onClick={() => { onOpenAchievements(); setIsOpen(false); }}
                 style={{ background: 'none', border: 'none', color: '#666', fontSize: '0.7rem', fontWeight: 900, cursor: 'pointer', letterSpacing: '0.05em' }}
               >

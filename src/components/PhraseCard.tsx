@@ -66,15 +66,15 @@ const PhraseCard: React.FC<PhraseCardProps> = ({ phraseCategory, phrase, onClose
   return (
     <div style={modalStyle}>
       <div style={contentStyle}>
-        <button style={closeButtonStyle} onClick={onClose}>&times;</button>
+        <button type="button" style={closeButtonStyle} onClick={onClose}>&times;</button>
         <h3 style={{ color: '#a0aec0', marginBottom: '10px', fontSize: '1.25rem' }}>{phraseCategory.title}</h3> {/* Muted header color */}
         {/* contextParagraph removed as per user request */}
         <h4 style={{ color: '#cbd5e1', marginBottom: '10px', fontSize: '1.1rem' }}>{phrase.english}</h4> {/* Slightly less bright color for English */}
         <p style={{ fontSize: '0.9rem', marginBottom: '8px' }}><strong>Toki Pona:</strong> {phrase.tokiPona}</p>
         <p style={{ fontSize: '0.9rem', marginBottom: '16px' }}><strong>Literal Meaning:</strong> {phrase.literal}</p>
         <div style={buttonContainerStyle}>
-          <button style={buttonStyle}>Audio</button>
-          <button style={buttonStyle}>Practice with jan Lina</button>
+          <button type="button" style={buttonStyle}>Audio</button>
+          <button type="button" style={buttonStyle}>Practice with jan Lina</button>
         </div>
       </div>
     </div>

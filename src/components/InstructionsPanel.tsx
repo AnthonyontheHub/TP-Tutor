@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
-import { STATUS_META, SMALL_RANKS } from '../types/mastery';
+import { STATUS_META, SMALL_RANKS, type MasteryStatus } from '../types/mastery';
 
 interface Props {
   isOpen: boolean;
@@ -13,26 +13,17 @@ const Section = ({ title, emoji, children, defaultOpen = false }: { title: strin
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div style={{ marginBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+    <div className="guide-section">
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
-        style={{
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '16px 20px',
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          textAlign: 'left'
-        }}
+        className="guide-section__trigger"
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <span style={{ fontSize: '1.2rem' }}>{emoji}</span>
-          <span style={{ fontSize: '0.85rem', fontWeight: 900, letterSpacing: '0.1em', color: 'white' }}>{title}</span>
+        <div className="guide-section__title-row">
+          <span className="text-[1.2rem]">{emoji}</span>
+          <span className="guide-section__title">{title}</span>
         </div>
-        <span style={{ color: 'var(--gold)', fontSize: '1rem' }}>{isOpen ? '▾' : '▸'}</span>
+        <span className={`text-[var(--gold)] text-[1rem]`}>{isOpen ? '▾' : '▸'}</span>
       </button>
       <AnimatePresence>
         {isOpen && (
@@ -40,9 +31,9 @@ const Section = ({ title, emoji, children, defaultOpen = false }: { title: strin
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            style={{ overflow: 'hidden' }}
+            className="overflow-hidden"
           >
-            <div style={{ padding: '0 20px 24px 20px', fontSize: '0.85rem', color: '#aaa', lineHeight: '1.6' }}>
+            <div className="guide-section__content">
               {children}
             </div>
           </motion.div>
@@ -58,87 +49,86 @@ export default function InstructionsPanel({ onClose }: Props) {
 
   return (
     <motion.div
-      className="side-panel"
+      className="side-panel overflow-y-auto bg-[rgba(5,5,5,0.98)]"
       initial={{ x: '100%' }}
       animate={{ x: 0 }}
       exit={{ x: '100%' }}
       transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-      style={{ overflowY: 'auto', background: 'rgba(5,5,5,0.98)' }}
     >
-      <header className="side-panel-header" style={{ justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 10, background: 'rgba(5,5,5,0.95)', backdropFilter: 'blur(10px)', padding: '20px' }}>
+      <header className="side-panel-header flex justify-between sticky top-0 z-10 bg-[rgba(5,5,5,0.95)] backdrop-blur-[10px] p-5">
         <div>
-          <h2 style={{ fontSize: '1rem', fontWeight: 900, letterSpacing: '0.15em', color: 'var(--gold)', margin: 0 }}>FIELD GUIDE</h2>
-          <p style={{ margin: '4px 0 0 0', fontSize: '0.7rem', color: '#666', fontStyle: 'italic' }}>pona. here's everything you need to know.</p>
+          <h2 className="text-[1rem] font-black tracking-[0.15em] text-[var(--gold)] m-0">FIELD GUIDE</h2>
+          <p className="mt-1 mb-0 mx-0 text-[0.7rem] text-[#666] italic">pona. here's everything you need to know.</p>
         </div>
-        <button onClick={onClose} className="btn-close-glowing">✕</button>
+        <button type="button" onClick={onClose} className="btn-close-glowing">✕</button>
       </header>
 
-      <div className="side-panel-content" style={{ padding: '0 0 100px 0' }}>
+      <div className="side-panel-content hide-scrollbar pb-[100px]">
         
         <Section title="WELCOME" emoji="🌱" defaultOpen={true}>
-          <p style={{ color: '#eee', marginBottom: '20px' }}>
-            This is <span style={{ color: 'var(--gold)', fontWeight: 800 }}>TP-Tutor</span> — your personal Toki Pona immersion system. 
+          <p className="text-[#eee] mb-5">
+            This is <span className="text-[var(--gold)] font-extrabold">TP-Tutor</span> — your personal Toki Pona immersion system. 
             Toki Pona is a constructed language with only ~137 words. 
             Sounds simple. It's not. But jan Lina's got you.
           </p>
-          <div style={{ display: 'grid', gap: '12px' }}>
+          <div className="guide-grid">
             {[
               { n: '1', icon: '🧬', text: 'Set up your profile & lore in Settings so jan Lina knows your world.' },
               { n: '2', icon: '🎛️', text: 'Pick a Review Vibe on the dashboard — Chill, Deep, or Intense.' },
               { n: '3', icon: '💬', text: 'Open jan Lina and start talking. That\'s it. She takes it from there.' }
             ].map(item => (
-              <div key={item.n} style={{ display: 'flex', gap: '16px', background: 'rgba(255,255,255,0.03)', padding: '16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <div style={{ color: 'var(--gold)', fontWeight: 900, fontSize: '1.2rem' }}>{item.n}</div>
-                <div style={{ fontSize: '0.8rem', color: '#ccc' }}><span style={{ marginRight: '8px' }}>{item.icon}</span>{item.text}</div>
+              <div key={item.n} className="guide-card">
+                <div className="guide-card__number">{item.n}</div>
+                <div className="guide-card__text"><span className="guide-card__icon">{item.icon}</span>{item.text}</div>
               </div>
             ))}
           </div>
         </Section>
 
         <Section title="THE MAP" emoji="🗺️">
-          <p style={{ marginBottom: '20px' }}>Your <span style={{ color: 'var(--gold)' }}>ROADMAP</span> tab is one continuous path — past, present, and future all on the same road.</p>
+          <p className="mb-5">Your <span className="text-[var(--gold)]">ROADMAP</span> tab is one continuous path — past, present, and future all on the same road.</p>
           
-          <div style={{ background: 'rgba(0,0,0,0.2)', padding: '20px', borderRadius: '8px', marginBottom: '24px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%' }}>
-                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#444', border: '2px solid #666' }} />
-                <div style={{ flex: 1, height: '2px', background: 'var(--gold)', opacity: 0.5 }} />
-                <div style={{ fontSize: '0.7rem', color: '#888' }}>PAST: Session nodes</div>
+          <div className="bg-[rgba(0,0,0,0.2)] p-5 rounded-[8px] mb-6">
+            <div className="flex flex-col items-center gap-0">
+              <div className="flex items-center gap-3 w-full">
+                <div className="w-3 h-3 rounded-full bg-[#444] border-2 border-[#666]" />
+                <div className="flex-1 h-[2px] bg-[var(--gold)] opacity-50" />
+                <div className="text-[0.7rem] text-[#888]">PAST: Session nodes</div>
               </div>
-              <div style={{ height: '20px', width: '2px', background: 'var(--gold)', alignSelf: 'flex-start', marginLeft: '5px' }} />
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%' }}>
-                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: 'white', boxShadow: '0 0 10px white' }} />
-                <div style={{ flex: 1, height: '2px', background: 'var(--gold)' }} />
-                <div style={{ fontSize: '0.7rem', color: 'white', fontWeight: 900 }}>PRESENT: You are here</div>
+              <div className="h-5 w-[2px] bg-[var(--gold)] self-start ml-[5px]" />
+              <div className="flex items-center gap-3 w-full">
+                <div className="w-3 h-3 rounded-full bg-white shadow-[0_0_10px_white]" />
+                <div className="flex-1 h-[2px] bg-[var(--gold)]" />
+                <div className="text-[0.7rem] text-white font-black">PRESENT: You are here</div>
               </div>
-              <div style={{ height: '20px', width: '2px', borderLeft: '2px dashed var(--gold)', opacity: 0.3, alignSelf: 'flex-start', marginLeft: '5px' }} />
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%' }}>
-                <div style={{ width: '12px', height: '12px', borderRadius: '50%', border: '2px dashed #444' }} />
-                <div style={{ flex: 1, height: '2px', borderTop: '2px dashed var(--gold)', opacity: 0.2 }} />
-                <div style={{ fontSize: '0.7rem', color: '#555' }}>FUTURE: Locked content</div>
+              <div className="h-5 w-[2px] border-l-2 border-dashed border-[var(--gold)] opacity-30 self-start ml-[5px]" />
+              <div className="flex items-center gap-3 w-full">
+                <div className="w-3 h-3 rounded-full border-2 border-dashed border-[#444]" />
+                <div className="flex-1 h-[2px] border-t-2 border-dashed border-[var(--gold)] opacity-20" />
+                <div className="text-[0.7rem] text-[#555]">FUTURE: Locked content</div>
               </div>
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+          <div className="grid grid-cols-2 gap-2.5">
             {[
               { t: 'VOCAB', d: 'Your word grid. Sort, filter, explore.' },
               { t: 'ROADMAP', d: 'The unified path. Past + future.' },
               { t: 'ARCHIVE', d: 'Saved phrases, expressions, songs.' },
               { t: 'JOURNEY', d: 'Your full session history in one place.' }
             ].map(tab => (
-              <div key={tab.t} style={{ background: 'rgba(255,255,255,0.02)', padding: '12px', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <div style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--gold)', marginBottom: '4px' }}>{tab.t}</div>
-                <div style={{ fontSize: '0.7rem', color: '#888', lineHeight: '1.3' }}>{tab.d}</div>
+              <div key={tab.t} className="bg-[rgba(255,255,255,0.02)] p-3 rounded-[4px] border border-[rgba(255,255,255,0.05)]">
+                <div className="text-[0.65rem] font-black text-[var(--gold)] mb-1">{tab.t}</div>
+                <div className="text-[0.7rem] text-[#888] leading-[1.3]">{tab.d}</div>
               </div>
             ))}
           </div>
         </Section>
 
         <Section title="JAN LINA" emoji="🤖">
-          <p style={{ color: '#eee' }}>jan Lina is your AI tutor. <span style={{ color: 'var(--gold)' }}>Cool older sister energy</span>. She knows Toki Pona. She knows your life (if you set up your lore). She will call you out.</p>
+          <p className="text-[#eee]">jan Lina is your AI tutor. <span className="text-[var(--gold)]">Cool older sister energy</span>. She knows Toki Pona. She knows your life (if you set up your lore). She will call you out.</p>
           
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', margin: '20px 0' }}>
+          <div className="grid grid-cols-3 gap-2.5 my-5">
             {[
               { i: '💬', t: 'CHAT', s: 'General convo' },
               { i: '📚', t: 'LESSON', s: 'Structured' },
@@ -147,104 +137,106 @@ export default function InstructionsPanel({ onClose }: Props) {
               { i: '⚖️', t: 'COURT', s: 'Petition' },
               { i: '📝', t: 'BUILDER', s: 'Practice' }
             ].map(item => (
-              <div key={item.t} style={{ textAlign: 'center', background: 'rgba(255,255,255,0.02)', padding: '10px 5px', borderRadius: '8px' }}>
-                <div style={{ fontSize: '1.2rem', marginBottom: '4px' }}>{item.i}</div>
-                <div style={{ fontSize: '0.6rem', fontWeight: 900, color: 'white' }}>{item.t}</div>
-                <div style={{ fontSize: '0.5rem', opacity: 0.5 }}>{item.s}</div>
+              <div key={item.t} className="text-center bg-[rgba(255,255,255,0.02)] py-2.5 px-[5px] rounded-[8px]">
+                <div className="text-[1.2rem] mb-1">{item.i}</div>
+                <div className="text-[0.6rem] font-black text-white">{item.t}</div>
+                <div className="text-[0.5rem] opacity-50">{item.s}</div>
               </div>
             ))}
           </div>
 
-          <p style={{ fontSize: '0.8rem', marginBottom: '12px' }}>
-            <strong style={{ color: 'var(--gold)' }}>CALIBRATING:</strong> When you see this, jan Lina is silently proposing a mastery update. It applies when you end the session.
+          <p className="text-[0.8rem] mb-3">
+            <strong className="text-[var(--gold)]">CALIBRATING:</strong> When you see this, jan Lina is silently proposing a mastery update. It applies when you end the session.
           </p>
-          <p style={{ fontSize: '0.8rem', marginBottom: '24px' }}>
-            <strong style={{ color: 'var(--gold)' }}>SESSION END:</strong> Say goodbye naturally — "that's all", "thanks". She'll wrap up, write session notes, and commit your progress.
+          <p className="text-[0.8rem] mb-6">
+            <strong className="text-[var(--gold)]">SESSION END:</strong> Say goodbye naturally — "that's all", "thanks". She'll wrap up, write session notes, and commit your progress.
           </p>
 
-          <div style={{ border: '1px solid var(--gold)', padding: '16px', borderRadius: '8px', background: 'rgba(255,191,0,0.05)' }}>
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '8px' }}>
+          <div className="border border-[var(--gold)] p-4 rounded-[8px] bg-[rgba(255,191,0,0.05)]">
+            <div className="flex gap-2.5 items-center mb-2">
               <span>⚖️</span>
-              <span style={{ fontWeight: 900, fontSize: '0.75rem', color: 'var(--gold)', letterSpacing: '0.1em' }}>MASTERY COURT</span>
+              <span className="font-black text-[0.75rem] text-[var(--gold)] tracking-[0.1em]">MASTERY COURT</span>
             </div>
-            <p style={{ fontSize: '0.75rem', margin: 0, opacity: 0.8 }}>Think a word was upgraded by mistake? Go to Settings → Mastery Court. Make your case. She decides. She can say no.</p>
+            <p className="text-[0.75rem] m-0 opacity-80">Think a word was upgraded by mistake? Go to Settings → Mastery Court. Make your case. She decides. She can say no.</p>
           </div>
         </Section>
 
         <Section title="YOUR WORDS" emoji="📖">
-          <p style={{ marginBottom: '16px' }}>The <span style={{ color: 'var(--gold)', fontWeight: 800 }}>Neural Resonance System</span> tracks your brain's connection to each word across three distinct nodes: <span style={{ color: 'white' }}>Noun</span>, <span style={{ color: 'white' }}>Verb</span>, and <span style={{ color: 'white' }}>Modifier</span>.</p>
+          <p className="mb-4">The <span className="text-[var(--gold)] font-extrabold">Neural Resonance System</span> tracks your brain's connection to each word across three distinct nodes: <span className="text-white">Noun</span>, <span className="text-white">Verb</span>, and <span className="text-white">Modifier</span>.</p>
           
-          <div style={{ background: 'rgba(255,255,255,0.02)', padding: '16px', borderRadius: '8px', border: '1px solid #222', marginBottom: '24px' }}>
-             <div style={{ fontSize: '0.65rem', fontWeight: 900, color: 'var(--gold)', marginBottom: '10px' }}>TRI-NODE MATRIX</div>
-             <p style={{ fontSize: '0.75rem', margin: 0 }}>Total Mastery (0-1000) is the sum of these three nodes. To master a word, you must use it in all three roles.</p>
+          <div className="bg-[rgba(255,255,255,0.02)] p-4 rounded-[8px] border border-[#222] mb-6">
+             <div className="text-[0.65rem] font-black text-[var(--gold)] mb-2.5">TRI-NODE MATRIX</div>
+             <p className="text-[0.75rem] m-0">Total Mastery (0-1000) is the sum of these three nodes. To master a word, you must use it in all three roles.</p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '24px' }}>
+          <div className="grid grid-cols-2 gap-2 mb-6">
             {[
-              { s: 'not_started', r: '0–200' },
-              { s: 'introduced', r: '201–500' },
-              { s: 'practicing', r: '501–750' },
-              { s: 'confident', r: '751–949' },
-              { s: 'mastered', r: '950–1000' }
+              { s: 'not_started' as MasteryStatus, r: '0–200' },
+              { s: 'introduced' as MasteryStatus, r: '201–500' },
+              { s: 'practicing' as MasteryStatus, r: '501–750' },
+              { s: 'confident' as MasteryStatus, r: '751–949' },
+              { s: 'mastered' as MasteryStatus, r: '950–1000' }
             ].map(item => (
-              <div key={item.s} style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.03)', padding: '6px 10px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <span style={{ fontSize: '0.8rem' }}>{STATUS_META[item.s as any].emoji}</span>
-                <div style={{ fontSize: '0.6rem', fontWeight: 900, color: 'white' }}>{STATUS_META[item.s as any].label}</div>
-                <div style={{ fontSize: '0.5rem', opacity: 0.4, marginLeft: 'auto' }}>{item.r}</div>
+              <div key={item.s} className="guide-stat-row">
+                <span className="text-[0.8rem]">{STATUS_META[item.s].emoji}</span>
+                <div className="text-[0.6rem] font-black text-white">{STATUS_META[item.s].label}</div>
+                <div className="text-[0.5rem] opacity-40 ml-auto">{item.r}</div>
               </div>
             ))}
           </div>
 
-          <div style={{ display: 'grid', gap: '10px', marginBottom: '24px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', padding: '10px 12px', background: 'rgba(34,197,94,0.05)', borderRadius: '4px', borderLeft: '3px solid #22c55e' }}>
-              <span style={{ color: '#22c55e', fontWeight: 900, fontSize: '0.65rem' }}>SYNC RATE (XP BONUSES)</span>
-              <ul style={{ margin: 0, paddingLeft: '15px', fontSize: '0.7rem', color: '#ccc' }}>
-                <li><span style={{ color: 'white' }}>Base Sync (+10):</span> Standard correct usage.</li>
-                <li><span style={{ color: 'white' }}>Structural Sync (+25):</span> Correct use of 'e', 'la', or 'pi'.</li>
-                <li><span style={{ color: 'white' }}>Lore Sync (2.0x):</span> Referencing your personal background.</li>
+          <div className="guide-grid mb-6">
+            <div className="flex flex-col gap-1 py-2.5 px-3 bg-[rgba(34,197,94,0.05)] rounded-[4px] border-l-[3px] border-[#22c55e]">
+              <span className="text-[#22c55e] font-black text-[0.65rem]">SYNC RATE (XP BONUSES)</span>
+              <ul className="m-0 pl-[15px] text-[0.7rem] text-[#ccc]">
+                <li><span className="text-white">Base Sync (+10):</span> Standard correct usage.</li>
+                <li><span className="text-white">Structural Sync (+25):</span> Correct use of 'e', 'la', or 'pi'.</li>
+                <li><span className="text-white">Lore Sync (2.0x):</span> Referencing your personal background.</li>
               </ul>
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '10px', marginBottom: '24px' }}>
-            <div style={{ flex: 1, padding: '10px', borderRadius: '4px', background: 'rgba(239,68,68,0.05)', border: '1px solid #7f1d1d' }}>
-              <div style={{ fontSize: '0.6rem', fontWeight: 900, color: '#f87171', marginBottom: '2px' }}>🔒 NODE LOCK</div>
-              <div style={{ fontSize: '0.65rem', opacity: 0.7 }}>A node stops gaining points if it's 100+ ahead of your lowest node for that word. Balance is mandatory.</div>
+          <div className="flex gap-2.5 mb-6">
+            <div className="flex-1 p-2.5 rounded-[4px] bg-[rgba(239,68,68,0.05)] border border-[#7f1d1d]">
+              <div className="text-[0.6rem] font-black text-[#f87171] mb-[2px]">🔒 NODE LOCK</div>
+              <div className="text-[0.65rem] opacity-70">A node stops gaining points if it's 100+ ahead of your lowest node for that word. Balance is mandatory.</div>
             </div>
-            <div style={{ flex: 1, padding: '10px', borderRadius: '4px', background: 'rgba(34,197,94,0.05)', border: '1px solid #166534' }}>
-              <div style={{ fontSize: '0.6rem', fontWeight: 900, color: '#4ade80', marginBottom: '2px' }}>🛡️ HARDENING</div>
-              <div style={{ fontSize: '0.65rem', opacity: 0.7 }}>Nodes at 950+ pts are immune to neural decay.</div>
+            <div className="flex-1 p-2.5 rounded-[4px] bg-[rgba(34,197,94,0.05)] border border-[#166534]">
+              <div className="text-[0.6rem] font-black text-[#4ade80] mb-[2px]">🛡️ HARDENING</div>
+              <div className="text-[0.65rem] opacity-70">Nodes at 950+ pts are immune to neural decay.</div>
             </div>
           </div>
 
-          <div style={{ padding: '12px', borderRadius: '8px', background: 'rgba(59,130,246,0.1)', border: '1px solid #3b82f6' }}>
-            <div style={{ fontSize: '0.6rem', fontWeight: 900, color: '#60a5fa', marginBottom: '4px' }}>⚡ GRID CHARGE</div>
-            <p style={{ fontSize: '0.65rem', margin: 0, opacity: 0.8 }}>Completing a Roadmap node "charges" your grid, freezing all decay for 24 hours.</p>
+          <div className="p-3 rounded-[8px] bg-[rgba(59,130,246,0.1)] border border-[#3b82f6]">
+            <div className="text-[0.6rem] font-black text-[#60a5fa] mb-1">⚡ GRID CHARGE</div>
+            <p className="text-[0.65rem] m-0 opacity-80">Completing a Roadmap node "charges" your grid, freezing all decay for 24 hours.</p>
           </div>
         </Section>
 
         <Section title="YOUR PROGRESS" emoji="🏆">
-          <p style={{ marginBottom: '20px' }}>Your <span style={{ color: 'var(--gold)', fontWeight: 800 }}>XP</span> represents your total resonance with the language. It scales up to 100,000 for the highest honor.</p>
+          <p className="mb-5">Your <span className="text-[var(--gold)] font-extrabold">XP</span> represents your total resonance with the language. It scales up to 100,000 for the highest honor.</p>
           
-          <div style={{ textAlign: 'center', marginBottom: '12px', fontSize: '0.7rem', color: '#666', fontWeight: 800 }}>
-            CURRENT XP: <span style={{ color: 'white' }}>{summary.xp.toLocaleString()}</span>
+          <div className="text-center mb-3 text-[0.7rem] text-[#666] font-extrabold">
+            CURRENT XP: <span className="text-white">{summary.xp.toLocaleString()}</span>
           </div>
 
-          <div style={{ background: '#111', borderRadius: '8px', border: '1px solid #222', overflow: 'hidden', marginBottom: '32px' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.75rem' }}>
+          <div className="bg-[#111] rounded-[8px] border border-[#222] overflow-hidden mb-8">
+            <table className="w-full border-collapse text-[0.75rem]">
               <tbody>
                 {[...SMALL_RANKS].reverse().map(r => {
                   const isCurrent = summary.rankTitle === r.title;
                   return (
-                    <tr key={r.title} style={{ 
-                      background: isCurrent ? 'var(--gold)' : 'transparent',
-                      color: isCurrent ? 'black' : '#888',
-                      borderBottom: '1px solid #222'
-                    }}>
-                      <td style={{ padding: '8px 16px', fontWeight: 900, opacity: isCurrent ? 1 : 0.4 }}>{r.xpThreshold.toLocaleString()}</td>
-                      <td style={{ padding: '8px 16px', fontWeight: 900 }}>
+                    <tr key={r.title} 
+                      className="border-b border-[#222]"
+                      style={{ 
+                        background: isCurrent ? 'var(--gold)' : 'transparent',
+                        color: isCurrent ? 'black' : '#888'
+                      }}
+                    >
+                      <td className="py-2 px-4 font-black" style={{ opacity: isCurrent ? 1 : 0.4 }}>{r.xpThreshold.toLocaleString()}</td>
+                      <td className="py-2 px-4 font-black">
                         {r.title.toUpperCase()}
-                        {isCurrent && <span style={{ marginLeft: '12px', fontSize: '0.6rem', opacity: 0.7 }}>← YOU</span>}
+                        {isCurrent && <span className="ml-3 text-[0.6rem] opacity-70">← YOU</span>}
                       </td>
                     </tr>
                   );
@@ -253,18 +245,18 @@ export default function InstructionsPanel({ onClose }: Props) {
             </table>
           </div>
 
-          <div style={{ marginBottom: '32px' }}>
-            <h4 style={{ fontSize: '0.65rem', color: 'var(--gold)', letterSpacing: '0.1em', marginBottom: '12px' }}>🔥 STREAK BONUSES</h4>
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <div className="mb-8">
+            <h4 className="text-[0.65rem] text-[var(--gold)] tracking-[0.1em] mb-3">🔥 STREAK BONUSES</h4>
+            <div className="flex gap-2 flex-wrap">
               {[
                 { d: '3', m: '1.1' },
                 { d: '7', m: '1.25' },
                 { d: '14', m: '1.5' },
                 { d: '30', m: '1.75' }
               ].map(s => (
-                <div key={s.d} style={{ padding: '6px 12px', background: 'rgba(255,255,255,0.03)', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.1)' }}>
-                  <div style={{ fontSize: '0.5rem', opacity: 0.5, fontWeight: 900 }}>{s.d} DAYS</div>
-                  <div style={{ fontSize: '0.8rem', fontWeight: 900, color: 'var(--gold)' }}>{s.m}x</div>
+                <div key={s.d} className="py-1.5 px-3 bg-[rgba(255,255,255,0.03)] rounded-[4px] border border-[rgba(255,255,255,0.1)]">
+                  <div className="text-[0.5rem] opacity-50 font-black">{s.d} DAYS</div>
+                  <div className="text-[0.8rem] font-black text-[var(--gold)]">{s.m}x</div>
                 </div>
               ))}
             </div>
@@ -272,25 +264,25 @@ export default function InstructionsPanel({ onClose }: Props) {
         </Section>
 
         <Section title="THE ARCHIVE" emoji="📦">
-          <div style={{ display: 'grid', gap: '12px' }}>
+          <div className="guide-grid">
             {[
               { i: '💾', t: 'MY SAVES', d: 'Phrases you\'ve saved from the Sentence Builder or jan Lina sessions. Tap to practice.' },
               { i: '🗣️', t: 'COMMON PHRASES', d: 'Everyday Toki Pona expressions. Good starting point for real conversation.' },
               { i: '🎵', t: 'DISCOGRAPHY', d: 'Toki Pona songs and lyrics. Use INTENSE vibe to deep-dive with jan Lina.' }
             ].map(item => (
-              <div key={item.t} style={{ background: 'rgba(255,255,255,0.03)', padding: '16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '1.2rem' }}>{item.i}</span>
-                  <span style={{ fontSize: '0.75rem', fontWeight: 900, color: 'white', letterSpacing: '0.1em' }}>{item.t}</span>
+              <div key={item.t} className="guide-card">
+                <div className="flex items-center gap-2.5 mb-2">
+                  <span className="text-[1.2rem]">{item.i}</span>
+                  <span className="text-[0.75rem] font-black text-white tracking-[0.1em]">{item.t}</span>
                 </div>
-                <div style={{ fontSize: '0.8rem', color: '#888', lineHeight: '1.4' }}>{item.d}</div>
+                <div className="text-[0.8rem] text-[#888] leading-[1.4]">{item.d}</div>
               </div>
             ))}
           </div>
         </Section>
 
         <Section title="TROUBLESHOOTING" emoji="⚙️">
-          <div style={{ display: 'grid', gap: '20px' }}>
+          <div className="guide-grid gap-5">
             {[
               { q: 'Why isn\'t jan Lina responding?', a: 'Check Settings for a valid Gemini API Key. Or flip on Sandbox Mode to test the UI without API calls.' },
               { q: 'How do I get a word to Mastered?', a: 'You can\'t just grind it — jan Lina has to agree. Show her you know it. She\'ll propose the upgrade when she\'s satisfied.' },
@@ -301,8 +293,8 @@ export default function InstructionsPanel({ onClose }: Props) {
               { q: 'What does BLEEDING mean?', a: 'A word that\'s dropped 50+ points in 48 hours. It\'s slipping. Review it before it falls a full tier.' }
             ].map(item => (
               <div key={item.q}>
-                <div style={{ fontSize: '0.8rem', fontWeight: 900, color: 'white', marginBottom: '4px' }}>Q: {item.q}</div>
-                <div style={{ fontSize: '0.8rem', color: '#888', lineHeight: '1.4' }}>A: {item.a}</div>
+                <div className="text-[0.8rem] font-black text-white mb-1">Q: {item.q}</div>
+                <div className="text-[0.8rem] text-[#888] leading-[1.4]">A: {item.a}</div>
               </div>
             ))}
           </div>

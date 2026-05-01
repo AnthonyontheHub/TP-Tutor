@@ -37,7 +37,7 @@ const STATUS_GLOWS: Record<MasteryStatus, string> = {
   introduced: 'rgba(168, 85, 247, 0.6)',
   practicing: 'rgba(59, 130, 246, 0.6)',
   confident: 'rgba(234, 179, 8, 0.6)',
-  mastered: 'rgba(34, 197,  green, 0.85)',
+  mastered: 'rgba(34, 197, 94, 0.85)',
 };
 
 export default function VocabCard({ word, onLongPress, onClick, onAskLina, isSandboxMode, isDimmed, isSelected, isRelated }: Props) {
@@ -122,15 +122,8 @@ export default function VocabCard({ word, onLongPress, onClick, onAskLina, isSan
 
   return (
     <div
-      className={`glass-panel vocab-card ${isSelected ? 'neon-border-gold active-pulse' : ''} ${isRelated ? 'is-related' : ''}`}
+      className={`glass-panel vocab-card ${isSelected ? 'neon-border-gold active-pulse' : ''} ${isRelated ? 'is-related' : ''} touch-none flex flex-col gap-1 transition-all duration-300 ease-in-out`}
       style={{ 
-        touchAction: 'none', 
-        padding: '12px 10px',
-        position: 'relative',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '4px',
-        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         opacity: isDimmed ? 0.3 : 1,
         borderColor: isSelected ? 'var(--gold)' : (isDimmed ? '#222' : statusColor),
         boxShadow: isSelected 
@@ -145,31 +138,16 @@ export default function VocabCard({ word, onLongPress, onClick, onAskLina, isSan
       onClick={handleCardClick}
     >
       <div className="vocab-card__bg-symbol">{word.word}</div>
-      <style>{`
-        @keyframes activePulse {
-          0% { box-shadow: 0 0 10px rgba(255, 191, 0, 0.2); }
-          50% { box-shadow: 0 0 20px rgba(255, 191, 0, 0.4); }
-          100% { box-shadow: 0 0 10px rgba(255, 191, 0, 0.2); }
-        }
-        .active-pulse { animation: activePulse 2s infinite; }
-        .vocab-card__quick-action {
-          opacity: 0;
-          transition: opacity 0.2s ease;
-        }
-        .vocab-card:hover .vocab-card__quick-action {
-          opacity: 1;
-        }
-      `}</style>
 
       {/* Top Right Icons */}
-      <div style={{ position: 'absolute', top: '8px', right: '8px', display: 'flex', gap: '6px', alignItems: 'center' }}>
+      <div className="absolute top-2 right-2 flex gap-[6px] items-center">
         {hasAIContent && (
-          <MessageSquare size={12} className="neon-text-gold" style={{ opacity: 0.8 }} />
+          <MessageSquare size={12} className="neon-text-gold opacity-80" />
         )}
         <div 
-          className="vocab-card__status"
+          className="vocab-card__status p-1 rounded-[4px] bg-white/5"
           onClick={handleStatusClick}
-          style={{ color: statusColor, background: 'rgba(255,255,255,0.03)', padding: '4px', borderRadius: '4px' }}
+          style={{ color: statusColor }}
         >
           {STATUS_ICONS[status]}
         </div>
@@ -177,34 +155,24 @@ export default function VocabCard({ word, onLongPress, onClick, onAskLina, isSan
 
       {/* Quick Action */}
       <div 
-        className="vocab-card__quick-action"
+        className="vocab-card__quick-action absolute bottom-2 right-2 text-[var(--gold)] cursor-pointer"
         onClick={handleDeepDive}
-        style={{ position: 'absolute', bottom: '8px', right: '8px', color: 'var(--gold)', cursor: 'pointer' }}
       >
         <Info size={14} />
       </div>
 
       <div 
-        className="vocab-card__word" 
-        style={{ 
-          fontWeight: 900,
-          textTransform: 'uppercase',
-          letterSpacing: '0.15em',
-          fontSize: '0.85rem',
-          color: 'var(--text)',
-          wordBreak: 'break-word',
-          marginTop: '4px'
-        }}
+        className="vocab-card__word font-black uppercase tracking-[0.15em] text-[0.85rem] text-[var(--text)] break-words mt-1" 
       >
         {word.type === 'grammar' ? word.sessionNotes : word.word}
       </div>
 
-      <div className="vocab-card__pos" style={{ fontSize: '0.6rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>
+      <div className="vocab-card__pos text-[0.6rem] text-[var(--text-muted)] uppercase tracking-[0.05em] font-bold">
         {word.type === 'grammar' ? 'GRAMMAR' : word.partOfSpeech}
       </div>
 
       {word.pinnedExample && (
-        <div style={{ fontSize: '0.65rem', color: 'var(--gold)', fontStyle: 'italic', marginTop: '2px', opacity: 0.6, lineHeight: 1.2 }}>
+        <div className="text-[0.65rem] text-[var(--gold)] italic mt-[2px] opacity-60 leading-[1.2]">
           "{word.pinnedExample}"
         </div>
       )}

@@ -36,7 +36,7 @@ const TrainingHub: React.FC<Props> = ({ onClose }) => {
             <h2 className="text-3xl font-black uppercase tracking-[0.2em] text-white">Neural Training Hub</h2>
             <p className="text-zinc-500 text-xs uppercase tracking-[0.3em] mt-2">Personalized Performance Modules</p>
           </div>
-          <button 
+          <button type="button" 
             onClick={onClose}
             className="p-3 bg-white/5 border border-white/10 rounded-full text-white/40 hover:text-white hover:bg-white/10 transition-all"
           >

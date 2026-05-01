@@ -31,7 +31,7 @@ export default function AchievementsPanel({ onClose }: Props) {
     >
       <header className="side-panel-header" style={{ justifyContent: 'space-between' }}>
         <h2 style={{ fontSize: '0.9rem', fontWeight: 900, letterSpacing: '0.15em', color: 'var(--gold)' }}>ACHIEVEMENTS</h2>
-        <button onClick={onClose} className="btn-close-glowing">✕</button>
+        <button type="button" onClick={onClose} className="btn-close-glowing">✕</button>
       </header>
 
       <div className="side-panel-content">
@@ -84,8 +84,8 @@ export default function AchievementsPanel({ onClose }: Props) {
         <div className="glass-panel">
           <h3 className="section-title" style={{ fontSize: '0.6rem' }}>Neural Log</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '10px' }}>
-            {history.slice().reverse().slice(0, 10).map((s, i) => (
-              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+            {history.slice().reverse().slice(0, 10).map((s) => (
+              <div key={s.date} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
                 <span style={{ color: '#888' }}>{s.date}</span>
                 <span style={{ fontWeight: 700, color: 'var(--gold)' }}>{s.xp} XP</span>
               </div>

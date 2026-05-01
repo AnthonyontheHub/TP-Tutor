@@ -2,14 +2,21 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, LogOut, Loader2 } from 'lucide-react';
 import { generateChallenge, evaluateInput } from '../../services/geminiService';
+import type { UserProfile } from '../../types/mastery';
 
-export const Essentializer = ({ userProfile, curriculumContext, onSessionEnd }) => {
-  const [currentChallenge, setCurrentChallenge] = useState(null);
+interface Props {
+  userProfile: UserProfile;
+  curriculumContext: string;
+  onSessionEnd: (stats: { score: number; total: number }) => void;
+}
+
+export const Essentializer = ({ userProfile, curriculumContext, onSessionEnd }: Props) => {
+  const [currentChallenge, setCurrentChallenge] = useState<any>(null);
   const [streak, setStreak] = useState(0);
   const [totalChallenges, setTotalChallenges] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [userInput, setUserInput] = useState('');
-  const [feedback, setFeedback] = useState(null);
+  const [feedback, setFeedback] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -27,7 +34,7 @@ export const Essentializer = ({ userProfile, curriculumContext, onSessionEnd }) 
     } finally {
       setIsLoading(false);
     }
-  }, [mode]);
+  }, [mode, userProfile, curriculumContext]);
 
   useEffect(() => { loadNextChallenge(); }, [loadNextChallenge]);
 
@@ -93,9 +100,9 @@ export const Essentializer = ({ userProfile, curriculumContext, onSessionEnd }) 
               {!feedback ? (
                 mode === 'selection' ? (
                   <div className="grid gap-4">
-                    {currentChallenge.options.map((opt, i) => (
-                      <button 
-                        key={i} 
+                    {currentChallenge.options.map((opt) => (
+                      <button type="button"
+                        key={opt} 
                         onClick={() => handleSelection(opt)} 
                         className="w-full p-6 text-left rounded-2xl border border-white/5 bg-white/5 hover:border-rose-500/40 hover:bg-rose-500/10 transition-all group uppercase tracking-[0.15em] text-white/60 hover:text-white font-medium"
                       >
@@ -111,7 +118,7 @@ export const Essentializer = ({ userProfile, curriculumContext, onSessionEnd }) 
                       placeholder="Enter simple essence..." 
                       className="w-full h-40 bg-black/60 border border-white/10 rounded-[2rem] p-6 text-white placeholder:text-white/10 focus:outline-none focus:border-rose-600/50 transition-all text-lg font-light resize-none" 
                     />
-                    <button 
+                    <button type="button"
                       onClick={handleInputSubmit} 
                       disabled={!userInput || isSubmitting} 
                       className="w-full py-5 bg-rose-600 text-white font-black uppercase tracking-[0.4em] rounded-2xl hover:bg-rose-500 shadow-[0_10px_30px_rgba(225,29,72,0.3)] transition-all"
@@ -125,7 +132,7 @@ export const Essentializer = ({ userProfile, curriculumContext, onSessionEnd }) 
                    <div className={`p-8 rounded-[2rem] border ${feedback.score >= 70 ? 'border-rose-500/30 bg-rose-500/5' : 'border-white/10 bg-white/5'}`}>
                       <p className="text-base text-white/80 leading-relaxed italic">"{feedback.feedback}"</p>
                    </div>
-                   <button 
+                   <button type="button"
                     onClick={loadNextChallenge} 
                     className="w-full py-5 bg-rose-600 text-white font-black uppercase tracking-[0.4em] rounded-2xl hover:bg-rose-500 transition-all flex items-center justify-center gap-3"
                   >
@@ -138,7 +145,7 @@ export const Essentializer = ({ userProfile, curriculumContext, onSessionEnd }) 
         )}
       </AnimatePresence>
 
-      <button 
+      <button type="button"
         onClick={() => onSessionEnd({ score: correctAnswers, total: totalChallenges })} 
         className="mt-16 mx-auto flex items-center gap-3 text-[10px] uppercase tracking-[0.5em] text-white/20 hover:text-rose-500 transition-all group py-2 px-4 border border-transparent hover:border-rose-500/20 rounded-full"
       >

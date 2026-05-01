@@ -184,7 +184,7 @@ const SessionRecap: React.FC<SessionRecapProps> = ({
             >
               <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)', animation: 'shimmer 2s infinite' }} />
               <h3 style={{ fontSize: '0.7rem', color: 'var(--gold)', letterSpacing: '0.2em', margin: '0 0 8px 0' }}>NEW RANK UNLOCKED</h3>
-              <div style={{ fontSize: '1.5rem', fontWeight: 900, marginBottom: '8px' }}>{'title' in newRankUnlocked ? newRankUnlocked.title : (newRankUnlocked as any).label}</div>
+              <div style={{ fontSize: '1.5rem', fontWeight: 900, marginBottom: '8px' }}>{newRankUnlocked.title}</div>
               <p style={{ fontSize: '0.8rem', opacity: 0.7, margin: 0 }}>{'description' in newRankUnlocked ? newRankUnlocked.description : 'Higher XP reached'}</p>
             </motion.div>
           )}
@@ -198,7 +198,7 @@ const SessionRecap: React.FC<SessionRecapProps> = ({
 
       </div>
 
-      <button 
+      <button type="button" 
         onClick={onContinue}
         style={{
           marginTop: 'auto',

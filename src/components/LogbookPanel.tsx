@@ -31,7 +31,7 @@ export default function LogbookPanel({ onClose }: Props) {
     >
       <header className="side-panel-header" style={{ justifyContent: 'space-between' }}>
         <h2 style={{ fontSize: '0.9rem', fontWeight: 900, letterSpacing: '0.15em', color: 'var(--gold)' }}>TEACHER'S LOGBOOK</h2>
-        <button onClick={onClose} className="close-button">✕</button>
+        <button type="button" onClick={onClose} className="close-button">✕</button>
       </header>
 
       <div className="side-panel-content" style={{ padding: '24px', overflowY: 'auto' }}>

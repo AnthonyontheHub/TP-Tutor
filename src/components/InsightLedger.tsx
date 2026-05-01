@@ -55,7 +55,7 @@ const InsightLedger: React.FC<Props> = ({ onClose }) => {
       >
         <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h2 style={{ fontSize: '1rem', fontWeight: 900, letterSpacing: '0.2em', margin: 0 }}>INSIGHT LOG</h2>
-          <button 
+          <button type="button" 
             onClick={onClose}
             style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer', padding: '4px' }}
           >

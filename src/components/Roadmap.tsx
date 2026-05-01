@@ -3,28 +3,12 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import NodeDossier from './NodeDossier';
-import type { CurriculumNode, ReviewVibe } from '../types/mastery';
+import type { CurriculumNode } from '../types/mastery';
 import { Crown, Map, Lock, Sparkles, Brain, Zap } from 'lucide-react';
 
 interface Props {
   onAskLina: (p: string) => void;
   isSandboxMode: boolean;
-}
-
-type RoadmapLevelLite = { nodes: { id: string; title: string }[] };
-export function getRoadmapLessonPrompt(curriculums: RoadmapLevelLite[], currentPositionNodeId: string, reviewVibe: ReviewVibe | null) {
-  const activeNode = curriculums.flatMap(l => l.nodes).find(n => n.id === currentPositionNodeId);
-  const nodeTitle = activeNode?.title || 'Current Module';
-
-  if (reviewVibe === 'chill') {
-    return `[SYSTEM: Roadmap Lesson - NEW CONCEPT. Focus strictly on current module items for "${nodeTitle}".]`;
-  } else if (reviewVibe === 'deep') {
-    return `[SYSTEM: Roadmap Lesson - REVIEW. Mix items from "${nodeTitle}" with previously introduced words.]`;
-  } else if (reviewVibe === 'intense') {
-    return `[SYSTEM: Roadmap Lesson - QUIZ / LEVEL UP. Conduct a proficiency test on the current module "${nodeTitle}".]`;
-  } else {
-    return `[SYSTEM: Roadmap Lesson. Continue "${nodeTitle}" with a mix of new material and past review.]`;
-  }
 }
 
 export default function Roadmap({ onAskLina, isSandboxMode }: Props) {
@@ -92,7 +76,15 @@ export default function Roadmap({ onAskLina, isSandboxMode }: Props) {
 
       <AnimatePresence>
         {selectedNode && (
-          <div className="modal-backdrop" style={{ zIndex: 5000 }} onClick={() => setSelectedNode(null)}>
+          <div 
+            className="modal-backdrop" 
+            style={{ zIndex: 5000 }} 
+            onClick={() => setSelectedNode(null)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => { if (e.key === 'Escape' || e.key === 'Enter') setSelectedNode(null); }}
+            aria-label="Close dossier"
+          >
             <div onClick={e => e.stopPropagation()} style={{ width: '100%', maxWidth: '500px' }}>
               <NodeDossier 
                 node={selectedNode} 

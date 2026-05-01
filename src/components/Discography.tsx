@@ -35,37 +35,25 @@ export default function Discography({ onAskLina, selectedWords = [] }: Props) {
 
   return (
     <div className="flex flex-col gap-6">
-      <style>{`
-        .album-card:hover .album-icon-container {
-          border-color: var(--gold);
-          box-shadow: 0 0 20px var(--gold-glow);
-          transform: translateY(-2px);
-        }
-        .album-card:hover {
-          border-color: var(--gold) !important;
-        }
-      `}</style>
-      
       <h2 className="section-title">DISCOGRAPHY</h2>
       
       {!selectedAlbumId ? (
-         <div style={{ display: 'grid', gap: '24px', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))' }}>
+         <div className="grid gap-6 grid-cols-[repeat(auto-fill,minmax(240px,1fr))]">
            {safeSongs.length === 0 ? (
-             <div className="glass-panel" style={{ gridColumn: '1/-1', textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)' }}>
+             <div className="glass-panel col-span-full text-center py-[60px] px-5 text-[var(--text-muted)]">
                No archives found in this sector.
              </div>
            ) : safeSongs.map(album => (
-             <button 
+             <button type="button" 
               key={album.id}
               onClick={() => setSelectedAlbumId(album.id)}
-              className="glass-panel album-card"
-              style={{ padding: '40px 24px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}
+              className="glass-panel album-card p-10 px-6 text-center flex flex-col items-center transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
              >
-               <div className="glass-panel album-icon-container" style={{ width: '80px', height: '80px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px', transition: 'all 0.3s ease', border: '1px solid var(--border)' }}>
-                 <Music size={32} color="var(--gold)" style={{ filter: 'drop-shadow(0 0 8px var(--gold-glow))' }} />
+               <div className="glass-panel album-icon-container w-20 h-20 rounded-full flex items-center justify-center mb-6 transition-all duration-300 ease-in-out border border-[var(--border)]">
+                 <Music size={32} color="var(--gold)" className="drop-shadow-[0_0_8px_var(--gold-glow)]" />
                </div>
-               <div style={{ fontWeight: 900, color: 'var(--text)', textTransform: 'uppercase', letterSpacing: '0.2em', fontSize: '0.85rem', marginBottom: '8px' }}>{album.title}</div>
-               <div style={{ color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+               <div className="font-black text-[var(--text)] uppercase tracking-[0.2em] text-[0.85rem] mb-2">{album.title}</div>
+               <div className="text-[var(--text-muted)] text-[0.65rem] font-bold tracking-[0.1em] uppercase">
                  EST. {album.year || 2025}
                </div>
              </button>
@@ -73,30 +61,29 @@ export default function Discography({ onAskLina, selectedWords = [] }: Props) {
          </div>
       ) : !selectedTrackTitle ? (
         <div className="flex flex-col gap-6">
-          <button onClick={() => setSelectedAlbumId(null)} className="btn-back" style={{ alignSelf: 'flex-start' }}>
+          <button type="button" onClick={() => setSelectedAlbumId(null)} className="btn-back self-start">
             <ChevronLeft size={14} /> BACK TO ALBUMS
           </button>
           
           <div className="flex flex-col gap-2">
-            <span style={{ fontSize: '0.6rem', fontWeight: 900, color: 'var(--text-muted)', letterSpacing: '0.2em' }}>NOW VIEWING ARCHIVE</span>
-            <h3 className="section-title" style={{ fontSize: '1.2rem', margin: 0 }}>{safeSongs.find(a => a.id === selectedAlbumId)?.title}</h3>
+            <span className="text-[0.6rem] font-black text-[var(--text-muted)] tracking-[0.2em]">NOW VIEWING ARCHIVE</span>
+            <h3 className="section-title text-[1.2rem] m-0">{safeSongs.find(a => a.id === selectedAlbumId)?.title}</h3>
           </div>
 
-          <div style={{ display: 'grid', gap: '12px', maxWidth: '800px' }}>
+          <div className="grid gap-3 max-w-[800px]">
             {safeSongs.find(a => a.id === selectedAlbumId)?.songs?.map((track: Song, idx: number) => (
-              <button 
+              <button type="button" 
                 key={track.title} 
                 onClick={() => { setSelectedTrackTitle(track.title); setSelectedBlocks([]); }}
-                className="vocab-card"
-                style={{ padding: '20px 24px', flexDirection: 'row', alignItems: 'center', gap: '24px' }}
+                className="vocab-card p-5 px-6 flex-row items-center gap-6"
               >
-                <span style={{ color: 'var(--gold)', opacity: 0.4, fontWeight: 900, fontSize: '0.75rem', letterSpacing: '0.1em', width: '30px' }}>
+                <span className="text-[var(--gold)] opacity-40 font-black text-[0.75rem] tracking-[0.1em] w-[30px]">
                   {(idx + 1).toString().padStart(2, '0')}
                 </span>
-                <span style={{ color: 'white', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', fontSize: '0.9rem' }}>
+                <span className="text-white font-extrabold tracking-[0.1em] uppercase text-[0.9rem]">
                   {track.title}
                 </span>
-                <div style={{ marginLeft: 'auto', opacity: 0.2 }}>
+                <div className="ml-auto opacity-20">
                   <Play size={16} fill="currentColor" />
                 </div>
               </button>
@@ -105,15 +92,14 @@ export default function Discography({ onAskLina, selectedWords = [] }: Props) {
         </div>
       ) : (
         <div className="flex flex-col gap-6">
-           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-             <button onClick={() => { setSelectedTrackTitle(null); setSelectedBlocks([]); }} className="btn-back">
+           <div className="flex justify-between items-center">
+             <button type="button" onClick={() => { setSelectedTrackTitle(null); setSelectedBlocks([]); }} className="btn-back">
                <ChevronLeft size={14} /> BACK TO TRACKLIST
              </button>
              {selectedBlocks.length > 0 && (
-               <button 
+               <button type="button" 
                 onClick={handlePracticeSelected}
-                className="btn-review"
-                style={{ margin: 0, width: 'auto', minWidth: '200px' }}
+                className="btn-review m-0 w-auto min-w-[200px]"
                >
                  PRACTICE SELECTED ({selectedBlocks.length})
                </button>
@@ -136,57 +122,46 @@ export default function Discography({ onAskLina, selectedWords = [] }: Props) {
              return (
                <div className="flex flex-col gap-8">
                  <div className="flex flex-col gap-2">
-                   <span style={{ fontSize: '0.6rem', fontWeight: 900, color: 'var(--text-muted)', letterSpacing: '0.2em' }}>TRACK {((album?.songs || []).indexOf(track) + 1).toString().padStart(2, '0')}</span>
-                   <h4 className="section-title" style={{ fontSize: '1.4rem', margin: 0 }}>{track.title}</h4>
+                   <span className="text-[0.6rem] font-black text-[var(--text-muted)] tracking-[0.2em]">TRACK {((album?.songs || []).indexOf(track) + 1).toString().padStart(2, '0')}</span>
+                   <h4 className="section-title text-[1.4rem] m-0">{track.title}</h4>
                  </div>
 
-                 <div style={{ display: 'grid', gap: '24px' }}>
+                 <div className="grid gap-6">
                     {filteredBlocks.length > 0 ? filteredBlocks.map((block: SongBlock, bi: number) => {
                       const isSelected = selectedBlocks.some(b => b.tp === block.tp && b.en === block.en);
                       return (
                         <div 
                           key={bi} 
                           onClick={() => toggleBlock(block)}
-                          className={`glass-panel ${isSelected ? 'neon-border-gold' : ''}`}
-                          style={{ 
-                            display: 'flex', 
-                            justifyContent: 'space-between', 
-                            alignItems: 'center', 
-                            padding: '32px',
-                            cursor: 'pointer',
-                            transition: 'all 0.3s ease',
-                            background: isSelected ? 'rgba(255, 191, 0, 0.03)' : 'var(--surface)'
-                          }}
+                          className={`glass-panel flex justify-between items-center p-8 cursor-pointer transition-all duration-300 ease-in-out ${isSelected ? 'neon-border-gold bg-[rgba(255,191,0,0.03)]' : 'bg-[var(--surface)]'}`}
                         >
-                          <div style={{ flex: 1 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                              <div style={{ width: '12px', height: '12px', border: '1px solid var(--gold)', borderRadius: '2px', background: isSelected ? 'var(--gold)' : 'transparent', transition: 'all 0.2s' }} />
-                              <div style={{ fontSize: '0.6rem', fontWeight: 900, color: 'var(--gold)', textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.5 }}>{block.title || 'BLOCK'}</div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-4">
+                              <div className={`w-3 h-3 border border-[var(--gold)] rounded-sm transition-all duration-200 ${isSelected ? 'bg-[var(--gold)]' : 'bg-transparent'}`} />
+                              <div className="text-[0.6rem] font-black text-[var(--gold)] uppercase tracking-[0.1em] opacity-50">{block.title || 'BLOCK'}</div>
                             </div>
-                            <div className={isSelected ? 'neon-text-gold' : ''} style={{ color: isSelected ? 'var(--gold)' : '#fff', fontWeight: 900, fontSize: '1.4rem', marginBottom: '12px', whiteSpace: 'pre-wrap', lineHeight: '1.4', letterSpacing: '0.02em', transition: 'all 0.3s ease' }}>{block.tp}</div>
-                            <div style={{ color: 'var(--text-muted)', fontSize: '0.95rem', fontStyle: 'italic', opacity: 0.8 }}>{block.en}</div>
+                            <div className={`font-black text-[1.4rem] mb-3 whitespace-pre-wrap leading-[1.4] tracking-[0.02em] transition-all duration-300 ease-in-out ${isSelected ? 'neon-text-gold' : 'text-white'}`}>{block.tp}</div>
+                            <div className="text-[var(--text-muted)] text-[0.95rem] italic opacity-80">{block.en}</div>
                           </div>
-                          <button 
+                          <button type="button" 
                             onClick={(e) => { e.stopPropagation(); onAskLina(`Let's practice this lyric: [${block.tp}]`); }}
-                            className="btn-toggle"
-                            style={{ width: 'auto', padding: '12px 20px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', marginLeft: '24px' }}
+                            className="btn-toggle w-auto py-3 px-5 bg-[rgba(255,255,255,0.03)] border border-[var(--border)] ml-6"
                           >
                             PRACTICE
                           </button>
                         </div>
                       );
                     }) : (
-                      <div className="glass-panel" style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>
+                      <div className="glass-panel text-center p-[60px] text-[var(--text-muted)]">
                         {selectedWords && selectedWords.length > 0 ? 'No lyrics match your current focal selection.' : 'Data stream pending...'}
                       </div>
                     )}
                  </div>
 
                  {selectedBlocks.length > 1 && (
-                    <button 
+                    <button type="button" 
                       onClick={handlePracticeSelected}
-                      className="btn-review"
-                      style={{ width: '100%', maxWidth: '600px', margin: '20px auto' }}
+                      className="btn-review w-full max-w-[600px] my-5 mx-auto"
                     >
                       PRACTICE {selectedBlocks.length} SELECTED BLOCKS
                     </button>

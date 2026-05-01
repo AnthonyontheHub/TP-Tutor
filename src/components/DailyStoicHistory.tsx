@@ -25,7 +25,15 @@ export default function DailyStoicHistory({ isOpen, onClose, onAskLina }: Props)
 
   return (
     <AnimatePresence>
-      <div className="modal-backdrop" style={{ zIndex: 6000 }} onClick={onClose}>
+      <div 
+        className="modal-backdrop" 
+        style={{ zIndex: 6000 }} 
+        onClick={onClose}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => { if (e.key === 'Escape' || e.key === 'Enter') onClose(); }}
+        aria-label="Close history"
+      >
         <motion.div
           initial={{ x: '100%' }}
           animate={{ x: 0 }}
@@ -53,7 +61,7 @@ export default function DailyStoicHistory({ isOpen, onClose, onAskLina }: Props)
               <BookOpen size={24} color="var(--gold)" />
               <h2 style={{ color: 'white', fontWeight: 900, margin: 0, letterSpacing: '0.1em' }}>STOIC ARCHIVE</h2>
             </div>
-            <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer' }}>
+            <button type="button" onClick={onClose} style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer' }}>
               <X size={24} />
             </button>
           </header>
@@ -81,7 +89,7 @@ export default function DailyStoicHistory({ isOpen, onClose, onAskLina }: Props)
                     <span style={{ fontSize: '0.65rem', color: 'var(--gold)', fontWeight: 800, letterSpacing: '0.1em' }}>
                       {quote.date}
                     </span>
-                    <button 
+                    <button type="button" 
                       onClick={() => onAskLina(`Please explain the grammar and vocabulary of this quote: "${quote.tokiPona}" (Translation: ${quote.english})`)}
                       style={{ 
                         background: 'rgba(255,255,255,0.05)', 

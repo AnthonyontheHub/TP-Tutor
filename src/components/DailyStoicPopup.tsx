@@ -79,10 +79,10 @@ export default function DailyStoicPopup() {
       <div style={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 9999, display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'flex-end' }}>
         {/* Dev Controls */}
         <div style={{ display: 'flex', gap: '5px', opacity: 0.5 }}>
-          <button onClick={() => setDevPhaseOverride(1)} style={{ fontSize: '0.6rem', padding: '2px 5px', background: '#333', color: 'white', border: 'none', borderRadius: '4px' }}>P1</button>
-          <button onClick={() => setDevPhaseOverride(2)} style={{ fontSize: '0.6rem', padding: '2px 5px', background: '#333', color: 'white', border: 'none', borderRadius: '4px' }}>P2</button>
-          <button onClick={() => setDevPhaseOverride(3)} style={{ fontSize: '0.6rem', padding: '2px 5px', background: '#333', color: 'white', border: 'none', borderRadius: '4px' }}>P3</button>
-          <button onClick={devReset} style={{ fontSize: '0.6rem', padding: '2px 5px', background: '#333', color: 'white', border: 'none', borderRadius: '4px' }}>Reset</button>
+          <button type="button" onClick={() => setDevPhaseOverride(1)} style={{ fontSize: '0.6rem', padding: '2px 5px', background: '#333', color: 'white', border: 'none', borderRadius: '4px' }}>P1</button>
+          <button type="button" onClick={() => setDevPhaseOverride(2)} style={{ fontSize: '0.6rem', padding: '2px 5px', background: '#333', color: 'white', border: 'none', borderRadius: '4px' }}>P2</button>
+          <button type="button" onClick={() => setDevPhaseOverride(3)} style={{ fontSize: '0.6rem', padding: '2px 5px', background: '#333', color: 'white', border: 'none', borderRadius: '4px' }}>P3</button>
+          <button type="button" onClick={devReset} style={{ fontSize: '0.6rem', padding: '2px 5px', background: '#333', color: 'white', border: 'none', borderRadius: '4px' }}>Reset</button>
         </div>
 
         <motion.div
@@ -106,7 +106,7 @@ export default function DailyStoicPopup() {
                 DAILY STOIC {phase === 1 ? '• MORNING' : phase === 2 ? '• CHALLENGE' : '• EVENING'}
               </span>
             </div>
-            <button onClick={() => setDevPhaseOverride(0)} style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer' }}>
+            <button type="button" onClick={() => setDevPhaseOverride(0)} style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer' }}>
               <X size={16} />
             </button>
           </header>
@@ -119,6 +119,7 @@ export default function DailyStoicPopup() {
 
           {phase === 1 && (
             <button
+              type="button"
               onClick={handlePhase1Dismiss}
               className="btn-review"
               style={{ width: '100%', padding: '10px' }}
@@ -147,6 +148,7 @@ export default function DailyStoicPopup() {
                 }}
               />
               <button
+                type="button"
                 onClick={handlePhase2Submit}
                 className="btn-review"
                 style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
@@ -180,6 +182,7 @@ export default function DailyStoicPopup() {
                 }}
               />
               <button
+                type="button"
                 onClick={handlePhase3Submit}
                 className="btn-review"
                 style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}

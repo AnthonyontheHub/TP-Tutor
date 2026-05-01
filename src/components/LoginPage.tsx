@@ -73,6 +73,7 @@ const LoginPage: React.FC = () => {
         )}
 
         <button
+          type="button"
           onClick={() => signIn()}
           disabled={loading}
           className="btn-review"
@@ -95,6 +96,7 @@ const LoginPage: React.FC = () => {
         </button>
 
         <button
+          type="button"
           onClick={() => skipSignIn()}
           disabled={loading}
           style={{

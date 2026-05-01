@@ -5,7 +5,7 @@ import ProgressSummary from './ProgressSummary';
 import MasteryGrid from './MasteryGrid';
 import PhraseGrid from './PhraseGrid';
 import Discography from './Discography';
-import Roadmap, { getRoadmapLessonPrompt } from './Roadmap';
+import Roadmap from './Roadmap';
 import SentenceBuilder from './SentenceBuilder';
 import ProveIt from './ProveIt';
 import ChallengeWidget from './ChallengeWidget';
@@ -14,7 +14,7 @@ import { SessionOverlay } from './SessionOverlay';
 import TrainingHub from './TrainingHub';
 import DailyStoicPopup from './DailyStoicPopup';
 import DailyStoicHistory from './DailyStoicHistory';
-import { fetchQuickTranslation, resolveApiKey, buildOfflineTranslation } from '../services/linaService';
+import { fetchQuickTranslation, resolveApiKey, buildOfflineTranslation, getRoadmapLessonPrompt } from '../services/linaService';
 import type { MasteryStatus, VocabWord } from '../types/mastery';
 import type { AppPanel } from '../App';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -177,7 +177,11 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
     }, 800);
   };
 
-  const getActiveStyle = (p: AppPanel) => activePanels.includes(p) ? { borderColor: 'var(--gold)', color: 'var(--gold)', boxShadow: '0 0 10px var(--gold-glow)' } : {};
+  const getActiveStyle = (p: AppPanel | 'chat' | 'archive') => {
+    if (p === 'chat') return chatCount > 0 ? { borderColor: 'var(--gold)', color: 'var(--gold)', boxShadow: '0 0 10px var(--gold-glow)' } : {};
+    if (p === 'archive') return isStoicHistoryOpen ? { borderColor: 'var(--gold)', color: 'var(--gold)', boxShadow: '0 0 10px var(--gold-glow)' } : {};
+    return activePanels.includes(p as AppPanel) ? { borderColor: 'var(--gold)', color: 'var(--gold)', boxShadow: '0 0 10px var(--gold-glow)' } : {};
+  };
 
   return (
     <div className="dashboard">
@@ -234,7 +238,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
         </div>
 
         <div className="dashboard__header-identity-area">
-          <button 
+          <button type="button" 
             onClick={() => onTogglePanel('profile')} 
             className="dashboard__profile-trigger"
             style={{ 
@@ -267,7 +271,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
             <span style={{ fontSize: '0.75rem', fontWeight: 900 }}>{(profile?.tpName || studentName)?.toUpperCase() || 'STUDENT'}</span>
           </button>
 
-          <button 
+          <button type="button" 
             onClick={() => setShowTrainingHub(true)} 
             className="dashboard__icon-btn" 
             style={{ 
@@ -302,22 +306,22 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
               🔥 {currentStreak}
             </div>
           )}
-          <button onClick={() => onTogglePanel('instructions')} className="dashboard__icon-btn" style={getActiveStyle('instructions')}>?</button>
-          <button onClick={() => setShowProveIt(true)} className="dashboard__icon-btn" title="Prove It Drill">🎯</button>
+          <button type="button" onClick={() => onTogglePanel('instructions')} className="dashboard__icon-btn" style={getActiveStyle('instructions')}>?</button>
+          <button type="button" onClick={() => setShowProveIt(true)} className="dashboard__icon-btn" title="Prove It Drill">🎯</button>
           <div style={{ position: 'relative' }}>
-            <button onClick={() => onAskLina('[SYSTEM: Start a general conversation.]')} className="dashboard__icon-btn" style={getActiveStyle('chat' as any)}>💬</button>
+            <button type="button" onClick={() => onAskLina('[SYSTEM: Start a general conversation.]')} className="dashboard__icon-btn" style={getActiveStyle('chat')}>💬</button>
             {chatCount > 0 && (
               <span style={{ position: 'absolute', top: '-5px', right: '-5px', background: 'var(--gold)', color: 'black', borderRadius: '50%', width: '18px', height: '18px', fontSize: '0.65rem', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--bg)', pointerEvents: 'none' }}>
                 {chatCount}
               </span>
             )}
           </div>
-          <button onClick={() => onTogglePanel('settings')} className="dashboard__icon-btn" style={getActiveStyle('settings')}>⚙️</button>
-          <button 
+          <button type="button" onClick={() => onTogglePanel('settings')} className="dashboard__icon-btn" style={getActiveStyle('settings')}>⚙️</button>
+          <button type="button" 
             onClick={() => setIsStoicHistoryOpen(true)} 
             className="dashboard__icon-btn" 
             title="Stoic Archive"
-            style={{ ...getActiveStyle('archive' as any) }}
+            style={{ ...getActiveStyle('archive') }}
           >
             <BookOpen size={18} />
           </button>
@@ -332,7 +336,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
         {/* Row 2: Review Controls */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
           <div className="flex flex-col md:flex-row gap-2 w-full">
-            <button onClick={handleDailyReview} className="btn-review w-full" style={{ flex: 1, marginBottom: 0 }}>
+            <button type="button" onClick={handleDailyReview} className="btn-review w-full" style={{ flex: 1, marginBottom: 0 }}>
               {activeView === 'vocab' ? '⚡ VOCAB PRACTICE' : 
                activeView === 'archive' ? (
                  reviewVibe === 'chill' ? '🔄 REFRESH MEMORY' :
@@ -342,19 +346,19 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
                ) : '🚀 ROADMAP LESSON'}
             </button>
             <div className="w-full dashboard__vibe-selector-container" style={{ display: 'flex', background: 'var(--surface)', borderRadius: '4px', padding: '4px', border: '1px solid var(--border)', flex: 1.5 }}>
-              <button 
+              <button type="button" 
                 onClick={() => setReviewVibe(reviewVibe === 'chill' ? null : 'chill')}
                 style={{ flex: 1, border: 'none', background: reviewVibe === 'chill' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'chill' ? 'black' : '#666', borderRadius: '2px', padding: '6px 4px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
               >
                 {activeView === 'vocab' ? (isSmallScreen ? 'CHILL' : 'CHILL') : activeView === 'archive' ? (isSmallScreen ? 'SAVES' : 'MY SAVES') : (isSmallScreen ? 'NEW' : 'NEW CONCEPT')}
               </button>
-              <button 
+              <button type="button" 
                 onClick={() => setReviewVibe(reviewVibe === 'deep' ? null : 'deep')}
                 style={{ flex: 1, border: 'none', background: reviewVibe === 'deep' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'deep' ? 'black' : '#666', borderRadius: '2px', padding: '6px 4px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
               >
                 {activeView === 'vocab' ? (isSmallScreen ? 'DEEP' : 'DEEP') : activeView === 'archive' ? (isSmallScreen ? 'EVERYDAY' : 'EVERYDAY') : (isSmallScreen ? 'REVIEW' : 'REVIEW')}
               </button>
-              <button 
+              <button type="button" 
                 onClick={() => setReviewVibe(reviewVibe === 'intense' ? null : 'intense')}
                 style={{ flex: 1, border: 'none', background: reviewVibe === 'intense' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'intense' ? 'black' : '#666', borderRadius: '2px', padding: '6px 4px', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer' }}
               >
@@ -374,21 +378,21 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
           border: '1px solid var(--border)',
           width: '100%'
         }}>
-          <button 
+          <button type="button" 
             onClick={() => setActiveView('vocab')} 
             className={`btn-toggle text-xs md:text-sm px-2 py-3 ${activeView === 'vocab' ? 'active' : ''}`}
             style={{ margin: 0, width: '100%', background: activeView === 'vocab' ? 'var(--gold)' : 'transparent', color: activeView === 'vocab' ? 'black' : 'inherit' }}
           >
             VOCAB
           </button>
-          <button 
+          <button type="button" 
             onClick={() => setActiveView('roadmap')} 
             className={`btn-toggle text-xs md:text-sm px-2 py-3 ${activeView === 'roadmap' ? 'active' : ''}`}
             style={{ margin: 0, width: '100%', background: activeView === 'roadmap' ? 'var(--gold)' : 'transparent', color: activeView === 'roadmap' ? 'black' : 'inherit' }}
           >
             ROADMAP
           </button>
-          <button 
+          <button type="button" 
             onClick={() => setActiveView('archive')} 
             className={`btn-toggle text-xs md:text-sm px-2 py-3 ${activeView === 'archive' ? 'active' : ''}`}
             style={{ margin: 0, width: '100%', background: activeView === 'archive' ? 'var(--gold)' : 'transparent', color: activeView === 'archive' ? 'black' : 'inherit' }}
@@ -417,7 +421,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
               <span style={{ fontSize: '0.75rem', color: 'var(--gold)', fontWeight: 800 }}>
                 FILTERED BY LESSON WORDS ({lessonFilter.length})
               </span>
-              <button 
+              <button type="button" 
                 onClick={() => setLessonFilter(null)}
                 style={{ background: 'none', border: 'none', color: 'var(--gold)', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 900 }}
               >
@@ -511,12 +515,12 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
                   autoFocus
                 />
                 <div style={{ display: 'flex', gap: '8px' }}>
-                   <button onClick={handleSaveSentence} className="btn-review" style={{ flex: 1, margin: 0 }}>SAVE</button>
-                   <button onClick={() => { setShowSaveNote(false); setSaveNoteInput(''); }} className="btn-toggle" style={{ flex: 1 }}>CANCEL</button>
+                   <button type="button" onClick={handleSaveSentence} className="btn-review" style={{ flex: 1, margin: 0 }}>SAVE</button>
+                   <button type="button" onClick={() => { setShowSaveNote(false); setSaveNoteInput(''); }} className="btn-toggle" style={{ flex: 1 }}>CANCEL</button>
                 </div>
                 <div style={{ marginTop: '10px', display: 'flex', gap: '8px' }}>
-                   <button onClick={() => { setSelectedWords([]); setShowSaveNote(false); }} className="btn-toggle" style={{ flex: 1, color: '#ef4444' }}>DELETE</button>
-                   <button onClick={() => setShowSaveNote(false)} className="btn-toggle" style={{ flex: 1 }}>EDIT</button>
+                   <button type="button" onClick={() => { setSelectedWords([]); setShowSaveNote(false); }} className="btn-toggle" style={{ flex: 1, color: '#ef4444' }}>DELETE</button>
+                   <button type="button" onClick={() => setShowSaveNote(false)} className="btn-toggle" style={{ flex: 1 }}>EDIT</button>
                 </div>
               </motion.div>
             </div>
@@ -534,12 +538,12 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
                 <h2 style={{ color: 'var(--gold)', marginBottom: '10px' }}>KNOWLEDGE CHECK</h2>
                 <p>jan Lina wants to verify your mastery of <strong>{assessmentWord.word}</strong>.</p>
                 <div style={{ margin: '20px 0', display: 'grid', gap: '10px' }}>
-                   <button onClick={() => { 
+                   <button type="button" onClick={() => { 
                      onAskLina(`[SYSTEM: Knowledge Check on "${assessmentWord.word}". Give 3 questions.]`); 
                      setAssessmentWord(null); 
                      setLastKnowledgeCheckDate(new Date().toDateString());
                    }} className="btn-review">START QUIZ</button>
-                   <button onClick={() => { 
+                   <button type="button" onClick={() => { 
                      setAssessmentWord(null); 
                      setLastKnowledgeCheckDate(new Date().toDateString());
                    }} style={{ background: 'none', border: 'none', color: '#666', fontSize: '0.8rem' }}>MAYBE LATER</button>

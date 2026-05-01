@@ -1,6 +1,6 @@
 /* src/components/WordDetailDrawer.tsx */
 import { motion, AnimatePresence } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import { STATUS_META } from '../types/mastery';
 import type { VocabWord, MasteryStatus } from '../types/mastery';
@@ -33,7 +33,7 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
   const primaryMeaning = word?.meanings?.split(',')[0].trim() || word?.meanings;
   const extra = word ? WORD_EXTRA_DATA[word.word] : null;
 
-  const triggerGeneration = async (_force?: boolean) => {
+  const triggerGeneration = useCallback(async (_force?: boolean) => {
     if (!word) return;
 
     const key = resolveApiKey();
@@ -47,11 +47,13 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
           setDeepDive(results);
           updateVocabAIContent(word.id, { aiExamples: examples, aiExplanation: explanation });
         }
+      } catch (err) {
+        console.error("Deep dive generation failed:", err);
       } finally {
         setIsLoading(false);
       }
     }
-  };
+  }, [word, isSandboxMode, profile, updateVocabAIContent]);
 
   useEffect(() => {
     if (isOpen && word) {
@@ -64,12 +66,12 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
         triggerGeneration();
       }
     }
-  }, [isOpen, word?.id, isSandboxMode]); // Only re-run when word ID changes
+  }, [isOpen, word, triggerGeneration]);
 
   return (
     <AnimatePresence>
       {isOpen && word && (
-        <div className="modal-backdrop" onClick={onClose}>
+        <div className="modal-backdrop" role="button" tabIndex={0} onClick={onClose} onKeyDown={(e) => { if (e.key === 'Escape' || e.key === 'Enter') onClose(); }}>
           <motion.div 
             className="modal-content" 
             initial={{ opacity: 0, scale: 0.9, y: 20 }} 
@@ -103,15 +105,15 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
                 {(['noun', 'verb', 'mod'] as const).map(role => {
                   const score = word.roleMatrix?.[role] || 0;
                   const lowest = Math.min(word.roleMatrix.noun, word.roleMatrix.verb, word.roleMatrix.mod);
-                  const isLocked = score >= lowest + 100 && score < 333;
-                  const progress = (score / 333) * 100;
+                  const isLocked = score >= lowest + 100 && score < 334;
+                  const progress = (score / 334) * 100;
                   const color = role === 'noun' ? 'var(--blue)' : role === 'verb' ? 'var(--pink)' : 'var(--amber)';
 
                   return (
                     <div key={role}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.55rem', textTransform: 'uppercase', marginBottom: '4px', fontWeight: 900, letterSpacing: '0.1em' }}>
                         <span style={{ color: isLocked ? '#666' : 'white' }}>{role === 'mod' ? 'modifier' : role} {isLocked && '🔒'}</span>
-                        <span style={{ color }}>{score} / 333</span>
+                        <span style={{ color }}>{score} / 334</span>
                       </div>
                       <div className="progress-bar-track" style={{ height: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '100px', overflow: 'hidden' }}>
                         <motion.div
@@ -152,7 +154,7 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
             <div style={{ marginBottom: '32px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                 <h3 className="section-title" style={{ fontSize: '0.6rem', margin: 0 }}>AI Explanation</h3>
-                <button 
+                <button type="button"
                   onClick={() => triggerGeneration(true)} 
                   style={{ background: 'none', border: 'none', color: 'var(--gold)', fontSize: '0.7rem', cursor: 'pointer', opacity: 0.6 }}
                 >
@@ -190,7 +192,7 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
                     <div key={tier} className="glass-panel" style={{ padding: '10px 15px', borderLeft: `2px solid ${borderCol}` }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px' }}>
                         <div style={{ fontSize: '0.55rem', fontWeight: 900, color: tier === 'Personal' ? 'var(--gold)' : 'var(--text-muted)', textTransform: 'uppercase' }}>{label}</div>
-                        <button 
+                        <button type="button"
                           onClick={() => onAskLina(`[SYSTEM: Deep-dive into "${word.word}" focus on ${tier} tier. Context: ${content}]`)}
                           style={{ border: 'none', color: 'var(--gold)', fontSize: '0.65rem', cursor: 'pointer', padding: '2px 6px', borderRadius: '4px', background: 'rgba(255,255,255,0.03)' }}
                         >
@@ -204,7 +206,7 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
               </div>
             </section>
 
-            <button onClick={onClose} style={{ position: 'absolute', top: '16px', right: '16px', background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: '1.5rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', padding: 0 }} aria-label="Close">
+            <button type="button" onClick={onClose} style={{ position: 'absolute', top: '16px', right: '16px', background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: '1.5rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', padding: 0 }} aria-label="Close">
               &times;
             </button>
           </motion.div>
