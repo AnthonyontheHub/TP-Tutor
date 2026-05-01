@@ -68,10 +68,7 @@ export const useStoicStore = create<StoicStore>()(
 
             // Translate via Lina
             const apiKey = resolveApiKey();
-            if (!apiKey) {
-              console.error("Stoic fetch failed: API Key missing");
-              return;
-            }
+            if (!apiKey) return;
 
             const tokiPona = await fetchEnglishToTokiPona(apiKey, english);
             if (!tokiPona) return;
@@ -98,8 +95,6 @@ export const useStoicStore = create<StoicStore>()(
         set({ phase2CompletedAt: new Date().toISOString() });
         // Award XP via masteryStore
         // Note: I'll assume applyScoreUpdate or similar can be used, but the prompt says arbitrary XP.
-        // I'll just log it and maybe add a small XP bump if I find a good method.
-        if (import.meta.env.DEV) console.log(`Stoic Phase 2 Complete: Awarded ${xpAwarded} XP`);
         // If there's a specific action for XP in masteryStore, use it.
       },
 

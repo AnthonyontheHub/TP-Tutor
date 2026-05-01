@@ -526,10 +526,9 @@ export const useMasteryStore = create<MasteryStore>()(
       setSongs: (songs) => { set({ songs }); void get().syncToCloud(); },
       syncSongsWithData: () => {
         const { songs } = get();
-        if (import.meta.env.DEV) console.log("Current songs in store:", songs);
+
         const hasTelo = Array.isArray(songs) && songs.some(a => a.id === 'telo-lon-kiwen');
         if (!Array.isArray(songs) || songs.length === 0 || !hasTelo) {
-          if (import.meta.env.DEV) console.log('Force-syncing songs to latest albumData...');
           set({ songs: defaultSongs });
           void get().syncToCloud();
         }
@@ -2263,7 +2262,6 @@ export const useMasteryStore = create<MasteryStore>()(
       },
       onRehydrateStorage: () => (state) => {
         if (state) {
-          if (import.meta.env.DEV) console.log("Current songs in store (pre-hydration):", state.songs);
 
           // Ensure critical array fields are always arrays and not empty if defaults exist
           if (!Array.isArray(state.commonPhrases) || state.commonPhrases.length === 0) {
@@ -2272,7 +2270,6 @@ export const useMasteryStore = create<MasteryStore>()(
           
           const hasTelo = Array.isArray(state.songs) && state.songs.some((a: Album) => a.id === 'telo-lon-kiwen');
           if (!Array.isArray(state.songs) || state.songs.length < 6 || !hasTelo) {
-            if (import.meta.env.DEV) console.log('Force-syncing songs to latest albumData (missing albums or telo-lon-kiwen missing)...');
             state.songs = defaultSongs;
           }
 
@@ -2280,7 +2277,6 @@ export const useMasteryStore = create<MasteryStore>()(
             state.savedPhrases = [];
           }
 
-          if (import.meta.env.DEV) console.log("Current songs in store (post-hydration):", state.songs);
 
           // Merge static content on rehydration
           const mergedCurriculums = curriculumRoadmap.map(staticLevel => {
