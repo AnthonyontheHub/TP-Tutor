@@ -177,7 +177,7 @@ export default function VocabCard({ word, onLongPress, onClick, onAskLina, isSan
       </div>
 
       <div className="vocab-card__pos text-[0.6rem] text-[var(--text-muted)] uppercase tracking-[0.05em] font-bold">
-        {word.type === 'grammar' ? 'GRAMMAR' : word.partOfSpeech}
+        {word.type === 'grammar' ? 'GRAMMAR' : word.partOfSpeech.split(',')[0].trim()}
       </div>
 
       {word.pinnedExample && (

@@ -5,6 +5,7 @@ import { useMasteryStore } from '../store/masteryStore';
 import { STATUS_META } from '../types/mastery';
 import type { VocabWord, MasteryStatus } from '../types/mastery';
 import { fetchDeepDiveExamples, resolveApiKey, stringifyUserContext } from '../services/linaService';
+import { WORD_RELATIONSHIPS } from '../data/wordRelationships';
 
 const NEXT_STATUS: Partial<Record<MasteryStatus, MasteryStatus>> = {
   not_started: 'introduced',
@@ -29,9 +30,23 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
   const { studentName, profile, updateVocabAIContent } = useMasteryStore();
   const [deepDive, setDeepDive] = useState<Record<string, string> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isNeighborsModalOpen, setIsNeighborsModalOpen] = useState(false);
 
   const primaryMeaning = word?.meanings?.split(',')[0].trim() || word?.meanings;
   const extra = word ? WORD_EXTRA_DATA[word.word] : null;
+  
+  const baseNeighbors = word ? WORD_RELATIONSHIPS[word.word] || [] : [];
+  const extraNeighbors = extra?.neighbors || [];
+  
+  // Merge neighbors, preferring the annotated ones from extra.neighbors
+  const neighbors = Array.from(new Set([...extraNeighbors, ...baseNeighbors]));
+  
+  // Filter out the unannotated base neighbor if an annotated version already exists
+  // e.g. if 'ike (Antonym)' is in extraNeighbors, remove 'ike' from the list.
+  const filteredNeighbors = neighbors.filter(n => {
+    if (extraNeighbors.includes(n)) return true;
+    return !extraNeighbors.some(en => en.startsWith(n + ' '));
+  });
 
   const triggerGeneration = useCallback(async (_force?: boolean) => {
     if (!word) return;
@@ -143,11 +158,17 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '32px' }}>
               <section className="glass-panel" style={{ padding: '12px' }}>
                 <h3 className="section-title" style={{ fontSize: '0.55rem' }}>Grammar</h3>
-                <div style={{ fontSize: '0.8rem', color: 'white', fontWeight: 900 }}>{word.partOfSpeech.toUpperCase()}</div>
+                <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                  {word.partOfSpeech.split(',').map(pos => (
+                    <div key={pos.trim()} style={{ fontSize: '0.65rem', color: 'white', fontWeight: 900, background: 'rgba(255,255,255,0.1)', padding: '2px 6px', borderRadius: '4px' }}>
+                      {pos.trim().toUpperCase()}
+                    </div>
+                  ))}
+                </div>
               </section>
               <section className="glass-panel" style={{ padding: '12px' }}>
                 <h3 className="section-title" style={{ fontSize: '0.55rem' }}>Neighbors</h3>
-                <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{extra?.neighbors.slice(0,2).join(', ') || '-'}</div>
+                <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{neighbors.length > 0 ? neighbors.slice(0,2).join(', ') : '-'}</div>
               </section>
             </div>
 
@@ -205,6 +226,40 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
                 })}
               </div>
             </section>
+
+            <AnimatePresence>
+              {isNeighborsModalOpen && (
+                <div 
+                  className="modal-backdrop" 
+                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.8)', zIndex: 100, display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: 'inherit' }}
+                  onClick={(e) => { e.stopPropagation(); setIsNeighborsModalOpen(false); }}
+                >
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    className="glass-panel"
+                    style={{ padding: '24px', maxWidth: '80%', minWidth: '200px', border: '1px solid var(--gold)', boxShadow: '0 0 20px rgba(255, 191, 0, 0.2)' }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <h3 style={{ marginTop: 0, color: 'white', fontSize: '1rem', marginBottom: '16px', textTransform: 'uppercase', fontWeight: 900 }}>All Neighbors</h3>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                      {filteredNeighbors.map(n => (
+                        <div key={n} style={{ background: 'rgba(255,255,255,0.1)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', color: 'var(--gold)', fontWeight: 700 }}>
+                          {n}
+                        </div>
+                      ))}
+                    </div>
+                    <button type="button"
+                      onClick={() => setIsNeighborsModalOpen(false)}
+                      style={{ marginTop: '24px', width: '100%', padding: '10px', background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white', borderRadius: '4px', cursor: 'pointer', fontWeight: 800, letterSpacing: '0.05em' }}
+                    >
+                      CLOSE
+                    </button>
+                  </motion.div>
+                </div>
+              )}
+            </AnimatePresence>
 
             <button type="button" onClick={onClose} style={{ position: 'absolute', top: '16px', right: '16px', background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: '1.5rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', padding: 0 }} aria-label="Close">
               &times;
