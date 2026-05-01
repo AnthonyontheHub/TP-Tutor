@@ -8,7 +8,7 @@ import {
   type MasteryStatus, type VocabWord, type StatusSummary, type SavedPhrase,
   type UserProfile, type ReviewVibe,
   type CurriculumLevel, type NodeStatus, type CommonPhrase, type PosRole,
-  type SmallRank, type CeremonialRank, type Badge, SMALL_RANKS,
+  type SmallRank, type CeremonialRank, type Badge, type MasteryWeight, SMALL_RANKS,
   CEREMONIAL_RANKS, ALL_BADGES, type SessionLogEntry, type WeeklyChallenge,
   type RoleMatrix, type MasteryEvent, type ScoreHistoryEntry
 } from '../types/mastery';
@@ -21,11 +21,11 @@ import { vocabContent } from '../data/vocabContent';
 import { TOKI_PONA_DICTIONARY, WORD_FREQUENCY } from '../data/tokiPonaDictionary';
 import aiVocabCache from '../data/aiVocabCache.json';
 
-function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: MasteryStatus; type: 'word' | 'grammar'; sessionNotes: string; frequencyRank?: number; weight?: string }): VocabWord {
+function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: MasteryStatus; type: 'word' | 'grammar'; sessionNotes: string; frequencyRank?: number; weight?: MasteryWeight }): VocabWord {
   const score = STATUS_MIDPOINT[v.status];
   const staticData: Partial<VocabContentEntry> = vocabContent[v.word] || {};
   const aiData = (aiVocabCache as Record<string, { aiExplanation?: string; aiExamples?: Record<string, string> }>)[v.word.toLowerCase()] || {};
-  const weight = (v.weight === 'pillar' || v.weight === 'working' || v.weight === 'bonus') ? v.weight : undefined;
+  const weight = v.weight;
 
   // Distribute initial score across roles
   const perRole = Math.floor(score / 3);
@@ -2301,6 +2301,16 @@ export const useMasteryStore = create<MasteryStore>()(
             state.vocabulary = state.vocabulary.filter(v => 
               !deprecatedParticles.includes(v.word) && !deprecatedParticles.includes(v.id)
             );
+
+            // Sync: Add missing nimi ku suli words
+            const currentWordSet = new Set(state.vocabulary.map(v => v.word));
+            const kuWordsToAdd = initialMasteryMap.initialVocabulary
+              .filter(v => v.weight === 'ku' && !currentWordSet.has(v.word))
+              .map(v => toFullVocabWord(v));
+            
+            if (kuWordsToAdd.length > 0) {
+              state.vocabulary = [...state.vocabulary, ...kuWordsToAdd];
+            }
 
             state.vocabulary = state.vocabulary.map(v => {
               if (v.aiExplanation) return v;

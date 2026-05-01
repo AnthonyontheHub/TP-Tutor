@@ -220,7 +220,7 @@ export interface Chapter {
 
 export type ItemType = 'word' | 'grammar';
 
-export type MasteryWeight = 'pillar' | 'working' | 'bonus';
+export type MasteryWeight = 'pillar' | 'working' | 'bonus' | 'ku';
 
 export interface VocabWord {
   id: string;

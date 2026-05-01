@@ -161,6 +161,15 @@ export default function VocabCard({ word, onLongPress, onClick, onAskLina, isSan
         <Info size={14} />
       </div>
 
+      {word.weight === 'ku' && (
+        <div 
+          className="absolute bottom-2 left-2 text-[0.5rem] font-black text-[var(--gold)] opacity-30 tracking-tighter"
+          style={{ pointerEvents: 'none' }}
+        >
+          KU
+        </div>
+      )}
+
       <div 
         className="vocab-card__word font-black uppercase tracking-[0.15em] text-[0.85rem] text-[var(--text)] break-words mt-1" 
       >
