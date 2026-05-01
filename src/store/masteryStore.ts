@@ -2296,6 +2296,12 @@ export const useMasteryStore = create<MasteryStore>()(
 
           // Inject AI Cache Data on rehydration if missing
           if (Array.isArray(state.vocabulary)) {
+            // Cleanup: Remove deprecated grammar particle cards
+            const deprecatedParticles = ['particle_li', 'particle_e', 'particle_pi', 'particle_la'];
+            state.vocabulary = state.vocabulary.filter(v => 
+              !deprecatedParticles.includes(v.word) && !deprecatedParticles.includes(v.id)
+            );
+
             state.vocabulary = state.vocabulary.map(v => {
               if (v.aiExplanation) return v;
               const aiData = (aiVocabCache as Record<string, any>)[v.word.toLowerCase()] || {};
