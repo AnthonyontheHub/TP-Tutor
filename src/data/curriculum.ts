@@ -329,9 +329,9 @@ const stage7Nodes: CurriculumNode[] = [
     ]
   },
   { 
-    id: "quantities", title: "Quantities: mute & ale", requiredVocabIds: ["mute", "ale", "ali", "wan", "ala", "jan", "ijo"], requiredGrammarIds: [], status: 'locked', activities: ['word-scramble'], suggestedMethod: 'Builder Drill', type: 'Topic',
+    id: "quantities", title: "Quantities: mute & ale", requiredVocabIds: ["mute", "ale", "wan", "ala", "jan", "ijo"], requiredGrammarIds: [], status: 'locked', activities: ['word-scramble'], suggestedMethod: 'Builder Drill', type: 'Topic',
     richContent: [
-      { type: 'text', content: "mute = many/very (also intensifier), ale/ali = all/everything/universe." },
+      { type: 'text', content: "mute = many/very (also intensifier), ale = all/everything/universe." },
       { type: 'structural', content: "'jan mute' (many people), 'ijo ale' (everything); mute as intensifier 'pona mute' (very good)." },
       { type: 'callout', content: "Practice: Describe quantities of things in student's life." }
     ]

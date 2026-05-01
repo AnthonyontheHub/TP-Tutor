@@ -33,7 +33,6 @@ export const WORD_RELATIONSHIPS: Record<string, string[]> = {
   ken: ['wile', 'la', 'ala'],
   ala: ['ken', 'wile', 'mute'],
   ale: ['mute', 'ala', 'pona'],
-  ali: ['mute', 'ala', 'pona'],
   tenpo: ['suno', 'mun', 'la'],
   suno: ['mun', 'tenpo', 'seli'],
   mun: ['suno', 'tenpo', 'lete'],

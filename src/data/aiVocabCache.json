@@ -55,14 +55,6 @@
     },
     "aiExplanation": "In Toki Pona, \"ale\" is a versatile word meaning \"all,\" \"every,\" or \"whole,\" and can also function as a noun meaning \"everything\" or \"all things.\" It typically follows the noun it modifies, such as in \"jan ale\" (all people) or \"suno ale\" (every day). When used alone, for instance as the subject \"ale li pona,\" it refers to 'everything' or 'all circumstances.'"
   },
-  "ali": {
-    "aiExamples": {
-      "simple": "ona ali. (They all.)",
-      "intermediate": "ma ali li pona. (All lands are good.)",
-      "advanced": "ona li kama jo e ijo ali li pana e ni tawa jan pona. (They acquire all things and give them to good people.)"
-    },
-    "aiExplanation": "In Toki Pona, \"ali\" means all, every, or everything, denoting completeness or totality. It can function as a noun (everything) or an adjective, modifying a preceding noun (e.g., \"jan ali\" means all people). This word emphasizes the full scope or universal presence of a concept or group."
-  },
   "anpa": {
     "aiExamples": {
       "simple": "ona li anpa. (It is low.)",
@@ -238,22 +230,6 @@
       "advanced": "mi wile moku e kili la, mi tawa tomo kili. (If I want to eat fruit/vegetable, I go to the fruit/vegetable shop.)"
     },
     "aiExplanation": "\"kili\" refers to any fruit, vegetable, or mushroom, essentially any edible part of a plant or fungus that is harvested. It's a very broad category, covering most things one might gather for food that aren't grains, nuts, or roots. This flexibility allows it to describe a wide variety of natural foods without needing more specific terms."
-  },
-  "kin": {
-    "aiExamples": {
-      "simple": "mi kin. (Me too. / I also.)",
-      "intermediate": "jan pona mi kin li kama. (My good friend is also coming.)",
-      "advanced": "pimeja li kama la, soweli kin li awen lon tomo ona. (When darkness comes, even the animals stay in their homes.)"
-    },
-    "aiExplanation": "kin adds emphasis, often translating to 'also', 'too', 'indeed', or 'even'. It highlights that the preceding word or idea is included, affirmed, or applies in an unexpected way. Use it to express agreement, inclusion, or to intensify a statement."
-  },
-  "kipisi": {
-    "aiExamples": {
-      "simple": "mi kipisi. (I cut.)",
-      "intermediate": "ona li kipisi wawa. (He/She cuts strongly.)",
-      "advanced": "mama mi li lon la, ona li kipisi e kili tawa mi. (When my mother is present, she cuts the fruit for me.)"
-    },
-    "aiExplanation": "Kipisi primarily means 'to cut,' 'to divide,' or 'to separate.' It can refer to both the physical act of cutting with an object (like a knife) and the conceptual act of making a division or separation. For example, 'kipisi tomo' could mean cutting a building's shape or dividing a space, highlighting its versatility."
   },
   "kiwen": {
     "aiExamples": {
@@ -526,14 +502,6 @@
       "advanced": "mi jo e tomo mute la, mi pana e ilo mute tawa ona. (If I have many houses, I give many tools to them.)"
     },
     "aiExplanation": "mute is a core word for quantity, meaning 'many,' 'much,' 'a lot,' or 'very.' As a verb, it means 'to be many/much' or 'to multiply.' When used as an adjective, it always comes after the noun it modifies, like 'jan mute' (many people). It can also intensify other adjectives, similar to 'very' in English, as in 'suli mute' (very big)."
-  },
-  "namako": {
-    "aiExamples": {
-      "simple": "ona li namako. (It is an extra/spice.)",
-      "intermediate": "ijo namako li suwi. (The extra thing is sweet.)",
-      "advanced": "sina pona e moku la, o kepeken e namako. (If you improve food, use namako/spice.)"
-    },
-    "aiExplanation": "namako broadly means \"extra, additional, spice, seasoning, embellishment.\" It describes anything added to enhance, diversify, or provide variety. While not strictly essential, a namako often brings pleasure or improvement to a situation or object, much like a delicious spice enriches a meal."
   },
   "nanpa": {
     "aiExamples": {
@@ -902,14 +870,6 @@
       "advanced": "mi lukin e tomo suli lon ma ni la mi pilin pona. (When I see a big building in this place, I feel good.)"
     },
     "aiExplanation": "toki! The word 'tomo' is quite broad, referring to any enclosed structure, be it a house, a room, a building, or even a tent. It primarily conveys the idea of a contained space that offers shelter or serves a particular purpose. Its exact meaning often becomes clear through context or by adding a modifying word, such as 'tomo moku' for a kitchen or restaurant, or 'tomo lape' for a bedroom."
-  },
-  "tonsi": {
-    "aiExamples": {
-      "simple": "mi tonsi. (I am non-binary.)",
-      "intermediate": "ona li tonsi suli. (They are very gender-nonconforming.)",
-      "advanced": "jan li pilin ante lon nasin tonsi la, ona li ken pana e sona sin tawa jan ale. (If a person feels different in a queer way, they can give new knowledge to everyone.)"
-    },
-    "aiExplanation": "tonsi describes someone who is non-binary, gender-nonconforming, or broadly queer. It signifies an identity that goes beyond traditional gender roles and expectations, embracing a diverse spectrum of expression. It can be used as both a noun (e.g., jan tonsi, a non-binary person) and an adjective to describe aspects related to gender diversity."
   },
   "tu": {
     "aiExamples": {

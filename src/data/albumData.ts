@@ -64,7 +64,7 @@ export const albumData: Album[] = [
       {
         id: "suno-sewi",
         title: "suno sewi",
-        blocks: [{ title: "Verse", tp: "suno sewi li suno e ali. mi lukin e suno.", en: "The divine sun lights everything. I look at the light." }]
+        blocks: [{ title: "Verse", tp: "suno sewi li suno e ale. mi lukin e suno.", en: "The divine sun lights everything. I look at the light." }]
       },
       {
         id: "awen-lape",
