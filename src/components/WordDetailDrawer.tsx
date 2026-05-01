@@ -66,7 +66,9 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
         if (results) {
           const { explanation, ...aiExamples } = results;
           setDeepDive(results);
-          updateVocabAIContent(word.id, { aiExamples, aiExplanation: explanation });
+          updateVocabAIContent(word.id, { aiExamples, aiExplanation: explanation, grammarExamples: examples || undefined });
+        } else if (examples) {
+          updateVocabAIContent(word.id, { grammarExamples: examples });
         }
         
         if (examples) {
@@ -86,19 +88,38 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
       setDeepDive(null);
       setGrammarExamples(null);
       
-      if (word.aiExamples && word.aiExplanation) {
+      const hasDeepDive = !!(word.aiExamples && word.aiExplanation);
+      const hasGrammar = !!word.grammarExamples;
+
+      if (hasDeepDive) {
         setDeepDive({ ...word.aiExamples, explanation: word.aiExplanation });
+      }
+      
+      if (hasGrammar) {
+        setGrammarExamples(word.grammarExamples);
+      }
+
+      if (!hasDeepDive || !hasGrammar) {
         const key = resolveApiKey();
         if (key && !isSandboxMode) {
-          const partsOfSpeech = word.partOfSpeech.split(',').map(p => p.trim());
           const userContext = stringifyUserContext(profile);
-          fetchExamplesForWord(key, word.word, partsOfSpeech, userContext).then(res => setGrammarExamples(res));
+          const partsOfSpeech = word.partOfSpeech.split(',').map(p => p.trim());
+          
+          if (!hasDeepDive && !hasGrammar) {
+            triggerGeneration();
+          } else if (!hasGrammar) {
+            fetchExamplesForWord(key, word.word, partsOfSpeech, userContext).then(res => {
+              setGrammarExamples(res);
+              updateVocabAIContent(word.id, { grammarExamples: res });
+            });
+          } else if (!hasDeepDive) {
+            // Technically handled by triggerGeneration, but let's just trigger it
+            triggerGeneration();
+          }
         }
-      } else {
-        triggerGeneration();
       }
     }
-  }, [isOpen, word, triggerGeneration, isSandboxMode, profile]);
+  }, [isOpen, word, triggerGeneration, isSandboxMode, profile, updateVocabAIContent]);
 
   return (
     <AnimatePresence>
