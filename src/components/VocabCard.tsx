@@ -171,7 +171,7 @@ export default function VocabCard({ word, onLongPress, onClick, onAskLina, isSan
       )}
 
       <div 
-        className="vocab-card__word font-black uppercase tracking-[0.15em] text-[0.85rem] text-[var(--text)] break-words mt-1" 
+        className="vocab-card__word font-black tracking-[0.15em] text-[0.85rem] text-[var(--text)] break-words mt-1" 
       >
         {word.type === 'grammar' ? word.sessionNotes : word.word}
       </div>
