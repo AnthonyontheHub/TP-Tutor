@@ -127,13 +127,7 @@ const initialVocabulary = [
   { word: "waso", partOfSpeech: "Noun", frequencyRank: 66, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
   { word: "wawa", partOfSpeech: "Adjective", frequencyRank: 53, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
   { word: "weka", partOfSpeech: "Adjective", frequencyRank: 129, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
-  { word: "wile", partOfSpeech: "Verb", frequencyRank: 33, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
-  
-  // Grammar Tiles
-  { word: "particle_li", partOfSpeech: "Particle", frequencyRank: 999, status: "not_started" as MasteryStatus, type: 'grammar' as const, weight: 'pillar', sessionNotes: "Subject Separator" },
-  { word: "particle_e", partOfSpeech: "Particle", frequencyRank: 999, status: "not_started" as MasteryStatus, type: 'grammar' as const, weight: 'pillar', sessionNotes: "Object Marker" },
-  { word: "particle_pi", partOfSpeech: "Particle", frequencyRank: 999, status: "not_started" as MasteryStatus, type: 'grammar' as const, weight: 'pillar', sessionNotes: "Grouping Particle" },
-  { word: "particle_la", partOfSpeech: "Particle", frequencyRank: 999, status: "not_started" as MasteryStatus, type: 'grammar' as const, weight: 'pillar', sessionNotes: "Context Particle" }
+  { word: "wile", partOfSpeech: "Verb", frequencyRank: 33, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" }
 ];
 
 export const initialMasteryMap = {
