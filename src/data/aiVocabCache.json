@@ -5,7 +5,13 @@
       "intermediate": "toki sina li pona mute. (Your speech is very good.)",
       "advanced": "mi wile toki e toki pona. (I want to speak Toki Pona.)"
     },
-    "aiExplanation": "toki is the core of communication in Toki Pona. It covers speech, language, talking, and even 'hello'. Its simplicity reflects the philosophy of clear and direct interaction."
+    "aiExplanation": "toki is the core of communication in Toki Pona. It covers speech, language, talking, and even 'hello'. Its simplicity reflects the philosophy of clear and direct interaction.",
+    "grammarExamples": {
+      "noun": "toki mi li pona. (My speech is good.)",
+      "verb": "mi toki. (I speak.)",
+      "modifier": "ona li jan toki. (They are a speaker.)",
+      "interjection": "toki! (Hello!)"
+    }
   },
   "pona": {
     "aiExamples": {
@@ -13,7 +19,13 @@
       "intermediate": "ilo pona li lon. (A good tool exists.)",
       "advanced": "jan li pali e pona la ona li jan pona. (If a person does good, they are a good person.)"
     },
-    "aiExplanation": "pona is the ultimate positive descriptor in Toki Pona. It means good, simple, friendly, or fixed. It's the goal of the language itself: to make thoughts and life 'pona'."
+    "aiExplanation": "pona is the ultimate positive descriptor in Toki Pona. It means good, simple, friendly, or fixed. It's the goal of the language itself: to make thoughts and life 'pona'.",
+    "grammarExamples": {
+      "noun": "pona li wawa. (Goodness is powerful.)",
+      "modifier": "ona li jan pona. (They are a good person.)",
+      "verb": "sina pona. (You are good.)",
+      "interjection": "Pona! (Good!)"
+    }
   },
   "a": {
     "aiExamples": {
@@ -21,7 +33,10 @@
       "intermediate": "pona a! (How good! / So good!)",
       "advanced": "pona a la, jan mute li kama. (Because it is so good, many people come.)"
     },
-    "aiExplanation": "kama pona, jan! The word \"a\" is a wonderfully versatile interjection in Toki Pona, used to express a wide spectrum of emotions, reactions, or to simply add emphasis. Its meaning is highly dependent on context and tone, similar to \"oh!\", \"ah!\", \"hey!\", \"huh?\", or even laughter in English. It can highlight a word or phrase, indicating surprise, strong feeling, agreement, or drawing attention to what was just said."
+    "aiExplanation": "kama pona, jan! The word \"a\" is a wonderfully versatile interjection in Toki Pona, used to express a wide spectrum of emotions, reactions, or to simply add emphasis. Its meaning is highly dependent on context and tone, similar to \"oh!\", \"ah!\", \"hey!\", \"huh?\", or even laughter in English. It can highlight a word or phrase, indicating surprise, strong feeling, agreement, or drawing attention to what was just said.",
+    "grammarExamples": {
+      "Particle": "pona a! (So good!)"
+    }
   },
   "akesi": {
     "aiExamples": {
@@ -29,7 +44,11 @@
       "intermediate": "akesi lili li tawa insa ma. (A small reptile moves inside the earth.)",
       "advanced": "akesi mute li lon insa tomo la, mi wile ala tawa. (If many reptiles are inside the house, I do not want to go.)"
     },
-    "aiExplanation": "In Toki Pona, \"akesi\" is a wonderfully broad word. It commonly refers to reptiles, amphibians, and often extends to anything that crawls, slithers, or is generally perceived as a 'creepy-crawly' creature, like large insects or even worms. The word captures the essence of these creatures' movement and appearance rather than a strict biological classification, emphasizing their 'otherness' from familiar animals."
+    "aiExplanation": "In Toki Pona, \"akesi\" is a wonderfully broad word. It commonly refers to reptiles, amphibians, and often extends to anything that crawls, slithers, or is generally perceived as a 'creepy-crawly' creature, like large insects or even worms. The word captures the essence of these creatures' movement and appearance rather than a strict biological classification, emphasizing their 'otherness' from familiar animals.",
+    "grammarExamples": {
+      "noun": "akesi li lili. (The reptile is small.)",
+      "modifier": "soweli akesi li suli. (The reptile-like animal is big.)"
+    }
   },
   "ala": {
     "aiExamples": {
@@ -37,7 +56,12 @@
       "intermediate": "ona li kama ala pona. (They don't come well.)",
       "advanced": "jan li lon ala la, soweli li moku e kili ala. (If people are not present, animals eat no fruit.)"
     },
-    "aiExplanation": "ala serves as a fundamental negator in Toki Pona, translating to \"no,\" \"not,\" \"none,\" or \"zero.\" It typically follows the word or phrase it negates, transforming it into its opposite. Beyond simple negation, ala can also be placed at the end of a sentence to turn it into a yes/no question, asking \"is it (verb/adjective) or not?\""
+    "aiExplanation": "ala serves as a fundamental negator in Toki Pona, translating to \"no,\" \"not,\" \"none,\" or \"zero.\" It typically follows the word or phrase it negates, transforming it into its opposite. Beyond simple negation, ala can also be placed at the end of a sentence to turn it into a yes/no question, asking \"is it (verb/adjective) or not?\"",
+    "grammarExamples": {
+      "noun": "mi wile e ala. (I want nothing.)",
+      "modifier": "mi jo e mani ala. (I have no money.)",
+      "verb": "ona li ala. (It is nothing.)"
+    }
   },
   "alasa": {
     "aiExamples": {
@@ -45,7 +69,12 @@
       "intermediate": "ona li alasa moku. (They hunt/gather food.)",
       "advanced": "suno li kama la, jan li alasa e kili. (When the sun arrives (morning), people gather fruit.)"
     },
-    "aiExplanation": "alasa is a versatile verb meaning to hunt, gather, search for, or collect. It describes the active pursuit or seeking of something, be it food, resources, or even abstract concepts like knowledge. While it can imply hunting animals, it more broadly emphasizes the effort of finding and acquiring."
+    "aiExplanation": "alasa is a versatile verb meaning to hunt, gather, search for, or collect. It describes the active pursuit or seeking of something, be it food, resources, or even abstract concepts like knowledge. While it can imply hunting animals, it more broadly emphasizes the effort of finding and acquiring.",
+    "grammarExamples": {
+      "noun": "alasa li suli. (The hunt is important.)",
+      "verb": "mi alasa. (I hunt.)",
+      "modifier": "jan alasa li kama. (The hunter comes.)"
+    }
   },
   "ale": {
     "aiExamples": {
@@ -53,7 +82,12 @@
       "intermediate": "mi lukin e ale pona. (I see all good things.)",
       "advanced": "ale li pona la, mi pilin pona. (If everything is good, I feel good.)"
     },
-    "aiExplanation": "In Toki Pona, \"ale\" is a versatile word meaning \"all,\" \"every,\" or \"whole,\" and can also function as a noun meaning \"everything\" or \"all things.\" It typically follows the noun it modifies, such as in \"jan ale\" (all people) or \"suno ale\" (every day). When used alone, for instance as the subject \"ale li pona,\" it refers to 'everything' or 'all circumstances.'"
+    "aiExplanation": "In Toki Pona, \"ale\" is a versatile word meaning \"all,\" \"every,\" or \"whole,\" and can also function as a noun meaning \"everything\" or \"all things.\" It typically follows the noun it modifies, such as in \"jan ale\" (all people) or \"suno ale\" (every day). When used alone, for instance as the subject \"ale li pona,\" it refers to 'everything' or 'all circumstances.'",
+    "grammarExamples": {
+      "noun": "ale li pona. (Everything is good.)",
+      "modifier": "jan ale li lon. (All people are present.)",
+      "adverb": "ona li moku ale. (She eats all of it.)"
+    }
   },
   "anpa": {
     "aiExamples": {
@@ -61,7 +95,12 @@
       "intermediate": "poka anpa li wawa. (The lower side is strong.)",
       "advanced": "suno li kama anpa la pimeja li kama. (When the sun comes down, darkness comes.)"
     },
-    "aiExplanation": "anpa primarily signifies \"down,\" \"low,\" or \"under.\" It can describe a physical position, like the bottom of something, or an abstract state, such as humility or subordination. This word beautifully encapsulates concepts of lowness, both literally and figuratively."
+    "aiExplanation": "anpa primarily signifies \"down,\" \"low,\" or \"under.\" It can describe a physical position, like the bottom of something, or an abstract state, such as humility or subordination. This word beautifully encapsulates concepts of lowness, both literally and figuratively.",
+    "grammarExamples": {
+      "noun": "mi lon anpa. (I am at the bottom.)",
+      "modifier": "ma anpa li suli. (The low land is big.)",
+      "verb": "mi anpa e tomo. (I lower the house.)"
+    }
   },
   "ante": {
     "aiExamples": {
@@ -69,7 +108,12 @@
       "intermediate": "ona li wile e pali ante. (She wants a different job.)",
       "advanced": "mi ante e ilo sina. (I change your tool.)"
     },
-    "aiExplanation": "ante means \"different,\" \"other,\" or \"changed,\" and can also function as a verb meaning \"to change\" or \"to make different.\" Its specific meaning depends heavily on context within the sentence. When used as a verb, it signifies an action of transformation, while as an adjective, it highlights distinctness or contrast."
+    "aiExplanation": "ante means \"different,\" \"other,\" or \"changed,\" and can also function as a verb meaning \"to change\" or \"to make different.\" Its specific meaning depends heavily on context within the sentence. When used as a verb, it signifies an action of transformation, while as an adjective, it highlights distinctness or contrast.",
+    "grammarExamples": {
+      "noun": "ni li ante. (This is a difference.)",
+      "modifier": "ona li jan ante. (They are a different person.)",
+      "verb": "ona li ante e ijo. (They change the thing.)"
+    }
   },
   "anu": {
     "aiExamples": {
@@ -77,7 +121,10 @@
       "intermediate": "ona li wile moku e kili pona anu e pan telo. (They want to eat good fruit or wet bread.)",
       "advanced": "sina lape anu sina kama la, mi toki e ni tawa sina. (If you sleep or you come, I will say this to you.)"
     },
-    "aiExplanation": "anu is Toki Pona's elegant way to express \"or,\" allowing us to connect two or more options, whether they are nouns, verbs, or even entire ideas. It functions as a flexible particle that highlights choices, often leaning towards an inclusive \"or\" unless the context clearly demands an exclusive selection. It's a key tool for expressing alternatives and possibilities in communication."
+    "aiExplanation": "anu is Toki Pona's elegant way to express \"or,\" allowing us to connect two or more options, whether they are nouns, verbs, or even entire ideas. It functions as a flexible particle that highlights choices, often leaning towards an inclusive \"or\" unless the context clearly demands an exclusive selection. It's a key tool for expressing alternatives and possibilities in communication.",
+    "grammarExamples": {
+      "Particle": "sina wawa anu ike? (Are you strong or bad?)"
+    }
   },
   "awen": {
     "aiExamples": {
@@ -85,7 +132,12 @@
       "intermediate": "tomo mi li awen suli (My house remains big)",
       "advanced": "sina awen tawa mi la, mi pana e mani tawa sina (If you wait for me, I give money to you)"
     },
-    "aiExplanation": "awen encapsulates the idea of staying, waiting, or remaining in a particular state or location. It can also function transitively with \"e\" to mean \"to keep\" or \"to protect\" something, preventing change or loss. Its core semantic range emphasizes continuity, preservation, and maintaining a condition."
+    "aiExplanation": "awen encapsulates the idea of staying, waiting, or remaining in a particular state or location. It can also function transitively with \"e\" to mean \"to keep\" or \"to protect\" something, preventing change or loss. Its core semantic range emphasizes continuity, preservation, and maintaining a condition.",
+    "grammarExamples": {
+      "noun": "mi wile e awen. (I want permanence.)",
+      "verb": "mi awen. (I wait.)",
+      "modifier": "jan awen li toki. (The waiting person speaks.)"
+    }
   },
   "e": {
     "aiExamples": {
@@ -93,7 +145,10 @@
       "intermediate": "jan pona li lukin e soweli lili. (The good person sees the small animal.)",
       "advanced": "mi wile e ni: sina pana e wawa tawa mi. (I want that you give energy to me.)"
     },
-    "aiExplanation": "The word 'e' is a crucial marker in Toki Pona that signals the direct object of a transitive verb. It separates the verb phrase from the noun or noun phrase that is receiving the action. Without 'e', a word following the verb might be interpreted as a modifier of the verb itself, leading to ambiguity or a different meaning entirely. It's essential for constructing clear transitive sentences and understanding who or what is being acted upon."
+    "aiExplanation": "The word 'e' is a crucial marker in Toki Pona that signals the direct object of a transitive verb. It separates the verb phrase from the noun or noun phrase that is receiving the action. Without 'e', a word following the verb might be interpreted as a modifier of the verb itself, leading to ambiguity or a different meaning entirely. It's essential for constructing clear transitive sentences and understanding who or what is being acted upon.",
+    "grammarExamples": {
+      "Particle": "mi moku e kili. (I eat the fruit.)"
+    }
   },
   "en": {
     "aiExamples": {
@@ -101,7 +156,10 @@
       "intermediate": "jan pi toki pona en jan pi toki ike li open.",
       "advanced": "jan mute en soweli lili li awen lon tomo. ni la, mi olin e ale."
     },
-    "aiExplanation": "en serves as a crucial conjunction in Toki Pona, primarily used to link two or more subjects performing the same action, or to connect two full clauses. It always precedes the particle 'li' (or 'o' for commands) when the combined subject is not 'mi' or 'sina'. Its role is to explicitly mark multiple distinct entities as unified participants in the predicate's action or state, emphasizing their collective involvement."
+    "aiExplanation": "en serves as a crucial conjunction in Toki Pona, primarily used to link two or more subjects performing the same action, or to connect two full clauses. It always precedes the particle 'li' (or 'o' for commands) when the combined subject is not 'mi' or 'sina'. Its role is to explicitly mark multiple distinct entities as unified participants in the predicate's action or state, emphasizing their collective involvement.",
+    "grammarExamples": {
+      "Particle": "mi moku e kili en telo. (I eat fruit and water.)"
+    }
   },
   "esun": {
     "aiExamples": {
@@ -109,7 +167,12 @@
       "intermediate": "esun suli li lon. (A big market exists.)",
       "advanced": "mi tawa esun la mi kama jo e ijo. (When I go to the market, I get things.)"
     },
-    "aiExplanation": "Esun captures the essence of commercial activity, encompassing not just a physical market or shop, but also the actions of buying, selling, or exchanging goods and services. It reflects the fundamental Toki Pona concept of interaction and transaction for obtaining necessities or desires, often implying a mutually agreed transfer of value."
+    "aiExplanation": "Esun captures the essence of commercial activity, encompassing not just a physical market or shop, but also the actions of buying, selling, or exchanging goods and services. It reflects the fundamental Toki Pona concept of interaction and transaction for obtaining necessities or desires, often implying a mutually agreed transfer of value.",
+    "grammarExamples": {
+      "noun": "mi tawa esun. (I go to the market.)",
+      "verb": "mi esun e kili. (I trade fruit.)",
+      "modifier": "tomo esun li suli. (The market building is big.)"
+    }
   },
   "ijo": {
     "aiExamples": {
@@ -117,7 +180,12 @@
       "intermediate": "ijo suli li lon. (An important thing exists.)",
       "advanced": "sina wile e ijo la, mi pana e ona tawa sina. (If you want a thing, I give it to you.)"
     },
-    "aiExplanation": "ijo is a very broad and fundamental word in Toki Pona, meaning \"thing, object, phenomenon, matter.\" It can refer to almost anything, from a physical object to an abstract concept, depending on the context. Its versatility makes it a frequent placeholder when a more specific term isn't necessary or available, allowing for concise communication about general existences or concepts."
+    "aiExplanation": "ijo is a very broad and fundamental word in Toki Pona, meaning \"thing, object, phenomenon, matter.\" It can refer to almost anything, from a physical object to an abstract concept, depending on the context. Its versatility makes it a frequent placeholder when a more specific term isn't necessary or available, allowing for concise communication about general existences or concepts.",
+    "grammarExamples": {
+      "noun": "ni li ijo. (This is a thing.)",
+      "modifier": "telo ijo li wawa. (Solid water is powerful.)",
+      "verb": "mi ijo e sitelen. (I objectify the drawing.)"
+    }
   },
   "ike": {
     "aiExamples": {
@@ -125,7 +193,12 @@
       "intermediate": "ona li toki ike. (They speak badly / in a bad way.)",
       "advanced": "suno li ike la mi moku e kili. (If the weather is bad, I eat the fruit.)"
     },
-    "aiExplanation": "The word 'ike' covers a broad semantic range beyond just 'bad' or 'evil'. It can denote anything wrong, complex, difficult, ugly, problematic, or simply 'not good'. Its precise meaning is highly context-dependent, often describing an undesirable or non-optimal state or quality."
+    "aiExplanation": "The word 'ike' covers a broad semantic range beyond just 'bad' or 'evil'. It can denote anything wrong, complex, difficult, ugly, problematic, or simply 'not good'. Its precise meaning is highly context-dependent, often describing an undesirable or non-optimal state or quality.",
+    "grammarExamples": {
+      "noun": "ike li lon. (A problem exists.)",
+      "modifier": "jan ike li tawa. (The bad person goes.)",
+      "verb": "ona li ike. (They are bad.)"
+    }
   },
   "ilo": {
     "aiExamples": {
@@ -133,7 +206,11 @@
       "intermediate": "ilo nasa li kama. (A strange tool arrives.)",
       "advanced": "mi wile pali e ijo la, mi jo e ilo. (If I want to make something, I have a tool.)"
     },
-    "aiExplanation": "ilo encompasses any object that serves a purpose, from the simplest implement to the most complex machine. It emphasizes function over form, referring to anything that facilitates an action or task. This broad meaning allows \"ilo\" to describe everything from a simple rock used as a hammer to a sophisticated computer."
+    "aiExplanation": "ilo encompasses any object that serves a purpose, from the simplest implement to the most complex machine. It emphasizes function over form, referring to anything that facilitates an action or task. This broad meaning allows \"ilo\" to describe everything from a simple rock used as a hammer to a sophisticated computer.",
+    "grammarExamples": {
+      "noun": "ona li ilo. (It is a tool.)",
+      "modifier": "poki ilo li pona. (The tool container is good.)"
+    }
   },
   "insa": {
     "aiExamples": {
@@ -141,7 +218,11 @@
       "intermediate": "insa mi li pona. (My inner feeling/gut is good.)",
       "advanced": "ona li pilin ike la, ona li pana e telo tawa insa ona. (When she felt bad, she gave water to her inside [i.e., she drank water].)"
     },
-    "aiExplanation": "Insa directly translates to \"inside\" or \"inner part,\" referring to a physical space, the contents of an object, or even the core of something. Beyond physical locations, it can represent abstract concepts like one's \"gut feeling,\" \"mind,\" or the essential nature of something. This word is highly versatile, functioning as a noun, an adjective (e.g., 'ma insa' for 'inner land'), or indicating containment."
+    "aiExplanation": "Insa directly translates to \"inside\" or \"inner part,\" referring to a physical space, the contents of an object, or even the core of something. Beyond physical locations, it can represent abstract concepts like one's \"gut feeling,\" \"mind,\" or the essential nature of something. This word is highly versatile, functioning as a noun, an adjective (e.g., 'ma insa' for 'inner land'), or indicating containment.",
+    "grammarExamples": {
+      "noun": "sijelo mi li jo e insa. (My body has an inside.)",
+      "modifier": "mi jo e len insa. (I have inner clothing.)"
+    }
   },
   "jaki": {
     "aiExamples": {
@@ -149,7 +230,12 @@
       "intermediate": "len jaki li lon supa. (Dirty clothes are on the table.)",
       "advanced": "sina pana e moku jaki tawa mi la, mi ike. (If you give dirty food to me, I feel bad/sick.)"
     },
-    "aiExplanation": "jaki encompasses concepts like \"disgusting,\" \"dirty,\" \"gross,\" \"unclean,\" or \"toxic.\" It's a strong negative word that can describe both physical uncleanliness and a general sense of revulsion or unpleasantness. Like many Toki Pona words, it's highly contextual and can modify nouns, act as a verb, or even be a noun itself depending on sentence structure."
+    "aiExplanation": "jaki encompasses concepts like \"disgusting,\" \"dirty,\" \"gross,\" \"unclean,\" or \"toxic.\" It's a strong negative word that can describe both physical uncleanliness and a general sense of revulsion or unpleasantness. Like many Toki Pona words, it's highly contextual and can modify nouns, act as a verb, or even be a noun itself depending on sentence structure.",
+    "grammarExamples": {
+      "noun": "ni li jaki. (This is filth.)",
+      "modifier": "soweli li jaki. (The animal is dirty.)",
+      "verb": "ona li jaki e mi. (It disgusts me.)"
+    }
   },
   "jan": {
     "aiExamples": {
@@ -157,7 +243,12 @@
       "intermediate": "ona li jan pona. (They are a good person/friend.)",
       "advanced": "mi lukin e jan la, mi pilin pona. (When I see a person, I feel good.)"
     },
-    "aiExplanation": "jan is one of Toki Pona's fundamental words, directly translating to \"person, human, people, somebody, anybody.\" It serves as a highly versatile noun, acting as a placeholder for any individual or group of individuals, regardless of specific roles or genders. Beyond its noun form, jan can also function as a verb meaning \"to personify\" or \"to make human,\" or even as an adjective describing something as human-like, making it a cornerstone for discussing sapient beings."
+    "aiExplanation": "jan is one of Toki Pona's fundamental words, directly translating to \"person, human, people, somebody, anybody.\" It serves as a highly versatile noun, acting as a placeholder for any individual or group of individuals, regardless of specific roles or genders. Beyond its noun form, jan can also function as a verb meaning \"to personify\" or \"to make human,\" or even as an adjective describing something as human-like, making it a cornerstone for discussing sapient beings.",
+    "grammarExamples": {
+      "noun": "mi jan. (I am a person.)",
+      "modifier": "ma jan li lili. (The human land is small.)",
+      "verb": "ona li jan e mi. (They personify me.)"
+    }
   },
   "jelo": {
     "aiExamples": {
@@ -165,7 +256,11 @@
       "intermediate": "kili jelo li suwi. (The yellow fruit is sweet.)",
       "advanced": "mi lukin e akesi jelo. (I see a yellow reptile/bug.)"
     },
-    "aiExplanation": "In Toki Pona, 'jelo' usually means yellow, but its meaning is more expansive than the English word. It can encompass a range of warm, light colors like light green, orange, or golden hues. Think of 'jelo' as the color of sunlight, ripe produce, or certain vivid plants, representing a general sense of brightness and warmth."
+    "aiExplanation": "In Toki Pona, 'jelo' usually means yellow, but its meaning is more expansive than the English word. It can encompass a range of warm, light colors like light green, orange, or golden hues. Think of 'jelo' as the color of sunlight, ripe produce, or certain vivid plants, representing a general sense of brightness and warmth.",
+    "grammarExamples": {
+      "noun": "ni li jelo. (This is yellow.)",
+      "modifier": "kala jelo li pona. (The yellow fish is good.)"
+    }
   },
   "jo": {
     "aiExamples": {
@@ -173,7 +268,12 @@
       "intermediate": "ona li jo mani lili. (They have a little money.)",
       "advanced": "jan li jo e ilo pi wile ona la, ona li ken pali pona. (If a person has the tool they want, they can work well.)"
     },
-    "aiExplanation": "\"jo\" primarily means \"to have,\" \"to hold,\" or \"to carry.\" It signifies a state of possession or containment, applying to both concrete objects (like \"mani\" - money) and abstract concepts (like \"pilin pona\" - good feelings). This word emphasizes the relationship of *having* or *being with* something, rather than the action of acquiring it."
+    "aiExplanation": "\"jo\" primarily means \"to have,\" \"to hold,\" or \"to carry.\" It signifies a state of possession or containment, applying to both concrete objects (like \"mani\" - money) and abstract concepts (like \"pilin pona\" - good feelings). This word emphasizes the relationship of *having* or *being with* something, rather than the action of acquiring it.",
+    "grammarExamples": {
+      "noun": "jo li pona. (Possession is good.)",
+      "verb": "mi jo e mani. (I have money.)",
+      "modifier": "ilo jo li suli. (The possessed tool is big.)"
+    }
   },
   "kala": {
     "aiExamples": {
@@ -181,7 +281,12 @@
       "intermediate": "kala lili li lon telo. (Small aquatic creatures are in the water.)",
       "advanced": "mi lukin e kala mute. (I see many fish/aquatic creatures.)"
     },
-    "aiExplanation": "pona! 'kala' is a wonderfully broad word in Toki Pona. While often translated as 'fish,' it actually encompasses almost any non-mammalian creature that lives in or is strongly associated with water—including frogs, crocodiles, lizards, and sometimes even insects if the context fits. Its true meaning depends heavily on surrounding words and the specific situation."
+    "aiExplanation": "pona! 'kala' is a wonderfully broad word in Toki Pona. While often translated as 'fish,' it actually encompasses almost any non-mammalian creature that lives in or is strongly associated with water—including frogs, crocodiles, lizards, and sometimes even insects if the context fits. Its true meaning depends heavily on surrounding words and the specific situation.",
+    "grammarExamples": {
+      "noun": "kala li tawa. (The fish moves.)",
+      "modifier": "jan kala li suli. (The noisy person is big.)",
+      "verb": "mi kala. (I make noise.)"
+    }
   },
   "kalama": {
     "aiExamples": {
@@ -189,7 +294,12 @@
       "intermediate": "kalama telo li pona. (The sound of water is good.)",
       "advanced": "kalama mute li kama la, mi pilin ike. (When a lot of sound comes, I feel bad.)"
     },
-    "aiExplanation": "In Toki Pona, 'kalama' is a very versatile word, encompassing any auditory sensation. It can function as a noun meaning 'sound, noise, voice' or as a verb meaning 'to sound, to make a sound, to speak'. Its precise meaning is often clarified by surrounding words, allowing you to describe anything from a whisper to a song or a thunderclap."
+    "aiExplanation": "In Toki Pona, 'kalama' is a very versatile word, encompassing any auditory sensation. It can function as a noun meaning 'sound, noise, voice' or as a verb meaning 'to sound, to make a sound, to speak'. Its precise meaning is often clarified by surrounding words, allowing you to describe anything from a whisper to a song or a thunderclap.",
+    "grammarExamples": {
+      "noun": "kalama li pona. (The sound is good.)",
+      "verb": "ona li kalama. (They make a sound.)",
+      "modifier": "ilo kalama li suli. (The musical tool is big.)"
+    }
   },
   "kama": {
     "aiExamples": {
@@ -197,7 +307,12 @@
       "intermediate": "mi kama tawa ma tomo. (I come to the city.)",
       "advanced": "sina kama sona la, o pana e toki pona tawa jan ante. (When you become wise, give good words to other people.)"
     },
-    "aiExplanation": "kama is a versatile word, primarily meaning \"to come, to arrive\" or \"to become.\" When used as a pre-verb (e.g., kama sona), it indicates a transition into a new state or a resulting action. It often emphasizes a process of change or the initiation of an event."
+    "aiExplanation": "kama is a versatile word, primarily meaning \"to come, to arrive\" or \"to become.\" When used as a pre-verb (e.g., kama sona), it indicates a transition into a new state or a resulting action. It often emphasizes a process of change or the initiation of an event.",
+    "grammarExamples": {
+      "noun": "kama li pona. (Arrival is good.)",
+      "verb": "mi kama. (I come.)",
+      "modifier": "suno kama li pona. (The coming day is good.)"
+    }
   },
   "kasi": {
     "aiExamples": {
@@ -205,7 +320,11 @@
       "intermediate": "kasi suli li pona tawa mi. (Big plants are good for me.)",
       "advanced": "suno li kama la kasi mute li kama jo e telo li suli. (When the sun comes, many plants get water and grow big.)"
     },
-    "aiExplanation": "In Toki Pona, 'kasi' is a wonderfully broad word, encompassing all forms of plant life, from towering trees to tiny blades of grass, and even leaves or herbs. It refers to anything green that grows from the ground. The specific type of plant is often understood through context or by adding a modifier, such as 'kasi suli' for a tree or 'kasi lili' for grass or a small plant."
+    "aiExplanation": "In Toki Pona, 'kasi' is a wonderfully broad word, encompassing all forms of plant life, from towering trees to tiny blades of grass, and even leaves or herbs. It refers to anything green that grows from the ground. The specific type of plant is often understood through context or by adding a modifier, such as 'kasi suli' for a tree or 'kasi lili' for grass or a small plant.",
+    "grammarExamples": {
+      "noun": "kasi li suli. (The plant is big.)",
+      "modifier": "mi moku e moku kasi. (I eat plant food.)"
+    }
   },
   "ken": {
     "aiExamples": {
@@ -213,7 +332,12 @@
       "intermediate": "ken suli li lon. (Great possibility/ability exists.)",
       "advanced": "sina wile sona e toki pona la, mi ken pana e sona. (If you want to know Toki Pona, I can give knowledge.)"
     },
-    "aiExplanation": "The word \"ken\" is very versatile, primarily meaning 'can', 'to be able to', or 'possible'. It often functions as a pre-verb, indicating the capability or permission for the action that follows. As a noun, \"ken\" refers to an ability, a possibility, or even permission itself, showing its broad semantic range in Toki Pona."
+    "aiExplanation": "The word \"ken\" is very versatile, primarily meaning 'can', 'to be able to', or 'possible'. It often functions as a pre-verb, indicating the capability or permission for the action that follows. As a noun, \"ken\" refers to an ability, a possibility, or even permission itself, showing its broad semantic range in Toki Pona.",
+    "grammarExamples": {
+      "noun": "ona li jo e ken. (They have ability/power/permission.)",
+      "verb": "mi ken tawa. (I can move.)",
+      "modifier": "wawa ken li suli. (Potential power is great.)"
+    }
   },
   "kepeken": {
     "aiExamples": {
@@ -221,7 +345,11 @@
       "intermediate": "mi kepeken ilo pona. (I use a good tool.)",
       "advanced": "jan li kepeken e toki pona la, ona li sona pona e jan ante. (If a person uses Toki Pona, they understand other people well.)"
     },
-    "aiExplanation": "pona! 'kepeken' means \"to use\", \"to apply\", or \"with (as an instrument)\". It's a very versatile word, functioning as a verb, a preposition, or even a modifier. When used as a verb, it directly signifies the act of utilizing something, as in 'mi kepeken telo' (I use water). Crucially, 'kepeken' can also act like a preposition (similar to 'lon' or 'tan'), indicating the tool, method, or means by which an action is performed, such as 'mi pali kepeken ilo' (I work using a tool). This dual role makes it incredibly useful for describing how tasks are accomplished."
+    "aiExplanation": "pona! 'kepeken' means \"to use\", \"to apply\", or \"with (as an instrument)\". It's a very versatile word, functioning as a verb, a preposition, or even a modifier. When used as a verb, it directly signifies the act of utilizing something, as in 'mi kepeken telo' (I use water). Crucially, 'kepeken' can also act like a preposition (similar to 'lon' or 'tan'), indicating the tool, method, or means by which an action is performed, such as 'mi pali kepeken ilo' (I work using a tool). This dual role makes it incredibly useful for describing how tasks are accomplished.",
+    "grammarExamples": {
+      "verb": "mi kepeken ilo. (I use a tool.)",
+      "preposition": "ona li tawa kepeken tomo tawa. (They go using a car.)"
+    }
   },
   "kili": {
     "aiExamples": {
@@ -229,7 +357,11 @@
       "intermediate": "kili loje li suwi. (Red fruit/vegetable is sweet.)",
       "advanced": "mi wile moku e kili la, mi tawa tomo kili. (If I want to eat fruit/vegetable, I go to the fruit/vegetable shop.)"
     },
-    "aiExplanation": "\"kili\" refers to any fruit, vegetable, or mushroom, essentially any edible part of a plant or fungus that is harvested. It's a very broad category, covering most things one might gather for food that aren't grains, nuts, or roots. This flexibility allows it to describe a wide variety of natural foods without needing more specific terms."
+    "aiExplanation": "\"kili\" refers to any fruit, vegetable, or mushroom, essentially any edible part of a plant or fungus that is harvested. It's a very broad category, covering most things one might gather for food that aren't grains, nuts, or roots. This flexibility allows it to describe a wide variety of natural foods without needing more specific terms.",
+    "grammarExamples": {
+      "noun": "ona li kili. (It is a fruit.)",
+      "modifier": "mi moku kili. (I eat fruit food.)"
+    }
   },
   "kiwen": {
     "aiExamples": {
@@ -237,7 +369,11 @@
       "intermediate": "kiwen suli li lon ma. (A big rock is on the ground.)",
       "advanced": "jan li wile pali e tomo la, ona li jo e kiwen mute. (If a person wants to build a house, they have many stones/hard materials.)"
     },
-    "aiExplanation": "kiwen literally means 'hard object, stone, rock, metal.' It encompasses anything that is hard, solid, and typically inorganic, from small pebbles to large mountains, and includes metals like iron or gold. The word emphasizes the quality of hardness and solidity rather than a specific material type."
+    "aiExplanation": "kiwen literally means 'hard object, stone, rock, metal.' It encompasses anything that is hard, solid, and typically inorganic, from small pebbles to large mountains, and includes metals like iron or gold. The word emphasizes the quality of hardness and solidity rather than a specific material type.",
+    "grammarExamples": {
+      "noun": "ni li kiwen. (This is a rock.)",
+      "modifier": "ilo kiwen li suli. (The stone tool is big.)"
+    }
   },
   "ko": {
     "aiExamples": {
@@ -245,7 +381,11 @@
       "intermediate": "ko jelo li pona tawa mi. (Yellow paste/powder is good for me.)",
       "advanced": "sina wile e ko la, o open e lupa. (If you want paste/powder, open the door.)"
     },
-    "aiExplanation": "ko refers to substances in a semi-solid state, like powder, paste, or crumbs. It describes materials that are neither fully liquid nor hard solid, emphasizing their granular or pliable texture. You might use it for flour, mud, dough, or even a thick soup, focusing on its consistency."
+    "aiExplanation": "ko refers to substances in a semi-solid state, like powder, paste, or crumbs. It describes materials that are neither fully liquid nor hard solid, emphasizing their granular or pliable texture. You might use it for flour, mud, dough, or even a thick soup, focusing on its consistency.",
+    "grammarExamples": {
+      "noun": "ko li suwi. (The paste/powder is sweet.)",
+      "modifier": "moku ko li pona. (The powdered food is good.)"
+    }
   },
   "kon": {
     "aiExamples": {
@@ -253,7 +393,12 @@
       "intermediate": "kon wawa li lon mi. (A strong spirit is in me.)",
       "advanced": "kon li suli la mi pilin pona. (If the spirit is great, I feel good.)"
     },
-    "aiExplanation": "kon is a rich word covering air, breath, spirit, and soul. It often refers to the unseen essence or vital force of a living thing or even a concept. Think of it as the non-physical aspect, from a simple breeze to a person's inner being or a group's collective mood."
+    "aiExplanation": "kon is a rich word covering air, breath, spirit, and soul. It often refers to the unseen essence or vital force of a living thing or even a concept. Think of it as the non-physical aspect, from a simple breeze to a person's inner being or a group's collective mood.",
+    "grammarExamples": {
+      "noun": "kon li pona. (Spirit is good.)",
+      "modifier": "mi lukin e jan kon. (I see a spirit person/ghost.)",
+      "verb": "ona li kon. (They breathe.)"
+    }
   },
   "kule": {
     "aiExamples": {
@@ -261,7 +406,12 @@
       "intermediate": "kiwen suli li kule mute. (The big rock is very colourful.)",
       "advanced": "sina jo e kule la sina ken sitelen e sitelen pona. (If you have paint, you can draw good pictures.)"
     },
-    "aiExplanation": "The word \"kule\" encompasses the concept of colour, being colourful, and the act of colouring or painting. It describes the visual attribute of an object having distinct colours, moving beyond mere light and shadow. It often implies a sense of vibrancy, beauty, or visual interest in a scene or object."
+    "aiExplanation": "The word \"kule\" encompasses the concept of colour, being colourful, and the act of colouring or painting. It describes the visual attribute of an object having distinct colours, moving beyond mere light and shadow. It often implies a sense of vibrancy, beauty, or visual interest in a scene or object.",
+    "grammarExamples": {
+      "noun": "ni li kule. (This is a color.)",
+      "modifier": "len kule li pona. (Colorful clothes are good.)",
+      "verb": "mi kule e sitelen. (I color the picture.)"
+    }
   },
   "kulupu": {
     "aiExamples": {
@@ -269,7 +419,10 @@
       "intermediate": "kulupu mi li pona tawa mi. (My group is good for me.)",
       "advanced": "kulupu ni li pali e wawa mute la, jan ali li pilin pona. (If this group creates much power/strength, all people feel good.)"
     },
-    "aiExplanation": "In Toki Pona, 'kulupu' refers to any collection of people or things that functions as a single unit, such as a community, organization, or simply a group. It implies a sense of shared identity or purpose, distinguishing it from merely 'mute' (many). This word can describe both formal bodies and informal gatherings, emphasizing belonging and collective action."
+    "aiExplanation": "In Toki Pona, 'kulupu' refers to any collection of people or things that functions as a single unit, such as a community, organization, or simply a group. It implies a sense of shared identity or purpose, distinguishing it from merely 'mute' (many). This word can describe both formal bodies and informal gatherings, emphasizing belonging and collective action.",
+    "grammarExamples": {
+      "Noun": "mi jo e kulupu. (I have a group.)"
+    }
   },
   "kute": {
     "aiExamples": {
@@ -277,7 +430,12 @@
       "intermediate": "ona li kute pona. (They listen well / They obey well.)",
       "advanced": "jan li toki la, mi kute e ona. (When someone speaks, I listen to them.)"
     },
-    "aiExplanation": "kute is a remarkably versatile word in Toki Pona, serving as the noun for 'ear' and the verb for 'to hear,' 'to listen,' or 'to obey.' Its precise meaning is heavily dependent on context; for example, 'kute pona' can imply hearing well or being obedient. Understanding its nuance often requires observing how it interacts with other words in a phrase."
+    "aiExplanation": "kute is a remarkably versatile word in Toki Pona, serving as the noun for 'ear' and the verb for 'to hear,' 'to listen,' or 'to obey.' Its precise meaning is heavily dependent on context; for example, 'kute pona' can imply hearing well or being obedient. Understanding its nuance often requires observing how it interacts with other words in a phrase.",
+    "grammarExamples": {
+      "noun": "mi jo e kute. (I have ears.)",
+      "verb": "ona li kute. (They listen.)",
+      "modifier": "ilo kute li pona. (A listening device is good.)"
+    }
   },
   "la": {
     "aiExamples": {
@@ -285,7 +443,10 @@
       "intermediate": "pipi lili pona li tawa lon ma la mi pilin pona. (When good small bugs move on the land, I feel good.)",
       "advanced": "pona mute li kama lon insa sina la sina ken pana e wawa tawa jan ante la o wile e ni. (If much goodness comes within you, then you can give strength to other people, therefore want this.)"
     },
-    "aiExplanation": "la is a crucial particle that separates a contextual or conditional phrase from the main statement. It establishes a \"setting\" or \"precondition\" for what follows, often translating to \"if,\" \"when,\" \"in the context of,\" or simply marking a topic shift. It helps clarify the relationship between the preceding information and the subsequent action or state."
+    "aiExplanation": "la is a crucial particle that separates a contextual or conditional phrase from the main statement. It establishes a \"setting\" or \"precondition\" for what follows, often translating to \"if,\" \"when,\" \"in the context of,\" or simply marking a topic shift. It helps clarify the relationship between the preceding information and the subsequent action or state.",
+    "grammarExamples": {
+      "Particle": "suno li kama la, mi tawa tomo. (When the sun comes, I go home.)"
+    }
   },
   "lape": {
     "aiExamples": {
@@ -293,7 +454,12 @@
       "intermediate": "jan lili li lape ike. (The child sleeps badly.)",
       "advanced": "sina lape ala la, sina pilin ike. (If you don't sleep, you feel bad.)"
     },
-    "aiExplanation": "ala, jan pona! 'Lape' primarily means to sleep or to rest. It covers the full spectrum from a quick nap to a deep, unconscious slumber. You can also use it as a noun, referring to 'sleep' or 'rest' itself, as in 'mi wile e lape pona' (I want good sleep)."
+    "aiExplanation": "ala, jan pona! 'Lape' primarily means to sleep or to rest. It covers the full spectrum from a quick nap to a deep, unconscious slumber. You can also use it as a noun, referring to 'sleep' or 'rest' itself, as in 'mi wile e lape pona' (I want good sleep).",
+    "grammarExamples": {
+      "noun": "lape li pona. (Sleep is good.)",
+      "verb": "mi lape. (I sleep.)",
+      "modifier": "jan lape li tawa. (The sleepy person walks.)"
+    }
   },
   "laso": {
     "aiExamples": {
@@ -301,7 +467,11 @@
       "intermediate": "tomo laso li suli. (The blue-green house is big.)",
       "advanced": "suno li seli la, telo laso li pona tawa mi. (When the sun is hot, the blue-green water is good for me.)"
     },
-    "aiExplanation": "In Toki Pona, \"laso\" describes a spectrum of cool colors, encompassing what English speakers might call blue and green. It often refers to hues found in the sky, water, or lush plants, making it a versatile word for the cool end of the color spectrum. To specify if it leans more towards blue or green, modifiers are often used, such as \"laso telo\" (watery blue-green) or \"laso kasi\" (plant-like green)."
+    "aiExplanation": "In Toki Pona, \"laso\" describes a spectrum of cool colors, encompassing what English speakers might call blue and green. It often refers to hues found in the sky, water, or lush plants, making it a versatile word for the cool end of the color spectrum. To specify if it leans more towards blue or green, modifiers are often used, such as \"laso telo\" (watery blue-green) or \"laso kasi\" (plant-like green).",
+    "grammarExamples": {
+      "noun": "ni li laso. (This is blue-green.)",
+      "modifier": "kala li laso. (The fish is blue-green.)"
+    }
   },
   "lawa": {
     "aiExamples": {
@@ -309,7 +479,12 @@
       "intermediate": "jan lawa wawa li jo e sona mute. (A powerful leader has much knowledge.)",
       "advanced": "kama sona li pona. tenpo mute la, ona li lawa e jan tawa pona. (Learning is good. Often, it guides people toward good.)"
     },
-    "aiExplanation": "In Toki Pona, \"lawa\" holds the core meaning of \"head\" (the body part), but extends powerfully to mean \"to lead,\" \"to control,\" \"to direct,\" or \"to command.\" This connection beautifully illustrates how the physical head, being the seat of thought and direction, becomes the metaphor for leadership and guidance. It can function as both a noun (a head, a leader) and a verb (to head, to lead), highlighting its active role in influence and decision-making."
+    "aiExplanation": "In Toki Pona, \"lawa\" holds the core meaning of \"head\" (the body part), but extends powerfully to mean \"to lead,\" \"to control,\" \"to direct,\" or \"to command.\" This connection beautifully illustrates how the physical head, being the seat of thought and direction, becomes the metaphor for leadership and guidance. It can function as both a noun (a head, a leader) and a verb (to head, to lead), highlighting its active role in influence and decision-making.",
+    "grammarExamples": {
+      "noun": "lawa mi li pona. (My head is good.)",
+      "verb": "ona li lawa e mi. (They lead me.)",
+      "modifier": "ni li tomo lawa. (This is the main building.)"
+    }
   },
   "len": {
     "aiExamples": {
@@ -317,7 +492,12 @@
       "intermediate": "len telo li pona tawa mi. (A towel is good for me.)",
       "advanced": "sina kama la mi pana e len mute tawa sina. (If you come, I will give much cloth to you.)"
     },
-    "aiExplanation": "The word \"len\" primarily signifies cloth, fabric, or clothing in a general sense. It refers to anything made of textile used for covering or protection. As a verb, \"len\" means to clothe or to cover with fabric, often implying an act of adornment or practical shielding."
+    "aiExplanation": "The word \"len\" primarily signifies cloth, fabric, or clothing in a general sense. It refers to anything made of textile used for covering or protection. As a verb, \"len\" means to clothe or to cover with fabric, often implying an act of adornment or practical shielding.",
+    "grammarExamples": {
+      "noun": "mi jo e len. (I have cloth.)",
+      "modifier": "sina jo e tomo len. (You have a clothing house/shop.)",
+      "verb": "ona li len e mi. (They clothe me.)"
+    }
   },
   "lete": {
     "aiExamples": {
@@ -325,7 +505,12 @@
       "intermediate": "telo lete li pona. (Cold water is good.)",
       "advanced": "mi pilin lete la, mi wile e len seli. (When I feel cold, I want warm clothes.)"
     },
-    "aiExplanation": "The word \"lete\" primarily denotes coldness or a lack of heat. Beyond temperature, it can also refer to things being raw, fresh, or uncooked, such as 'kala lete' (raw fish) or 'kon lete' (fresh air). It captures a state of being naturally unheated or unmanipulated by warmth."
+    "aiExplanation": "The word \"lete\" primarily denotes coldness or a lack of heat. Beyond temperature, it can also refer to things being raw, fresh, or uncooked, such as 'kala lete' (raw fish) or 'kon lete' (fresh air). It captures a state of being naturally unheated or unmanipulated by warmth.",
+    "grammarExamples": {
+      "noun": "lete li ike. (Cold is bad.)",
+      "modifier": "telo lete li pona. (Cold water is good.)",
+      "verb": "ma li lete. (The land is cold.)"
+    }
   },
   "li": {
     "aiExamples": {
@@ -333,7 +518,10 @@
       "intermediate": "jan pona mi li moku pona. (My good friend eats well.)",
       "advanced": "suno li open la, mi moku e telo. (When the sun starts, I drink water.)"
     },
-    "aiExplanation": "li is a grammatical particle that separates the subject from the verb phrase (predicate) in Toki Pona. It explicitly marks the action or state of the subject. Crucially, 'li' is *not* used when the subject is 'mi' (I/we) or 'sina' (you), but *must* be used for all other subjects, helping to clarify sentence structure."
+    "aiExplanation": "li is a grammatical particle that separates the subject from the verb phrase (predicate) in Toki Pona. It explicitly marks the action or state of the subject. Crucially, 'li' is *not* used when the subject is 'mi' (I/we) or 'sina' (you), but *must* be used for all other subjects, helping to clarify sentence structure.",
+    "grammarExamples": {
+      "Particle": "jan pona li pana e moku. (The good person gives food.)"
+    }
   },
   "lili": {
     "aiExamples": {
@@ -341,7 +529,12 @@
       "intermediate": "jan lili li moku e telo. (The young person drinks water.)",
       "advanced": "mi wile e ijo lili la mi kama jo e ona kepeken ilo sin. (I want a small thing, so I get it using a new tool.)"
     },
-    "aiExplanation": "lili fundamentally means \"small,\" \"little,\" or \"young.\" It's often used to describe physical size, age, or quantity. Beyond that, it can also imply a degree of unimportance or insignificance, contrasting with suli (big, important), and can even function adverbially to mean \"a little\" or \"slightly.\""
+    "aiExplanation": "lili fundamentally means \"small,\" \"little,\" or \"young.\" It's often used to describe physical size, age, or quantity. Beyond that, it can also imply a degree of unimportance or insignificance, contrasting with suli (big, important), and can even function adverbially to mean \"a little\" or \"slightly.\"",
+    "grammarExamples": {
+      "noun": "ona li lili. (It is a small thing.)",
+      "modifier": "ijo lili li pona. (Small things are good.)",
+      "verb": "mi lili e ijo. (I make the thing small.)"
+    }
   },
   "linja": {
     "aiExamples": {
@@ -349,7 +542,11 @@
       "intermediate": "linja mute li lon ma ni. (Many lines are in this land.)",
       "advanced": "sina wile e linja suli tawa telo la, sina ken jo e pona pi mute ali. (If you want a big pipe for water, you can have all good things.)"
     },
-    "aiExplanation": "linja is a versatile word for anything long, thin, and continuous. It can describe physical objects like a thread, rope, or a strand of hair, as well as abstract concepts such as a drawn line or a queue. Its broad meaning allows it to encompass various linear forms, from simple markings to complex interconnected systems like pipes or cables."
+    "aiExplanation": "linja is a versatile word for anything long, thin, and continuous. It can describe physical objects like a thread, rope, or a strand of hair, as well as abstract concepts such as a drawn line or a queue. Its broad meaning allows it to encompass various linear forms, from simple markings to complex interconnected systems like pipes or cables.",
+    "grammarExamples": {
+      "noun": "linja li suli. (The line is big.)",
+      "modifier": "mi moku e pan linja. (I eat spaghetti.)"
+    }
   },
   "lipu": {
     "aiExamples": {
@@ -357,7 +554,11 @@
       "intermediate": "mi pana e lipu pona. (I give good papers.)",
       "advanced": "mi lukin e lipu la, mi sona. (When I look at the document, I know.)"
     },
-    "aiExplanation": "In Toki Pona, 'lipu' refers to any flat and bendable surface containing information, like a book, paper, document, or even a website. It encompasses both physical and digital forms of records or communication. It's not limited to just 'book' but extends to any medium used for writing, drawing, or displaying text and images."
+    "aiExplanation": "In Toki Pona, 'lipu' refers to any flat and bendable surface containing information, like a book, paper, document, or even a website. It encompasses both physical and digital forms of records or communication. It's not limited to just 'book' but extends to any medium used for writing, drawing, or displaying text and images.",
+    "grammarExamples": {
+      "noun": "ni li lipu. (This is a book/document.)",
+      "modifier": "mi lukin e tomo lipu. (I see the library/book building.)"
+    }
   },
   "loje": {
     "aiExamples": {
@@ -365,7 +566,11 @@
       "intermediate": "telo loje li pona. (Red liquid is good.)",
       "advanced": "mi moku e kili loje. (I eat the red fruit.)"
     },
-    "aiExplanation": "As jan Lina, I can tell you that 'loje' primarily means red, reddish, or crimson. It's one of the core color terms in Toki Pona, describing anything from blood to ripe fruit or a sunset. While often translated simply as 'red', it encompasses the full spectrum of red hues, including purplish-reds and reddish-browns, depending on context."
+    "aiExplanation": "As jan Lina, I can tell you that 'loje' primarily means red, reddish, or crimson. It's one of the core color terms in Toki Pona, describing anything from blood to ripe fruit or a sunset. While often translated simply as 'red', it encompasses the full spectrum of red hues, including purplish-reds and reddish-browns, depending on context.",
+    "grammarExamples": {
+      "noun": "ni li loje. (This is redness.)",
+      "modifier": "pake loje li pona. (The red box is good.)"
+    }
   },
   "lon": {
     "aiExamples": {
@@ -373,7 +578,12 @@
       "intermediate": "mi lon tomo suli. (I am in the big house.)",
       "advanced": "jan pona li wile lon e pona. (Good people want to actualize goodness.)"
     },
-    "aiExplanation": "lon is a highly versatile word in Toki Pona, commonly functioning as a preposition to indicate location (\"in\", \"on\", \"at\") or as a verb meaning \"to exist\" or \"to be true\". Its deeper usage extends to meaning \"real\" or \"present\" as a modifier, and transitively with \"e\" to mean \"to actualize\" or \"to make true,\" emphasizing the establishment of reality or truth. It's a foundational word for expressing presence, reality, and location."
+    "aiExplanation": "lon is a highly versatile word in Toki Pona, commonly functioning as a preposition to indicate location (\"in\", \"on\", \"at\") or as a verb meaning \"to exist\" or \"to be true\". Its deeper usage extends to meaning \"real\" or \"present\" as a modifier, and transitively with \"e\" to mean \"to actualize\" or \"to make true,\" emphasizing the establishment of reality or truth. It's a foundational word for expressing presence, reality, and location.",
+    "grammarExamples": {
+      "verb": "mi lon. (I exist.)",
+      "preposition": "suno li lon sewi. (The sun is in the sky.)",
+      "modifier": "toki lon li pona. (True words are good.)"
+    }
   },
   "luka": {
     "aiExamples": {
@@ -381,7 +591,12 @@
       "intermediate": "ona li jo e luka wawa. (He/She has a strong hand/arm.)",
       "advanced": "luka li pona la jan li ken pali e mute. (If hands/arms are good, people can do many things.)"
     },
-    "aiExplanation": "luka primarily refers to the 'hand' or 'arm,' encompassing the entire limb used for grasping and manipulation. It can also extend metaphorically to mean 'tool,' 'limb' in a broader sense, or even 'action' or 'work' due to the hand's role in physical labor and creation. This word emphasizes the ability to interact physically with the world, whether through holding, making, or performing tasks."
+    "aiExplanation": "luka primarily refers to the 'hand' or 'arm,' encompassing the entire limb used for grasping and manipulation. It can also extend metaphorically to mean 'tool,' 'limb' in a broader sense, or even 'action' or 'work' due to the hand's role in physical labor and creation. This word emphasizes the ability to interact physically with the world, whether through holding, making, or performing tasks.",
+    "grammarExamples": {
+      "noun": "ni li luka. (This is a hand.)",
+      "modifier": "ona li moku luka. (That is finger food.)",
+      "verb": "mi luka e tomo. (I touch the house.)"
+    }
   },
   "lukin": {
     "aiExamples": {
@@ -389,7 +604,12 @@
       "intermediate": "ona li lukin utala. (She tries to fight. / She looks for a fight.)",
       "advanced": "mi lukin e pali sina la mi pilin pona. (When I see your work, I feel good.)"
     },
-    "aiExplanation": "The word \"lukin\" is very versatile, covering a wide range of visual perception and intention. It can mean to \"see,\" \"look at,\" or \"watch,\" but also extends to \"to seek\" or \"to try.\" Furthermore, with a modifier, it can describe how something \"appears\" (e.g., \"ona li lukin pona\" means \"she looks good\"). Its exact meaning is always determined by the context and other words it's paired with."
+    "aiExplanation": "The word \"lukin\" is very versatile, covering a wide range of visual perception and intention. It can mean to \"see,\" \"look at,\" or \"watch,\" but also extends to \"to seek\" or \"to try.\" Furthermore, with a modifier, it can describe how something \"appears\" (e.g., \"ona li lukin pona\" means \"she looks good\"). Its exact meaning is always determined by the context and other words it's paired with.",
+    "grammarExamples": {
+      "noun": "lukin sina li pona. (Your sight is good.)",
+      "verb": "mi lukin e suno. (I see the sun.)",
+      "modifier": "suno li pona lukin. (The sun is beautiful.)"
+    }
   },
   "lupa": {
     "aiExamples": {
@@ -397,7 +617,11 @@
       "intermediate": "lupa suli li lon tomo mi. (A big opening is in my house.)",
       "advanced": "jan li open e lupa la, mi kama tawa ona. (When a person opens the opening, I come to them.)"
     },
-    "aiExplanation": "lupa refers to any 'hole' or 'opening'. This can be broadly applied to things like doors, windows, vents, or even natural gaps. It focuses on the fundamental aspect of being a passage or an empty space within something solid."
+    "aiExplanation": "lupa refers to any 'hole' or 'opening'. This can be broadly applied to things like doors, windows, vents, or even natural gaps. It focuses on the fundamental aspect of being a passage or an empty space within something solid.",
+    "grammarExamples": {
+      "noun": "lupa li suli. (The door/opening is big.)",
+      "modifier": "poki lupa li jo e telo. (The holey container has water.)"
+    }
   },
   "ma": {
     "aiExamples": {
@@ -405,7 +629,11 @@
       "intermediate": "mi tawa ma suli. (I go to a big country.)",
       "advanced": "jan Olin li kama jo e ma mi. (Olin obtained my land.)"
     },
-    "aiExplanation": "ma is a foundational word in Toki Pona, covering a broad spectrum of meanings from 'land,' 'earth,' and 'country,' to 'place,' 'outdoor,' or even 'region.' Its precise meaning is heavily dependent on context, allowing it to describe a small patch of ground, an entire nation, or simply an outdoor environment. It essentially refers to any spatial area, whether naturally occurring or human-defined."
+    "aiExplanation": "ma is a foundational word in Toki Pona, covering a broad spectrum of meanings from 'land,' 'earth,' and 'country,' to 'place,' 'outdoor,' or even 'region.' Its precise meaning is heavily dependent on context, allowing it to describe a small patch of ground, an entire nation, or simply an outdoor environment. It essentially refers to any spatial area, whether naturally occurring or human-defined.",
+    "grammarExamples": {
+      "noun": "ma li suli. (The land is big.)",
+      "modifier": "mi tawa tomo ma. (I go to the country house.)"
+    }
   },
   "mama": {
     "aiExamples": {
@@ -413,7 +641,12 @@
       "intermediate": "mama meli mi li pona. (My mother is good.)",
       "advanced": "jan li kama sona tan mama pi sona mute la, jan li pilin pona. (When people gain knowledge from a source of much wisdom, people feel good.)"
     },
-    "aiExplanation": "In Toki Pona, \"mama\" extends beyond just a biological parent; it signifies any origin, creator, or nurturing source. This allows it to refer to a mother, father, or even metaphorically to the foundational ideas or primary influences behind something. Thus, one might use \"mama\" to describe a helpful teacher or the main source of a river."
+    "aiExplanation": "In Toki Pona, \"mama\" extends beyond just a biological parent; it signifies any origin, creator, or nurturing source. This allows it to refer to a mother, father, or even metaphorically to the foundational ideas or primary influences behind something. Thus, one might use \"mama\" to describe a helpful teacher or the main source of a river.",
+    "grammarExamples": {
+      "noun": "mama li pona. (A parent is good.)",
+      "modifier": "mi lon ma mama mi. (I am in my homeland.)",
+      "verb": "ona li mama e mi. (They created me.)"
+    }
   },
   "mani": {
     "aiExamples": {
@@ -421,7 +654,11 @@
       "intermediate": "mani mute li suli. (Much money is important.)",
       "advanced": "mi wile e mani tawa esun. (I want money for the market/shop.)"
     },
-    "aiExplanation": "The word \"mani\" primarily refers to money or currency. Beyond just physical cash, it can encompass the broader concept of wealth, valuable resources, or anything used as a medium of exchange. It highlights the economic aspect of value and transaction within Toki Pona."
+    "aiExplanation": "The word \"mani\" primarily refers to money or currency. Beyond just physical cash, it can encompass the broader concept of wealth, valuable resources, or anything used as a medium of exchange. It highlights the economic aspect of value and transaction within Toki Pona.",
+    "grammarExamples": {
+      "noun": "mi jo e mani. (I have money.)",
+      "modifier": "mi wile e tomo mani. (I want a money building/bank.)"
+    }
   },
   "meli": {
     "aiExamples": {
@@ -429,7 +666,11 @@
       "intermediate": "meli lili li kalama suli. (The small woman makes a big sound.)",
       "advanced": "jan meli li lon tomo. ni la ona li pana e ilo tawa mi. (The woman is in the house. Because of this, she gives a tool to me.)"
     },
-    "aiExplanation": "In Toki Pona, 'meli' primarily denotes 'woman' or 'female person'. It often functions as a modifier, as seen in 'jan meli' (female person/woman) or 'soweli meli' (female animal). While it typically refers to biological sex, its usage can sometimes encompass aspects of femininity or roles often associated with women in a particular context."
+    "aiExplanation": "In Toki Pona, 'meli' primarily denotes 'woman' or 'female person'. It often functions as a modifier, as seen in 'jan meli' (female person/woman) or 'soweli meli' (female animal). While it typically refers to biological sex, its usage can sometimes encompass aspects of femininity or roles often associated with women in a particular context.",
+    "grammarExamples": {
+      "noun": "meli li pona. (The woman is good.)",
+      "modifier": "jan meli li pona. (The female person is good.)"
+    }
   },
   "mi": {
     "aiExamples": {
@@ -437,7 +678,11 @@
       "intermediate": "mi jan pona. (I am a good person.)",
       "advanced": "ona li lukin e mi. (They see me.)"
     },
-    "aiExplanation": "mi is the first-person pronoun, meaning 'I' or 'me.' It can also represent 'we' or 'us' depending on context, especially when the speaker refers to themselves and others collectively without explicitly naming them. Additionally, 'mi' can function possessively, meaning 'my' or 'our,' when placed after a noun it describes, such as in 'tomo mi' (my house)."
+    "aiExplanation": "mi is the first-person pronoun, meaning 'I' or 'me.' It can also represent 'we' or 'us' depending on context, especially when the speaker refers to themselves and others collectively without explicitly naming them. Additionally, 'mi' can function possessively, meaning 'my' or 'our,' when placed after a noun it describes, such as in 'tomo mi' (my house).",
+    "grammarExamples": {
+      "noun": "mi li pona. (I am good.)",
+      "modifier": "ilo mi li pona. (My tool is good.)"
+    }
   },
   "mije": {
     "aiExamples": {
@@ -445,7 +690,11 @@
       "intermediate": "mije suli li tawa. (The big man walks.)",
       "advanced": "mi wile e mije pona tawa tomo mi. (I want a good man for my house.)"
     },
-    "aiExplanation": "mije fundamentally refers to a man or male person. As an adjective, it describes something as male, masculine, or possessing qualities often associated with men like strength or courage. Its specific nuance, whether referring to a man, a husband, or a masculine quality, is highly dependent on the surrounding words and context."
+    "aiExplanation": "mije fundamentally refers to a man or male person. As an adjective, it describes something as male, masculine, or possessing qualities often associated with men like strength or courage. Its specific nuance, whether referring to a man, a husband, or a masculine quality, is highly dependent on the surrounding words and context.",
+    "grammarExamples": {
+      "noun": "mije li wawa. (The man is strong.)",
+      "modifier": "jan mije li pona. (The male person is good.)"
+    }
   },
   "moku": {
     "aiExamples": {
@@ -453,7 +702,12 @@
       "intermediate": "ni li moku pona. (This is good food.)",
       "advanced": "mi wile moku e kili suwi mute. (I want to eat many sweet fruits.)"
     },
-    "aiExplanation": "The word \"moku\" is incredibly versatile, functioning as both a noun meaning 'food' or 'meal,' and a verb meaning 'to eat' or 'to drink.' It encompasses anything consumable for sustenance, without distinguishing between solids and liquids unless a modifier like \"telo\" (water/liquid) is added. Therefore, \"moku telo\" specifically means 'a drink' or 'liquid food.'"
+    "aiExplanation": "The word \"moku\" is incredibly versatile, functioning as both a noun meaning 'food' or 'meal,' and a verb meaning 'to eat' or 'to drink.' It encompasses anything consumable for sustenance, without distinguishing between solids and liquids unless a modifier like \"telo\" (water/liquid) is added. Therefore, \"moku telo\" specifically means 'a drink' or 'liquid food.'",
+    "grammarExamples": {
+      "noun": "moku li pona. (Food is good.)",
+      "verb": "mi moku. (I eat.)",
+      "modifier": "sina wile moku moku. (You want edible food.)"
+    }
   },
   "moli": {
     "aiExamples": {
@@ -461,7 +715,12 @@
       "intermediate": "soweli moli li lon ma tomo. (Dead animals are in the city.)",
       "advanced": "kama moli la, jan mute li pilin ike. (When death comes, many people feel bad.)"
     },
-    "aiExplanation": "The word \"moli\" is quite versatile, spanning the concepts of 'dead', 'death', 'to die', and 'to kill'. It can describe a state, an action, or the abstract idea of mortality itself. While commonly referring to biological death, it can also be used metaphorically for the cessation or ending of anything, like a project or a dream, emphasizing a final state of non-existence."
+    "aiExplanation": "The word \"moli\" is quite versatile, spanning the concepts of 'dead', 'death', 'to die', and 'to kill'. It can describe a state, an action, or the abstract idea of mortality itself. While commonly referring to biological death, it can also be used metaphorically for the cessation or ending of anything, like a project or a dream, emphasizing a final state of non-existence.",
+    "grammarExamples": {
+      "noun": "moli li ike. (Death is bad.)",
+      "verb": "mi moli. (I die.)",
+      "modifier": "mi jo e kala moli. (I have a dead fish.)"
+    }
   },
   "monsi": {
     "aiExamples": {
@@ -469,7 +728,11 @@
       "intermediate": "monsi tomo li pona. (The back of the house is good.)",
       "advanced": "mi pilin ike lon monsi mi la, mi wile lape. (If I feel bad in my back, I want to sleep.)"
     },
-    "aiExplanation": "monsi refers to the back, rear, or behind. This can be the physical back of a person or animal, the rear part of an object like a house or car, or simply the general position 'behind' something. It encapsulates anything related to the posterior aspect, often contrasting with 'sinpin' (front)."
+    "aiExplanation": "monsi refers to the back, rear, or behind. This can be the physical back of a person or animal, the rear part of an object like a house or car, or simply the general position 'behind' something. It encapsulates anything related to the posterior aspect, often contrasting with 'sinpin' (front).",
+    "grammarExamples": {
+      "noun": "monsi li suli. (The back is big.)",
+      "modifier": "pipi monsi li lon ma. (The back bug is on the ground.)"
+    }
   },
   "mu": {
     "aiExamples": {
@@ -477,7 +740,12 @@
       "intermediate": "soweli suli li mu suli. (The big animal makes a big/loud sound.)",
       "advanced": "soweli mute li mu la mi pilin ike. (When many animals make sound, I feel bad.)"
     },
-    "aiExplanation": "In Toki Pona, 'mu' is primarily an onomatopoeia, most commonly associated with a cow's moo. However, its meaning extends to any animal sound or even a general, non-human, or guttural sound (like a grunt or a growl). It captures the essence of a raw, often simple, vocalization."
+    "aiExplanation": "In Toki Pona, 'mu' is primarily an onomatopoeia, most commonly associated with a cow's moo. However, its meaning extends to any animal sound or even a general, non-human, or guttural sound (like a grunt or a growl). It captures the essence of a raw, often simple, vocalization.",
+    "grammarExamples": {
+      "noun": "soweli li pana e mu. (The animal gives a moo.)",
+      "verb": "soweli li mu. (The animal moos.)",
+      "modifier": "kalama mu li lon. (There is an animal sound.)"
+    }
   },
   "mun": {
     "aiExamples": {
@@ -485,7 +753,11 @@
       "intermediate": "mun pimeja li lon sewi. (The dark moon is up high/in the sky.)",
       "advanced": "pimeja li kama la, mi lukin e mun. (When darkness comes, I see the moon.)"
     },
-    "aiExplanation": "The word \"mun\" primarily refers to the moon, and by extension, any celestial body visible in the night sky, such as stars or planets. It evokes the concepts of night, darkness, and the cyclical nature of time. While commonly used for our moon, its broader meaning of 'night object' makes it versatile for expressing various astronomical ideas."
+    "aiExplanation": "The word \"mun\" primarily refers to the moon, and by extension, any celestial body visible in the night sky, such as stars or planets. It evokes the concepts of night, darkness, and the cyclical nature of time. While commonly used for our moon, its broader meaning of 'night object' makes it versatile for expressing various astronomical ideas.",
+    "grammarExamples": {
+      "noun": "mun li lon sewi. (The moon is up high.)",
+      "modifier": "mi lukin e telo mun. (I see moonlight.)"
+    }
   },
   "musi": {
     "aiExamples": {
@@ -493,7 +765,12 @@
       "intermediate": "ona li musi pona. (They play well/nicely.)",
       "advanced": "mi kama sona la, mi musi e wawa mi. (When I learn, I enjoy/play with my power/energy.)"
     },
-    "aiExplanation": "The word \"musi\" is wonderfully broad, encompassing play, games, art, entertainment, and anything that brings fun or creativity. It speaks to the joy and lightheartedness found in enjoyable activities, whether active or passive. \"musi\" can function as a noun (fun, game, art), a verb (to play, to have fun, to create art), or an adjective (fun, playful, artistic), making it highly versatile for expressing delight and engagement."
+    "aiExplanation": "The word \"musi\" is wonderfully broad, encompassing play, games, art, entertainment, and anything that brings fun or creativity. It speaks to the joy and lightheartedness found in enjoyable activities, whether active or passive. \"musi\" can function as a noun (fun, game, art), a verb (to play, to have fun, to create art), or an adjective (fun, playful, artistic), making it highly versatile for expressing delight and engagement.",
+    "grammarExamples": {
+      "noun": "musi li pona. (Fun is good.)",
+      "verb": "mi musi. (I play.)",
+      "modifier": "ona li jan musi. (They are a playful person.)"
+    }
   },
   "mute": {
     "aiExamples": {
@@ -501,7 +778,12 @@
       "intermediate": "mute jan li lon tomo mi. (Many people are in my house.)",
       "advanced": "mi jo e tomo mute la, mi pana e ilo mute tawa ona. (If I have many houses, I give many tools to them.)"
     },
-    "aiExplanation": "mute is a core word for quantity, meaning 'many,' 'much,' 'a lot,' or 'very.' As a verb, it means 'to be many/much' or 'to multiply.' When used as an adjective, it always comes after the noun it modifies, like 'jan mute' (many people). It can also intensify other adjectives, similar to 'very' in English, as in 'suli mute' (very big)."
+    "aiExplanation": "mute is a core word for quantity, meaning 'many,' 'much,' 'a lot,' or 'very.' As a verb, it means 'to be many/much' or 'to multiply.' When used as an adjective, it always comes after the noun it modifies, like 'jan mute' (many people). It can also intensify other adjectives, similar to 'very' in English, as in 'suli mute' (very big).",
+    "grammarExamples": {
+      "noun": "mute li pona. (People are good.)",
+      "modifier": "jan mute li toki. (Many people speak.)",
+      "adverb": "mi pilin pona mute. (I feel very good.)"
+    }
   },
   "nanpa": {
     "aiExamples": {
@@ -509,7 +791,12 @@
       "intermediate": "nanpa wan li pona tawa mi. (The first number is good for me.)",
       "advanced": "jan Pona li nanpa e ijo ale tawa mama ona. (Pona counts all things for her mother.)"
     },
-    "aiExplanation": "nanpa is a versatile word in Toki Pona, primarily meaning \"number\" or \"count.\" It can also function as a verb meaning \"to number\" or \"to count.\" Beyond simple arithmetic, it encompasses the general concept of quantity, order, and even mathematics itself, often appearing in phrases like \"nanpa wan\" for \"first\" or \"number one.\""
+    "aiExplanation": "nanpa is a versatile word in Toki Pona, primarily meaning \"number\" or \"count.\" It can also function as a verb meaning \"to number\" or \"to count.\" Beyond simple arithmetic, it encompasses the general concept of quantity, order, and even mathematics itself, often appearing in phrases like \"nanpa wan\" for \"first\" or \"number one.\"",
+    "grammarExamples": {
+      "noun": "nanpa li suli. (Numbers are important.)",
+      "modifier": "poki nanpa li lon. (The numbered box is here.)",
+      "ordinal-marker": "mi mute nanpa wan. (We are the first ones.)"
+    }
   },
   "nasa": {
     "aiExamples": {
@@ -517,7 +804,12 @@
       "intermediate": "toki sina li nasa mute. (Your words are very strange.)",
       "advanced": "o kama jo e wawa nasa! (Obtain strange power! / Get unusual strength!)"
     },
-    "aiExplanation": "The word \"nasa\" covers a broad spectrum of meanings, including silly, strange, unusual, crazy, stupid, and drunk. While often carrying a negative or peculiar connotation, its precise nuance is heavily determined by context and the words it accompanies, occasionally implying something uniquely special. It can describe behavior, objects, or even abstract concepts that deviate from the norm."
+    "aiExplanation": "The word \"nasa\" covers a broad spectrum of meanings, including silly, strange, unusual, crazy, stupid, and drunk. While often carrying a negative or peculiar connotation, its precise nuance is heavily determined by context and the words it accompanies, occasionally implying something uniquely special. It can describe behavior, objects, or even abstract concepts that deviate from the norm.",
+    "grammarExamples": {
+      "noun": "nasa li ike. (Foolishness is bad.)",
+      "modifier": "mi moku e ijo nasa. (I eat a strange thing.)",
+      "verb": "ona li nasa. (They are strange/silly.)"
+    }
   },
   "nasin": {
     "aiExamples": {
@@ -525,7 +817,11 @@
       "intermediate": "nasin pona li nasin mi. (A good way is my method/path.)",
       "advanced": "sina wile sona e toki pona la, nasin pona li open e sona. (If you want to understand Toki Pona, a good method opens understanding.)"
     },
-    "aiExplanation": "nasin encompasses not only physical paths and roads but also abstract concepts like methods, ways, customs, or doctrines. It often describes a sequence of steps or a system of thought for achieving a goal. Think of it as 'how' something is done or 'where' one goes, both literally and figuratively."
+    "aiExplanation": "nasin encompasses not only physical paths and roads but also abstract concepts like methods, ways, customs, or doctrines. It often describes a sequence of steps or a system of thought for achieving a goal. Think of it as 'how' something is done or 'where' one goes, both literally and figuratively.",
+    "grammarExamples": {
+      "noun": "nasin li suli. (The path is important.)",
+      "modifier": "toki nasin li pona. (Traditional speech is good.)"
+    }
   },
   "nena": {
     "aiExamples": {
@@ -533,7 +829,11 @@
       "intermediate": "nena suli li pona tawa mi. (Big hills are good for me.)",
       "advanced": "mi lukin e nena e telo la, mi pilin pona. (When I see hills and water, I feel good.)"
     },
-    "aiExplanation": "nena is a versatile word referring to any kind of protuberance or elevated feature. It can describe large landforms like hills and mountains, or smaller bumps and even a nose or button. Its precise meaning is heavily influenced by surrounding words and context."
+    "aiExplanation": "nena is a versatile word referring to any kind of protuberance or elevated feature. It can describe large landforms like hills and mountains, or smaller bumps and even a nose or button. Its precise meaning is heavily influenced by surrounding words and context.",
+    "grammarExamples": {
+      "noun": "nena li suli. (The bump/hill is big.)",
+      "modifier": "ma nena li pona. (Hilly land is good.)"
+    }
   },
   "ni": {
     "aiExamples": {
@@ -541,7 +841,11 @@
       "intermediate": "tomo ni li suli. (This house is big.)",
       "advanced": "mi wile e ni la sina ken pana e ona tawa mi. (If I want this, you can give it to me.)"
     },
-    "aiExplanation": "ni is a highly versatile deictic word, meaning \"this,\" \"that,\" or \"it.\" It always refers to something in the immediate context, whether physically present or conceptually central to the discussion. It can stand alone as a pronoun or act as an adjective modifying the preceding noun, always serving to point out or specify what is currently relevant."
+    "aiExplanation": "ni is a highly versatile deictic word, meaning \"this,\" \"that,\" or \"it.\" It always refers to something in the immediate context, whether physically present or conceptually central to the discussion. It can stand alone as a pronoun or act as an adjective modifying the preceding noun, always serving to point out or specify what is currently relevant.",
+    "grammarExamples": {
+      "modifier": "jan ni li pona. (This person is good.)",
+      "noun": "ni li pona. (This is good.)"
+    }
   },
   "nimi": {
     "aiExamples": {
@@ -549,7 +853,12 @@
       "intermediate": "nimi mi li \"Lina\". (My name is \"Lina\".)",
       "advanced": "jan li toki e nimi mute la, mi pilin ike. (When people speak many words, I feel bad.)"
     },
-    "aiExplanation": "nimi primarily translates to \"word\" or \"name.\" Beyond individual words, it broadly encompasses any distinct linguistic unit that conveys meaning, including phrases or concepts. It's crucial for both identifying things (as a name) and discussing elements of language itself."
+    "aiExplanation": "nimi primarily translates to \"word\" or \"name.\" Beyond individual words, it broadly encompasses any distinct linguistic unit that conveys meaning, including phrases or concepts. It's crucial for both identifying things (as a name) and discussing elements of language itself.",
+    "grammarExamples": {
+      "noun": "ni li nimi mi. (This is my name.)",
+      "verb": "mi nimi e ni. (I name this.)",
+      "modifier": "ona li lukin e sitelen nimi. (They look at the text.)"
+    }
   },
   "noka": {
     "aiExamples": {
@@ -557,7 +866,12 @@
       "intermediate": "noka mi li pona. (My leg is good.)",
       "advanced": "o kepeken e noka sina tawa kama tawa ma pona. (Use your legs to arrive at the good land.)"
     },
-    "aiExplanation": "In Toki Pona, \"noka\" primarily means \"leg\" or \"foot,\" referring to the entire limb used for movement. Beyond this literal sense, it also encompasses the base or lowest part of any object, acting as its support. This extends its usage to anything that provides foundational stability, whether physical like a table leg, or more abstract like a core principle."
+    "aiExplanation": "In Toki Pona, \"noka\" primarily means \"leg\" or \"foot,\" referring to the entire limb used for movement. Beyond this literal sense, it also encompasses the base or lowest part of any object, acting as its support. This extends its usage to anything that provides foundational stability, whether physical like a table leg, or more abstract like a core principle.",
+    "grammarExamples": {
+      "noun": "mi jo e noka tu. (I have two legs/feet.)",
+      "modifier": "mi jo e len noka. (I have foot-clothing [e.g., shoes/socks].)",
+      "verb": "ona li noka e kiwen. (She kicks the rock.)"
+    }
   },
   "o": {
     "aiExamples": {
@@ -565,7 +879,10 @@
       "intermediate": "o kama tawa ma ni. (Come to this land.)",
       "advanced": "o pana e moku la, mi pakala ala. (If you give food, I will not be broken/hurt.)"
     },
-    "aiExplanation": "o is a versatile particle used for direct address, commands, and interjections. It marks something as being directed *to* someone or something. It often precedes the main verb of a command or the noun being addressed, indicating a vocative or imperative function. Its usage can range from a polite suggestion to an urgent demand, depending on context and intonation, always carrying a direct and engaging tone."
+    "aiExplanation": "o is a versatile particle used for direct address, commands, and interjections. It marks something as being directed *to* someone or something. It often precedes the main verb of a command or the noun being addressed, indicating a vocative or imperative function. Its usage can range from a polite suggestion to an urgent demand, depending on context and intonation, always carrying a direct and engaging tone.",
+    "grammarExamples": {
+      "Particle": "o toki! (Speak!)"
+    }
   },
   "olin": {
     "aiExamples": {
@@ -573,7 +890,12 @@
       "intermediate": "olin mi li pona. (My love/care is good/kind.)",
       "advanced": "jan li wile e sona la, ona li olin e jan sona. (If a person wants knowledge, they love/respect the knowledgeable person.)"
     },
-    "aiExplanation": "olin is a core concept in Toki Pona, embodying love, compassion, respect, and kindness. It can refer to deep affection for people or things, as well as a general attitude of care and benevolence. It functions both as a noun (\"love\") and a verb (\"to love/care for\"), highlighting its versatility in expressing positive emotional connection and regard."
+    "aiExplanation": "olin is a core concept in Toki Pona, embodying love, compassion, respect, and kindness. It can refer to deep affection for people or things, as well as a general attitude of care and benevolence. It functions both as a noun (\"love\") and a verb (\"to love/care for\"), highlighting its versatility in expressing positive emotional connection and regard.",
+    "grammarExamples": {
+      "noun": "olin li suli. (Love is important.)",
+      "verb": "mi olin e sina. (I love you.)",
+      "modifier": "jan olin li pona. (A loving person is good.)"
+    }
   },
   "ona": {
     "aiExamples": {
@@ -581,7 +903,11 @@
       "intermediate": "jan pona ona li moku. (Their friend ate.)",
       "advanced": "ona li toki la mi pilin pona. (When they speak, I feel good.)"
     },
-    "aiExplanation": "ona is Toki Pona's singular all-purpose third-person pronoun, meaning 'he, she, it, they' without distinguishing gender or number. This flexibility means its precise meaning often depends heavily on the surrounding context or previous statements. It encourages focusing on the action or state rather than specific personal details like gender identity or quantity, which are often considered less crucial in Toki Pona."
+    "aiExplanation": "ona is Toki Pona's singular all-purpose third-person pronoun, meaning 'he, she, it, they' without distinguishing gender or number. This flexibility means its precise meaning often depends heavily on the surrounding context or previous statements. It encourages focusing on the action or state rather than specific personal details like gender identity or quantity, which are often considered less crucial in Toki Pona.",
+    "grammarExamples": {
+      "noun": "ona li pona. (They are good.)",
+      "modifier": "jan ona li suli. (Their person is big.)"
+    }
   },
   "open": {
     "aiExamples": {
@@ -589,7 +915,12 @@
       "intermediate": "ona li open sin e lipu. (S/he opens the book again.)",
       "advanced": "pipi li open e kili la mi moku e ona. (When the insect opens the fruit, I eat it.)"
     },
-    "aiExplanation": "The word 'open' refers to the act of unfastening, uncovering, or making something accessible, and also to the state of being unfastened or uncovered. It can be used as both a verb ('to open') and an adjective ('opened'). Beyond physical objects like doors or books, it can also describe starting something, like a meeting or a new path, or even turning on a device."
+    "aiExplanation": "The word 'open' refers to the act of unfastening, uncovering, or making something accessible, and also to the state of being unfastened or uncovered. It can be used as both a verb ('to open') and an adjective ('opened'). Beyond physical objects like doors or books, it can also describe starting something, like a meeting or a new path, or even turning on a device.",
+    "grammarExamples": {
+      "noun": "pana li pona. (An opening is good.)",
+      "verb": "mi pana e tomo. (I open the house.)",
+      "modifier": "mi lukin e tomo pana. (I see an open house.)"
+    }
   },
   "pakala": {
     "aiExamples": {
@@ -597,7 +928,13 @@
       "intermediate": "ona li toki pakala. (They speak incorrectly/make mistakes speaking.)",
       "advanced": "jan pi sona ala li pakala e tomo la mi pilin ike. (If a person without knowledge breaks the house, I feel bad.)"
     },
-    "aiExplanation": "In Toki Pona, \"pakala\" is a highly versatile word that encompasses a wide range of 'wrongness' or imperfection. It means to break, to damage, to mess up, to blunder, or signifies an accident or mistake. Crucially, \"pakala\" often refers to something being wrong or damaged without necessarily implying malice or intent, making it suitable for accidents or errors."
+    "aiExplanation": "In Toki Pona, \"pakala\" is a highly versatile word that encompasses a wide range of 'wrongness' or imperfection. It means to break, to damage, to mess up, to blunder, or signifies an accident or mistake. Crucially, \"pakala\" often refers to something being wrong or damaged without necessarily implying malice or intent, making it suitable for accidents or errors.",
+    "grammarExamples": {
+      "noun": "ona li pana e pakala. (She gave an error.)",
+      "verb": "suno li pakala e kiwen. (The sun damaged the rock.)",
+      "modifier": "ilo pakala li wawa ala. (A broken tool has no power.)",
+      "interjection": "pakala! mi wile ala e ni. (Oops! I don't want this.)"
+    }
   },
   "pali": {
     "aiExamples": {
@@ -605,7 +942,12 @@
       "intermediate": "ona li pali wawa. (They work hard/make strong things.)",
       "advanced": "jan pi toki pona li pali e sitelen pona. (Toki Pona people make good writing/drawings.)"
     },
-    "aiExplanation": "pali is a very broad and versatile word in Toki Pona, encompassing actions like 'to work,' 'to make,' 'to build,' 'to create,' and 'to do.' It captures the essence of effort or action resulting in something, whether it's physical labor or the creation of an idea. This flexibility means it can describe anything from cooking a meal to constructing a building, or even the act of producing art."
+    "aiExplanation": "pali is a very broad and versatile word in Toki Pona, encompassing actions like 'to work,' 'to make,' 'to build,' 'to create,' and 'to do.' It captures the essence of effort or action resulting in something, whether it's physical labor or the creation of an idea. This flexibility means it can describe anything from cooking a meal to constructing a building, or even the act of producing art.",
+    "grammarExamples": {
+      "noun": "pali li pona. (Work is good.)",
+      "verb": "mi pali. (I work.)",
+      "modifier": "jan pali li pona. (A working person is good.)"
+    }
   },
   "palisa": {
     "aiExamples": {
@@ -613,7 +955,11 @@
       "intermediate": "palisa suli li lon ma. (A big stick is on the ground.)",
       "advanced": "mi kepeken e palisa tawa lukin e nasin. (I use a stick to look at the path (e.g., to probe or explore).)"
     },
-    "aiExplanation": "In Toki Pona, \"palisa\" refers to a stick, branch, or any long, rigid object. It encompasses natural elements like tree branches and human-made items such as staffs, poles, or even pencils. The word highlights the elongated and firm quality, making it versatile for describing tools, supports, or simple linear structures."
+    "aiExplanation": "In Toki Pona, \"palisa\" refers to a stick, branch, or any long, rigid object. It encompasses natural elements like tree branches and human-made items such as staffs, poles, or even pencils. The word highlights the elongated and firm quality, making it versatile for describing tools, supports, or simple linear structures.",
+    "grammarExamples": {
+      "noun": "ni li palisa. (This is a stick.)",
+      "modifier": "ona li moku e kili palisa. (She eats a long fruit.)"
+    }
   },
   "pan": {
     "aiExamples": {
@@ -621,7 +967,11 @@
       "intermediate": "mi moku e pan suwi. (I eat sweet bread.)",
       "advanced": "mi jo e pan la mi pilin pona. (If I have bread, I feel good.)"
     },
-    "aiExplanation": "jan mute o! The word \"pan\" is a wonderfully broad term in Toki Pona, referring to grains and all food products made from them. This includes not only bread, but also rice, pasta, cereal, or even pastries and cakes. It acts as a general category for staple carbohydrates derived from various cereals. To specify a type of grain product, you can simply add a modifier, such as \"pan walo\" for white bread or \"pan suwi\" for sweet bread or cake."
+    "aiExplanation": "jan mute o! The word \"pan\" is a wonderfully broad term in Toki Pona, referring to grains and all food products made from them. This includes not only bread, but also rice, pasta, cereal, or even pastries and cakes. It acts as a general category for staple carbohydrates derived from various cereals. To specify a type of grain product, you can simply add a modifier, such as \"pan walo\" for white bread or \"pan suwi\" for sweet bread or cake.",
+    "grammarExamples": {
+      "noun": "pan li pona. (Bread is good.)",
+      "modifier": "moku pan li pona. (Grain food is good.)"
+    }
   },
   "pana": {
     "aiExamples": {
@@ -629,7 +979,12 @@
       "intermediate": "ona li pana pona. (They give well/nicely.)",
       "advanced": "sina wile moku la mi pana e moku tawa sina. (If you want food, I give food to you.)"
     },
-    "aiExplanation": "pona! 'pana' is a wonderfully versatile word in Toki Pona, primarily meaning 'to give,' 'to send,' 'to put,' or 'to release.' It describes the act of transferring something—be it an object, information, or even a feeling—from one entity to another. The specific nuance of 'pana' is always heavily influenced by its context and any accompanying nouns or modifiers, allowing it to cover a wide range of actions from providing assistance to delivering a message."
+    "aiExplanation": "pona! 'pana' is a wonderfully versatile word in Toki Pona, primarily meaning 'to give,' 'to send,' 'to put,' or 'to release.' It describes the act of transferring something—be it an object, information, or even a feeling—from one entity to another. The specific nuance of 'pana' is always heavily influenced by its context and any accompanying nouns or modifiers, allowing it to cover a wide range of actions from providing assistance to delivering a message.",
+    "grammarExamples": {
+      "noun": "pana li pona. (Giving is good.)",
+      "verb": "mi pana e toki. (I give speech.)",
+      "modifier": "ona li jo e ilo pana. (They have a giving tool.)"
+    }
   },
   "pi": {
     "aiExamples": {
@@ -637,7 +992,10 @@
       "intermediate": "ma tomo suli pi jan mute li lon. (The big city of many people exists.)",
       "advanced": "jan pi toki pona li kama sona la, ona li wawa. (If a Toki Pona speaker learns, they are strong.)"
     },
-    "aiExplanation": "pi acts as a grouping particle, allowing a head noun that already has one or more modifiers to be further modified by a second set of modifiers. This prevents ambiguity by clearly indicating which modifiers apply to the head noun directly and which apply to the modified noun phrase as a whole. It's essential for forming complex noun phrases like 'person of good speech' (jan pi toki pona) or 'small animal of mine' (soweli lili pi mi)."
+    "aiExplanation": "pi acts as a grouping particle, allowing a head noun that already has one or more modifiers to be further modified by a second set of modifiers. This prevents ambiguity by clearly indicating which modifiers apply to the head noun directly and which apply to the modified noun phrase as a whole. It's essential for forming complex noun phrases like 'person of good speech' (jan pi toki pona) or 'small animal of mine' (soweli lili pi mi).",
+    "grammarExamples": {
+      "Particle": "ona li jan pi toki pona. (They are a Toki Pona speaker.)"
+    }
   },
   "pilin": {
     "aiExamples": {
@@ -645,7 +1003,12 @@
       "intermediate": "mi pilin pona. (I feel good.)",
       "advanced": "mi pilin e ni: ona li kama. (I feel that: they are coming.)"
     },
-    "aiExplanation": "In Toki Pona, 'pilin' is a versatile word that encompasses a broad spectrum of sensory and emotional experiences. It functions as both a noun (meaning a feeling, a heart, or a sense) and a verb (meaning to feel, to touch, or to sense). The specific nuance of 'pilin' is heavily determined by its context, allowing it to describe anything from a physical sensation to an abstract emotional state or intuition."
+    "aiExplanation": "In Toki Pona, 'pilin' is a versatile word that encompasses a broad spectrum of sensory and emotional experiences. It functions as both a noun (meaning a feeling, a heart, or a sense) and a verb (meaning to feel, to touch, or to sense). The specific nuance of 'pilin' is heavily determined by its context, allowing it to describe anything from a physical sensation to an abstract emotional state or intuition.",
+    "grammarExamples": {
+      "noun": "mi jo e pilin pona. (I have a good feeling.)",
+      "verb": "mi pilin pona. (I feel good.)",
+      "modifier": "ona li toki pilin. (They speak emotionally.)"
+    }
   },
   "pimeja": {
     "aiExamples": {
@@ -653,7 +1016,12 @@
       "intermediate": "ma ni li pimeja wawa. (This place is very dark.)",
       "advanced": "suno li pini la, ma li pimeja mute. (When the sun sets, the land is very dark.)"
     },
-    "aiExplanation": "In Toki Pona, \"pimeja\" fundamentally means dark, darkness, or the color black. It describes not just the absence of light, but also the visual quality of something that absorbs light or is naturally dark. It is often used to contrast with \"walo\" (light/white) and can evoke a sense of night, depth, or even a lack of clarity depending on the context."
+    "aiExplanation": "In Toki Pona, \"pimeja\" fundamentally means dark, darkness, or the color black. It describes not just the absence of light, but also the visual quality of something that absorbs light or is naturally dark. It is often used to contrast with \"walo\" (light/white) and can evoke a sense of night, depth, or even a lack of clarity depending on the context.",
+    "grammarExamples": {
+      "noun": "pimeja li suli. (Darkness is big.)",
+      "modifier": "tomo pimeja li pona. (The dark house is good.)",
+      "verb": "ma li pimeja. (The land is dark.)"
+    }
   },
   "pini": {
     "aiExamples": {
@@ -661,7 +1029,12 @@
       "intermediate": "suno pini li kama. (The previous day arrived.)",
       "advanced": "moku li pini la, jan li pilin ike. (If the food is finished, people feel bad.)"
     },
-    "aiExplanation": "pini refers to the end, completion, or the state of being finished or past. It can function as a verb meaning \"to finish\" or \"to end,\" or as an adjective for \"previous\" or \"old.\" When used as a noun, it simply means \"the end\" or \"conclusion,\" highlighting a state of finality rather than just an absence."
+    "aiExplanation": "pini refers to the end, completion, or the state of being finished or past. It can function as a verb meaning \"to finish\" or \"to end,\" or as an adjective for \"previous\" or \"old.\" When used as a noun, it simply means \"the end\" or \"conclusion,\" highlighting a state of finality rather than just an absence.",
+    "grammarExamples": {
+      "noun": "ni li pini. (This is the end.)",
+      "verb": "mi pini e pali. (I finish the work.)",
+      "modifier": "tenpo pini la mi pilin pona. (In the past, I felt good.)"
+    }
   },
   "pipi": {
     "aiExamples": {
@@ -669,7 +1042,11 @@
       "intermediate": "pipi lili li tawa. (Small bugs move.)",
       "advanced": "suno li kama open la, pipi mute li tawa lon ma. (When the sun begins to appear, many bugs move on the ground.)"
     },
-    "aiExplanation": "In Toki Pona, \"pipi\" broadly refers to a wide range of small, multi-legged creatures, encompassing insects like ants and flies, arachnids such as spiders, and even worms. Its precise meaning is highly context-dependent, allowing it to describe anything from a tiny beneficial insect to a large, unsettling 'bug'. It generally conveys the idea of a 'creepy-crawly' or 'insect', emphasizing their small size and sometimes their peculiar or alien nature."
+    "aiExplanation": "In Toki Pona, \"pipi\" broadly refers to a wide range of small, multi-legged creatures, encompassing insects like ants and flies, arachnids such as spiders, and even worms. Its precise meaning is highly context-dependent, allowing it to describe anything from a tiny beneficial insect to a large, unsettling 'bug'. It generally conveys the idea of a 'creepy-crawly' or 'insect', emphasizing their small size and sometimes their peculiar or alien nature.",
+    "grammarExamples": {
+      "noun": "pipi li lon. (An insect is present.)",
+      "modifier": "ona li toki e toki pipi. (They speak quiet words.)"
+    }
   },
   "poka": {
     "aiExamples": {
@@ -677,7 +1054,12 @@
       "intermediate": "mi lon poka sina. (I am at your side.)",
       "advanced": "jan poka li kama la, mi pona e moku. (When the nearby person comes, I prepare food.)"
     },
-    "aiExplanation": "poka denotes physical proximity, meaning 'side,' 'hip,' or 'nearby.' It emphasizes being directly next to or in the company of something or someone, often implying togetherness rather than just general closeness. You might use it for 'my side,' 'the side of the road,' or 'to be next to me.'"
+    "aiExplanation": "poka denotes physical proximity, meaning 'side,' 'hip,' or 'nearby.' It emphasizes being directly next to or in the company of something or someone, often implying togetherness rather than just general closeness. You might use it for 'my side,' 'the side of the road,' or 'to be next to me.'",
+    "grammarExamples": {
+      "noun": "ona li lon poka. (They are nearby.)",
+      "modifier": "tomo poka li suli. (The nearby house is big.)",
+      "preposition": "mi lon poka sina. (I am next to you.)"
+    }
   },
   "poki": {
     "aiExamples": {
@@ -685,7 +1067,12 @@
       "intermediate": "mi jo e poki telo suli. (I have a big water container/bottle.)",
       "advanced": "sina wile pana e moku la, o kepeken e poki pona. (If you want to give food, use a good container.)"
     },
-    "aiExplanation": "\"poki\" broadly encompasses anything that holds or contains: a box, a bag, a cup, a drawer, a room, or even a database. It can also function as a verb, meaning \"to contain\" or \"to put into a container.\" Its versatility means context is key for understanding the specific type of container being referred to."
+    "aiExplanation": "\"poki\" broadly encompasses anything that holds or contains: a box, a bag, a cup, a drawer, a room, or even a database. It can also function as a verb, meaning \"to contain\" or \"to put into a container.\" Its versatility means context is key for understanding the specific type of container being referred to.",
+    "grammarExamples": {
+      "noun": "poki li jo e telo. (The container has water.)",
+      "verb": "mi poki e moku. (I put the food in a container.)",
+      "modifier": "telo poki li pona. (Contained water is good.)"
+    }
   },
   "pu": {
     "aiExamples": {
@@ -693,7 +1080,10 @@
       "intermediate": "mi pu mute. (I read the book a lot.)",
       "advanced": "mi pu la mi sona e toki pona. (If I interact with the official book, I learn Toki Pona.)"
     },
-    "aiExplanation": "\"pu\" specifically refers to the official Toki Pona book by Sonja Lang, titled \"Toki Pona: The Language of Good\". It can function as both a noun, meaning the book itself, and a verb, meaning to interact with, use, or learn from this particular official text. Using \"pu\" implies engaging with the foundational and authoritative source of the language, rather than just any book."
+    "aiExplanation": "\"pu\" specifically refers to the official Toki Pona book by Sonja Lang, titled \"Toki Pona: The Language of Good\". It can function as both a noun, meaning the book itself, and a verb, meaning to interact with, use, or learn from this particular official text. Using \"pu\" implies engaging with the foundational and authoritative source of the language, rather than just any book.",
+    "grammarExamples": {
+      "Adjective": "lipu pu li pona. (The official book is good.)"
+    }
   },
   "sama": {
     "aiExamples": {
@@ -701,7 +1091,12 @@
       "intermediate": "len mi li sama len sina. (My clothes are like your clothes. / My clothes are similar to your clothes.)",
       "advanced": "jan li wile e moku sama la, ona li kama tawa tomo mi. (If people want similar food, they come to my house.)"
     },
-    "aiExplanation": "sama is a core Toki Pona word meaning \"same,\" \"similar,\" \"alike,\" or \"equal.\" It's primarily used to express comparison or equivalence between two or more things, ideas, or actions. You'll often use it to describe objects that share qualities or to state that one thing is 'like' another, making it essential for drawing parallels and noting shared characteristics."
+    "aiExplanation": "sama is a core Toki Pona word meaning \"same,\" \"similar,\" \"alike,\" or \"equal.\" It's primarily used to express comparison or equivalence between two or more things, ideas, or actions. You'll often use it to describe objects that share qualities or to state that one thing is 'like' another, making it essential for drawing parallels and noting shared characteristics.",
+    "grammarExamples": {
+      "noun": "sama li pona. (Equality is good.)",
+      "modifier": "ona li jan sama. (They are similar people.)",
+      "preposition": "ona li toki sama mi. (She speaks like me.)"
+    }
   },
   "seli": {
     "aiExamples": {
@@ -709,7 +1104,12 @@
       "intermediate": "telo li seli mute. (The water is very hot.)",
       "advanced": "mi pana e seli tawa telo kon. (I give heat to the air.)"
     },
-    "aiExplanation": "pona! 'seli' is a versatile word that means heat, warmth, or something hot. You can use it as a noun (the heat), an adjective (hot/warm), or a verb (to heat/to warm). It primarily describes temperature but can also broadly refer to energy or comfort."
+    "aiExplanation": "pona! 'seli' is a versatile word that means heat, warmth, or something hot. You can use it as a noun (the heat), an adjective (hot/warm), or a verb (to heat/to warm). It primarily describes temperature but can also broadly refer to energy or comfort.",
+    "grammarExamples": {
+      "noun": "seli li wawa. (Fire is strong.)",
+      "modifier": "telo seli li pona. (Hot water is good.)",
+      "verb": "mi seli e telo. (I heat the water.)"
+    }
   },
   "selo": {
     "aiExamples": {
@@ -717,7 +1117,11 @@
       "intermediate": "selo telo li pona. (The water's surface is good.)",
       "advanced": "mi wile ala moku e selo pi kili ni. (I do not want to eat the peel of this fruit.)"
     },
-    "aiExplanation": "Selo primarily denotes the outer layer, skin, or surface of anything, from an animal's hide to the bark of a tree or the surface of a planet. It emphasizes the boundary or external covering, making it distinct from \"insa\" (inside). This word captures the essence of a protective or defining exterior."
+    "aiExplanation": "Selo primarily denotes the outer layer, skin, or surface of anything, from an animal's hide to the bark of a tree or the surface of a planet. It emphasizes the boundary or external covering, making it distinct from \"insa\" (inside). This word captures the essence of a protective or defining exterior.",
+    "grammarExamples": {
+      "noun": "selo li lili. (The skin is small.)",
+      "modifier": "kili selo li walo. (The fruit peel is white.)"
+    }
   },
   "seme": {
     "aiExamples": {
@@ -725,7 +1129,10 @@
       "intermediate": "jan seme li kama? (Which person is coming?)",
       "advanced": "sina wile e seme la, mi ken sona e wile sina? (If you want what, I can know your desire?)"
     },
-    "aiExplanation": "seme is a fundamental Toki Pona word, primarily functioning as 'what?' or 'which?'. It is incredibly versatile, able to replace a noun, verb, or modifier in a sentence to form a question about the unknown element. Beyond its interrogative use, seme can also signify 'something' or 'anything' in a broader, non-question context, making it a powerful and flexible tool in communication."
+    "aiExplanation": "seme is a fundamental Toki Pona word, primarily functioning as 'what?' or 'which?'. It is incredibly versatile, able to replace a noun, verb, or modifier in a sentence to form a question about the unknown element. Beyond its interrogative use, seme can also signify 'something' or 'anything' in a broader, non-question context, making it a powerful and flexible tool in communication.",
+    "grammarExamples": {
+      "interrogative": "sina wile seme? (What do you want?)"
+    }
   },
   "sijelo": {
     "aiExamples": {
@@ -733,7 +1140,11 @@
       "intermediate": "sijelo mi li wawa. (My body is strong.)",
       "advanced": "mi wawa e sijelo mi la, mi ken tawa suli. (When I strengthen my body, I can move greatly.)"
     },
-    "aiExplanation": "In Toki Pona, 'sijelo' primarily means the physical body, form, or torso. It emphasizes the tangible, material aspect of existence, differentiating it from a person's mind ('pilin' or 'pona') or spirit. While often referring to a whole body, it can also describe the main physical structure or trunk of something."
+    "aiExplanation": "In Toki Pona, 'sijelo' primarily means the physical body, form, or torso. It emphasizes the tangible, material aspect of existence, differentiating it from a person's mind ('pilin' or 'pona') or spirit. While often referring to a whole body, it can also describe the main physical structure or trunk of something.",
+    "grammarExamples": {
+      "noun": "sijelo mi li pona. (My body is good.)",
+      "modifier": "pilin sijelo li ike. (The physical feeling is bad.)"
+    }
   },
   "sike": {
     "aiExamples": {
@@ -741,7 +1152,12 @@
       "intermediate": "ilo sike li wawa. (The round tool/wheel is strong.)",
       "advanced": "sike suno pini li kama sike e sike suno sin la, mi pilin e wawa lon kon mi. (When the past year cycles into a new year, I feel strength in my spirit.)"
     },
-    "aiExplanation": "In Toki Pona, \"sike\" primarily denotes roundness, circles, and wheels, extending to the concept of cycles or years. It can function as a noun, verb, or adjective, often implying not just a geometric shape but also recurring patterns or a complete rotation, making it versatile for concepts like time, objects, or events."
+    "aiExplanation": "In Toki Pona, \"sike\" primarily denotes roundness, circles, and wheels, extending to the concept of cycles or years. It can function as a noun, verb, or adjective, often implying not just a geometric shape but also recurring patterns or a complete rotation, making it versatile for concepts like time, objects, or events.",
+    "grammarExamples": {
+      "noun": "ni li sike. (This is a circle.)",
+      "modifier": "kiwen sike li lon. (There is a round stone.)",
+      "verb": "mun li sike. (The moon circles.)"
+    }
   },
   "sin": {
     "aiExamples": {
@@ -749,7 +1165,12 @@
       "intermediate": "mi lukin e tomo sin. (I see a new house.)",
       "advanced": "jan sin li kama la, kulupu li wawa sin. (When new people come, the group becomes strong again/anew.)"
     },
-    "aiExplanation": "The word \"sin\" primarily means \"new,\" \"fresh,\" or \"additional.\" It describes things that have recently appeared or are in a renewed state. When used as a modifier to a verb or predicate, \"sin\" can also mean \"again\" or \"anew,\" indicating a repetition or a refreshed state of an action or quality."
+    "aiExplanation": "The word \"sin\" primarily means \"new,\" \"fresh,\" or \"additional.\" It describes things that have recently appeared or are in a renewed state. When used as a modifier to a verb or predicate, \"sin\" can also mean \"again\" or \"anew,\" indicating a repetition or a refreshed state of an action or quality.",
+    "grammarExamples": {
+      "noun": "ni li sin. (This is new.)",
+      "modifier": "mi moku e kili sin. (I eat new fruit.)",
+      "verb": "ona li sin e tomo. (They renew the house.)"
+    }
   },
   "sina": {
     "aiExamples": {
@@ -757,7 +1178,11 @@
       "intermediate": "sina jan pona. (You are a good person.)",
       "advanced": "mi wile sona e sina. (I want to know you.)"
     },
-    "aiExplanation": "sina is the second-person pronoun, meaning \"you.\" It typically refers to a singular \"you,\" addressing one person directly. While Toki Pona doesn't explicitly differentiate between singular and plural forms for pronouns, sina maintains its singular focus in most contexts, making it fundamental for direct interaction and conversation."
+    "aiExplanation": "sina is the second-person pronoun, meaning \"you.\" It typically refers to a singular \"you,\" addressing one person directly. While Toki Pona doesn't explicitly differentiate between singular and plural forms for pronouns, sina maintains its singular focus in most contexts, making it fundamental for direct interaction and conversation.",
+    "grammarExamples": {
+      "noun": "sina li pona. (You are good.)",
+      "modifier": "ma sina li suli. (Your land is big.)"
+    }
   },
   "sinpin": {
     "aiExamples": {
@@ -765,7 +1190,11 @@
       "intermediate": "mi lukin e sinpin telo. (I look at the water's surface.)",
       "advanced": "mi wile kama jo e sinpin pona la, mi moku e kili mute. (If I want to have a good face/appearance, I eat many fruits.)"
     },
-    "aiExplanation": "sinpin denotes the 'front surface' or 'face' of something, whether it's a person, an object, or even the surface of water. It captures the idea of what is presented forward or what one directly perceives. This word is versatile, moving beyond just a literal face to encompass any leading or exposed surface."
+    "aiExplanation": "sinpin denotes the 'front surface' or 'face' of something, whether it's a person, an object, or even the surface of water. It captures the idea of what is presented forward or what one directly perceives. This word is versatile, moving beyond just a literal face to encompass any leading or exposed surface.",
+    "grammarExamples": {
+      "noun": "sinpin li lon. (The front is present.)",
+      "modifier": "mi lukin e tomo sinpin. (I see the front building.)"
+    }
   },
   "sitelen": {
     "aiExamples": {
@@ -773,7 +1202,12 @@
       "intermediate": "sitelen pona li pilin pona. (Good writing/drawings feel good.)",
       "advanced": "mi pali e sitelen suli lon lupa. (I make a big drawing/writing on the door.)"
     },
-    "aiExplanation": "sitelen encompasses any form of visual representation, from a simple mark to complex writing or an intricate drawing. It can be a noun (a picture, a symbol, text) or a verb (to draw, to write, to mark). The word focuses on the act or result of creating something visual to convey meaning or simply to exist as an image, and is often combined with other words to specify its meaning, like sitelen toki for written language or sitelen tawa for moving images."
+    "aiExplanation": "sitelen encompasses any form of visual representation, from a simple mark to complex writing or an intricate drawing. It can be a noun (a picture, a symbol, text) or a verb (to draw, to write, to mark). The word focuses on the act or result of creating something visual to convey meaning or simply to exist as an image, and is often combined with other words to specify its meaning, like sitelen toki for written language or sitelen tawa for moving images.",
+    "grammarExamples": {
+      "noun": "sitelen li pona. (The writing is good.)",
+      "verb": "mi sitelen. (I write.)",
+      "modifier": "mi lukin e lipu sitelen. (I see a written paper.)"
+    }
   },
   "sona": {
     "aiExamples": {
@@ -781,7 +1215,12 @@
       "intermediate": "ona li sona mute. (They are very wise/know much.)",
       "advanced": "mi wile sona e toki pona. (I want to learn Toki Pona.)"
     },
-    "aiExplanation": "sona is a remarkably versatile word covering the entire spectrum of knowledge and understanding. It can mean \"to know,\" \"to learn,\" or \"to teach,\" blurring the lines between these concepts. Furthermore, it refers to both factual knowledge and a broader sense of wisdom or skill, often appearing as \"jan sona\" for a teacher or wise person."
+    "aiExplanation": "sona is a remarkably versatile word covering the entire spectrum of knowledge and understanding. It can mean \"to know,\" \"to learn,\" or \"to teach,\" blurring the lines between these concepts. Furthermore, it refers to both factual knowledge and a broader sense of wisdom or skill, often appearing as \"jan sona\" for a teacher or wise person.",
+    "grammarExamples": {
+      "noun": "sona li pona. (Knowledge is good.)",
+      "verb": "mi sona e toki pona. (I know Toki Pona.)",
+      "modifier": "jan sona li pona. (The wise person is good.)"
+    }
   },
   "soweli": {
     "aiExamples": {
@@ -789,7 +1228,11 @@
       "intermediate": "soweli suli li pona tawa mi. (Big animals are good to me.)",
       "advanced": "mi lukin e soweli la, mi pilin pona. (When I see animals, I feel good.)"
     },
-    "aiExplanation": "The word \"soweli\" broadly refers to any land animal that is not a human (\"jan\") or a fish (\"kala\"). It commonly encompasses mammals, reptiles, and amphibians, but can sometimes extend to birds or insects depending on the context and the speaker's focus on its 'land creature' aspect. While versatile, it most often evokes images of furry or scaly creatures, serving as a general term for the diverse non-human inhabitants of our land."
+    "aiExplanation": "The word \"soweli\" broadly refers to any land animal that is not a human (\"jan\") or a fish (\"kala\"). It commonly encompasses mammals, reptiles, and amphibians, but can sometimes extend to birds or insects depending on the context and the speaker's focus on its 'land creature' aspect. While versatile, it most often evokes images of furry or scaly creatures, serving as a general term for the diverse non-human inhabitants of our land.",
+    "grammarExamples": {
+      "noun": "soweli li pona. (The animal is good.)",
+      "modifier": "mi pana e moku soweli. (I give pet food.)"
+    }
   },
   "suli": {
     "aiExamples": {
@@ -797,7 +1240,12 @@
       "intermediate": "ma tomo li suli mute. (The city is very big.)",
       "advanced": "suno li suli la, mi wile e telo mute. (When the sun is strong/big, I want a lot of water.)"
     },
-    "aiExplanation": "The word \"suli\" primarily denotes 'big', 'tall', 'long', or 'heavy', referring to physical dimensions. However, its meaning extends to 'important', 'great', or 'significant' and can describe seniority, as in \"jan suli\" (an elder or important person). It's a versatile word whose precise nuance of 'largeness' (physical, conceptual, or influential) is often determined by context."
+    "aiExplanation": "The word \"suli\" primarily denotes 'big', 'tall', 'long', or 'heavy', referring to physical dimensions. However, its meaning extends to 'important', 'great', or 'significant' and can describe seniority, as in \"jan suli\" (an elder or important person). It's a versatile word whose precise nuance of 'largeness' (physical, conceptual, or influential) is often determined by context.",
+    "grammarExamples": {
+      "noun": "mi wile e suli. (I want importance.)",
+      "modifier": "tomo suli li pona. (A big house is good.)",
+      "verb": "mi suli e tomo. (I enlarge the house.)"
+    }
   },
   "suno": {
     "aiExamples": {
@@ -805,7 +1253,12 @@
       "intermediate": "suno suli li pona. (The big sun is good. / Bright light is good.)",
       "advanced": "mi lukin e suno la, mi pilin pona. (When I see the sun, I feel good.)"
     },
-    "aiExplanation": "In Toki Pona, 'suno' is much more than just the 'sun'. It broadly encompasses 'light', 'day', and the act of 'shining' or 'being bright'. You can use 'suno' to refer to a lamp, daylight hours, or the overall brightness of a scene, not just the celestial body itself."
+    "aiExplanation": "In Toki Pona, 'suno' is much more than just the 'sun'. It broadly encompasses 'light', 'day', and the act of 'shining' or 'being bright'. You can use 'suno' to refer to a lamp, daylight hours, or the overall brightness of a scene, not just the celestial body itself.",
+    "grammarExamples": {
+      "noun": "suno li suli. (The sun is big.)",
+      "modifier": "toki suno li pona. (Bright speech is good.)",
+      "verb": "suno li suno e ma. (The sun shines on the land.)"
+    }
   },
   "supa": {
     "aiExamples": {
@@ -813,7 +1266,11 @@
       "intermediate": "supa suli li pona. (The big surface is good.)",
       "advanced": "mi lape la supa mi li pona. (When I sleep, my surface is good.)"
     },
-    "aiExplanation": "supa refers to any flat, generally horizontal surface where things rest or actions happen. It flexibly covers objects like tables, beds, floors, or even soft surfaces such as pillows. The exact meaning of \"supa\" is often understood through its surrounding context and the actions performed on it."
+    "aiExplanation": "supa refers to any flat, generally horizontal surface where things rest or actions happen. It flexibly covers objects like tables, beds, floors, or even soft surfaces such as pillows. The exact meaning of \"supa\" is often understood through its surrounding context and the actions performed on it.",
+    "grammarExamples": {
+      "noun": "supa li suli. (The surface is big.)",
+      "modifier": "len supa li suli. (The mat/tablecloth is big.)"
+    }
   },
   "suwi": {
     "aiExamples": {
@@ -821,7 +1278,12 @@
       "intermediate": "kili suwi li pona mute. (Sweet fruit is very good.)",
       "advanced": "jan li moku e kili suwi mute la, ona li pilin pona. (When a person eats a lot of sweet fruit, they feel good.)"
     },
-    "aiExplanation": "The word \"suwi\" extends beyond just the taste \"sweet.\" It also means cute, lovely, attractive, or pleasant. It can describe anything that brings a gentle, positive feeling, whether it's a taste, a sight, a sound, or a general sensation, making it a versatile term for 'delightful' or 'charming'."
+    "aiExplanation": "The word \"suwi\" extends beyond just the taste \"sweet.\" It also means cute, lovely, attractive, or pleasant. It can describe anything that brings a gentle, positive feeling, whether it's a taste, a sight, a sound, or a general sensation, making it a versatile term for 'delightful' or 'charming'.",
+    "grammarExamples": {
+      "noun": "mi moku e suwi. (I eat a sweet thing.)",
+      "modifier": "telo li suwi. (The water is sweet.)",
+      "verb": "mi suwi e telo. (I sweeten the water.)"
+    }
   },
   "tan": {
     "aiExamples": {
@@ -829,7 +1291,12 @@
       "intermediate": "mi kama jo e wawa tan suno suli. (I get power from the big sun.)",
       "advanced": "tan telo ike la, mi pakala e kon mi. (Because of bad water, I harm my spirit/breath.)"
     },
-    "aiExplanation": "The word \"tan\" fundamentally points to origin, source, or cause. It can indicate a physical location something comes *from*, or explain *why* something happened by introducing the reason. Think of \"tan\" as answering the questions \"where did it come from?\" or \"what caused it?\""
+    "aiExplanation": "The word \"tan\" fundamentally points to origin, source, or cause. It can indicate a physical location something comes *from*, or explain *why* something happened by introducing the reason. Think of \"tan\" as answering the questions \"where did it come from?\" or \"what caused it?\"",
+    "grammarExamples": {
+      "noun": "ni li tan. (This is the cause.)",
+      "preposition": "mi kama tan tomo. (I come from the house.)",
+      "verb": "ona li tan e pilin ike. (They cause bad feelings.)"
+    }
   },
   "taso": {
     "aiExamples": {
@@ -837,7 +1304,10 @@
       "intermediate": "mi pali, taso mi wile lape. (I work, but I want to sleep.)",
       "advanced": "kili mute li lon supa la, mi moku taso e kili jelo. (If many fruits are on the table, I only eat the yellow fruit.)"
     },
-    "aiExplanation": "taso is a versatile particle used to express contrast, limitation, or exclusivity. It can mean \"but\" or \"however,\" connecting two differing ideas, or \"only\" and \"just,\" indicating that something is restricted or unique. This flexibility allows it to both introduce exceptions and narrow the focus of a statement."
+    "aiExplanation": "taso is a versatile particle used to express contrast, limitation, or exclusivity. It can mean \"but\" or \"however,\" connecting two differing ideas, or \"only\" and \"just,\" indicating that something is restricted or unique. This flexibility allows it to both introduce exceptions and narrow the focus of a statement.",
+    "grammarExamples": {
+      "Adjective": "jan taso li kama. (Only people come.)"
+    }
   },
   "tawa": {
     "aiExamples": {
@@ -845,7 +1315,10 @@
       "intermediate": "ona li tawa tomo mi. (He/She goes to my house.)",
       "advanced": "jan pona mi li tawa tomo sina la, sina pana e moku tawa ona. (If my friend goes to your house, you give food to him/her.)"
     },
-    "aiExplanation": "tawa is a dynamic and incredibly versatile word. Its core meaning relates to movement, direction, and purpose, allowing it to function as a verb ('to move/go'), a preposition ('to/for/towards'), or even a modifier indicating motion. It's essential for expressing travel, giving things to someone, or indicating a recipient or beneficiary."
+    "aiExplanation": "tawa is a dynamic and incredibly versatile word. Its core meaning relates to movement, direction, and purpose, allowing it to function as a verb ('to move/go'), a preposition ('to/for/towards'), or even a modifier indicating motion. It's essential for expressing travel, giving things to someone, or indicating a recipient or beneficiary.",
+    "grammarExamples": {
+      "Preposition": "mi tawa tomo. (I go to the house.)"
+    }
   },
   "telo": {
     "aiExamples": {
@@ -853,7 +1326,12 @@
       "intermediate": "telo seli li pona. (Hot water is good.)",
       "advanced": "mi wile telo e kili la, mi tawa tomo telo. (If I want to water the fruit/vegetable, I go to the water building.)"
     },
-    "aiExplanation": "telo primarily refers to water or any liquid. It can also act as a verb meaning \"to water,\" \"to wash with water,\" or \"to dilute.\" Due to its broad meaning, telo often needs modifiers like \"telo seli\" (hot water) or \"telo wawa\" (alcohol, strong liquid) to specify its type or context."
+    "aiExplanation": "telo primarily refers to water or any liquid. It can also act as a verb meaning \"to water,\" \"to wash with water,\" or \"to dilute.\" Due to its broad meaning, telo often needs modifiers like \"telo seli\" (hot water) or \"telo wawa\" (alcohol, strong liquid) to specify its type or context.",
+    "grammarExamples": {
+      "noun": "telo li pona. (Water is good.)",
+      "modifier": "ijo telo li pona. (Wet things are good.)",
+      "verb": "mi telo. (I am wet.)"
+    }
   },
   "tenpo": {
     "aiExamples": {
@@ -861,7 +1339,11 @@
       "intermediate": "tenpo suli li lon. (A long duration exists.)",
       "advanced": "tenpo suno la mi musi e jan pona. (During the day, I play with friends.)"
     },
-    "aiExplanation": "tenpo is a fundamental Toki Pona word meaning \"time, moment, period, duration, or event.\" It's incredibly versatile, acting as both a general concept of time and a specific instance. When combined with other words like \"suno\" (sun/light) or \"pimeja\" (dark), it specifies \"daytime\" or \"nighttime,\" respectively, illustrating its role in forming precise temporal expressions."
+    "aiExplanation": "tenpo is a fundamental Toki Pona word meaning \"time, moment, period, duration, or event.\" It's incredibly versatile, acting as both a general concept of time and a specific instance. When combined with other words like \"suno\" (sun/light) or \"pimeja\" (dark), it specifies \"daytime\" or \"nighttime,\" respectively, illustrating its role in forming precise temporal expressions.",
+    "grammarExamples": {
+      "noun": "tenpo li pona. (Time is good.)",
+      "modifier": "ilo tenpo li suli. (The time tool/clock is big.)"
+    }
   },
   "tomo": {
     "aiExamples": {
@@ -869,7 +1351,11 @@
       "intermediate": "tomo telo li pona mute tawa mi. (The water building is very good for me.)",
       "advanced": "mi lukin e tomo suli lon ma ni la mi pilin pona. (When I see a big building in this place, I feel good.)"
     },
-    "aiExplanation": "toki! The word 'tomo' is quite broad, referring to any enclosed structure, be it a house, a room, a building, or even a tent. It primarily conveys the idea of a contained space that offers shelter or serves a particular purpose. Its exact meaning often becomes clear through context or by adding a modifying word, such as 'tomo moku' for a kitchen or restaurant, or 'tomo lape' for a bedroom."
+    "aiExplanation": "toki! The word 'tomo' is quite broad, referring to any enclosed structure, be it a house, a room, a building, or even a tent. It primarily conveys the idea of a contained space that offers shelter or serves a particular purpose. Its exact meaning often becomes clear through context or by adding a modifying word, such as 'tomo moku' for a kitchen or restaurant, or 'tomo lape' for a bedroom.",
+    "grammarExamples": {
+      "noun": "ni li tomo. (This is a house.)",
+      "modifier": "ona li jan tomo. (They are a house person.)"
+    }
   },
   "tu": {
     "aiExamples": {
@@ -877,7 +1363,12 @@
       "intermediate": "soweli tu li lape. (Two animals are sleeping.)",
       "advanced": "sina wile e tomo tu la, mi ken pana. (If you want two buildings/houses, I can give them.)"
     },
-    "aiExplanation": "In Toki Pona, \"tu\" primarily means \"two.\" However, it extends beyond a mere numeral to often imply a pair or a small duo, emphasizing the concept of two items or individuals existing together. It functions as a modifier, placed after the noun it quantifies, like \"jan tu\" for \"two people.\""
+    "aiExplanation": "In Toki Pona, \"tu\" primarily means \"two.\" However, it extends beyond a mere numeral to often imply a pair or a small duo, emphasizing the concept of two items or individuals existing together. It functions as a modifier, placed after the noun it quantifies, like \"jan tu\" for \"two people.\"",
+    "grammarExamples": {
+      "noun": "tu li pona. (Two is good.)",
+      "modifier": "jan tu li lon. (Two people are present.)",
+      "verb": "ona li tu. (It became two.)"
+    }
   },
   "unpa": {
     "aiExamples": {
@@ -885,7 +1376,12 @@
       "intermediate": "ona li unpa wawa. (They have strong intimacy/sex.)",
       "advanced": "ona li unpa e jan ante la, ona li pilin pona. (If they have intimacy/sex with another person, they feel good.)"
     },
-    "aiExplanation": "\"unpa\" often refers to sexual activity or deep physical intimacy. However, its core meaning is more about a very close, intimate interaction or connection, which can be sexual or non-sexual depending on context and modifiers. It describes a shared, profound experience between individuals."
+    "aiExplanation": "\"unpa\" often refers to sexual activity or deep physical intimacy. However, its core meaning is more about a very close, intimate interaction or connection, which can be sexual or non-sexual depending on context and modifiers. It describes a shared, profound experience between individuals.",
+    "grammarExamples": {
+      "noun": "unpa li pona. (Sex is good.)",
+      "verb": "mi unpa. (I have sex.)",
+      "modifier": "ona li jan unpa. (They are a sexual person.)"
+    }
   },
   "uta": {
     "aiExamples": {
@@ -893,7 +1389,12 @@
       "intermediate": "uta pona li lon. (There is a good mouth / Good speech exists.)",
       "advanced": "jan li kepeken e uta tawa toki la mi pilin e wawa. (When a person uses their mouth to speak, I feel power.)"
     },
-    "aiExplanation": "In Toki Pona, 'uta' literally means mouth, lips, or jaw. However, it extends conceptually to encompass speech and communication, as the mouth is the primary organ for verbal expression. Thus, it can refer to both the physical structure and the act or output of speaking."
+    "aiExplanation": "In Toki Pona, 'uta' literally means mouth, lips, or jaw. However, it extends conceptually to encompass speech and communication, as the mouth is the primary organ for verbal expression. Thus, it can refer to both the physical structure and the act or output of speaking.",
+    "grammarExamples": {
+      "noun": "mi open e uta mi. (I open my mouth.)",
+      "modifier": "sina jo e pali uta. (You have an oral job/task.)",
+      "verb": "ona li uta e nimi mute. (She utters many words.)"
+    }
   },
   "utala": {
     "aiExamples": {
@@ -901,7 +1402,12 @@
       "intermediate": "ona li utala wawa. (They fight strongly.)",
       "advanced": "mi wile ala utala e jan ike la ona li utala e mi. (When I do not want to fight bad people, they fight me.)"
     },
-    "aiExplanation": "utala is a versatile word in Toki Pona, encompassing actions of fighting, struggling, hitting, attacking, or competing. It describes any forceful or opposing action, not solely aggressive violence. While it can refer to physical combat, it also applies to overcoming challenges or engaging in spirited competition."
+    "aiExplanation": "utala is a versatile word in Toki Pona, encompassing actions of fighting, struggling, hitting, attacking, or competing. It describes any forceful or opposing action, not solely aggressive violence. While it can refer to physical combat, it also applies to overcoming challenges or engaging in spirited competition.",
+    "grammarExamples": {
+      "noun": "utala li ike. (Conflict is bad.)",
+      "verb": "mi utala. (I fight.)",
+      "modifier": "jan utala li kama. (The warrior comes.)"
+    }
   },
   "walo": {
     "aiExamples": {
@@ -909,7 +1415,11 @@
       "intermediate": "mun walo li kama pona. (The bright moon arrives well/pleasantly.)",
       "advanced": "mi tawa tomo la mi lukin e kon walo. (When I go to the house, I see the light air/bright spirit.)"
     },
-    "aiExplanation": "pona, we're talking about 'walo'! This word fundamentally means white or light in color. However, its meaning extends beyond just a color to encompass brightness, illumination, or the very concept of lightness. It can describe anything from a white object to a bright light source or even the clear, light feeling of a space."
+    "aiExplanation": "pona, we're talking about 'walo'! This word fundamentally means white or light in color. However, its meaning extends beyond just a color to encompass brightness, illumination, or the very concept of lightness. It can describe anything from a white object to a bright light source or even the clear, light feeling of a space.",
+    "grammarExamples": {
+      "noun": "walo li pona. (White is good.)",
+      "modifier": "suno walo li suli. (The white sun is big.)"
+    }
   },
   "wan": {
     "aiExamples": {
@@ -917,7 +1427,12 @@
       "intermediate": "ijo wan li suli. (One thing is big.)",
       "advanced": "mi lukin e kala wan la, mi toki e nimi ike. (When I see one fish, I speak bad words.)"
     },
-    "aiExplanation": "In Toki Pona, \"wan\" represents more than just the number 'one.' It encompasses the concepts of unity, singularity, and being a single unit or whole. It can also imply a small amount or a brief instance, conveying uniqueness or togetherness."
+    "aiExplanation": "In Toki Pona, \"wan\" represents more than just the number 'one.' It encompasses the concepts of unity, singularity, and being a single unit or whole. It can also imply a small amount or a brief instance, conveying uniqueness or togetherness.",
+    "grammarExamples": {
+      "noun": "wan li pona. (One is good.)",
+      "modifier": "mi jo e akesi wan. (I have one lizard.)",
+      "verb": "mi mute li wan. (We unite.)"
+    }
   },
   "waso": {
     "aiExamples": {
@@ -925,7 +1440,11 @@
       "intermediate": "waso suli li utala. (A big bird fights.)",
       "advanced": "kon li telo la waso li pana e kalama. (When the air is wet, birds give sound / Birds sing when it's humid.)"
     },
-    "aiExplanation": "The word \"waso\" primarily translates to 'bird'. However, in Toki Pona's minimalist spirit, it can broadly encompass any flying animal, including insects like bees or even bats, especially when specific categorization isn't necessary. It focuses on the characteristic of flight rather than strict biological classification, often implying smaller, winged creatures."
+    "aiExplanation": "The word \"waso\" primarily translates to 'bird'. However, in Toki Pona's minimalist spirit, it can broadly encompass any flying animal, including insects like bees or even bats, especially when specific categorization isn't necessary. It focuses on the characteristic of flight rather than strict biological classification, often implying smaller, winged creatures.",
+    "grammarExamples": {
+      "noun": "waso li tawa. (The bird moves.)",
+      "modifier": "kala waso li suwi. (Bird sound is sweet/pleasant.)"
+    }
   },
   "wawa": {
     "aiExamples": {
@@ -933,7 +1452,13 @@
       "intermediate": "suno wawa li kama. (The strong sun comes.)",
       "advanced": "jan pona li pana e wawa tawa mi. (Good friends give strength to me.)"
     },
-    "aiExplanation": "Wawa fundamentally conveys the idea of strength, power, and energy. It can refer to physical might, the force of natural elements like the sun or wind, or even the intensity of feelings or ideas. This word often emphasizes vitality, capability, and the ability to effect change or influence."
+    "aiExplanation": "Wawa fundamentally conveys the idea of strength, power, and energy. It can refer to physical might, the force of natural elements like the sun or wind, or even the intensity of feelings or ideas. This word often emphasizes vitality, capability, and the ability to effect change or influence.",
+    "grammarExamples": {
+      "noun": "ona li jo e wawa. (They have strength.)",
+      "modifier": "jan wawa li pana e ijo. (A strong person gives things.)",
+      "verb": "ona li wawa. (They are strong.)",
+      "adverb": "ona li toki wawa. (They speak strongly.)"
+    }
   },
   "weka": {
     "aiExamples": {
@@ -941,7 +1466,12 @@
       "intermediate": "ijo weka lili. (The small thing is removed.)",
       "advanced": "jan li weka e telo ike. (The person removes the bad water.)"
     },
-    "aiExplanation": "Weka describes the state of being absent, removed, or far away. It can also act as a verb, meaning to remove or get rid of something. This word often implies a deliberate action of causing something to be 'away' from a specific location or context, or simply denoting its distance or non-presence."
+    "aiExplanation": "Weka describes the state of being absent, removed, or far away. It can also act as a verb, meaning to remove or get rid of something. This word often implies a deliberate action of causing something to be 'away' from a specific location or context, or simply denoting its distance or non-presence.",
+    "grammarExamples": {
+      "noun": "weka li ike. (Trash is bad.)",
+      "modifier": "tomo weka li suli. (The distant house is big.)",
+      "verb": "mi weka e ilo. (I remove the tool.)"
+    }
   },
   "wile": {
     "aiExamples": {
@@ -949,7 +1479,12 @@
       "intermediate": "mi wile tawa tomo. (I want to go home/to the building.)",
       "advanced": "mi wile e ni: sina sona e toki pona. (I want this: you know Toki Pona.)"
     },
-    "aiExplanation": "In Toki Pona, 'wile' encapsulates concepts of desire, need, and intention. It most commonly functions as a verb meaning 'to want' or 'to need,' often taking a noun or a verb phrase as its object. Beyond this, 'wile' can also act as an adjective ('desired,' 'necessary') or a noun ('will,' 'desire'), with its precise meaning heavily reliant on the surrounding context."
+    "aiExplanation": "In Toki Pona, 'wile' encapsulates concepts of desire, need, and intention. It most commonly functions as a verb meaning 'to want' or 'to need,' often taking a noun or a verb phrase as its object. Beyond this, 'wile' can also act as an adjective ('desired,' 'necessary') or a noun ('will,' 'desire'), with its precise meaning heavily reliant on the surrounding context.",
+    "grammarExamples": {
+      "noun": "ona li jo e wile suli. (They have a great desire.)",
+      "verb": "mi wile e telo. (I want water.)",
+      "modifier": "jan wile li kama. (The wanted person comes.)"
+    }
   },
   "ali": {
     "aiExamples": {
@@ -957,7 +1492,12 @@
       "intermediate": "ma ali li pona. (All lands are good.)",
       "advanced": "ona li kama jo e ijo ali li pana e ni tawa jan pona. (They acquire all things and give them to good people.)"
     },
-    "aiExplanation": "ali is a variant of ale, meaning all, every, or everything. It emphasizes completeness or totality and can function as a noun or an adjective."
+    "aiExplanation": "ali is a variant of ale, meaning all, every, or everything. It emphasizes completeness or totality and can function as a noun or an adjective.",
+    "grammarExamples": {
+      "noun": "ali li pona. (Everything is good.)",
+      "modifier": "jan ali li pona. (All people are good.)",
+      "adverb": "mi wawa ali. (I am completely strong.)"
+    }
   },
   "epiku": {
     "aiExamples": {
@@ -965,7 +1505,10 @@
       "intermediate": "sitelen epiku mute. (Many epic pictures.)",
       "advanced": "jan pali li pona e tomo la ona li pali epiku a! (If the worker fixes the house, they have done epic work!)"
     },
-    "aiExplanation": "epiku means epic, awesome, or amazing. It is used to describe things that are particularly impressive, grand, or high-quality."
+    "aiExplanation": "epiku means epic, awesome, or amazing. It is used to describe things that are particularly impressive, grand, or high-quality.",
+    "grammarExamples": {
+      "Adjective": "ni li epiku. (This is epic.)"
+    }
   },
   "jasima": {
     "aiExamples": {
@@ -973,7 +1516,10 @@
       "intermediate": "jasima suli li lon. (A big mirror exists.)",
       "advanced": "mi lukin e mi lon jasima la mi pona e len mi. (When I look at myself in the mirror, I fix my clothes.)"
     },
-    "aiExplanation": "jasima refers to mirrors, reflections, or the act of reflecting. It captures the concept of visual symmetry or duplication."
+    "aiExplanation": "jasima refers to mirrors, reflections, or the act of reflecting. It captures the concept of visual symmetry or duplication.",
+    "grammarExamples": {
+      "Noun": "telo li jo e jasima mi. (The water holds my reflection.)"
+    }
   },
   "kijetesantakalu": {
     "aiExamples": {
@@ -981,7 +1527,10 @@
       "intermediate": "kijetesantakalu lili li musi. (The little raccoon is playing.)",
       "advanced": "kijetesantakalu li tawa lon poka telo la ona li alasa e kala. (When the otter moves by the water, it hunts for fish.)"
     },
-    "aiExplanation": "kijetesantakalu is a specific, humorous word for procyonids (raccoons) or mustelids (otters). It is famously long, contrasting with Toki Pona’s usual brevity."
+    "aiExplanation": "kijetesantakalu is a specific, humorous word for procyonids (raccoons) or mustelids (otters). It is famously long, contrasting with Toki Pona’s usual brevity.",
+    "grammarExamples": {
+      "Noun": "kijetesantakalu li moku e telo. (The raccoon drinks water.)"
+    }
   },
   "kin": {
     "aiExamples": {
@@ -989,7 +1538,10 @@
       "intermediate": "jan pona mi kin li kama. (My good friend is also coming.)",
       "advanced": "pimeja li kama la, soweli kin li awen lon tomo ona. (When darkness comes, even the animals stay in their homes.)"
     },
-    "aiExplanation": "kin adds emphasis, meaning also, too, indeed, or even. It highlights that the preceding word is included or affirmed."
+    "aiExplanation": "kin adds emphasis, meaning also, too, indeed, or even. It highlights that the preceding word is included or affirmed.",
+    "grammarExamples": {
+      "Adjective": "pipi kin li lon. (Even the bug is here.)"
+    }
   },
   "kipisi": {
     "aiExamples": {
@@ -997,7 +1549,10 @@
       "intermediate": "ona li kipisi wawa. (They cut strongly.)",
       "advanced": "mama mi li lon la ona li kipisi e kili tawa mi. (When my mother is here, she cuts fruit for me.)"
     },
-    "aiExplanation": "kipisi means to cut, divide, or separate. It can refer to physical cutting or conceptual divisions."
+    "aiExplanation": "kipisi means to cut, divide, or separate. It can refer to physical cutting or conceptual divisions.",
+    "grammarExamples": {
+      "Verb": "mi kipisi e kili. (I cut the fruit.)"
+    }
   },
   "kokosila": {
     "aiExamples": {
@@ -1005,7 +1560,10 @@
       "intermediate": "ona li kokosila mute. (They speak too much non-Toki-Pona.)",
       "advanced": "jan li toki e toki Inli lon kulupu pi toki pona la ona li kokosila. (If a person speaks English in a Toki Pona group, they are kokosila-ing.)"
     },
-    "aiExplanation": "kokosila means to speak a non-Toki Pona language in a Toki Pona environment. It’s a playful term for breaking the immersion."
+    "aiExplanation": "kokosila means to speak a non-Toki Pona language in a Toki Pona environment. It’s a playful term for breaking the immersion.",
+    "grammarExamples": {
+      "Verb": "mi kokosila. (I make a rustling sound.)"
+    }
   },
   "ku": {
     "aiExamples": {
@@ -1013,7 +1571,10 @@
       "intermediate": "lipu ku li suli. (The ku book is big.)",
       "advanced": "mi sona ala e nimi la mi ku e ona. (If I don’t know a word, I look it up in the ku dictionary.)"
     },
-    "aiExplanation": "ku refers to using or interacting with the Toki Pona Dictionary (2021). It represents the expansion and community-driven evolution of the language."
+    "aiExplanation": "ku refers to using or interacting with the Toki Pona Dictionary (2021). It represents the expansion and community-driven evolution of the language.",
+    "grammarExamples": {
+      "Verb": "mi ku. (I consult the Toki Pona Dictionary.)"
+    }
   },
   "lanpan": {
     "aiExamples": {
@@ -1021,7 +1582,10 @@
       "intermediate": "ona li lanpan e ijo. (They seize the thing.)",
       "advanced": "soweli li lanpan e moku pi jan pali. (The animal stole the worker’s food.)"
     },
-    "aiExplanation": "lanpan means to get, take, seize, catch, or steal. It describes the active acquisition of an object."
+    "aiExplanation": "lanpan means to get, take, seize, catch, or steal. It describes the active acquisition of an object.",
+    "grammarExamples": {
+      "Verb": "mi lanpan e telo. (I seize the water.)"
+    }
   },
   "meso": {
     "aiExamples": {
@@ -1029,7 +1593,10 @@
       "intermediate": "suli meso li pona. (Medium size is good.)",
       "advanced": "telo li seli suli ala li lete ala; ona li meso. (The water is not very hot or cold; it is medium.)"
     },
-    "aiExplanation": "meso means middle, medium, average, or moderate. It’s used for things that aren’t at either extreme."
+    "aiExplanation": "meso means middle, medium, average, or moderate. It’s used for things that aren’t at either extreme.",
+    "grammarExamples": {
+      "Adjective": "mi lon supa meso. (I am on the middle surface.)"
+    }
   },
   "misikeke": {
     "aiExamples": {
@@ -1037,7 +1604,10 @@
       "intermediate": "misikeke pona li lon. (Good medicine exists.)",
       "advanced": "sijelo mi li pakala la mi wile e misikeke. (If my body is hurt, I need medicine.)"
     },
-    "aiExplanation": "misikeke refers to medicine, medical substances, or treatments. It’s the specific word for things that heal the body."
+    "aiExplanation": "misikeke refers to medicine, medical substances, or treatments. It’s the specific word for things that heal the body.",
+    "grammarExamples": {
+      "Noun": "misikeke li pona. (Medicine is good.)"
+    }
   },
   "monsuta": {
     "aiExamples": {
@@ -1045,7 +1615,10 @@
       "intermediate": "monsuta suli li kama. (A big monster is coming.)",
       "advanced": "mi pilin monsuta la mi wile ala tawa pimeja. (If I feel fear, I don’t want to go into the dark.)"
     },
-    "aiExplanation": "monsuta means monster, fear, or scary. It covers both the scary thing itself and the feeling of being afraid."
+    "aiExplanation": "monsuta means monster, fear, or scary. It covers both the scary thing itself and the feeling of being afraid.",
+    "grammarExamples": {
+      "Noun": "monsuta li lon. (The monster exists.)"
+    }
   },
   "n": {
     "aiExamples": {
@@ -1053,7 +1626,10 @@
       "intermediate": "jan li toki la mi n. (When the person speaks, I go \"hmm\".)",
       "advanced": "mi n e ni: mi pali e seme? (I am thinking about this: what do I do?)"
     },
-    "aiExplanation": "n is a syllabic consonant used to represent humming, thinking, or acknowledging something. It’s a very minimal, evocative sound."
+    "aiExplanation": "n is a syllabic consonant used to represent humming, thinking, or acknowledging something. It’s a very minimal, evocative sound.",
+    "grammarExamples": {
+      "Particle": "mi sona. n. (I know. Indeed.)"
+    }
   },
   "namako": {
     "aiExamples": {
@@ -1061,7 +1637,10 @@
       "intermediate": "moku namako li pona. (Spiced food is good.)",
       "advanced": "mi pona e moku la mi kepeken e namako mute. (When I fix/improve food, I use many spices.)"
     },
-    "aiExplanation": "namako means extra, additional, spice, or embellishment. It’s a variant of sin that specifically implies seasoning or variety."
+    "aiExplanation": "namako means extra, additional, spice, or embellishment. It’s a variant of sin that specifically implies seasoning or variety.",
+    "grammarExamples": {
+      "Adjective": "suno namako li pona tawa mi. (A new/interesting day is good for me.)"
+    }
   },
   "oko": {
     "aiExamples": {
@@ -1069,7 +1648,10 @@
       "intermediate": "oko ona li laso. (Their eyes are blue.)",
       "advanced": "jan li lukin e suno la oko ona li pakala. (If a person looks at the sun, their eyes are hurt.)"
     },
-    "aiExplanation": "oko specifically refers to the eye as an organ. While lukin covers the action of seeing, oko is the physical eye itself."
+    "aiExplanation": "oko specifically refers to the eye as an organ. While lukin covers the action of seeing, oko is the physical eye itself.",
+    "grammarExamples": {
+      "Noun": "oko li pona. (The eye is good.)"
+    }
   },
   "soko": {
     "aiExamples": {
@@ -1077,7 +1659,10 @@
       "intermediate": "soko pimeja li lon. (A dark mushroom exists.)",
       "advanced": "mi moku e soko la mi pilin pakala. (If I eat the mushroom, I feel sick.)"
     },
-    "aiExplanation": "soko refers to mushrooms, fungi, or similar growths. It distinguishes these from ordinary green plants (kasi)."
+    "aiExplanation": "soko refers to mushrooms, fungi, or similar growths. It distinguishes these from ordinary green plants (kasi).",
+    "grammarExamples": {
+      "Noun": "mi moku e soko. (I eat mushrooms.)"
+    }
   },
   "tonsi": {
     "aiExamples": {
@@ -1085,6 +1670,9 @@
       "intermediate": "ona li jan tonsi. (They are a trans/non-binary person.)",
       "advanced": "jan li pilin ante lon nasin tonsi la ona li ken pana e sona sin. (If a person feels different in a trans way, they can give new wisdom.)"
     },
-    "aiExplanation": "tonsi describes someone who is non-binary, trans, or gender-nonconforming. It embraces the diverse spectrum of gender expression."
+    "aiExplanation": "tonsi describes someone who is non-binary, trans, or gender-nonconforming. It embraces the diverse spectrum of gender expression.",
+    "grammarExamples": {
+      "Noun": "ona li tonsi. (They are non-binary/trans.)"
+    }
   }
 }
