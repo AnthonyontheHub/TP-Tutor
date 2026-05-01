@@ -2296,11 +2296,15 @@ export const useMasteryStore = create<MasteryStore>()(
 
           // Inject AI Cache Data on rehydration if missing
           if (Array.isArray(state.vocabulary)) {
+            let needsSync = false;
+
             // Cleanup: Remove deprecated grammar particle cards
             const deprecatedParticles = ['particle_li', 'particle_e', 'particle_pi', 'particle_la'];
+            const initialCount = state.vocabulary.length;
             state.vocabulary = state.vocabulary.filter(v => 
               !deprecatedParticles.includes(v.word) && !deprecatedParticles.includes(v.id)
             );
+            if (state.vocabulary.length !== initialCount) needsSync = true;
 
             // Sync: Add missing nimi ku suli words
             const currentWordSet = new Set(state.vocabulary.map(v => v.word));
@@ -2310,16 +2314,34 @@ export const useMasteryStore = create<MasteryStore>()(
             
             if (kuWordsToAdd.length > 0) {
               state.vocabulary = [...state.vocabulary, ...kuWordsToAdd];
+              needsSync = true;
             }
 
             state.vocabulary = state.vocabulary.map(v => {
-              if (v.aiExplanation) return v;
-              const aiData = (aiVocabCache as Record<string, any>)[v.word.toLowerCase()] || {};
-              if (aiData.aiExplanation) {
-                return { ...v, aiExplanation: aiData.aiExplanation, aiExamples: aiData.aiExamples };
+              let updated = v;
+              // Ensure KU weight is set correctly for known ku words
+              const isKu = initialMasteryMap.initialVocabulary.some(iv => iv.word === v.word && iv.weight === 'ku');
+              if (isKu && v.weight !== 'ku') {
+                updated = { ...updated, weight: 'ku' };
+                needsSync = true;
               }
-              return v;
+
+              if (!updated.aiExplanation || updated.aiExplanation === '') {
+                const aiData = (aiVocabCache as Record<string, any>)[v.word.toLowerCase()] || {};
+                if (aiData.aiExplanation) {
+                  updated = { ...updated, aiExplanation: aiData.aiExplanation, aiExamples: aiData.aiExamples };
+                  needsSync = true;
+                }
+              }
+              return updated;
             });
+
+            if (needsSync) {
+              setTimeout(() => {
+                state.refreshCurriculumStatus();
+                void state.syncToCloud();
+              }, 1000);
+            }
           }
 
           state.refreshCurriculumStatus();

@@ -63,6 +63,7 @@ export default function MasteryGrid({
       .filter(item => {
         const passesLesson = !lessonFilter || lessonFilter.includes(item.id) || lessonFilter.includes(item.word);
         const matchesPOS = selectedPOS === 'All' || item.partOfSpeech === selectedPOS;
+        const matchesKu = sortMode === 'ku' ? item.weight === 'ku' : true;
         
         let matchesSearch = true;
         if (searchQuery.trim() !== '') {
@@ -74,7 +75,7 @@ export default function MasteryGrid({
             (item.sessionNotes && item.sessionNotes.toLowerCase().includes(q));
         }
 
-        return passesLesson && matchesPOS && matchesSearch;
+        return passesLesson && matchesPOS && matchesSearch && matchesKu;
       })
       .sort((a, b) => {
         if (sortMode === 'status') {
@@ -185,6 +186,7 @@ export default function MasteryGrid({
             <option value="length">Word Length</option>
             <option value="partOfSpeech">Part of Speech</option>
             <option value="useCount">Most Used</option>
+            <option value="ku">Nimi Ku</option>
           </select>
           <button
             type="button"

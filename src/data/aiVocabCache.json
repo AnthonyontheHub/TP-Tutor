@@ -950,5 +950,141 @@
       "advanced": "mi wile e ni: sina sona e toki pona. (I want this: you know Toki Pona.)"
     },
     "aiExplanation": "In Toki Pona, 'wile' encapsulates concepts of desire, need, and intention. It most commonly functions as a verb meaning 'to want' or 'to need,' often taking a noun or a verb phrase as its object. Beyond this, 'wile' can also act as an adjective ('desired,' 'necessary') or a noun ('will,' 'desire'), with its precise meaning heavily reliant on the surrounding context."
+  },
+  "ali": {
+    "aiExamples": {
+      "simple": "ona ali. (They all.)",
+      "intermediate": "ma ali li pona. (All lands are good.)",
+      "advanced": "ona li kama jo e ijo ali li pana e ni tawa jan pona. (They acquire all things and give them to good people.)"
+    },
+    "aiExplanation": "ali is a variant of ale, meaning all, every, or everything. It emphasizes completeness or totality and can function as a noun or an adjective."
+  },
+  "epiku": {
+    "aiExamples": {
+      "simple": "musi ni li epiku. (This game is epic.)",
+      "intermediate": "sitelen epiku mute. (Many epic pictures.)",
+      "advanced": "jan pali li pona e tomo la ona li pali epiku a! (If the worker fixes the house, they have done epic work!)"
+    },
+    "aiExplanation": "epiku means epic, awesome, or amazing. It is used to describe things that are particularly impressive, grand, or high-quality."
+  },
+  "jasima": {
+    "aiExamples": {
+      "simple": "ni li jasima. (This is a mirror/reflection.)",
+      "intermediate": "jasima suli li lon. (A big mirror exists.)",
+      "advanced": "mi lukin e mi lon jasima la mi pona e len mi. (When I look at myself in the mirror, I fix my clothes.)"
+    },
+    "aiExplanation": "jasima refers to mirrors, reflections, or the act of reflecting. It captures the concept of visual symmetry or duplication."
+  },
+  "kijetesantakalu": {
+    "aiExamples": {
+      "simple": "kijetesantakalu li suwi. (The raccoon/otter is cute.)",
+      "intermediate": "kijetesantakalu lili li musi. (The little raccoon is playing.)",
+      "advanced": "kijetesantakalu li tawa lon poka telo la ona li alasa e kala. (When the otter moves by the water, it hunts for fish.)"
+    },
+    "aiExplanation": "kijetesantakalu is a specific, humorous word for procyonids (raccoons) or mustelids (otters). It is famously long, contrasting with Toki Pona’s usual brevity."
+  },
+  "kin": {
+    "aiExamples": {
+      "simple": "mi kin. (Me too.)",
+      "intermediate": "jan pona mi kin li kama. (My good friend is also coming.)",
+      "advanced": "pimeja li kama la, soweli kin li awen lon tomo ona. (When darkness comes, even the animals stay in their homes.)"
+    },
+    "aiExplanation": "kin adds emphasis, meaning also, too, indeed, or even. It highlights that the preceding word is included or affirmed."
+  },
+  "kipisi": {
+    "aiExamples": {
+      "simple": "mi kipisi. (I cut.)",
+      "intermediate": "ona li kipisi wawa. (They cut strongly.)",
+      "advanced": "mama mi li lon la ona li kipisi e kili tawa mi. (When my mother is here, she cuts fruit for me.)"
+    },
+    "aiExplanation": "kipisi means to cut, divide, or separate. It can refer to physical cutting or conceptual divisions."
+  },
+  "kokosila": {
+    "aiExamples": {
+      "simple": "o kokosila ala. (Don’t speak non-Toki-Pona.)",
+      "intermediate": "ona li kokosila mute. (They speak too much non-Toki-Pona.)",
+      "advanced": "jan li toki e toki Inli lon kulupu pi toki pona la ona li kokosila. (If a person speaks English in a Toki Pona group, they are kokosila-ing.)"
+    },
+    "aiExplanation": "kokosila means to speak a non-Toki Pona language in a Toki Pona environment. It’s a playful term for breaking the immersion."
+  },
+  "ku": {
+    "aiExamples": {
+      "simple": "mi ku. (I am using the ku dictionary.)",
+      "intermediate": "lipu ku li suli. (The ku book is big.)",
+      "advanced": "mi sona ala e nimi la mi ku e ona. (If I don’t know a word, I look it up in the ku dictionary.)"
+    },
+    "aiExplanation": "ku refers to using or interacting with the Toki Pona Dictionary (2021). It represents the expansion and community-driven evolution of the language."
+  },
+  "lanpan": {
+    "aiExamples": {
+      "simple": "mi lanpan. (I take/catch.)",
+      "intermediate": "ona li lanpan e ijo. (They seize the thing.)",
+      "advanced": "soweli li lanpan e moku pi jan pali. (The animal stole the worker’s food.)"
+    },
+    "aiExplanation": "lanpan means to get, take, seize, catch, or steal. It describes the active acquisition of an object."
+  },
+  "meso": {
+    "aiExamples": {
+      "simple": "ni li meso. (This is medium/average.)",
+      "intermediate": "suli meso li pona. (Medium size is good.)",
+      "advanced": "telo li seli suli ala li lete ala; ona li meso. (The water is not very hot or cold; it is medium.)"
+    },
+    "aiExplanation": "meso means middle, medium, average, or moderate. It’s used for things that aren’t at either extreme."
+  },
+  "misikeke": {
+    "aiExamples": {
+      "simple": "mi moku e misikeke. (I take medicine.)",
+      "intermediate": "misikeke pona li lon. (Good medicine exists.)",
+      "advanced": "sijelo mi li pakala la mi wile e misikeke. (If my body is hurt, I need medicine.)"
+    },
+    "aiExplanation": "misikeke refers to medicine, medical substances, or treatments. It’s the specific word for things that heal the body."
+  },
+  "monsuta": {
+    "aiExamples": {
+      "simple": "ni li monsuta. (This is a monster/scary.)",
+      "intermediate": "monsuta suli li kama. (A big monster is coming.)",
+      "advanced": "mi pilin monsuta la mi wile ala tawa pimeja. (If I feel fear, I don’t want to go into the dark.)"
+    },
+    "aiExplanation": "monsuta means monster, fear, or scary. It covers both the scary thing itself and the feeling of being afraid."
+  },
+  "n": {
+    "aiExamples": {
+      "simple": "n... (Hmm...)",
+      "intermediate": "jan li toki la mi n. (When the person speaks, I go \"hmm\".)",
+      "advanced": "mi n e ni: mi pali e seme? (I am thinking about this: what do I do?)"
+    },
+    "aiExplanation": "n is a syllabic consonant used to represent humming, thinking, or acknowledging something. It’s a very minimal, evocative sound."
+  },
+  "namako": {
+    "aiExamples": {
+      "simple": "ona li namako. (It is extra/spicy.)",
+      "intermediate": "moku namako li pona. (Spiced food is good.)",
+      "advanced": "mi pona e moku la mi kepeken e namako mute. (When I fix/improve food, I use many spices.)"
+    },
+    "aiExplanation": "namako means extra, additional, spice, or embellishment. It’s a variant of sin that specifically implies seasoning or variety."
+  },
+  "oko": {
+    "aiExamples": {
+      "simple": "oko mi. (My eye.)",
+      "intermediate": "oko ona li laso. (Their eyes are blue.)",
+      "advanced": "jan li lukin e suno la oko ona li pakala. (If a person looks at the sun, their eyes are hurt.)"
+    },
+    "aiExplanation": "oko specifically refers to the eye as an organ. While lukin covers the action of seeing, oko is the physical eye itself."
+  },
+  "soko": {
+    "aiExamples": {
+      "simple": "ni li soko. (This is a mushroom.)",
+      "intermediate": "soko pimeja li lon. (A dark mushroom exists.)",
+      "advanced": "mi moku e soko la mi pilin pakala. (If I eat the mushroom, I feel sick.)"
+    },
+    "aiExplanation": "soko refers to mushrooms, fungi, or similar growths. It distinguishes these from ordinary green plants (kasi)."
+  },
+  "tonsi": {
+    "aiExamples": {
+      "simple": "mi tonsi. (I am non-binary/trans.)",
+      "intermediate": "ona li jan tonsi. (They are a trans/non-binary person.)",
+      "advanced": "jan li pilin ante lon nasin tonsi la ona li ken pana e sona sin. (If a person feels different in a trans way, they can give new wisdom.)"
+    },
+    "aiExplanation": "tonsi describes someone who is non-binary, trans, or gender-nonconforming. It embraces the diverse spectrum of gender expression."
   }
 }
