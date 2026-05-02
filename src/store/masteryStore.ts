@@ -21,7 +21,7 @@ import { vocabContent } from '../data/vocabContent';
 import { TOKI_PONA_DICTIONARY, WORD_FREQUENCY } from '../data/tokiPonaDictionary';
 import aiVocabCache from '../data/aiVocabCache.json';
 
-function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: MasteryStatus; type: 'word' | 'grammar'; sessionNotes: string; frequencyRank?: number; weight?: MasteryWeight }): VocabWord {
+function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: MasteryStatus; type: 'word' | 'grammar'; sessionNotes: string; frequencyRank?: number; weight?: MasteryWeight; sitelenPona?: string; sitelenEtymology?: string; neighborConnections?: Record<string, string>; grammarExamples?: Record<string, string> }): VocabWord {
   const score = STATUS_MIDPOINT[v.status];
   const staticData: Partial<VocabContentEntry> = vocabContent[v.word] || {};
   const aiData = (aiVocabCache as Record<string, { aiExplanation?: string; aiExamples?: Record<string, string>; grammarExamples?: Record<string, string>; neighborConnections?: Record<string, string> }>)[v.word.toLowerCase()] || {};
@@ -47,7 +47,10 @@ function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: Maste
     sessionNotes: v.sessionNotes,
     aiExplanation: aiData.aiExplanation || '',
     aiExamples: aiData.aiExamples,
-    grammarExamples: aiData.grammarExamples,
+    grammarExamples: v.grammarExamples || aiData.grammarExamples,
+    neighborConnections: v.neighborConnections || aiData.neighborConnections,
+    sitelenPona: v.sitelenPona,
+    sitelenEtymology: v.sitelenEtymology,
     lastReviewed: new Date().toISOString(),
     scoreHistory: [],
     hardened: false,

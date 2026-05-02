@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
 import WordDetailDrawer from './WordDetailDrawer';
 import { soundService } from '../services/soundService';
+import { initialMasteryMap } from '../data/initialMasteryMap';
 
 interface Props {
   onClose: () => void;
@@ -82,6 +83,8 @@ export default function FlashcardMode({ onClose, onAskLina, isSandboxMode }: Pro
   }
 
   const word = displayCards[currentIndex];
+  const initialData = initialMasteryMap.initialVocabulary.find((v: any) => v.word === word.word);
+  const sitelenPona = word.sitelenPona || initialData?.sitelenPona || word.word;
 
   return (
     <div className="modal-backdrop" style={{ zIndex: 6000, background: 'rgba(0,0,0,0.9)' }}>
@@ -121,7 +124,10 @@ export default function FlashcardMode({ onClose, onAskLina, isSandboxMode }: Pro
             >
               <div style={{ fontSize: '0.8rem', color: '#666', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '16px' }}>TAP TO FLIP</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px', justifyContent: 'center' }}>
-                <h2 style={{ fontSize: '4rem', margin: 0, color: 'white', fontWeight: 900, textAlign: 'center' }}>{word.word}</h2>
+                <h2 style={{ fontSize: '4rem', margin: 0, color: 'white', fontWeight: 900, textAlign: 'center', display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  {word.word}
+                  <span className="sitelen-pona" style={{ color: 'var(--gold)', fontSize: '4.5rem', fontWeight: 'normal', lineHeight: 1 }}>{sitelenPona}</span>
+                </h2>
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); soundService.speak(word.word); }}
@@ -155,7 +161,10 @@ export default function FlashcardMode({ onClose, onAskLina, isSandboxMode }: Pro
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', justifyContent: 'center' }}>
-                <h2 style={{ fontSize: '2.5rem', margin: 0, color: 'white', fontWeight: 900 }}>{word.word}</h2>
+                <h2 style={{ fontSize: '2.5rem', margin: 0, color: 'white', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  {word.word}
+                  <span className="sitelen-pona" style={{ color: 'var(--gold)', fontSize: '3rem', fontWeight: 'normal', lineHeight: 1 }}>{sitelenPona}</span>
+                </h2>
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); soundService.speak(word.word); }}

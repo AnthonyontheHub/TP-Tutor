@@ -244,6 +244,8 @@ export interface VocabWord {
   aiExamples?: Record<string, string>;
   grammarExamples?: Record<string, string>;
   neighborConnections?: Record<string, string>;
+  sitelenPona?: string;
+  sitelenEtymology?: string;
 
   // Deep Knowledge Scoring
   lastReviewed: string; // ISO timestamp

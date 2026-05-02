@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'linja-pona';
+  src: url('https://davidar.github.io/linja-pona/linja-pona-4.1.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.sitelen-pona {
+  font-family: 'linja-pona', sans-serif;
+  font-feature-settings: "liga" 1, "clig" 1, "calt" 1, "kern" 1, "mark" 1;
+  text-rendering: optimizeLegibility;
+  font-variant-ligatures: contextual;
+}
+
 /* ─── Reset & Base ──────────────────────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -29,6 +43,15 @@
   --header-height: 64px;
   --glass: blur(25px);
   --panel-width: 400px;
+
+  /* ─── Z-Index Scale ────────────────────────────────────────────────── */
+  --z-drawer-backdrop: 1000;
+  --z-modal: 5000;
+  --z-chat-drawer: 6000;
+  --z-chat-manager: 6500;
+  --z-chat-dock: 7000;
+  --z-chat-translate: 7000;
+  --z-sandbox-banner: 9999;
 }
 
 html, body {
@@ -58,9 +81,12 @@ select {
 /* ─── Layout ───────────────────────────────────────────────────────────── */
 .app-container {
   display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
   height: 100dvh;
   background: var(--bg);
   overflow-x: hidden;
+  position: relative;
 }
 
 .dashboard {
@@ -496,6 +522,37 @@ select {
   font-weight: 700;
 }
 
+/* ─── Vocab Card Progress Bar ──────────────────────────────────────────── */
+.vocab-card__progress {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.vocab-card__progress-track {
+  flex: 1;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.vocab-card__progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.vocab-card__progress-label {
+  font-size: 0.55rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  min-width: 26px;
+  text-align: right;
+}
+
 .vocab-card__status {
   position: absolute;
   top: 8px;
@@ -533,12 +590,12 @@ select {
 }
 
 .chat-drawer {
-  height: 100%;
+  height: 92dvh;
   background: var(--surface-opaque);
   border-left: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  z-index: 6000;
+  z-index: var(--z-chat-drawer);
   user-select: text;
   -webkit-user-select: text;
 }
@@ -738,4 +795,105 @@ button:active { transform: scale(0.96); }
 /* Ensure dashboard__main has overflow-x hidden for overall layout stability */
 .dashboard__main {
   overflow-x: hidden;
+}
+
+/* ─── Vibe Selector Buttons ─────────────────────────────────────────── */
+.vibe-btn {
+  flex: 1;
+  border: none;
+  border-radius: 2px;
+  padding: 10px 4px;
+  font-size: 0.7rem;
+  font-weight: 900;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.vibe-btn--inactive {
+  background: transparent;
+  color: #666;
+}
+
+.vibe-btn--active {
+  background: var(--gold);
+  color: black;
+}
+
+/* ─── Saved Phrases Scrollable Container ────────────────────────────── */
+.saved-phrases-scroll {
+  max-height: 60vh;
+  overflow-y: auto;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+/* ─── Saved Phrase Card ─────────────────────────────────────────────── */
+.saved-phrase-card {
+  background: #0a0a0a;
+  padding: 18px;
+  border-radius: 12px;
+  border: 1px solid #1e293b;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.saved-phrase-card__words {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.saved-phrase-card__word-meaning {
+  font-size: 0.55rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  font-weight: 800;
+  margin-bottom: 2px;
+  opacity: 0.6;
+}
+
+.saved-phrase-card__word-text {
+  font-weight: 900;
+  font-size: 1.1rem;
+  color: #fff;
+}
+
+.saved-phrase-card__translation {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.saved-phrase-card__footer {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #1e293b;
+}
+
+.saved-phrase-card__note {
+  font-size: 0.8rem;
+  color: #cbd5e1;
+  margin-bottom: 12px;
+  padding: 10px;
+  background: #1e293b;
+  border-radius: 8px;
+  border-left: 3px solid var(--gold);
+}
+
+/* ─── Chat Translate Bubble ─────────────────────────────────────────── */
+.chat-translate-bubble {
+  position: fixed;
+  transform: translateX(-50%);
+  z-index: var(--z-chat-translate);
+  background: #222;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 8px 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  font-size: 0.8rem;
+  color: white;
+  min-width: 100px;
+  text-align: center;
 }

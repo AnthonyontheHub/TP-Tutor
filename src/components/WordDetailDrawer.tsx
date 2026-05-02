@@ -7,6 +7,7 @@ import type { VocabWord, MasteryStatus } from '../types/mastery';
 import { fetchDeepDiveExamples, fetchExamplesForWord, fetchNeighborConnections, resolveApiKey, stringifyUserContext } from '../services/linaService';
 import { WORD_RELATIONSHIPS } from '../data/wordRelationships';
 import { soundService } from '../services/soundService';
+import { initialMasteryMap } from '../data/initialMasteryMap';
 
 const NEXT_STATUS: Partial<Record<MasteryStatus, MasteryStatus>> = {
   not_started: 'introduced',
@@ -37,12 +38,17 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
 
   const primaryMeaning = word?.meanings?.split(',')[0].trim() || word?.meanings;
   const extra = word ? WORD_EXTRA_DATA[word.word] : null;
-  
+
+  const initialData = word ? initialMasteryMap.initialVocabulary.find((v: any) => v.word === word.word) : null;
+  const sitelenPona = word?.sitelenPona || initialData?.sitelenPona || word?.word;
+  const sitelenEtymology = word?.sitelenEtymology || initialData?.sitelenEtymology || extra?.etymology;
+
   const baseNeighbors = word ? WORD_RELATIONSHIPS[word.word] || [] : [];
   const extraNeighbors = extra?.neighbors || [];
+  const hardcodedNeighbors = word?.neighborConnections ? Object.keys(word.neighborConnections) : (initialData?.neighborConnections ? Object.keys(initialData.neighborConnections) : []);
   
   // Merge neighbors, preferring the annotated ones from extra.neighbors
-  const neighbors = Array.from(new Set([...extraNeighbors, ...baseNeighbors]));
+  const neighbors = Array.from(new Set([...extraNeighbors, ...baseNeighbors, ...hardcodedNeighbors]));
   
   // Filter out the unannotated base neighbor if an annotated version already exists
   // e.g. if 'ike (Antonym)' is in extraNeighbors, remove 'ike' from the list.
@@ -101,19 +107,19 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
       setNeighborConnections(null);
       
       const hasDeepDive = !!(word.aiExamples && word.aiExplanation);
-      const hasGrammar = !!word.grammarExamples;
-      const hasNeighbors = !!word.neighborConnections;
+      const hasGrammar = !!(word.grammarExamples || initialData?.grammarExamples);
+      const hasNeighbors = !!(word.neighborConnections || initialData?.neighborConnections);
 
       if (hasDeepDive) {
         setDeepDive({ ...word.aiExamples, explanation: word.aiExplanation });
       }
       
       if (hasGrammar) {
-        setGrammarExamples(word.grammarExamples);
+        setGrammarExamples({ ...(word.grammarExamples || {}), ...(initialData?.grammarExamples || {}) });
       }
 
       if (hasNeighbors) {
-        setNeighborConnections(word.neighborConnections);
+        setNeighborConnections({ ...(word.neighborConnections || {}), ...(initialData?.neighborConnections || {}) });
       }
 
       if (!hasDeepDive || !hasGrammar || !hasNeighbors) {
@@ -169,7 +175,10 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
             <div style={{ marginBottom: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <h2 style={{ fontSize: '3rem', marginBottom: '0', fontWeight: 900, color: 'white', letterSpacing: '-0.02em' }}>{word.word}</h2>
+                  <h2 style={{ fontSize: '3rem', marginBottom: '0', fontWeight: 900, color: 'white', letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '16px' }}>
+                    {word.word}
+                    <span className="sitelen-pona" style={{ color: 'var(--gold)', fontSize: '3.5rem', fontWeight: 'normal', lineHeight: 1 }}>{sitelenPona}</span>
+                  </h2>
                   <button
                     type="button"
                     onClick={(e) => { e.stopPropagation(); soundService.speak(word.word); }}
@@ -185,8 +194,10 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
                 </div>
               </div>
               <div style={{ fontSize: '1.4rem', color: 'var(--gold)', fontWeight: 700, marginTop: '-5px', textTransform: 'uppercase' }}>{primaryMeaning}</div>
-              {extra?.etymology && (
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontStyle: 'italic', marginTop: '6px' }}>{extra.etymology}</div>
+              {sitelenEtymology && (
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontStyle: 'italic', marginTop: '6px' }}>
+                  <span style={{ color: 'var(--gold)', fontWeight: 800 }}>GLYPH ORIGIN:</span> {sitelenEtymology}
+                </div>
               )}
             </div>
 
@@ -258,6 +269,7 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
               </div>
             </div>
 
+            {word.partOfSpeech.split(',').length > 1 && (
             <div style={{ marginBottom: '32px' }}>
               <section className="glass-panel" style={{ padding: '15px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
@@ -266,11 +278,13 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
                 <div style={{ display: 'grid', gap: '8px' }}>
                   {word.partOfSpeech.split(',').map(pos => {
                     const cleanPos = pos.trim();
+                    const capitalizedPos = cleanPos.charAt(0).toUpperCase() + cleanPos.slice(1).toLowerCase();
+                    const grammarEx = grammarExamples?.[cleanPos] || grammarExamples?.[cleanPos.toLowerCase()] || grammarExamples?.[capitalizedPos] || grammarExamples?.[cleanPos.toUpperCase()];
                     return (
                       <div key={cleanPos} style={{ background: 'rgba(255,255,255,0.03)', padding: '10px', borderRadius: '4px', borderLeft: '2px solid var(--gold)' }}>
                         <div style={{ fontSize: '0.65rem', color: 'var(--gold)', fontWeight: 900, textTransform: 'uppercase', marginBottom: '4px' }}>{cleanPos}</div>
-                        {grammarExamples?.[cleanPos] ? (
-                          <div style={{ fontSize: '0.85rem', color: '#eee' }}>{grammarExamples[cleanPos]}</div>
+                        {grammarEx ? (
+                          <div style={{ fontSize: '0.85rem', color: '#eee' }}>{grammarEx}</div>
                         ) : (
                           <div style={{ height: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '2px', width: '80%' }} />
                         )}
@@ -280,6 +294,7 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
                 </div>
               </section>
             </div>
+            )}
 
             {filteredNeighbors.length > 0 && (
               <div style={{ marginBottom: '32px' }}>
@@ -290,6 +305,7 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
                   <div style={{ display: 'grid', gap: '8px' }}>
                     {filteredNeighbors.slice(0, 4).map(n => {
                       const pureName = n.split(' ')[0];
+                      const conn = neighborConnections?.[n] || neighborConnections?.[pureName];
                       return (
                         <div key={n} style={{ background: 'rgba(255,255,255,0.03)', padding: '10px', borderRadius: '4px', borderLeft: '2px solid var(--amber)' }}>
                           <button type="button" 
@@ -298,8 +314,8 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
                           >
                             {n}
                           </button>
-                          {neighborConnections?.[n] ? (
-                            <div style={{ fontSize: '0.85rem', color: '#eee', lineHeight: '1.4' }}>{neighborConnections[n]}</div>
+                          {conn ? (
+                            <div style={{ fontSize: '0.85rem', color: '#eee', lineHeight: '1.4' }}>{conn}</div>
                           ) : (
                             <div style={{ height: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '2px', width: '80%' }} />
                           )}
@@ -370,6 +386,7 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
                     <div style={{ display: 'grid', gap: '8px', maxHeight: '60vh', overflowY: 'auto', paddingRight: '4px' }}>
                       {filteredNeighbors.map(n => {
                         const pureName = n.split(' ')[0];
+                        const conn = neighborConnections?.[n] || neighborConnections?.[pureName];
                         return (
                           <div key={n} style={{ background: 'rgba(255,255,255,0.1)', padding: '10px', borderRadius: '4px', borderLeft: '2px solid var(--amber)' }}>
                             <button type="button" 
@@ -378,8 +395,8 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
                             >
                               {n}
                             </button>
-                            {neighborConnections?.[n] ? (
-                              <div style={{ fontSize: '0.85rem', color: '#eee', lineHeight: '1.4' }}>{neighborConnections[n]}</div>
+                            {conn ? (
+                              <div style={{ fontSize: '0.85rem', color: '#eee', lineHeight: '1.4' }}>{conn}</div>
                             ) : (
                               <div style={{ height: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '2px', width: '80%' }} />
                             )}

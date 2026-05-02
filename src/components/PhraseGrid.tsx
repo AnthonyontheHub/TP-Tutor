@@ -86,31 +86,31 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
       {isChill && (
         <div style={{ padding: '0 4px' }}>
           <h2 className="section-title" style={{ color: 'var(--gold)', marginBottom: '20px', borderLeft: '4px solid var(--gold)', paddingLeft: '12px' }}>MY SAVES</h2>
-          <div style={{ display: 'grid', gap: '12px', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}>
+          <div className="saved-phrases-scroll">
             {filteredSaves.length === 0 ? (
               <p style={{ color: '#555', gridColumn: '1/-1', textAlign: 'center', padding: '40px 20px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px dashed #333' }}>
                 {selectedWords && selectedWords.length > 0 ? 'No saved phrases match your selection.' : 'No phrases saved yet.'}
               </p>
             ) : filteredSaves.map((p) => (
-              <div key={p.id} style={{ background: '#0a0a0a', padding: '18px', borderRadius: '12px', border: '1px solid #1e293b', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
+              <div key={p.id} className="saved-phrase-card">
                 <div style={{ cursor: 'default' }}> 
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
+                  <div className="saved-phrase-card__words">
                     {(p.tp || '').split(' ').map((w, idx) => {
                       const cleanW = clean(w);
                       const vocab = (vocabulary || []).find(v => v.word === cleanW);
                       const meaning = vocab?.meanings?.split(',')[0].trim() || '';
                       return (
                         <div key={`${w}-${idx}`} style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                          <div style={{ fontSize: '0.55rem', color: 'var(--gold)', textTransform: 'uppercase', fontWeight: 800, marginBottom: '2px', opacity: 0.6 }}>{meaning}</div>
-                          <div style={{ fontWeight: 900, fontSize: '1.1rem', color: '#fff' }}>{w}</div>
+                          <div className="saved-phrase-card__word-meaning">{meaning}</div>
+                          <div className="saved-phrase-card__word-text">{w}</div>
                         </div>
                       );
                     })}
                   </div>
-                  <div style={{ fontSize: '0.85rem', color: '#94a3b8', fontStyle: 'italic', lineHeight: '1.4' }}>{p.en}</div>
+                  <div className="saved-phrase-card__translation">{p.en}</div>
                 </div>
-                <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #1e293b' }}>
-                  {p.notes && <div style={{ fontSize: '0.8rem', color: '#cbd5e1', marginBottom: '12px', padding: '10px', background: '#1e293b', borderRadius: '8px', borderLeft: '3px solid var(--gold)' }}>📝 {p.notes}</div>}
+                <div className="saved-phrase-card__footer">
+                  {p.notes && <div className="saved-phrase-card__note">📝 {p.notes}</div>}
                   <div style={{ display: 'flex', gap: '8px' }}>
                     <button type="button" onClick={() => { setEditingId(p.id); setNoteInput(p.notes); }} className="btn-toggle" style={{ padding: '6px 12px', fontSize: '0.7rem', width: 'auto', background: 'rgba(255,255,255,0.05)', borderRadius: '6px' }}>
                       {p.notes ? 'EDIT NOTE' : '+ NOTE'}

@@ -137,7 +137,7 @@ export default function VocabCard({ word, onLongPress, onClick, onAskLina, isSan
       onPointerCancel={handlePointerCancel}
       onClick={handleCardClick}
     >
-      <div className="vocab-card__bg-symbol">{word.word}</div>
+      <div className="vocab-card__bg-symbol sitelen-pona">{word.sitelenPona || word.word}</div>
 
       {/* Top Right Icons */}
       <div className="absolute top-2 right-2 flex gap-[6px] items-center">
@@ -176,9 +176,32 @@ export default function VocabCard({ word, onLongPress, onClick, onAskLina, isSan
         {word.type === 'grammar' ? word.sessionNotes : word.word}
       </div>
 
-      <div className="vocab-card__pos text-[0.6rem] text-[var(--text-muted)] uppercase tracking-[0.05em] font-bold">
-        {word.type === 'grammar' ? 'GRAMMAR' : word.partOfSpeech.split(',')[0].trim()}
-      </div>
+      {(() => {
+        const score = word.baseScore ?? 0;
+        const tiers = [
+          { min: 0, max: 200 },
+          { min: 201, max: 500 },
+          { min: 501, max: 750 },
+          { min: 751, max: 949 },
+          { min: 950, max: 1000 },
+        ];
+        const tier = tiers.find(t => score >= t.min && score <= t.max) || tiers[0];
+        const range = tier.max - tier.min || 1;
+        const pct = Math.round(((score - tier.min) / range) * 100);
+        return (
+          <div className="vocab-card__progress">
+            <div className="vocab-card__progress-track">
+              <div
+                className="vocab-card__progress-fill"
+                style={{ width: `${pct}%`, background: statusColor }}
+              />
+            </div>
+            <span className="vocab-card__progress-label" style={{ color: statusColor }}>
+              {pct}%
+            </span>
+          </div>
+        );
+      })()}
 
       {word.pinnedExample && (
         <div className="text-[0.65rem] text-[var(--gold)] italic mt-[2px] opacity-60 leading-[1.2]">

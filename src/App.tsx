@@ -223,7 +223,7 @@ export default function App() {
         padding: '0 20px',
         gap: '12px',
         pointerEvents: 'none',
-        zIndex: 7000
+        zIndex: 'var(--z-chat-dock)'
       }}>
         {chatSessions.filter(s => s.isMinimized).map((session) => (
           <div 
@@ -253,7 +253,7 @@ export default function App() {
         ))}
       </div>
 
-      <div className="chat-manager-layer" style={{ pointerEvents: 'none', position: 'fixed', inset: 0, zIndex: 6500 }}>
+      <div className="chat-manager-layer" style={{ pointerEvents: 'none', position: 'fixed', inset: 0, zIndex: 'var(--z-chat-manager)' }}>
         <AnimatePresence>
           {chatSessions.filter(s => !s.isMinimized).map((session) => (
             <ChatSession 

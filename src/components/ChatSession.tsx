@@ -554,7 +554,7 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
       <m.div
         className="chat-drawer"
         initial={{ x: '100%' }}
-        animate={{ x: 0, height: isMinimized ? 'var(--header-height)' : '100%' }}
+        animate={{ x: 0, height: isMinimized ? 'var(--header-height)' : '92dvh' }}
         exit={{ x: '100%' }}
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
         onMouseUp={handleTextSelection}
@@ -570,7 +570,6 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
           right: 0,
           boxShadow: '-10px 0 30px rgba(0,0,0,0.5)',
           borderLeft: '1px solid var(--border)',
-          zIndex: 6000,
           ...style
         }}
       >
@@ -639,7 +638,7 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
         </header>
 
         {translateBubble && (
-          <div onMouseDown={e => e.stopPropagation()} style={{ position: 'fixed', top: translateBubble.top, left: translateBubble.left, transform: 'translateX(-50%)', zIndex: 7000, background: '#222', border: '1px solid #444', borderRadius: '4px', padding: '8px 12px', boxShadow: '0 4px 12px rgba(0,0,0,0.5)', fontSize: '0.8rem', color: 'white', minWidth: '100px', textAlign: 'center' }}>
+          <div onMouseDown={e => e.stopPropagation()} className="chat-translate-bubble" style={{ top: translateBubble.top, left: translateBubble.left }}>
             {translateBubble.result ? <div style={{ lineHeight: '1.4' }}>{translateBubble.result}</div> : <button type="button" onClick={handleTranslateClick} style={{ background: 'var(--gold)', border: 'none', borderRadius: '2px', color: 'black', padding: '4px 8px', fontWeight: 900, cursor: 'pointer', fontSize: '0.7rem' }}>{translateBubble.loading ? '...' : 'TRANSLATE'}</button>}
           </div>
         )}
