@@ -4,7 +4,6 @@ export const WORD_RELATIONSHIPS: Record<string, string[]> = {
   ala: ['ale', 'mute', 'lili', 'ken'],
   alasa: ['kama', 'pali', 'lukin'],
   ale: ['ala', 'mute', 'suli'],
-  ali: ['ala', 'mute', 'suli'],
   anpa: ['sewi', 'noka', 'monsi'],
   ante: ['sama', 'sin', 'nasa'],
   anu: ['en', 'ala', 'seme'],

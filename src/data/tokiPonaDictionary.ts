@@ -1,6 +1,6 @@
 /* src/data/tokiPonaDictionary.ts */
 export const TOKI_PONA_DICTIONARY: Record<string, string> = {
-  "a": "ah, ha, oh", "akesi": "reptile, lizard", "ala": "no, not, zero", "alasa": "hunt, forage", "ale": "all, every, life", "ali": "all, every, life (variant)", "anpa": "down, low, bottom", "ante": "different, other", "anu": "or", "awen": "stay, wait, keep", "e": "object marker", "en": "and (subjects)",
+  "a": "ah, ha, oh", "akesi": "reptile, lizard", "ala": "no, not, zero", "alasa": "hunt, forage", "ale": "all, every, life", "anpa": "down, low, bottom", "ante": "different, other", "anu": "or", "awen": "stay, wait, keep", "e": "object marker", "en": "and (subjects)",
   "epiku": "epic, awesome", "esun": "market, shop", "ijo": "thing, object", "ike": "bad, evil, complex", "ilo": "tool, machine", "insa": "inside, stomach", "jaki": "dirty, gross",
   "jasima": "reflect, mirror", "jan": "person, human", "jelo": "yellow, light green", "jo": "have, hold", "kala": "fish, sea creature", "kalama": "sound, noise", "kama": "come, become",
   "kasi": "plant, leaf", "ken": "can, possible", "kepeken": "use, with", "kijetesantakalu": "raccoon, otter", "kili": "fruit, vegetable", "kiwen": "hard, rock, metal", "ko": "clay, paste, powder", "kon": "air, spirit, soul", "kule": "color, colorful", "kulupu": "group, community", "kute": "hear, listen",

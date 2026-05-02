@@ -87,7 +87,7 @@
       "verb": "ona li ala. (It is nothing.)"
     },
     "neighborConnections": {
-      "ali (Antonym)": "Opposite: 'ali' means all or everything, while 'ala' means no, not, or none.",
+      "ale (Antonym)": "Opposite: 'ale' means all or everything, while 'ala' means no, not, or none.",
       "mute (Antonym-ish)": "Opposite-ish: While 'mute' signifies many or much, 'ala' represents the absence of quantity, or none.",
       "wan (Opposite-ish)": "Opposite-ish: 'wan' denotes one or unique existence, contrasting with 'ala' which signifies non-existence or none."
     }
@@ -573,7 +573,7 @@
     "aiExamples": {
       "simple": "ona li kulupu. (They are a group.)",
       "intermediate": "kulupu mi li pona tawa mi. (My group is good for me.)",
-      "advanced": "kulupu ni li pali e wawa mute la, jan ali li pilin pona. (If this group creates much power/strength, all people feel good.)"
+      "advanced": "kulupu ni li pali e wawa mute la, jan ale li pilin pona. (If this group creates much power/strength, all people feel good.)"
     },
     "aiExplanation": "In Toki Pona, 'kulupu' refers to any collection of people or things that functions as a single unit, such as a community, organization, or simply a group. It implies a sense of shared identity or purpose, distinguishing it from merely 'mute' (many). This word can describe both formal bodies and informal gatherings, emphasizing belonging and collective action.",
     "grammarExamples": {
@@ -736,7 +736,7 @@
     "aiExamples": {
       "simple": "ona li linja. (It is a line.)",
       "intermediate": "linja mute li lon ma ni. (Many lines are in this land.)",
-      "advanced": "sina wile e linja suli tawa telo la, sina ken jo e pona pi mute ali. (If you want a big pipe for water, you can have all good things.)"
+      "advanced": "sina wile e linja suli tawa telo la, sina ken jo e pona pi mute ale. (If you want a big pipe for water, you can have all good things.)"
     },
     "aiExplanation": "linja is a versatile word for anything long, thin, and continuous. It can describe physical objects like a thread, rope, or a strand of hair, as well as abstract concepts such as a drawn line or a queue. Its broad meaning allows it to encompass various linear forms, from simple markings to complex interconnected systems like pipes or cables.",
     "grammarExamples": {
@@ -1052,7 +1052,7 @@
     },
     "neighborConnections": {
       "ala (Antonym-ish)": "mute signifies many or much, while ala means none or zero, making them contrasting in quantity.",
-      "ali (Synonym-ish)": "Both mute (many) and ali (all) describe a large or total quantity, making them somewhat similar in scope.",
+      "ale (Synonym-ish)": "Both mute (many) and ale (all) describe a large or total quantity, making them somewhat similar in scope.",
       "lili (Antonym)": "mute means many or much, directly contrasting with lili which means few or little.",
       "wan (Antonym)": "While mute refers to multiple or many items, wan specifically refers to a single item, making them opposite in number."
     }
@@ -1906,7 +1906,7 @@
     "neighborConnections": {
       "ala (Opposite-ish)": "ala (none/zero) is an opposite-ish of wan (one) as it represents the absence of quantity, while wan represents a single unit.",
       "ale (Opposite-ish)": "ale (all) is an opposite-ish of wan (one) because ale encompasses everything, contrasting with wan which specifies a single item.",
-      "ali (Opposite-ish)": "Similar to ale, ali (all) is an opposite-ish of wan (one) by representing the complete set as opposed to a solitary element.",
+      "ale (Opposite-ish)": "Similar to ale, ale (all) is an opposite-ish of wan (one) by representing the complete set as opposed to a solitary element.",
       "mute (Antonym)": "mute (many) is an antonym to wan (one) as it expresses multiplicity, directly contrasting with singularity.",
       "tu (Neighbor)": "tu (two) is a numerical neighbor to wan (one) as it is the very next number in the Toki Pona counting system."
     }
@@ -1979,24 +1979,6 @@
     "neighborConnections": {
       "ken (Related)": "ken is related to wile as both words function as pre-verbs that modify a subsequent verb to express different modalities, such as ability or desire.",
       "sona (Related)": "sona is related to wile as both words describe internal states, with sona referring to knowledge or understanding and wile referring to desire or intention, often leading to actions involving one another."
-    }
-  },
-  "ali": {
-    "aiExamples": {
-      "simple": "ona ali. (They all.)",
-      "intermediate": "ma ali li pona. (All lands are good.)",
-      "advanced": "ona li kama jo e ijo ali li pana e ni tawa jan pona. (They acquire all things and give them to good people.)"
-    },
-    "aiExplanation": "ali is a variant of ale, meaning all, every, or everything. It emphasizes completeness or totality and can function as a noun or an adjective.",
-    "grammarExamples": {
-      "noun": "ali li pona. (Everything is good.)",
-      "modifier": "jan ali li pona. (All people are good.)",
-      "adverb": "mi wawa ali. (I am completely strong.)"
-    },
-    "neighborConnections": {
-      "ala (Antonym)": "Antonym: 'ali' means all or everything, while 'ala' means none or nothing.",
-      "mute (Synonym-ish)": "Synonym-ish: While 'ali' refers to every single one or the entirety, 'mute' indicates a large quantity or many of something.",
-      "wan (Opposite-ish)": "Opposite-ish: 'ali' encompasses the totality or all parts together, whereas 'wan' specifies a single unit or item."
     }
   },
   "epiku": {
