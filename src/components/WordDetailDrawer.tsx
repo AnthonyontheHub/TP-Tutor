@@ -6,6 +6,7 @@ import { STATUS_META } from '../types/mastery';
 import type { VocabWord, MasteryStatus } from '../types/mastery';
 import { fetchDeepDiveExamples, fetchExamplesForWord, fetchNeighborConnections, resolveApiKey, stringifyUserContext } from '../services/linaService';
 import { WORD_RELATIONSHIPS } from '../data/wordRelationships';
+import { soundService } from '../services/soundService';
 
 const NEXT_STATUS: Partial<Record<MasteryStatus, MasteryStatus>> = {
   not_started: 'introduced',
@@ -167,7 +168,17 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
           >
             <div style={{ marginBottom: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <h2 style={{ fontSize: '3rem', marginBottom: '0', fontWeight: 900, color: 'white', letterSpacing: '-0.02em' }}>{word.word}</h2>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <h2 style={{ fontSize: '3rem', marginBottom: '0', fontWeight: 900, color: 'white', letterSpacing: '-0.02em' }}>{word.word}</h2>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); soundService.speak(word.word); }}
+                    style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white', borderRadius: '50%', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '1.2rem' }}
+                    aria-label="Pronounce word"
+                  >
+                    🔊
+                  </button>
+                </div>
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{STATUS_META[word.status].label}</div>
                   <div style={{ fontSize: '1.5rem' }}>{STATUS_META[word.status].emoji}</div>

@@ -113,9 +113,9 @@ const SessionRecap: React.FC<SessionRecapProps> = ({
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          style={{ color: 'var(--gold)', fontWeight: 800 }}
+          style={{ color: totalXPEarned < 0 ? '#ef4444' : 'var(--gold)', fontWeight: 800 }}
         >
-          +{totalXPEarned} XP {isPersonalBest && <span style={{ background: 'var(--gold)', color: 'black', padding: '2px 8px', borderRadius: '4px', marginLeft: '8px', fontSize: '0.7rem' }}>NEW PERSONAL BEST</span>}
+          {totalXPEarned > 0 ? `+${totalXPEarned}` : totalXPEarned} XP {isPersonalBest && <span style={{ background: 'var(--gold)', color: 'black', padding: '2px 8px', borderRadius: '4px', marginLeft: '8px', fontSize: '0.7rem' }}>NEW PERSONAL BEST</span>}
         </motion.div>
         {xpMultiplier > 1.0 && (
           <div style={{ fontSize: '0.8rem', marginTop: '8px', color: '#ff4d4d', fontWeight: 900 }}>

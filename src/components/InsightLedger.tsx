@@ -79,7 +79,7 @@ const InsightLedger: React.FC<Props> = ({ onClose }) => {
             }}>
               <div>
                 <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#eee' }}>{event.label}</div>
-                <div style={{ fontSize: '0.9rem', fontWeight: 900, color: 'var(--gold)' }}>
+                <div style={{ fontSize: '0.9rem', fontWeight: 900, color: event.change < 0 ? '#ef4444' : 'var(--gold)' }}>
                   {event.change > 0 ? `+${event.change}` : event.change}
                 </div>
               </div>

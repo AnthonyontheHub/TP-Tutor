@@ -1,6 +1,6 @@
 /* src/components/ChatSession.tsx */
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { m, LazyMotion, domMax } from 'framer-motion';
+import { m, LazyMotion, domMax, AnimatePresence } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
 import { useChatStore } from '../store/chatStore';
 import type { ChatMessage } from '../store/chatStore';
@@ -45,6 +45,8 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
   const [showRecap, setShowRecap] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
   const [summaryText, setSummaryText] = useState('');
+  const [showDictionary, setShowDictionary] = useState(false);
+  const [dictSearch, setDictSearch] = useState('');
   const [sessionXP, setSessionXP] = useState(0);
   const [startingTotalXP, setStartingTotalXP] = useState(0);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -584,16 +586,15 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <h2 style={{ fontSize: '0.8rem', fontWeight: 900, letterSpacing: '0.2em', color: 'var(--gold)', margin: 0 }}>{chatContext === 'GENERAL' ? 'jan LINA LINK' : chatContext}</h2>
-            {sessionXP > 0 && (
-              <div style={{ fontSize: '0.7rem', color: 'var(--gold)', fontWeight: 800 }}>
-                +{sessionXP} XP {xpMultiplier > 1.0 && '🔥'}
+            {sessionXP !== 0 && (
+              <div style={{ fontSize: '0.7rem', color: sessionXP < 0 ? '#ef4444' : 'var(--gold)', fontWeight: 800 }}>
+                {sessionXP > 0 ? '+' : ''}{sessionXP} XP {xpMultiplier > 1.0 && sessionXP > 0 && '🔥'}
               </div>
             )}
           </div>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <button type="button"
-              onClick={finalizeSessionAndSave}
-              disabled={isLoading}
+              onClick={() => setShowDictionary(true)}
               style={{ 
                 background: 'rgba(255, 191, 0, 0.1)', 
                 border: '1px solid var(--gold)', 
@@ -606,8 +607,9 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
                 letterSpacing: '0.05em'
               }}
             >
-              FINISH
+              📖 DICT
             </button>
+
             <button type="button"
               onClick={onMinimize}
               style={{ background: 'none', border: 'none', color: '#666', fontSize: '0.8rem', cursor: 'pointer', fontWeight: 900 }}
@@ -679,6 +681,55 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
           ))}
           <div ref={messagesEndRef} />
         </div>
+
+        <AnimatePresence>
+          {showDictionary && (
+            <m.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              style={{
+                position: 'absolute',
+                top: 'var(--header-height)',
+                right: 0,
+                bottom: 0,
+                width: '100%',
+                background: 'rgba(5,5,5,0.98)',
+                zIndex: 10,
+                display: 'flex',
+                flexDirection: 'column',
+                borderLeft: '1px solid var(--border)'
+              }}
+            >
+              <div style={{ padding: '16px', borderBottom: '1px solid var(--border)', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                 <input 
+                   autoFocus
+                   value={dictSearch}
+                   onChange={e => setDictSearch(e.target.value)}
+                   placeholder="Search Toki Pona word..."
+                   style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', color: 'white', padding: '10px', borderRadius: '4px', outline: 'none', fontSize: '0.9rem' }}
+                 />
+                 <button onClick={() => { setShowDictionary(false); setDictSearch(''); }} style={{ background: 'none', border: 'none', color: 'var(--gold)', fontWeight: 900, cursor: 'pointer', fontSize: '0.8rem' }}>CLOSE</button>
+              </div>
+              <div style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
+                 {vocabulary.filter(v => v.word.toLowerCase().includes(dictSearch.toLowerCase()) || v.meanings.toLowerCase().includes(dictSearch.toLowerCase())).map(v => (
+                   <div key={v.id} style={{ padding: '12px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ color: 'var(--gold)', fontSize: '1.2rem', fontWeight: 900 }}>{v.word}</span>
+                        <span style={{ fontSize: '0.65rem', color: '#888', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.1em' }}>{v.partOfSpeech}</span>
+                     </div>
+                     <div style={{ fontSize: '0.9rem', color: '#ccc', marginTop: '6px', lineHeight: '1.4' }}>{v.meanings}</div>
+                     <button type="button" onClick={() => { setDictSearch(''); setShowDictionary(false); sendToLina(`[SYSTEM: Briefly explain the word "${v.word}" and give an example.]`); }} style={{ marginTop: '12px', background: 'rgba(255,191,0,0.1)', border: '1px solid var(--gold)', color: 'var(--gold)', fontSize: '0.65rem', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontWeight: 900, letterSpacing: '0.05em' }}>ASK LINA ABOUT THIS</button>
+                   </div>
+                 ))}
+                 {vocabulary.filter(v => v.word.toLowerCase().includes(dictSearch.toLowerCase()) || v.meanings.toLowerCase().includes(dictSearch.toLowerCase())).length === 0 && (
+                   <div style={{ color: '#666', textAlign: 'center', marginTop: '40px', fontSize: '0.9rem' }}>No words found matching "{dictSearch}"</div>
+                 )}
+              </div>
+            </m.div>
+          )}
+        </AnimatePresence>
 
         <div style={{ padding: '16px', background: 'rgba(5,5,5,0.5)', borderTop: '1px solid var(--border)', display: isMinimized ? 'none' : 'flex', flexDirection: 'column', gap: '12px' }}>
           <div style={{ display: 'flex', gap: '8px' }}>

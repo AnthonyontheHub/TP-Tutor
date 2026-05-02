@@ -19,6 +19,7 @@ import type { MasteryStatus, VocabWord } from '../types/mastery';
 import type { AppPanel } from '../App';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BookOpen } from 'lucide-react';
+import FlashcardMode from './FlashcardMode';
 
 export type DashboardView = 'vocab' | 'roadmap' | 'archive';
 
@@ -33,6 +34,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
 
   const [activeView, setActiveView] = useState<DashboardView>('vocab');
   const [showTrainingHub, setShowTrainingHub] = useState(false);
+  const [showFlashcards, setShowFlashcards] = useState(false);
   const [isStoicHistoryOpen, setIsStoicHistoryOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
   const [posFilter, setPosFilter] = useState('All');
@@ -312,6 +314,26 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
             🎮
           </button>
           
+          <button type="button" 
+            onClick={() => setShowFlashcards(true)} 
+            className="dashboard__icon-btn" 
+            style={{ 
+              width: '42px',
+              height: '42px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '1.3rem',
+              background: 'rgba(255,191,0,0.1)',
+              borderRadius: '50%',
+              border: '1px solid var(--gold)',
+              color: 'var(--gold)'
+            }}
+            title="Flashcard Mode"
+          >
+            🎴
+          </button>
+
           <OperationalIntelligenceWidget 
             onAskLina={onAskLina}
             onOpenAchievements={() => onTogglePanel('achievements')}
@@ -355,7 +377,40 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
         </div>
         <ProgressSummary activeFilter={activeFilter} onFilterClick={setActiveFilter} />
         
-        {/* Row 2: Review Controls */}
+        {/* Row 2: 3-Way Navigation Switcher */}
+        <div className="dashboard__view-toggle overflow-x-auto hide-scrollbar" style={{ 
+          marginBottom: '20px', 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(3, 1fr)', 
+          background: 'var(--surface)', 
+          borderRadius: '4px', 
+          border: '1px solid var(--border)',
+          width: '100%'
+        }}>
+          <button type="button" 
+            onClick={() => setActiveView('vocab')} 
+            className={`btn-toggle text-xs md:text-sm px-2 py-4 ${activeView === 'vocab' ? 'active' : ''}`}
+            style={{ margin: 0, width: '100%', background: activeView === 'vocab' ? 'var(--gold)' : 'transparent', color: activeView === 'vocab' ? 'black' : 'inherit', fontSize: '0.8rem' }}
+          >
+            VOCAB
+          </button>
+          <button type="button" 
+            onClick={() => setActiveView('roadmap')} 
+            className={`btn-toggle text-xs md:text-sm px-2 py-4 ${activeView === 'roadmap' ? 'active' : ''}`}
+            style={{ margin: 0, width: '100%', background: activeView === 'roadmap' ? 'var(--gold)' : 'transparent', color: activeView === 'roadmap' ? 'black' : 'inherit', fontSize: '0.8rem' }}
+          >
+            ROADMAP
+          </button>
+          <button type="button" 
+            onClick={() => setActiveView('archive')} 
+            className={`btn-toggle text-xs md:text-sm px-2 py-4 ${activeView === 'archive' ? 'active' : ''}`}
+            style={{ margin: 0, width: '100%', background: activeView === 'archive' ? 'var(--gold)' : 'transparent', color: activeView === 'archive' ? 'black' : 'inherit', fontSize: '0.8rem' }}
+          >
+            ARCHIVE
+          </button>
+        </div>
+
+        {/* Row 3: Review Controls */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
           <div className="flex flex-col md:flex-row gap-2 w-full">
             <button type="button" onClick={handleDailyReview} className="btn-review w-full" style={{ flex: 1, marginBottom: 0 }}>
@@ -388,39 +443,6 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
               </button>
             </div>
           </div>
-        </div>
-
-        {/* Row 3: 3-Way Navigation Switcher */}
-        <div className="dashboard__view-toggle overflow-x-auto hide-scrollbar" style={{ 
-          marginBottom: '20px', 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(3, 1fr)', 
-          background: 'var(--surface)', 
-          borderRadius: '4px', 
-          border: '1px solid var(--border)',
-          width: '100%'
-        }}>
-          <button type="button" 
-            onClick={() => setActiveView('vocab')} 
-            className={`btn-toggle text-xs md:text-sm px-2 py-4 ${activeView === 'vocab' ? 'active' : ''}`}
-            style={{ margin: 0, width: '100%', background: activeView === 'vocab' ? 'var(--gold)' : 'transparent', color: activeView === 'vocab' ? 'black' : 'inherit', fontSize: '0.8rem' }}
-          >
-            VOCAB
-          </button>
-          <button type="button" 
-            onClick={() => setActiveView('roadmap')} 
-            className={`btn-toggle text-xs md:text-sm px-2 py-4 ${activeView === 'roadmap' ? 'active' : ''}`}
-            style={{ margin: 0, width: '100%', background: activeView === 'roadmap' ? 'var(--gold)' : 'transparent', color: activeView === 'roadmap' ? 'black' : 'inherit', fontSize: '0.8rem' }}
-          >
-            ROADMAP
-          </button>
-          <button type="button" 
-            onClick={() => setActiveView('archive')} 
-            className={`btn-toggle text-xs md:text-sm px-2 py-4 ${activeView === 'archive' ? 'active' : ''}`}
-            style={{ margin: 0, width: '100%', background: activeView === 'archive' ? 'var(--gold)' : 'transparent', color: activeView === 'archive' ? 'black' : 'inherit', fontSize: '0.8rem' }}
-          >
-            ARCHIVE
-          </button>
         </div>
 
         {/* Main Viewport */}
@@ -593,6 +615,14 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
       
       {showTrainingHub && (
         <TrainingHub onClose={() => setShowTrainingHub(false)} />
+      )}
+
+      {showFlashcards && (
+        <FlashcardMode 
+          onClose={() => setShowFlashcards(false)} 
+          onAskLina={onAskLina}
+          isSandboxMode={isSandboxMode}
+        />
       )}
 
       <DailyStoicPopup />
