@@ -139,6 +139,17 @@ export default function VocabCard({ word, onLongPress, onClick, onAskLina, isSan
     >
       <div className="vocab-card__bg-symbol sitelen-pona">{word.sitelenPona || word.word}</div>
 
+      {/* Top Left POS Badges */}
+      {word.type !== 'grammar' && (
+        <div className="vocab-card__pos-badges">
+          {word.partOfSpeech.split(',').map((role, i) => (
+            <span key={i} className="vocab-card__pos-badge">
+              {role.trim().charAt(0).toUpperCase()}
+            </span>
+          ))}
+        </div>
+      )}
+
       {/* Top Right Icons */}
       <div className="absolute top-2 right-2 flex gap-[6px] items-center">
         {hasAIContent && (

@@ -553,6 +553,30 @@ select {
   text-align: right;
 }
 
+/* ─── Vocab Card POS Badges ────────────────────────────────────────────── */
+.vocab-card__pos-badges {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  display: flex;
+  gap: 2px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.vocab-card__pos-badge {
+  font-size: 0.45rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  opacity: 0.45;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 2px;
+  padding: 1px 3px;
+  letter-spacing: 0.06em;
+  line-height: 1;
+}
+
 .vocab-card__status {
   position: absolute;
   top: 8px;

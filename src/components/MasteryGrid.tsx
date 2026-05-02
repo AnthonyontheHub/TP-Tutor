@@ -62,7 +62,7 @@ export default function MasteryGrid({
     return vocabulary
       .filter(item => {
         const passesLesson = !lessonFilter || lessonFilter.includes(item.id) || lessonFilter.includes(item.word);
-        const matchesPOS = selectedPOS === 'All' || item.partOfSpeech === selectedPOS;
+        const matchesPOS = selectedPOS === 'All' || item.partOfSpeech.toLowerCase().split(',').map(s => s.trim()).includes(selectedPOS.toLowerCase());
         const matchesKu = sortMode === 'ku' ? item.weight === 'ku' : true;
         
         let matchesSearch = true;
@@ -141,13 +141,13 @@ export default function MasteryGrid({
             }}
           >
             <option value="All">All Parts of Speech</option>
-            <option value="Noun">Nouns</option>
-            <option value="Verb">Verbs</option>
-            <option value="Adjective">Adjectives</option>
-            <option value="Particle">Particles</option>
-            <option value="Preposition">Prepositions</option>
-            <option value="Pronoun">Pronouns</option>
-            <option value="Number">Numbers</option>
+            <option value="noun">Noun</option>
+            <option value="verb">Verb</option>
+            <option value="modifier">Modifier</option>
+            <option value="particle">Particle</option>
+            <option value="preposition">Preposition</option>
+            <option value="pronoun">Pronoun</option>
+            <option value="number">Number</option>
           </select>
           <input
             type="text"
