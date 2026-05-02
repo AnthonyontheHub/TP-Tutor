@@ -726,29 +726,37 @@ export async function generateAIChallenge(apiKey: string, vocabulary: VocabWord[
   const vocabSummary = candidates.map(v => `${v.word} (${v.status})`).slice(0, 10).join(', ');
   
   const prompt = `Act as jan Lina, a Toki Pona teacher. Generate a ${type} challenge for a student with ${totalXP} XP.
+  
+  DYNAMIC SCALING RULES:
+  - targetCount = (TotalXP / 5000) + [Base Count].
+    (Base Counts: word_usage: 3, session_count: 2, word_progression: 1, prove_it_usage: 1, convo_length: 5, phrase_save: 2)
+    Example: At 30,000 XP, word_usage target should be around (30000/5000) + 3 = 9.
+  - xpReward = (TotalXP / 1000) + 150.
+    Example: At 30,000 XP, reward should be (30000/1000) + 150 = 180.
+  
   Current priority words: ${vocabSummary || 'None (use common words like toki, pona, etc.)'}
+  If the student is high level (e.g. >20k XP), prioritize words in 'practicing' status for 'word_progression' to push them toward 'mastered'.
 
   Available Challenge Types:
   - word_usage: Use [word] in conversation.
   - session_count: Start X new sessions.
   - word_progression: Move [word] to the next status level.
   - prove_it_usage: Use [word] in a Prove It sentence.
-  - convo_length: Have a conversation of at least X messages.
-  - phrase_save: Save X new phrases.
+  - convo_length: Have a conversation of at least X messages in one session.
+  - phrase_save: Save X new phrases to The Archive.
 
-  Return a JSON object matching this structure:
+  Return a JSON object:
   {
     "type": "one of the types above",
-    "title": "Short catchy title",
-    "description": "Clear instruction",
+    "title": "Short catchy title in jan Lina's voice",
+    "description": "Clear instruction in jan Lina's voice",
     "targetWord": "optional word if applicable",
-    "targetCount": number,
-    "xpReward": number
+    "targetCount": number (calculated based on rules),
+    "xpReward": number (calculated based on rules)
   }
   
-  For Daily challenges, set targetCount lower (e.g. 1-3). For Weekly, set higher (e.g. 5-10 or complex tasks).
-  Make the title and description personal and encouraging in jan Lina's voice.
-  XP Rewards: Daily (50-100), Weekly (150-300).
+  For Daily challenges, you can slightly reduce targetCount (e.g. 50% of the calculated value, min 1).
+  Make the title and description personal and encouraging.
   `;
 
   try {

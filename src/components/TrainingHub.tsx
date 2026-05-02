@@ -1,7 +1,7 @@
 /* src/components/TrainingHub.tsx */
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Shield, Target, Zap, Clock, ArrowLeft } from 'lucide-react';
+import { X, Shield, Target, Zap, Clock, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { useMasteryStore } from '../store/masteryStore';
 
 interface Props {
@@ -115,43 +115,61 @@ const TrainingHub: React.FC<Props> = ({ onClose }) => {
               exit={{ x: -20, opacity: 0 }}
               className="space-y-6"
             >
-              {[
-                { type: 'Daily', data: currentDailyChallenge, icon: <Zap size={20} className="text-gold" /> },
-                { type: 'Weekly', data: currentChallenge, icon: <Clock size={20} className="text-gold" /> }
-              ].map((challenge) => (
-                <div 
-                  key={challenge.type}
-                  className="bg-white/5 border border-white/10 rounded-[2rem] p-8 flex flex-col md:flex-row gap-8 items-center"
-                >
-                  <div className="w-20 h-20 rounded-2xl bg-gold/10 border border-gold/20 flex items-center justify-center">
-                    {challenge.icon}
-                  </div>
-                  <div className="flex-1 text-center md:text-left">
-                    <div className="text-gold text-[10px] font-black uppercase tracking-[0.3em] mb-2">{challenge.type} Objective</div>
-                    {challenge.data ? (
-                      <>
-                        <h3 className="text-xl font-bold text-white mb-2">{challenge.data.title}</h3>
-                        <p className="text-zinc-400 text-sm mb-4">{challenge.data.description}</p>
-                        <div className="flex items-center gap-4">
-                          <div className="flex-1 h-2 bg-white/5 rounded-full overflow-hidden">
-                            <div 
-                              className="h-full bg-gold shadow-[0_0_15px_rgba(255,215,0,0.4)] transition-all duration-1000"
-                              style={{ width: `${(challenge.data.currentCount / challenge.data.targetCount) * 100}%` }}
-                            />
+              <div className="grid grid-cols-1 gap-6">
+                {[
+                  { type: 'Daily', data: currentDailyChallenge, icon: <Zap size={20} className="text-gold" /> },
+                  { type: 'Weekly', data: currentChallenge, icon: <Clock size={20} className="text-gold" /> }
+                ].map((challenge) => (
+                  <div 
+                    key={challenge.type}
+                    className="bg-white/5 border border-white/10 rounded-[2rem] p-8 flex flex-col md:flex-row gap-8 items-center relative overflow-hidden"
+                  >
+                    {/* Background Glow */}
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-gold/5 blur-3xl -mr-16 -mt-16" />
+                    
+                    <div className="w-20 h-20 rounded-2xl bg-gold/10 border border-gold/20 flex items-center justify-center relative z-10">
+                      {challenge.icon}
+                    </div>
+                    
+                    <div className="flex-1 text-center md:text-left relative z-10">
+                      <div className="text-gold text-[10px] font-black uppercase tracking-[0.3em] mb-2">{challenge.type} Objective</div>
+                      {challenge.data ? (
+                        <>
+                          <h3 className="text-xl font-bold text-white mb-2">{challenge.data.title}</h3>
+                          <p className="text-zinc-400 text-sm mb-6 leading-relaxed max-w-lg">{challenge.data.description}</p>
+                          <div className="flex items-center gap-4">
+                            <div className="flex-1 h-3 bg-white/5 rounded-full overflow-hidden border border-white/5">
+                              <motion.div 
+                                initial={{ width: 0 }}
+                                animate={{ width: `${(challenge.data.currentCount / challenge.data.targetCount) * 100}%` }}
+                                className="h-full bg-gold shadow-[0_0_20px_rgba(255,215,0,0.4)]"
+                              />
+                            </div>
+                            <span className="text-white font-black text-sm tabular-nums">
+                              {challenge.data.currentCount} <span className="text-zinc-600">/</span> {challenge.data.targetCount}
+                            </span>
                           </div>
-                          <span className="text-white font-black text-xs">{challenge.data.currentCount} / {challenge.data.targetCount}</span>
+                        </>
+                      ) : (
+                        <div className="py-4">
+                          <p className="text-zinc-600 italic uppercase tracking-[0.2em] text-[10px]">No active {challenge.type.toLowerCase()} challenge detected.</p>
+                          <p className="text-zinc-700 text-[9px] mt-1">Complete more sessions to trigger a new neural objective.</p>
                         </div>
-                      </>
-                    ) : (
-                      <p className="text-zinc-600 italic uppercase tracking-widest text-xs">No active {challenge.type.toLowerCase()} challenge</p>
-                    )}
+                      )}
+                    </div>
+                    
+                    <div className="text-right relative z-10">
+                      <div className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Potential Yield</div>
+                      <div className="text-2xl font-black text-white">+{challenge.data?.xpReward || 0} <span className="text-gold">XP</span></div>
+                      {challenge.data?.completed && (
+                        <div className="mt-2 text-green-500 text-[10px] font-black uppercase tracking-widest flex items-center justify-end gap-1">
+                          <CheckCircle2 size={12} /> Sync Complete
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Reward</div>
-                    <div className="text-2xl font-black text-white">+{challenge.data?.xpReward || 0} <span className="text-gold">XP</span></div>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
