@@ -43,6 +43,9 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
   const sitelenPona = word?.sitelenPona || initialData?.sitelenPona || word?.word;
   const sitelenEtymology = word?.sitelenEtymology || initialData?.sitelenEtymology || extra?.etymology;
 
+  // Prefer initialData partOfSpeech (canonical, complete list) over stored word data
+  const fullPartOfSpeech = initialData?.partOfSpeech || word?.partOfSpeech || '';
+
   const baseNeighbors = word ? WORD_RELATIONSHIPS[word.word] || [] : [];
   const extraNeighbors = extra?.neighbors || [];
   const hardcodedNeighbors = word?.neighborConnections ? Object.keys(word.neighborConnections) : (initialData?.neighborConnections ? Object.keys(initialData.neighborConnections) : []);
@@ -65,7 +68,7 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
       setIsLoading(true);
       const userContext = stringifyUserContext(profile);
       try {
-        const partsOfSpeech = word.partOfSpeech.split(',').map(p => p.trim());
+        const partsOfSpeech = fullPartOfSpeech.split(',').map(p => p.trim());
         const [results, examples, connections] = await Promise.all([
           fetchDeepDiveExamples(key, word.word, userContext),
           fetchExamplesForWord(key, word.word, partsOfSpeech, userContext),
@@ -126,7 +129,7 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
         const key = resolveApiKey();
         if (key && !isSandboxMode) {
           const userContext = stringifyUserContext(profile);
-          const partsOfSpeech = word.partOfSpeech.split(',').map(p => p.trim());
+          const partsOfSpeech = fullPartOfSpeech.split(',').map(p => p.trim());
           
           if (!hasDeepDive && !hasGrammar && !hasNeighbors) {
             triggerGeneration();
@@ -275,7 +278,7 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
                   <h3 className="section-title" style={{ fontSize: '0.6rem', margin: 0 }}>Grammar Roles</h3>
                 </div>
                 <div style={{ display: 'grid', gap: '8px' }}>
-                  {word.partOfSpeech.split(',').map(pos => {
+                  {fullPartOfSpeech.split(',').map(pos => {
                     const cleanPos = pos.trim();
                     const capitalizedPos = cleanPos.charAt(0).toUpperCase() + cleanPos.slice(1).toLowerCase();
                     const grammarEx = grammarExamples?.[cleanPos] || grammarExamples?.[cleanPos.toLowerCase()] || grammarExamples?.[capitalizedPos] || grammarExamples?.[cleanPos.toUpperCase()];
