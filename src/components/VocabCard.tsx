@@ -4,6 +4,7 @@ import type { VocabWord, MasteryStatus } from '../types/mastery';
 import { useMasteryStore } from '../store/masteryStore';
 import { soundService } from '../services/soundService';
 import { Circle, Sparkles, Zap, ShieldCheck, Crown, Info, MessageSquare } from 'lucide-react';
+import { initialMasteryMap } from '../data/initialMasteryMap';
 
 interface Props {
   word: VocabWord;
@@ -119,6 +120,8 @@ export default function VocabCard({ word, onLongPress, onClick, onAskLina, isSan
 
   const hasAIContent = !!(word.aiExplanation || (word.sessionNotes && word.sessionNotes.length > 0));
   const statusColor = STATUS_COLORS[status];
+  const initialData = initialMasteryMap.initialVocabulary.find((v: any) => v.word === word.word);
+  const fullPartOfSpeech = initialData?.partOfSpeech || word.partOfSpeech || '';
 
   return (
     <div
@@ -142,7 +145,7 @@ export default function VocabCard({ word, onLongPress, onClick, onAskLina, isSan
       {/* Top Left POS Badges */}
       {word.type !== 'grammar' && (
         <div className="vocab-card__pos-badges">
-          {word.partOfSpeech.split(',').map((role, i) => (
+          {fullPartOfSpeech.split(',').map((role, i) => (
             <span key={i} className="vocab-card__pos-badge">
               {role.trim().charAt(0).toUpperCase()}
             </span>
