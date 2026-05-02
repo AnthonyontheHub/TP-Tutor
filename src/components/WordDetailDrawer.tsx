@@ -269,7 +269,6 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
               </div>
             </div>
 
-            {word.partOfSpeech.split(',').length > 1 && (
             <div style={{ marginBottom: '32px' }}>
               <section className="glass-panel" style={{ padding: '15px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
@@ -294,7 +293,6 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
                 </div>
               </section>
             </div>
-            )}
 
             {filteredNeighbors.length > 0 && (
               <div style={{ marginBottom: '32px' }}>
