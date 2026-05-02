@@ -24,7 +24,7 @@ import aiVocabCache from '../data/aiVocabCache.json';
 function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: MasteryStatus; type: 'word' | 'grammar'; sessionNotes: string; frequencyRank?: number; weight?: MasteryWeight }): VocabWord {
   const score = STATUS_MIDPOINT[v.status];
   const staticData: Partial<VocabContentEntry> = vocabContent[v.word] || {};
-  const aiData = (aiVocabCache as Record<string, { aiExplanation?: string; aiExamples?: Record<string, string> }>)[v.word.toLowerCase()] || {};
+  const aiData = (aiVocabCache as Record<string, { aiExplanation?: string; aiExamples?: Record<string, string>; grammarExamples?: Record<string, string> }>)[v.word.toLowerCase()] || {};
   const weight = v.weight;
 
   // Distribute initial score across roles
@@ -47,6 +47,7 @@ function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: Maste
     sessionNotes: v.sessionNotes,
     aiExplanation: aiData.aiExplanation || '',
     aiExamples: aiData.aiExamples,
+    grammarExamples: aiData.grammarExamples,
     lastReviewed: new Date().toISOString(),
     scoreHistory: [],
     hardened: false,
