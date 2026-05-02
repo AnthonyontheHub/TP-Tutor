@@ -2329,13 +2329,24 @@ export const useMasteryStore = create<MasteryStore>()(
                 needsSync = true;
               }
 
-              if (!updated.aiExplanation || updated.aiExplanation === '') {
-                const aiData = (aiVocabCache as Record<string, any>)[v.word.toLowerCase()] || {};
-                if (aiData.aiExplanation) {
-                  updated = { ...updated, aiExplanation: aiData.aiExplanation, aiExamples: aiData.aiExamples };
-                  needsSync = true;
-                }
+              const aiData = (aiVocabCache as Record<string, any>)[v.word.toLowerCase()] || {};
+              
+              if (aiData.aiExplanation && (!updated.aiExplanation || updated.aiExplanation === '')) {
+                updated = { ...updated, aiExplanation: aiData.aiExplanation, aiExamples: aiData.aiExamples };
+                needsSync = true;
               }
+
+              if (aiData.grammarExamples && !updated.grammarExamples) {
+                updated = { ...updated, grammarExamples: aiData.grammarExamples };
+                needsSync = true;
+              }
+              
+              const isBadConnections = updated.neighborConnections && Object.values(updated.neighborConnections).some((val: any) => val === 'A related Toki Pona word.');
+              if (aiData.neighborConnections && (!updated.neighborConnections || isBadConnections)) {
+                updated = { ...updated, neighborConnections: aiData.neighborConnections };
+                needsSync = true;
+              }
+
               return updated;
             });
 
