@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import { STATUS_META } from '../types/mastery';
 import type { VocabWord, MasteryStatus } from '../types/mastery';
-import { fetchDeepDiveExamples, fetchExamplesForWord, resolveApiKey, stringifyUserContext } from '../services/linaService';
+import { fetchDeepDiveExamples, fetchExamplesForWord, fetchNeighborConnections, resolveApiKey, stringifyUserContext } from '../services/linaService';
 import { WORD_RELATIONSHIPS } from '../data/wordRelationships';
 
 const NEXT_STATUS: Partial<Record<MasteryStatus, MasteryStatus>> = {
@@ -26,10 +26,11 @@ const WORD_EXTRA_DATA: Record<string, { etymology: string, neighbors: string[], 
 };
 
 
-export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isSandboxMode }: { isOpen: boolean; word?: VocabWord | null; onClose: () => void; onAskLina: (p: string) => void; isSandboxMode: boolean }) {
+export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isSandboxMode, onWordSelect }: { isOpen: boolean; word?: VocabWord | null; onClose: () => void; onAskLina: (p: string) => void; isSandboxMode: boolean; onWordSelect?: (word: string) => void }) {
   const { studentName, profile, updateVocabAIContent } = useMasteryStore();
   const [deepDive, setDeepDive] = useState<Record<string, string> | null>(null);
   const [grammarExamples, setGrammarExamples] = useState<Record<string, string> | null>(null);
+  const [neighborConnections, setNeighborConnections] = useState<Record<string, string> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isNeighborsModalOpen, setIsNeighborsModalOpen] = useState(false);
 
@@ -58,21 +59,30 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
       const userContext = stringifyUserContext(profile);
       try {
         const partsOfSpeech = word.partOfSpeech.split(',').map(p => p.trim());
-        const [results, examples] = await Promise.all([
+        const [results, examples, connections] = await Promise.all([
           fetchDeepDiveExamples(key, word.word, userContext),
-          fetchExamplesForWord(key, word.word, partsOfSpeech, userContext)
+          fetchExamplesForWord(key, word.word, partsOfSpeech, userContext),
+          fetchNeighborConnections(key, word.word, filteredNeighbors, userContext)
         ]);
 
+        const updateObj: any = {};
         if (results) {
           const { explanation, ...aiExamples } = results;
           setDeepDive(results);
-          updateVocabAIContent(word.id, { aiExamples, aiExplanation: explanation, grammarExamples: examples || undefined });
-        } else if (examples) {
-          updateVocabAIContent(word.id, { grammarExamples: examples });
+          updateObj.aiExamples = aiExamples;
+          updateObj.aiExplanation = explanation;
         }
-        
         if (examples) {
           setGrammarExamples(examples);
+          updateObj.grammarExamples = examples;
+        }
+        if (connections) {
+          setNeighborConnections(connections);
+          updateObj.neighborConnections = connections;
+        }
+        
+        if (Object.keys(updateObj).length > 0) {
+          updateVocabAIContent(word.id, updateObj);
         }
       } catch (err) {
         console.error("Deep dive generation failed:", err);
@@ -80,16 +90,18 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
         setIsLoading(false);
       }
     }
-  }, [word, isSandboxMode, profile, updateVocabAIContent]);
+  }, [word, isSandboxMode, profile, updateVocabAIContent, filteredNeighbors]);
 
   useEffect(() => {
     if (isOpen && word) {
       // RESET STATE for new word
       setDeepDive(null);
       setGrammarExamples(null);
+      setNeighborConnections(null);
       
       const hasDeepDive = !!(word.aiExamples && word.aiExplanation);
       const hasGrammar = !!word.grammarExamples;
+      const hasNeighbors = !!word.neighborConnections;
 
       if (hasDeepDive) {
         setDeepDive({ ...word.aiExamples, explanation: word.aiExplanation });
@@ -99,27 +111,46 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
         setGrammarExamples(word.grammarExamples);
       }
 
-      if (!hasDeepDive || !hasGrammar) {
+      if (hasNeighbors) {
+        setNeighborConnections(word.neighborConnections);
+      }
+
+      if (!hasDeepDive || !hasGrammar || !hasNeighbors) {
         const key = resolveApiKey();
         if (key && !isSandboxMode) {
           const userContext = stringifyUserContext(profile);
           const partsOfSpeech = word.partOfSpeech.split(',').map(p => p.trim());
           
-          if (!hasDeepDive && !hasGrammar) {
+          if (!hasDeepDive && !hasGrammar && !hasNeighbors) {
             triggerGeneration();
-          } else if (!hasGrammar) {
-            fetchExamplesForWord(key, word.word, partsOfSpeech, userContext).then(res => {
-              setGrammarExamples(res);
-              updateVocabAIContent(word.id, { grammarExamples: res });
-            });
-          } else if (!hasDeepDive) {
-            // Technically handled by triggerGeneration, but let's just trigger it
-            triggerGeneration();
+          } else {
+            // Fetch missing pieces individually
+            if (!hasGrammar) {
+              fetchExamplesForWord(key, word.word, partsOfSpeech, userContext).then(res => {
+                setGrammarExamples(res);
+                updateVocabAIContent(word.id, { grammarExamples: res });
+              });
+            }
+            if (!hasNeighbors) {
+              fetchNeighborConnections(key, word.word, filteredNeighbors, userContext).then(res => {
+                setNeighborConnections(res);
+                updateVocabAIContent(word.id, { neighborConnections: res });
+              });
+            }
+            if (!hasDeepDive) {
+               fetchDeepDiveExamples(key, word.word, userContext).then(results => {
+                 if (results) {
+                   const { explanation, ...aiExamples } = results;
+                   setDeepDive(results);
+                   updateVocabAIContent(word.id, { aiExamples, aiExplanation: explanation });
+                 }
+               });
+            }
           }
         }
       }
     }
-  }, [isOpen, word, triggerGeneration, isSandboxMode, profile, updateVocabAIContent]);
+  }, [isOpen, word, triggerGeneration, isSandboxMode, profile, updateVocabAIContent, filteredNeighbors]);
 
   return (
     <AnimatePresence>
@@ -302,12 +333,25 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
                     onClick={(e) => e.stopPropagation()}
                   >
                     <h3 style={{ marginTop: 0, color: 'white', fontSize: '1rem', marginBottom: '16px', textTransform: 'uppercase', fontWeight: 900 }}>All Neighbors</h3>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                      {filteredNeighbors.map(n => (
-                        <div key={n} style={{ background: 'rgba(255,255,255,0.1)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', color: 'var(--gold)', fontWeight: 700 }}>
-                          {n}
-                        </div>
-                      ))}
+                    <div style={{ display: 'grid', gap: '8px', maxHeight: '60vh', overflowY: 'auto', paddingRight: '4px' }}>
+                      {filteredNeighbors.map(n => {
+                        const pureName = n.split(' ')[0];
+                        return (
+                          <div key={n} style={{ background: 'rgba(255,255,255,0.1)', padding: '10px', borderRadius: '4px', borderLeft: '2px solid var(--amber)' }}>
+                            <button type="button" 
+                              onClick={() => { setIsNeighborsModalOpen(false); onWordSelect?.(pureName); }}
+                              style={{ background: 'none', border: 'none', padding: 0, margin: 0, fontSize: '0.75rem', color: 'var(--amber)', fontWeight: 900, textTransform: 'uppercase', marginBottom: '4px', cursor: 'pointer', textAlign: 'left' }}
+                            >
+                              {n}
+                            </button>
+                            {neighborConnections?.[n] ? (
+                              <div style={{ fontSize: '0.85rem', color: '#eee', lineHeight: '1.4' }}>{neighborConnections[n]}</div>
+                            ) : (
+                              <div style={{ height: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '2px', width: '80%' }} />
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                     <button type="button"
                       onClick={() => setIsNeighborsModalOpen(false)}

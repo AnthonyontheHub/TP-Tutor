@@ -256,6 +256,7 @@ export default function NodeDossier({ node, onBack, onAskLina, isSandboxMode }: 
         onClose={() => setDrawerId(null)}
         onAskLina={onAskLina}
         isSandboxMode={isSandboxMode}
+        onWordSelect={(w) => setDrawerId(w)}
       />
 
       <AnimatePresence>

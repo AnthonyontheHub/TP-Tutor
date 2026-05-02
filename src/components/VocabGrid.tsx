@@ -116,6 +116,7 @@ export default function VocabGrid({
         onClose={() => setDrawerId(null)}
         onAskLina={onAskLina}
         isSandboxMode={isSandboxMode}
+        onWordSelect={(w) => setDrawerId(w)}
       />
     </div>
   );

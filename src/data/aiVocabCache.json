@@ -11,6 +11,14 @@
       "verb": "mi toki. (I speak.)",
       "modifier": "ona li jan toki. (They are a speaker.)",
       "interjection": "toki! (Hello!)"
+    },
+    "neighborConnections": {
+      "kalama (Neighbor)": "Toki (speech) often involves kalama (sound, voice), as spoken communication creates audible noise.",
+      "nimi (Neighbor)": "Toki (language, speech) is fundamentally constructed using nimi (words, names) as its building blocks.",
+      "kokosila (Related)": "Kokosila refers to non-Toki Pona speech or gibberish, serving as a contrast to clear and meaningful toki (communication).",
+      "mu (Opposite-ish)": "While toki represents human speech and communication, mu signifies non-linguistic animal sounds, highlighting a distinction in vocalization.",
+      "pilin (Source)": "Toki (speech, communication) serves as a primary way to express and convey one's pilin (feelings, thoughts, opinions).",
+      "sitelen (Form)": "Sitelen (writing, symbols, pictures) is a visual form through which toki (language, communication) can be represented and shared, distinct from spoken toki."
     }
   },
   "pona": {
@@ -25,6 +33,13 @@
       "modifier": "ona li jan pona. (They are a good person.)",
       "verb": "sina pona. (You are good.)",
       "interjection": "Pona! (Good!)"
+    },
+    "neighborConnections": {
+      "ike (Antonym)": "Opposite: 'ike' means bad, evil, or wrong, directly contrasting 'pona'.",
+      "suwi (Synonym-ish)": "Overlap: 'suwi' means sweet or cute, often implying a pleasantness or goodness that aligns with 'pona'.",
+      "jaki (Antonym)": "Opposite: 'jaki' means dirty, disgusting, or toxic, which is the opposite of 'pona' in terms of cleanliness or pleasantness.",
+      "nasa (Antonym-ish)": "Contrast: 'nasa' means silly or unusual, often describing something that deviates from what is considered sensible or 'pona'.",
+      "pakala (Antonym)": "Opposite: 'pakala' means broken, damaged, or a mistake, which directly contrasts with something being in a good or fixed state ('pona')."
     }
   },
   "a": {
@@ -36,6 +51,9 @@
     "aiExplanation": "kama pona, jan! The word \"a\" is a wonderfully versatile interjection in Toki Pona, used to express a wide spectrum of emotions, reactions, or to simply add emphasis. Its meaning is highly dependent on context and tone, similar to \"oh!\", \"ah!\", \"hey!\", \"huh?\", or even laughter in English. It can highlight a word or phrase, indicating surprise, strong feeling, agreement, or drawing attention to what was just said.",
     "grammarExamples": {
       "Particle": "pona a! (So good!)"
+    },
+    "neighborConnections": {
+      "kin (Synonym)": "Synonym: Both 'a' and 'kin' are small interjections that can be used to express affirmation or add emphasis to a statement."
     }
   },
   "akesi": {
@@ -48,6 +66,12 @@
     "grammarExamples": {
       "noun": "akesi li lili. (The reptile is small.)",
       "modifier": "soweli akesi li suli. (The reptile-like animal is big.)"
+    },
+    "neighborConnections": {
+      "kala (Category)": "Akesi and kala are both categories of animals, distinguishing land-based non-mammals (akesi) from aquatic creatures (kala).",
+      "pipi (Category)": "Akesi and pipi are both categories of small creatures; pipi refers to insects, while akesi is a broader term for reptiles, amphibians, and sometimes insects.",
+      "soweli (Category)": "Akesi and soweli are both categories of land animals, with akesi referring to non-mammal land animals and soweli specifically to mammals.",
+      "waso (Category)": "Akesi and waso are both categories of animals, with akesi referring to non-mammal land animals and waso specifically to birds."
     }
   },
   "ala": {
@@ -61,6 +85,11 @@
       "noun": "mi wile e ala. (I want nothing.)",
       "modifier": "mi jo e mani ala. (I have no money.)",
       "verb": "ona li ala. (It is nothing.)"
+    },
+    "neighborConnections": {
+      "ali (Antonym)": "Opposite: 'ali' means all or everything, while 'ala' means no, not, or none.",
+      "mute (Antonym-ish)": "Opposite-ish: While 'mute' signifies many or much, 'ala' represents the absence of quantity, or none.",
+      "wan (Opposite-ish)": "Opposite-ish: 'wan' denotes one or unique existence, contrasting with 'ala' which signifies non-existence or none."
     }
   },
   "alasa": {
@@ -74,6 +103,10 @@
       "noun": "alasa li suli. (The hunt is important.)",
       "verb": "mi alasa. (I hunt.)",
       "modifier": "jan alasa li kama. (The hunter comes.)"
+    },
+    "neighborConnections": {
+      "kama (Goal)": "alasa (to hunt or search) often has kama (to get or achieve) as its ultimate goal or desired result.",
+      "lukin (Action)": "alasa (hunting or searching) frequently involves lukin (looking or seeing) as a key component action."
     }
   },
   "ale": {
@@ -87,6 +120,11 @@
       "noun": "ale li pona. (Everything is good.)",
       "modifier": "jan ale li lon. (All people are present.)",
       "adverb": "ona li moku ale. (She eats all of it.)"
+    },
+    "neighborConnections": {
+      "ala (Antonym)": "Antonym: 'ale' means all or everything, while 'ala' signifies none or absence.",
+      "mute (Synonym-ish)": "Synonym-ish: While 'ale' signifies everything or all, 'mute' means many, which can sometimes imply a significant portion approaching the sense of 'all'.",
+      "wan (Opposite-ish)": "Opposite-ish: 'ale' refers to all or everything in a group, which contrasts with 'wan' meaning a single item or one."
     }
   },
   "anpa": {
@@ -100,6 +138,12 @@
       "noun": "mi lon anpa. (I am at the bottom.)",
       "modifier": "ma anpa li suli. (The low land is big.)",
       "verb": "mi anpa e tomo. (I lower the house.)"
+    },
+    "neighborConnections": {
+      "monsi (Location)": "Both 'anpa' and 'monsi' describe spatial positions, with 'anpa' referring to low and 'monsi' to back.",
+      "noka (Location)": " 'noka' refers to the foot or leg, which is typically the 'anpa' (bottom) part of a body.",
+      "sewi (Antonym)": " 'sewi' is the direct opposite of 'anpa', meaning high or up compared to 'anpa' meaning low or down.",
+      "sinpin (Location)": "Similar to 'monsi', 'sinpin' describes a spatial position, specifically the front, contrasting with 'anpa' which describes the bottom or low position."
     }
   },
   "ante": {
@@ -113,6 +157,9 @@
       "noun": "ni li ante. (This is a difference.)",
       "modifier": "ona li jan ante. (They are a different person.)",
       "verb": "ona li ante e ijo. (They change the thing.)"
+    },
+    "neighborConnections": {
+      "sama (Antonym)": "Antonym: 'sama' means same or similar, which is the direct opposite of 'ante' meaning different or other."
     }
   },
   "anu": {
@@ -124,6 +171,9 @@
     "aiExplanation": "anu is Toki Pona's elegant way to express \"or,\" allowing us to connect two or more options, whether they are nouns, verbs, or even entire ideas. It functions as a flexible particle that highlights choices, often leaning towards an inclusive \"or\" unless the context clearly demands an exclusive selection. It's a key tool for expressing alternatives and possibilities in communication.",
     "grammarExamples": {
       "Particle": "sina wawa anu ike? (Are you strong or bad?)"
+    },
+    "neighborConnections": {
+      "en (Conjunction)": "Contrastive Conjunctions: Both 'anu' and 'en' are particles that connect elements, with 'anu' offering choices ('or') and 'en' combining subjects ('and')."
     }
   },
   "awen": {
@@ -137,6 +187,10 @@
       "noun": "mi wile e awen. (I want permanence.)",
       "verb": "mi awen. (I wait.)",
       "modifier": "jan awen li toki. (The waiting person speaks.)"
+    },
+    "neighborConnections": {
+      "pali (Opposite-ish)": "While 'awen' focuses on staying, remaining, or preserving, 'pali' emphasizes action, creation, or change, making them somewhat opposite in their core meaning.",
+      "tawa (Antonym)": "'Awen' means to stay or remain still, directly contrasting with 'tawa', which means to move or go."
     }
   },
   "e": {
@@ -148,6 +202,12 @@
     "aiExplanation": "The word 'e' is a crucial marker in Toki Pona that signals the direct object of a transitive verb. It separates the verb phrase from the noun or noun phrase that is receiving the action. Without 'e', a word following the verb might be interpreted as a modifier of the verb itself, leading to ambiguity or a different meaning entirely. It's essential for constructing clear transitive sentences and understanding who or what is being acted upon.",
     "grammarExamples": {
       "Particle": "mi moku e kili. (I eat the fruit.)"
+    },
+    "neighborConnections": {
+      "la (Particle)": "Syntactic Function Difference: 'e' marks the direct object of a transitive verb, whereas 'la' introduces a contextual or conditional clause.",
+      "li (Particle)": "Complementary Syntactic Roles: Both 'e' and 'li' are crucial sentence-structuring particles, with 'e' marking the direct object and 'li' separating the subject from its verb phrase (unless the subject is \"mi\" or \"sina\").",
+      "o (Particle)": "Distinct Grammatical Functions: 'e' designates the direct object, while 'o' marks a vocative or introduces an imperative command or request.",
+      "pi (Particle)": "Different Phrase-Structuring Roles: 'e' indicates the direct object, differentiating it from 'pi', which is used to group modifiers for a preceding head noun, creating a more complex noun phrase."
     }
   },
   "en": {
@@ -159,6 +219,9 @@
     "aiExplanation": "en serves as a crucial conjunction in Toki Pona, primarily used to link two or more subjects performing the same action, or to connect two full clauses. It always precedes the particle 'li' (or 'o' for commands) when the combined subject is not 'mi' or 'sina'. Its role is to explicitly mark multiple distinct entities as unified participants in the predicate's action or state, emphasizing their collective involvement.",
     "grammarExamples": {
       "Particle": "mi moku e kili en telo. (I eat fruit and water.)"
+    },
+    "neighborConnections": {
+      "anu (Conjunction)": "Anu is another conjunction in Toki Pona, serving as an alternative to 'en' by meaning 'or' instead of 'and'."
     }
   },
   "esun": {
@@ -172,6 +235,10 @@
       "noun": "mi tawa esun. (I go to the market.)",
       "verb": "mi esun e kili. (I trade fruit.)",
       "modifier": "tomo esun li suli. (The market building is big.)"
+    },
+    "neighborConnections": {
+      "mani (Related)": "Mani, meaning money or currency, is often the medium of exchange or a common item found at an esun, which is a market or transaction.",
+      "pana (Action)": "Pana, meaning to give or send, is a key action that occurs in an esun, as goods or money are given and received during an exchange."
     }
   },
   "ijo": {
@@ -185,6 +252,10 @@
       "noun": "ni li ijo. (This is a thing.)",
       "modifier": "telo ijo li wawa. (Solid water is powerful.)",
       "verb": "mi ijo e sitelen. (I objectify the drawing.)"
+    },
+    "neighborConnections": {
+      "jan (Antonym-ish)": "jan refers to a person, while ijo refers to a non-person or general thing, making them distinct categories of existence.",
+      "kulupu (Opposite-ish)": "ijo typically refers to an individual item or thing, whereas kulupu refers to a collection or group of things or people."
     }
   },
   "ike": {
@@ -198,6 +269,11 @@
       "noun": "ike li lon. (A problem exists.)",
       "modifier": "jan ike li tawa. (The bad person goes.)",
       "verb": "ona li ike. (They are bad.)"
+    },
+    "neighborConnections": {
+      "pona (Antonym)": "Pona is the antonym of ike, meaning good, positive, or simple.",
+      "jaki (Synonym-ish)": "Jaki describes a specific type of ike, focusing on dirtiness, grossness, or unhealthiness.",
+      "pakala (Result)": "Pakala, meaning a break, damage, or mistake, often results from something being ike or makes something become ike."
     }
   },
   "ilo": {
@@ -210,6 +286,9 @@
     "grammarExamples": {
       "noun": "ona li ilo. (It is a tool.)",
       "modifier": "poki ilo li pona. (The tool container is good.)"
+    },
+    "neighborConnections": {
+      "pali (Action)": "Usage: 'ilo' (tool, device, machine) is often used to perform 'pali' (work, action, or creation)."
     }
   },
   "insa": {
@@ -222,6 +301,12 @@
     "grammarExamples": {
       "noun": "sijelo mi li jo e insa. (My body has an inside.)",
       "modifier": "mi jo e len insa. (I have inner clothing.)"
+    },
+    "neighborConnections": {
+      "monsi (Location)": "Monsi refers to the back or rear, which is an external part, contrasting with insa's internal meaning.",
+      "poka (Location)": "Poka means 'side' or 'next to,' indicating an adjacent external location, distinct from insa's meaning of 'inside' or 'interior.'",
+      "selo (Antonym)": "Selo, meaning 'outer layer' or 'surface,' is a direct antonym to insa, which signifies the 'inside' or 'interior.'",
+      "sinpin (Location)": "Sinpin refers to the front or face of something, an external orientation, distinct from insa's internal meaning."
     }
   },
   "jaki": {
@@ -235,6 +320,10 @@
       "noun": "ni li jaki. (This is filth.)",
       "modifier": "soweli li jaki. (The animal is dirty.)",
       "verb": "ona li jaki e mi. (It disgusts me.)"
+    },
+    "neighborConnections": {
+      "ike (Synonym-ish)": "Synonym-ish: Something 'jaki' (gross, dirty) is often considered 'ike' (bad, unwanted), as both describe undesirable qualities.",
+      "pona (Antonym)": "Antonym: 'jaki' (gross, dirty) is the opposite of 'pona' (good, clean, simple, pleasant), as one describes something undesirable and the other something desirable."
     }
   },
   "jan": {
@@ -248,6 +337,15 @@
       "noun": "mi jan. (I am a person.)",
       "modifier": "ma jan li lili. (The human land is small.)",
       "verb": "ona li jan e mi. (They personify me.)"
+    },
+    "neighborConnections": {
+      "soweli (Neighbor)": "soweli is another type of living being, often contrasted with jan in terms of classification.",
+      "ijoa (Neighbor)": "ijoa is not a recognized Toki Pona word, so there is no established connection to jan.",
+      "ijo (Antonym-ish)": "ijo refers to a thing or object, which is distinct from jan who refers to a person.",
+      "kulupu (Plural)": "kulupu refers to a group or community, often made up of multiple jan.",
+      "meli (Subset)": "meli is a type of jan specifically referring to a woman or female person.",
+      "mije (Subset)": "mije is a type of jan specifically referring to a man or male person.",
+      "tonsi (Subset)": "tonsi is a type of jan specifically referring to a gender-diverse or non-binary person."
     }
   },
   "jelo": {
@@ -260,6 +358,9 @@
     "grammarExamples": {
       "noun": "ni li jelo. (This is yellow.)",
       "modifier": "kala jelo li pona. (The yellow fish is good.)"
+    },
+    "neighborConnections": {
+      "kule (Category)": "Category: 'jelo' (yellow) is a specific kind of 'kule' (color)."
     }
   },
   "jo": {
@@ -273,6 +374,10 @@
       "noun": "jo li pona. (Possession is good.)",
       "verb": "mi jo e mani. (I have money.)",
       "modifier": "ilo jo li suli. (The possessed tool is big.)"
+    },
+    "neighborConnections": {
+      "lanpan (Action)": "Action: 'lanpan' describes the action of taking or seizing, which results in having or holding ('jo').",
+      "pana (Antonym)": "Antonym: 'pana' means to give or send away, which is the opposite of 'jo' (to have or hold)."
     }
   },
   "kala": {
@@ -286,6 +391,12 @@
       "noun": "kala li tawa. (The fish moves.)",
       "modifier": "jan kala li suli. (The noisy person is big.)",
       "verb": "mi kala. (I make noise.)"
+    },
+    "neighborConnections": {
+      "akesi (Category)": "Category: Both 'kala' (fish/marine animal) and 'akesi' (reptile/amphibian) are fundamental categories for different types of animals in Toki Pona.",
+      "pipi (Category)": "Category: Both 'kala' (fish/marine animal) and 'pipi' (insect/bug) are fundamental categories for different types of animals in Toki Pona.",
+      "soweli (Category)": "Category: Both 'kala' (fish/marine animal) and 'soweli' (land animal/mammal) are fundamental categories for different types of animals in Toki Pona.",
+      "waso (Category)": "Category: Both 'kala' (fish/marine animal) and 'waso' (bird/flying creature) are fundamental categories for different types of animals in Toki Pona."
     }
   },
   "kalama": {
@@ -299,6 +410,11 @@
       "noun": "kalama li pona. (The sound is good.)",
       "verb": "ona li kalama. (They make a sound.)",
       "modifier": "ilo kalama li suli. (The musical tool is big.)"
+    },
+    "neighborConnections": {
+      "kute (Action)": "kute is the action of hearing or listening to kalama (sound).",
+      "mu (Subset)": "mu is a specific type of kalama, referring to the sound made by an animal.",
+      "toki (Subset)": "toki is a type of kalama that specifically refers to the sound of speech or language."
     }
   },
   "kama": {
@@ -312,6 +428,12 @@
       "noun": "kama li pona. (Arrival is good.)",
       "verb": "mi kama. (I come.)",
       "modifier": "suno kama li pona. (The coming day is good.)"
+    },
+    "neighborConnections": {
+      "alasa (Action)": "alasa is an action, much like kama can describe the action of coming or becoming.",
+      "awen (Opposite-ish)": "awen means to stay or remain, making it somewhat opposite to kama, which implies movement towards or arrival.",
+      "open (Synonym-ish)": "open is a loose synonym when kama refers to something starting or coming into being, just as open means to begin.",
+      "tawa (Action)": "tawa is a fundamental action of moving, and kama often describes the result or direction of that movement, like coming or arriving."
     }
   },
   "kasi": {
@@ -324,6 +446,11 @@
     "grammarExamples": {
       "noun": "kasi li suli. (The plant is big.)",
       "modifier": "mi moku e moku kasi. (I eat plant food.)"
+    },
+    "neighborConnections": {
+      "kili (Part)": "Part: 'kili' refers to the fruit or vegetable part that grows from a 'kasi'.",
+      "pan (Subset)": "Subset: 'pan', meaning grain, is a type of 'kasi' that provides sustenance.",
+      "soko (Subset)": "Subset: 'soko' (mushroom/fungus) is often categorized as a type of 'kasi' in the general Toki Pona sense of things that grow from the ground."
     }
   },
   "ken": {
@@ -337,6 +464,9 @@
       "noun": "ona li jo e ken. (They have ability/power/permission.)",
       "verb": "mi ken tawa. (I can move.)",
       "modifier": "wawa ken li suli. (Potential power is great.)"
+    },
+    "neighborConnections": {
+      "wile (Related)": "Both 'ken' (ability, possibility) and 'wile' (desire, necessity) are auxiliary verbs that describe a subject's relation to an action, with 'wile' often indicating a motivation for what one 'ken' or wants to 'ken'."
     }
   },
   "kepeken": {
@@ -349,6 +479,9 @@
     "grammarExamples": {
       "verb": "mi kepeken ilo. (I use a tool.)",
       "preposition": "ona li tawa kepeken tomo tawa. (They go using a car.)"
+    },
+    "neighborConnections": {
+      "ilo (Related)": "Ilo (tool, device) is often the object that one kepeken (uses)."
     }
   },
   "kili": {
@@ -361,6 +494,11 @@
     "grammarExamples": {
       "noun": "ona li kili. (It is a fruit.)",
       "modifier": "mi moku kili. (I eat fruit food.)"
+    },
+    "neighborConnections": {
+      "kasi (Source)": "kili (fruit, vegetable) often grows from or is produced by a kasi (plant, tree).",
+      "pan (Subset)": "pan (grain, bread) can be considered a type of kili (fruit, vegetable) when thinking of grains as edible plant products.",
+      "soko (Subset)": "soko (mushroom) is explicitly a kind of kili (fruit, vegetable, mushroom) within the Toki Pona word's broad meaning."
     }
   },
   "kiwen": {
@@ -373,6 +511,10 @@
     "grammarExamples": {
       "noun": "ni li kiwen. (This is a rock.)",
       "modifier": "ilo kiwen li suli. (The stone tool is big.)"
+    },
+    "neighborConnections": {
+      "ko (Antonym)": "As an antonym, 'ko' (paste, powder, soft substance) describes a state of matter opposite to the hard, solid nature of 'kiwen' (stone).",
+      "telo (Opposite-ish)": "Though not a strict opposite, 'telo' (water, liquid) represents a fluid state that contrasts with the solid, fixed form of 'kiwen' (stone)."
     }
   },
   "ko": {
@@ -385,6 +527,10 @@
     "grammarExamples": {
       "noun": "ko li suwi. (The paste/powder is sweet.)",
       "modifier": "moku ko li pona. (The powdered food is good.)"
+    },
+    "neighborConnections": {
+      "kiwen (Antonym)": "Antonym: 'ko' (soft, paste, semi-solid) is the opposite of 'kiwen' (hard, stone, solid).",
+      "telo (Neighbor)": "Related concept: 'ko' (semi-solid, paste) represents a state between 'telo' (liquid) and 'kiwen' (solid), often being a viscous form of liquid."
     }
   },
   "kon": {
@@ -398,6 +544,9 @@
       "noun": "kon li pona. (Spirit is good.)",
       "modifier": "mi lukin e jan kon. (I see a spirit person/ghost.)",
       "verb": "ona li kon. (They breathe.)"
+    },
+    "neighborConnections": {
+      "telo (Opposite-ish)": "While 'kon' often refers to air, gas, or spirit, representing the intangible or gaseous, 'telo' signifies water or any liquid, embodying the tangible and fluid."
     }
   },
   "kule": {
@@ -411,6 +560,13 @@
       "noun": "ni li kule. (This is a color.)",
       "modifier": "len kule li pona. (Colorful clothes are good.)",
       "verb": "mi kule e sitelen. (I color the picture.)"
+    },
+    "neighborConnections": {
+      "jelo (Subset)": "Subset: 'jelo' means yellow, which is a specific type of 'kule' (color).",
+      "laso (Subset)": "Subset: 'laso' means blue or green, which is a specific type of 'kule' (color).",
+      "loje (Subset)": "Subset: 'loje' means red, which is a specific type of 'kule' (color).",
+      "pimeja (Opposite-ish)": "Opposite-ish: 'pimeja' means black or darkness, which often represents the absence of 'kule' (color) or light.",
+      "walo (Opposite-ish)": "Opposite-ish: 'walo' means white or light, which is often contrasted with 'pimeja' and specific 'kule' (colors)."
     }
   },
   "kulupu": {
@@ -422,6 +578,10 @@
     "aiExplanation": "In Toki Pona, 'kulupu' refers to any collection of people or things that functions as a single unit, such as a community, organization, or simply a group. It implies a sense of shared identity or purpose, distinguishing it from merely 'mute' (many). This word can describe both formal bodies and informal gatherings, emphasizing belonging and collective action.",
     "grammarExamples": {
       "Noun": "mi jo e kulupu. (I have a group.)"
+    },
+    "neighborConnections": {
+      "ijo (Opposite-ish)": "Opposite-ish: 'kulupu' denotes a group of entities, contrasting with 'ijo' which often refers to a single, distinct item or concept.",
+      "jan (Member)": "Member: A 'jan' is commonly an individual member or component of a 'kulupu'."
     }
   },
   "kute": {
@@ -435,6 +595,11 @@
       "noun": "mi jo e kute. (I have ears.)",
       "verb": "ona li kute. (They listen.)",
       "modifier": "ilo kute li pona. (A listening device is good.)"
+    },
+    "neighborConnections": {
+      "kalama (Target)": "kute and kalama have a direct relationship; kute means to hear, and kalama is the sound that is heard.",
+      "lukin (Sense)": "kute and lukin are parallel concepts, as kute is the sense of hearing and lukin is the sense of sight.",
+      "oko (Sense)": "kute and oko are parallel concepts representing sense organs; kute means ear, and oko means eye."
     }
   },
   "la": {
@@ -446,6 +611,12 @@
     "aiExplanation": "la is a crucial particle that separates a contextual or conditional phrase from the main statement. It establishes a \"setting\" or \"precondition\" for what follows, often translating to \"if,\" \"when,\" \"in the context of,\" or simply marking a topic shift. It helps clarify the relationship between the preceding information and the subsequent action or state.",
     "grammarExamples": {
       "Particle": "suno li kama la, mi tawa tomo. (When the sun comes, I go home.)"
+    },
+    "neighborConnections": {
+      "e": "Both \"e\" and \"la\" are grammatical particles, but \"e\" marks the direct object of a verb, whereas \"la\" sets up a context or condition.",
+      "li": "Both \"li\" and \"la\" are essential grammatical particles; however, \"li\" separates a subject from its verb, while \"la\" introduces a situational clause.",
+      "o": "Both \"o\" and \"la\" are particles, but \"o\" is used for commands, requests, or direct address, contrasting with \"la\" which defines a preceding circumstance.",
+      "pi": "Both \"pi\" and \"la\" are particles in Toki Pona; \"pi\" groups multiple modifying words to a noun, while \"la\" creates a contextual or conditional clause."
     }
   },
   "lape": {
@@ -459,6 +630,10 @@
       "noun": "lape li pona. (Sleep is good.)",
       "verb": "mi lape. (I sleep.)",
       "modifier": "jan lape li tawa. (The sleepy person walks.)"
+    },
+    "neighborConnections": {
+      "awen (Synonym-ish)": "Synonym-ish: While 'lape' means to sleep or rest, 'awen' can mean to stay or remain still, which often accompanies resting.",
+      "pali (Antonym)": "Antonym: 'pali' means to work or do, which is often the opposite of 'lape' or resting."
     }
   },
   "laso": {
@@ -471,6 +646,9 @@
     "grammarExamples": {
       "noun": "ni li laso. (This is blue-green.)",
       "modifier": "kala li laso. (The fish is blue-green.)"
+    },
+    "neighborConnections": {
+      "kule (Category)": "Category: laso refers to specific colors like blue and green, which are types of kule (color)."
     }
   },
   "lawa": {
@@ -484,6 +662,9 @@
       "noun": "lawa mi li pona. (My head is good.)",
       "verb": "ona li lawa e mi. (They lead me.)",
       "modifier": "ni li tomo lawa. (This is the main building.)"
+    },
+    "neighborConnections": {
+      "noka (Antonym)": "Antonym: 'lawa' means head or top and implies control, while 'noka' means foot or bottom and is the opposite end of the body."
     }
   },
   "len": {
@@ -497,6 +678,9 @@
       "noun": "mi jo e len. (I have cloth.)",
       "modifier": "sina jo e tomo len. (You have a clothing house/shop.)",
       "verb": "ona li len e mi. (They clothe me.)"
+    },
+    "neighborConnections": {
+      "selo (Synonym-ish)": "Synonym-ish: Both 'len' and 'selo' can denote a covering or outer layer, with 'len' referring to a cloth covering and 'selo' to a natural outer surface like skin."
     }
   },
   "lete": {
@@ -510,6 +694,9 @@
       "noun": "lete li ike. (Cold is bad.)",
       "modifier": "telo lete li pona. (Cold water is good.)",
       "verb": "ma li lete. (The land is cold.)"
+    },
+    "neighborConnections": {
+      "seli (Antonym)": "Opposite: 'lete' means cold or cool, while 'seli' means hot or warm."
     }
   },
   "li": {
@@ -521,6 +708,12 @@
     "aiExplanation": "li is a grammatical particle that separates the subject from the verb phrase (predicate) in Toki Pona. It explicitly marks the action or state of the subject. Crucially, 'li' is *not* used when the subject is 'mi' (I/we) or 'sina' (you), but *must* be used for all other subjects, helping to clarify sentence structure.",
     "grammarExamples": {
       "Particle": "jan pona li pana e moku. (The good person gives food.)"
+    },
+    "neighborConnections": {
+      "e (Particle)": "Like li, e is a particle used in the predicate, specifically marking the direct object of a verb often introduced by li.",
+      "la (Particle)": "la is a particle that introduces a contextual clause, setting the scene for a main clause whose predicate is typically marked by li.",
+      "o (Particle)": "o is a particle that, in contrast to li marking statements, introduces an imperative or vocative phrase for commands or direct address.",
+      "pi (Particle)": "pi is a particle used within a noun phrase to group modifiers, differing from li which introduces the main verb phrase of a sentence."
     }
   },
   "lili": {
@@ -534,6 +727,9 @@
       "noun": "ona li lili. (It is a small thing.)",
       "modifier": "ijo lili li pona. (Small things are good.)",
       "verb": "mi lili e ijo. (I make the thing small.)"
+    },
+    "neighborConnections": {
+      "suli (Antonym)": "Opposite: 'suli' means big, large, or important, while 'lili' means small, little, or unimportant."
     }
   },
   "linja": {
@@ -546,6 +742,10 @@
     "grammarExamples": {
       "noun": "linja li suli. (The line is big.)",
       "modifier": "mi moku e pan linja. (I eat spaghetti.)"
+    },
+    "neighborConnections": {
+      "palisa (Synonym-ish)": "Synonym-ish: Both 'linja' and 'palisa' refer to long, thin objects, with 'linja' often being flexible and 'palisa' rigid.",
+      "sike (Antonym-ish)": "Antonym-ish: 'linja' represents a straight, often open form, whereas 'sike' represents a closed, circular form."
     }
   },
   "lipu": {
@@ -558,6 +758,10 @@
     "grammarExamples": {
       "noun": "ni li lipu. (This is a book/document.)",
       "modifier": "mi lukin e tomo lipu. (I see the library/book building.)"
+    },
+    "neighborConnections": {
+      "ku (Specific)": "Specific Example: 'ku' specifically refers to the official Toki Pona dictionary, which is a well-known type of 'lipu' (document or book).",
+      "pu (Specific)": "Specific Example: 'pu' specifically refers to the original Toki Pona book by Sonja Lang, a foundational 'lipu' (document or book) for the language."
     }
   },
   "loje": {
@@ -570,6 +774,9 @@
     "grammarExamples": {
       "noun": "ni li loje. (This is redness.)",
       "modifier": "pake loje li pona. (The red box is good.)"
+    },
+    "neighborConnections": {
+      "kule (Category)": "Category: 'loje' means red, which is a specific instance of 'kule', meaning color."
     }
   },
   "lon": {
@@ -583,6 +790,9 @@
       "verb": "mi lon. (I exist.)",
       "preposition": "suno li lon sewi. (The sun is in the sky.)",
       "modifier": "toki lon li pona. (True words are good.)"
+    },
+    "neighborConnections": {
+      "weka (Antonym)": "Opposite: 'lon' means to be present or located, while 'weka' means to be absent or removed."
     }
   },
   "luka": {
@@ -596,6 +806,9 @@
       "noun": "ni li luka. (This is a hand.)",
       "modifier": "ona li moku luka. (That is finger food.)",
       "verb": "mi luka e tomo. (I touch the house.)"
+    },
+    "neighborConnections": {
+      "noka (Opposite-ish)": "Opposite-ish: 'luka' refers to hands and arms (upper limbs), while 'noka' refers to feet and legs (lower limbs), making them positional opposites."
     }
   },
   "lukin": {
@@ -609,6 +822,10 @@
       "noun": "lukin sina li pona. (Your sight is good.)",
       "verb": "mi lukin e suno. (I see the sun.)",
       "modifier": "suno li pona lukin. (The sun is beautiful.)"
+    },
+    "neighborConnections": {
+      "kute (Sense)": "Sensory Category: Both 'lukin' (to see) and 'kute' (to hear) represent primary senses and the acts of perception associated with them.",
+      "oko (Synonym)": "Related Body Part: 'oko' refers to the eye, the specific body part used to perform the action of 'lukin' (to see)."
     }
   },
   "lupa": {
@@ -621,6 +838,9 @@
     "grammarExamples": {
       "noun": "lupa li suli. (The door/opening is big.)",
       "modifier": "poki lupa li jo e telo. (The holey container has water.)"
+    },
+    "neighborConnections": {
+      "nena (Antonym)": "Antonym: 'lupa' means a hole or opening, which is the opposite of 'nena', meaning a bump or protuberance."
     }
   },
   "ma": {
@@ -633,6 +853,9 @@
     "grammarExamples": {
       "noun": "ma li suli. (The land is big.)",
       "modifier": "mi tawa tomo ma. (I go to the country house.)"
+    },
+    "neighborConnections": {
+      "telo (Antonym-ish)": "Antonym-ish: 'ma' refers to land or ground, while 'telo' refers to water or liquid, often seen as opposing natural elements."
     }
   },
   "mama": {
@@ -646,6 +869,9 @@
       "noun": "mama li pona. (A parent is good.)",
       "modifier": "mi lon ma mama mi. (I am in my homeland.)",
       "verb": "ona li mama e mi. (They created me.)"
+    },
+    "neighborConnections": {
+      "jan (Category)": "Category: A 'mama' (parent or creator) is often a 'jan' (person)."
     }
   },
   "mani": {
@@ -658,6 +884,9 @@
     "grammarExamples": {
       "noun": "mi jo e mani. (I have money.)",
       "modifier": "mi wile e tomo mani. (I want a money building/bank.)"
+    },
+    "neighborConnections": {
+      "esun (Related)": "mani is inherently related to esun as it is the primary medium of exchange used when buying or selling things at a market or shop."
     }
   },
   "meli": {
@@ -670,6 +899,11 @@
     "grammarExamples": {
       "noun": "meli li pona. (The woman is good.)",
       "modifier": "jan meli li pona. (The female person is good.)"
+    },
+    "neighborConnections": {
+      "jan (Category)": "meli is a category of jan, as a 'meli' is a type of 'person'.",
+      "mije (Counterpart)": "mije is the gendered counterpart to meli, meaning man or male person.",
+      "tonsi (Counterpart)": "tonsi is a gender counterpart to meli and mije, representing non-binary gender identities."
     }
   },
   "mi": {
@@ -682,6 +916,10 @@
     "grammarExamples": {
       "noun": "mi li pona. (I am good.)",
       "modifier": "ilo mi li pona. (My tool is good.)"
+    },
+    "neighborConnections": {
+      "ona (Pronoun)": "Related Concept: Both 'mi' and 'ona' are fundamental personal pronouns, distinguishing between the speaker (mi) and a third party (ona).",
+      "sina (Pronoun)": "Contrast: 'mi' refers to the speaker (first person), while 'sina' refers to the listener (second person), creating the core of Toki Pona dialogue."
     }
   },
   "mije": {
@@ -694,6 +932,11 @@
     "grammarExamples": {
       "noun": "mije li wawa. (The man is strong.)",
       "modifier": "jan mije li pona. (The male person is good.)"
+    },
+    "neighborConnections": {
+      "jan (Category)": "Category: 'jan' refers to any person, while 'mije' is a specific type of 'jan' referring to a male person.",
+      "meli (Counterpart)": "Counterpart: 'meli' refers to a female person and serves as the direct gender counterpart to 'mije' (male).",
+      "tonsi (Counterpart)": "Counterpart: 'tonsi' refers to a non-binary or gender-nonconforming person, representing another gender identity often considered alongside 'mije' and 'meli'."
     }
   },
   "moku": {
@@ -707,6 +950,11 @@
       "noun": "moku li pona. (Food is good.)",
       "verb": "mi moku. (I eat.)",
       "modifier": "sina wile moku moku. (You want edible food.)"
+    },
+    "neighborConnections": {
+      "telo (Neighbor)": "telo, meaning water or liquid, is a common form of sustenance often consumed alongside or as a type of moku (food).",
+      "pan (Neighbor)": "pan refers to grain products like bread or pasta, which are specific and common forms of moku (food).",
+      "pana (Opposite-ish)": "If moku means to eat or consume something for oneself, pana is an opposite-ish idea, meaning to give or provide something to others."
     }
   },
   "moli": {
@@ -720,6 +968,9 @@
       "noun": "moli li ike. (Death is bad.)",
       "verb": "mi moli. (I die.)",
       "modifier": "mi jo e kala moli. (I have a dead fish.)"
+    },
+    "neighborConnections": {
+      "pini (Synonym-ish)": "Synonym-ish: 'moli' means to die, signifying an end to life, much like 'pini' means to end or finish something."
     }
   },
   "monsi": {
@@ -732,6 +983,11 @@
     "grammarExamples": {
       "noun": "monsi li suli. (The back is big.)",
       "modifier": "pipi monsi li lon ma. (The back bug is on the ground.)"
+    },
+    "neighborConnections": {
+      "anpa (Location)": "Both 'monsi' and 'anpa' describe spatial locations, with 'anpa' referring to the lower part or bottom, which can sometimes relate to a rear or posterior position.",
+      "insa (Location)": "'insa' describes an interior or inner location, which is a different spatial concept from 'monsi' referring to the back or rear part.",
+      "sinpin (Antonym)": "'sinpin' is a direct antonym for 'monsi', as 'sinpin' means front or face, while 'monsi' means back or rear."
     }
   },
   "mu": {
@@ -745,6 +1001,10 @@
       "noun": "soweli li pana e mu. (The animal gives a moo.)",
       "verb": "soweli li mu. (The animal moos.)",
       "modifier": "kalama mu li lon. (There is an animal sound.)"
+    },
+    "neighborConnections": {
+      "kalama (Category)": "Category: 'mu' is a specific type of sound, falling under the broader category of 'kalama' (sound).",
+      "toki (Opposite-ish)": "Opposite-ish: While 'toki' refers to structured human speech and language, 'mu' often signifies non-verbal, animalistic sounds or a lack of understandable communication."
     }
   },
   "mun": {
@@ -757,6 +1017,9 @@
     "grammarExamples": {
       "noun": "mun li lon sewi. (The moon is up high.)",
       "modifier": "mi lukin e telo mun. (I see moonlight.)"
+    },
+    "neighborConnections": {
+      "suno (Antonym)": "Opposite: 'suno' means sun or day, contrasting with 'mun' meaning moon or night."
     }
   },
   "musi": {
@@ -770,6 +1033,9 @@
       "noun": "musi li pona. (Fun is good.)",
       "verb": "mi musi. (I play.)",
       "modifier": "ona li jan musi. (They are a playful person.)"
+    },
+    "neighborConnections": {
+      "pali (Antonym)": "Antonym: 'musi' refers to play and entertainment, while 'pali' refers to work and labor."
     }
   },
   "mute": {
@@ -783,6 +1049,12 @@
       "noun": "mute li pona. (People are good.)",
       "modifier": "jan mute li toki. (Many people speak.)",
       "adverb": "mi pilin pona mute. (I feel very good.)"
+    },
+    "neighborConnections": {
+      "ala (Antonym-ish)": "mute signifies many or much, while ala means none or zero, making them contrasting in quantity.",
+      "ali (Synonym-ish)": "Both mute (many) and ali (all) describe a large or total quantity, making them somewhat similar in scope.",
+      "lili (Antonym)": "mute means many or much, directly contrasting with lili which means few or little.",
+      "wan (Antonym)": "While mute refers to multiple or many items, wan specifically refers to a single item, making them opposite in number."
     }
   },
   "nanpa": {
@@ -796,6 +1068,9 @@
       "noun": "nanpa li suli. (Numbers are important.)",
       "modifier": "poki nanpa li lon. (The numbered box is here.)",
       "ordinal-marker": "mi mute nanpa wan. (We are the first ones.)"
+    },
+    "neighborConnections": {
+      "mute (Related)": "Both 'nanpa' and 'mute' relate to quantity; 'nanpa' refers to numbers or counting, while 'mute' describes a large amount or many items, often determined by counting."
     }
   },
   "nasa": {
@@ -809,6 +1084,9 @@
       "noun": "nasa li ike. (Foolishness is bad.)",
       "modifier": "mi moku e ijo nasa. (I eat a strange thing.)",
       "verb": "ona li nasa. (They are strange/silly.)"
+    },
+    "neighborConnections": {
+      "pona (Antonym-ish)": "While 'nasa' refers to something bad, strange, or foolish, 'pona' means good, simple, or positive, making them often opposite in quality or sentiment."
     }
   },
   "nasin": {
@@ -821,6 +1099,9 @@
     "grammarExamples": {
       "noun": "nasin li suli. (The path is important.)",
       "modifier": "toki nasin li pona. (Traditional speech is good.)"
+    },
+    "neighborConnections": {
+      "tawa (Action)": "Means for Action: 'nasin' describes the path, method, or way used to perform the action of 'tawa' (moving or going)."
     }
   },
   "nena": {
@@ -833,6 +1114,9 @@
     "grammarExamples": {
       "noun": "nena li suli. (The bump/hill is big.)",
       "modifier": "ma nena li pona. (Hilly land is good.)"
+    },
+    "neighborConnections": {
+      "lupa (Antonym)": "Opposite: 'nena' describes a raised feature like a bump or hill, while 'lupa' describes a recessed feature like a hole or opening."
     }
   },
   "ni": {
@@ -845,6 +1129,9 @@
     "grammarExamples": {
       "modifier": "jan ni li pona. (This person is good.)",
       "noun": "ni li pona. (This is good.)"
+    },
+    "neighborConnections": {
+      "ona (Synonym-ish)": "Both 'ni' and 'ona' can translate to 'it', with 'ni' often referring to something near or just mentioned, and 'ona' serving as a more general third-person pronoun."
     }
   },
   "nimi": {
@@ -858,6 +1145,9 @@
       "noun": "ni li nimi mi. (This is my name.)",
       "verb": "mi nimi e ni. (I name this.)",
       "modifier": "ona li lukin e sitelen nimi. (They look at the text.)"
+    },
+    "neighborConnections": {
+      "toki (Component)": "Component: A 'nimi' (word or name) is a fundamental unit that constructs 'toki' (language or speech)."
     }
   },
   "noka": {
@@ -882,6 +1172,12 @@
     "aiExplanation": "o is a versatile particle used for direct address, commands, and interjections. It marks something as being directed *to* someone or something. It often precedes the main verb of a command or the noun being addressed, indicating a vocative or imperative function. Its usage can range from a polite suggestion to an urgent demand, depending on context and intonation, always carrying a direct and engaging tone.",
     "grammarExamples": {
       "Particle": "o toki! (Speak!)"
+    },
+    "neighborConnections": {
+      "e": "Grammatical Function: Both 'o' and 'e' are particles that play crucial roles in defining sentence structure, with 'o' for commands/vocatives and 'e' for marking direct objects.",
+      "la": "Grammatical Function: Like 'o', 'la' is a particle that helps structure sentences, with 'la' setting context for a statement and 'o' introducing commands or direct address.",
+      "li": "Grammatical Function: Similar to 'o', 'li' is a particle essential for Toki Pona sentence structure, with 'o' for commands/vocatives and 'li' separating the subject from its verb or predicate.",
+      "pi": "Grammatical Function: Both 'o' and 'pi' are particles that modify or structure parts of a sentence, with 'o' for commands/vocatives and 'pi' for grouping modifiers to a head noun."
     }
   },
   "olin": {
@@ -895,6 +1191,10 @@
       "noun": "olin li suli. (Love is important.)",
       "verb": "mi olin e sina. (I love you.)",
       "modifier": "jan olin li pona. (A loving person is good.)"
+    },
+    "neighborConnections": {
+      "ike (Antonym-ish)": "Antonym-ish: 'ike' (bad/evil/problem) often stands in opposition to 'olin' (love/compassion/respect), as 'olin' implies positive regard and well-being, while 'ike' denotes negativity.",
+      "pona (Synonym-ish)": "Synonym-ish: 'pona' (good/positive/simple) is closely aligned with 'olin' (love/compassion/respect), as 'olin' represents a fundamental goodness and positive connection."
     }
   },
   "ona": {
@@ -907,6 +1207,11 @@
     "grammarExamples": {
       "noun": "ona li pona. (They are good.)",
       "modifier": "jan ona li suli. (Their person is big.)"
+    },
+    "neighborConnections": {
+      "mi (Pronoun)": "Category: Both 'mi' and 'ona' are personal pronouns, with 'mi' referring to the first person and 'ona' to the third.",
+      "ni (Synonym-ish)": "Referential: 'ona' often functions as a pronoun that refers back to an entity previously indicated by 'ni' (this/that), making them referentially connected.",
+      "sina (Pronoun)": "Category: Both 'sina' and 'ona' are personal pronouns, with 'sina' referring to the second person and 'ona' to the third."
     }
   },
   "open": {
@@ -920,6 +1225,9 @@
       "noun": "pana li pona. (An opening is good.)",
       "verb": "mi pana e tomo. (I open the house.)",
       "modifier": "mi lukin e tomo pana. (I see an open house.)"
+    },
+    "neighborConnections": {
+      "pini (Antonym)": "Antonym: 'pini' means to close or finish, which is the opposite of to open or begin."
     }
   },
   "pakala": {
@@ -934,6 +1242,10 @@
       "verb": "suno li pakala e kiwen. (The sun damaged the rock.)",
       "modifier": "ilo pakala li wawa ala. (A broken tool has no power.)",
       "interjection": "pakala! mi wile ala e ni. (Oops! I don't want this.)"
+    },
+    "neighborConnections": {
+      "ike (Related)": "Related: 'pakala' describes something broken or messed up, which is often inherently 'ike' (bad).",
+      "pona (Antonym)": "Antonym: 'pakala' means to break or mess up, while 'pona' means to fix, improve, or make good."
     }
   },
   "pali": {
@@ -947,6 +1259,11 @@
       "noun": "pali li pona. (Work is good.)",
       "verb": "mi pali. (I work.)",
       "modifier": "jan pali li pona. (A working person is good.)"
+    },
+    "neighborConnections": {
+      "musi (Antonym-ish)": "While 'pali' refers to work or creation, 'musi' implies play or entertainment, making them somewhat opposing activities.",
+      "awen (Opposite-ish)": "'pali' is about actively doing or making, whereas 'awen' often relates to staying, waiting, or preserving, representing a more static or maintaining state.",
+      "lape (Antonym)": "'pali' signifies active work or doing, making it a direct opposite to 'lape', which means to sleep or rest."
     }
   },
   "palisa": {
@@ -959,6 +1276,11 @@
     "grammarExamples": {
       "noun": "ni li palisa. (This is a stick.)",
       "modifier": "ona li moku e kili palisa. (She eats a long fruit.)"
+    },
+    "neighborConnections": {
+      "linja (Synonym-ish)": "Both 'palisa' and 'linja' describe long, thin objects, with 'palisa' often implying stiffness and 'linja' flexibility.",
+      "sike (Antonym-ish)": "While 'palisa' refers to a long, straight object, 'sike' refers to a round or circular one, representing contrasting shapes.",
+      "supa (Opposite-ish)": "Palisa is typically a long, often vertical object, whereas 'supa' is a flat, horizontal surface, contrasting in dimension and typical orientation."
     }
   },
   "pan": {
@@ -971,6 +1293,10 @@
     "grammarExamples": {
       "noun": "pan li pona. (Bread is good.)",
       "modifier": "moku pan li pona. (Grain food is good.)"
+    },
+    "neighborConnections": {
+      "kasi (Source)": "Source: 'kasi' refers to plants, which are the source material for many types of 'pan'.",
+      "kili (Neighbor)": "Category: 'kili' refers to fruits and vegetables, which, like 'pan', are types of edible plant-based food items."
     }
   },
   "pana": {
@@ -984,6 +1310,12 @@
       "noun": "pana li pona. (Giving is good.)",
       "verb": "mi pana e toki. (I give speech.)",
       "modifier": "ona li jo e ilo pana. (They have a giving tool.)"
+    },
+    "neighborConnections": {
+      "esun (Action)": "Action: 'esun' (to buy or sell) often involves 'pana' (to give or provide) items or payment.",
+      "jo (Antonym)": "Antonym: 'pana' (to give or let go of) is the opposite of 'jo' (to have or possess).",
+      "lanpan (Antonym)": "Antonym: 'pana' (to give) is the opposite of 'lanpan' (to take or seize).",
+      "moku (Opposite-ish)": "Opposite-ish: While 'pana' is to give or provide, 'moku' is to eat or consume, representing a different interaction with an item."
     }
   },
   "pi": {
@@ -995,6 +1327,12 @@
     "aiExplanation": "pi acts as a grouping particle, allowing a head noun that already has one or more modifiers to be further modified by a second set of modifiers. This prevents ambiguity by clearly indicating which modifiers apply to the head noun directly and which apply to the modified noun phrase as a whole. It's essential for forming complex noun phrases like 'person of good speech' (jan pi toki pona) or 'small animal of mine' (soweli lili pi mi).",
     "grammarExamples": {
       "Particle": "ona li jan pi toki pona. (They are a Toki Pona speaker.)"
+    },
+    "neighborConnections": {
+      "e (Particle)": "Syntactic Role: `pi` clarifies noun modification within a phrase, while `e` marks the direct object, showing they both define grammatical roles.",
+      "la (Particle)": "Structural Marker: `pi` groups modifiers within a noun phrase, similar to how `la` separates contextual clauses, both serving to structure sentence components.",
+      "li (Particle)": "Grammatical Delimiter: `pi` delimits noun modifiers, much like `li` separates the subject from the predicate, both defining grammatical boundaries.",
+      "o (Particle)": "Phrase/Sentence Modifier: `pi` modifies the interpretation of noun phrases, while `o` modifies the sentence into a command or address, both shaping meaning."
     }
   },
   "pilin": {
@@ -1008,6 +1346,9 @@
       "noun": "mi jo e pilin pona. (I have a good feeling.)",
       "verb": "mi pilin pona. (I feel good.)",
       "modifier": "ona li toki pilin. (They speak emotionally.)"
+    },
+    "neighborConnections": {
+      "toki (Expression)": "Expression: 'toki' is the act of outwardly expressing or communicating one's 'pilin' (feelings or thoughts)."
     }
   },
   "pimeja": {
@@ -1021,6 +1362,10 @@
       "noun": "pimeja li suli. (Darkness is big.)",
       "modifier": "tomo pimeja li pona. (The dark house is good.)",
       "verb": "ma li pimeja. (The land is dark.)"
+    },
+    "neighborConnections": {
+      "kule (Category)": "Category: 'pimeja' (dark/black) is a specific type of 'kule' (color).",
+      "walo (Antonym)": "Antonym: 'pimeja' (dark/black) is the opposite of 'walo' (white/light)."
     }
   },
   "pini": {
@@ -1034,6 +1379,11 @@
       "noun": "ni li pini. (This is the end.)",
       "verb": "mi pini e pali. (I finish the work.)",
       "modifier": "tenpo pini la mi pilin pona. (In the past, I felt good.)"
+    },
+    "neighborConnections": {
+      "kama (Antonym-ish)": "Antonym-ish: While 'pini' means to finish or end, 'kama' means to come or begin, often representing an opposite point in a process or timeline.",
+      "moli (Synonym-ish)": "Synonym-ish: 'Moli' means to die, which can be thought of as the ultimate 'pini' or end of life, linking them conceptually.",
+      "open (Antonym)": "Antonym: 'Open' directly means to start or begin, serving as a clear opposite to 'pini', which means to finish or end."
     }
   },
   "pipi": {
@@ -1046,6 +1396,12 @@
     "grammarExamples": {
       "noun": "pipi li lon. (An insect is present.)",
       "modifier": "ona li toki e toki pipi. (They speak quiet words.)"
+    },
+    "neighborConnections": {
+      "akesi (Category)": "Category: 'pipi' (insects) and 'akesi' (reptiles/amphibians) are both types of small, non-mammalian animals.",
+      "kala (Category)": "Category: 'pipi' (insects) and 'kala' (fish/aquatic creatures) are both distinct types of small animals, differentiated by their habitat.",
+      "soweli (Category)": "Category: 'pipi' (insects) and 'soweli' (mammals/land animals) are both broad categories for different kinds of animals.",
+      "waso (Category)": "Category: 'pipi' (insects) and 'waso' (birds) are both categories of animals, many of which are known for flight."
     }
   },
   "poka": {
@@ -1059,6 +1415,10 @@
       "noun": "ona li lon poka. (They are nearby.)",
       "modifier": "tomo poka li suli. (The nearby house is big.)",
       "preposition": "mi lon poka sina. (I am next to you.)"
+    },
+    "neighborConnections": {
+      "insa (Location)": "Both 'poka' (side, near) and 'insa' (inside) describe different types of spatial relationships or locations.",
+      "weka (Antonym)": "Antonym: 'poka' means near or next to, while 'weka' means away or absent."
     }
   },
   "poki": {
@@ -1072,6 +1432,9 @@
       "noun": "poki li jo e telo. (The container has water.)",
       "verb": "mi poki e moku. (I put the food in a container.)",
       "modifier": "telo poki li pona. (Contained water is good.)"
+    },
+    "neighborConnections": {
+      "insa (Related)": "A 'poki' (container) often defines an 'insa' (inside or content), as 'insa' refers to what is within something like a container."
     }
   },
   "pu": {
@@ -1083,6 +1446,10 @@
     "aiExplanation": "\"pu\" specifically refers to the official Toki Pona book by Sonja Lang, titled \"Toki Pona: The Language of Good\". It can function as both a noun, meaning the book itself, and a verb, meaning to interact with, use, or learn from this particular official text. Using \"pu\" implies engaging with the foundational and authoritative source of the language, rather than just any book.",
     "grammarExamples": {
       "Adjective": "lipu pu li pona. (The official book is good.)"
+    },
+    "neighborConnections": {
+      "ku (Related)": "ku is related to pu as another major reference work for Toki Pona, serving as a community dictionary to complement the official book.",
+      "lipu (Category)": "pu falls under the category of lipu, as it is a specific book or document."
     }
   },
   "sama": {
@@ -1096,6 +1463,9 @@
       "noun": "sama li pona. (Equality is good.)",
       "modifier": "ona li jan sama. (They are similar people.)",
       "preposition": "ona li toki sama mi. (She speaks like me.)"
+    },
+    "neighborConnections": {
+      "ante (Antonym)": "Antonym: 'sama' means same or similar, while 'ante' means different or other."
     }
   },
   "seli": {
@@ -1109,6 +1479,9 @@
       "noun": "seli li wawa. (Fire is strong.)",
       "modifier": "telo seli li pona. (Hot water is good.)",
       "verb": "mi seli e telo. (I heat the water.)"
+    },
+    "neighborConnections": {
+      "lete (Antonym)": "Opposite: 'seli' means heat, warmth, or hot, while 'lete' means cold, coolness, or cool."
     }
   },
   "selo": {
@@ -1121,6 +1494,10 @@
     "grammarExamples": {
       "noun": "selo li lili. (The skin is small.)",
       "modifier": "kili selo li walo. (The fruit peel is white.)"
+    },
+    "neighborConnections": {
+      "insa (Antonym)": "insa is the opposite of selo because selo refers to the outer layer or surface, while insa means the inside or contents.",
+      "len (Synonym-ish)": "len is somewhat similar to selo as both can describe a covering or an outer layer, with len being more specifically a cloth or clothing that serves as a covering."
     }
   },
   "seme": {
@@ -1132,6 +1509,9 @@
     "aiExplanation": "seme is a fundamental Toki Pona word, primarily functioning as 'what?' or 'which?'. It is incredibly versatile, able to replace a noun, verb, or modifier in a sentence to form a question about the unknown element. Beyond its interrogative use, seme can also signify 'something' or 'anything' in a broader, non-question context, making it a powerful and flexible tool in communication.",
     "grammarExamples": {
       "interrogative": "sina wile seme? (What do you want?)"
+    },
+    "neighborConnections": {
+      "ni (Answer)": "Answer: 'ni' (this/that) is frequently used to point to or identify the specific thing that 'seme' (what/which) is asking about, serving as a direct response."
     }
   },
   "sijelo": {
@@ -1144,6 +1524,9 @@
     "grammarExamples": {
       "noun": "sijelo mi li pona. (My body is good.)",
       "modifier": "pilin sijelo li ike. (The physical feeling is bad.)"
+    },
+    "neighborConnections": {
+      "kon (Opposite-ish)": "Opposite-ish: While 'sijelo' is the physical body, 'kon' can refer to the spirit, soul, or essence, representing the non-physical aspect of being."
     }
   },
   "sike": {
@@ -1157,6 +1540,11 @@
       "noun": "ni li sike. (This is a circle.)",
       "modifier": "kiwen sike li lon. (There is a round stone.)",
       "verb": "mun li sike. (The moon circles.)"
+    },
+    "neighborConnections": {
+      "linja (Antonym-ish)": "Sike (round, circle) contrasts with linja (line, string) as one implies curvature and enclosure, while the other suggests straightness and extension.",
+      "palisa (Antonym-ish)": "Sike (round, circular) stands in contrast to palisa (stick, rod) because sike implies a continuous curve, whereas palisa describes a straight, rigid form.",
+      "supa (Opposite-ish)": "Sike (round, circular, wheel) is quite different from supa (flat surface, table) as sike often implies form or motion associated with roundness, opposing the stable, planar nature of supa."
     }
   },
   "sin": {
@@ -1170,6 +1558,9 @@
       "noun": "ni li sin. (This is new.)",
       "modifier": "mi moku e kili sin. (I eat new fruit.)",
       "verb": "ona li sin e tomo. (They renew the house.)"
+    },
+    "neighborConnections": {
+      "awen (Antonym-ish)": "Antonym-ish: 'sin' means new or fresh, while 'awen' implies something that stays, remains, or endures, suggesting a contrast between novelty and continuity."
     }
   },
   "sina": {
@@ -1182,6 +1573,10 @@
     "grammarExamples": {
       "noun": "sina li pona. (You are good.)",
       "modifier": "ma sina li suli. (Your land is big.)"
+    },
+    "neighborConnections": {
+      "mi (Pronoun)": "Category: Both 'mi' and 'sina' are core personal pronouns in Toki Pona, with 'mi' representing the speaker and 'sina' representing the listener.",
+      "ona (Pronoun)": "Category: 'sina' and 'ona' are both personal pronouns, distinguishing the listener ('sina') from a third party or group ('ona')."
     }
   },
   "sinpin": {
@@ -1194,6 +1589,11 @@
     "grammarExamples": {
       "noun": "sinpin li lon. (The front is present.)",
       "modifier": "mi lukin e tomo sinpin. (I see the front building.)"
+    },
+    "neighborConnections": {
+      "anpa (Location)": "Both 'sinpin' (front/face) and 'anpa' (bottom/under) describe relative locations on or around an object or person.",
+      "insa (Location)": "'insa' refers to the inner part or inside, which describes a different kind of location compared to the outer 'sinpin' (front).",
+      "monsi (Antonym)": "'monsi' means back or rear, making it a direct antonym to 'sinpin' (front)."
     }
   },
   "sitelen": {
@@ -1207,6 +1607,9 @@
       "noun": "sitelen li pona. (The writing is good.)",
       "verb": "mi sitelen. (I write.)",
       "modifier": "mi lukin e lipu sitelen. (I see a written paper.)"
+    },
+    "neighborConnections": {
+      "toki (Representation)": "Representation: Both 'sitelen' and 'toki' are ways to represent ideas and information, with 'sitelen' being visual or written and 'toki' being auditory or spoken."
     }
   },
   "sona": {
@@ -1220,6 +1623,11 @@
       "noun": "sona li pona. (Knowledge is good.)",
       "verb": "mi sona e toki pona. (I know Toki Pona.)",
       "modifier": "jan sona li pona. (The wise person is good.)"
+    },
+    "neighborConnections": {
+      "nasa (Antonym-ish)": "Antonym-ish: 'sona' means knowledge or to know, while 'nasa' means silly or foolish, often implying a lack of good judgment or understanding.",
+      "kute (Neighbor)": "Neighbor: 'sona' often comes from 'kute', as hearing and listening are crucial ways to gain knowledge and understanding.",
+      "wile (Related)": "Related: 'sona' can mean 'to be able to', while 'wile' means 'to want to' or 'must', making them both important for expressing intention and capability."
     }
   },
   "soweli": {
@@ -1232,6 +1640,13 @@
     "grammarExamples": {
       "noun": "soweli li pona. (The animal is good.)",
       "modifier": "mi pana e moku soweli. (I give pet food.)"
+    },
+    "neighborConnections": {
+      "akesi (Category)": "Category: 'akesi' refers to reptiles and amphibians, which are distinct groups of animals from 'soweli'.",
+      "kala (Category)": "Category: 'kala' denotes fish and other marine creatures, representing a different category of animals compared to 'soweli' (land animals).",
+      "kijetesantakalu (Subset)": "Subset: 'kijetesantakalu' is a specific, often humorous, kind of land animal, making it a subset of 'soweli'.",
+      "pipi (Category)": "Category: 'pipi' describes insects and bugs, which are another distinct category of animals from 'soweli'.",
+      "waso (Category)": "Category: 'waso' refers to birds and other flying creatures, representing a separate category of animals compared to 'soweli'."
     }
   },
   "suli": {
@@ -1245,6 +1660,9 @@
       "noun": "mi wile e suli. (I want importance.)",
       "modifier": "tomo suli li pona. (A big house is good.)",
       "verb": "mi suli e tomo. (I enlarge the house.)"
+    },
+    "neighborConnections": {
+      "lili (Antonym)": "Opposite: 'lili' means small, little, or short, directly contrasting with 'suli' which means big, important, or long."
     }
   },
   "suno": {
@@ -1258,6 +1676,9 @@
       "noun": "suno li suli. (The sun is big.)",
       "modifier": "toki suno li pona. (Bright speech is good.)",
       "verb": "suno li suno e ma. (The sun shines on the land.)"
+    },
+    "neighborConnections": {
+      "mun (Antonym)": "Opposite: 'suno' refers to the sun or day, while 'mun' refers to the moon or night."
     }
   },
   "supa": {
@@ -1270,6 +1691,10 @@
     "grammarExamples": {
       "noun": "supa li suli. (The surface is big.)",
       "modifier": "len supa li suli. (The mat/tablecloth is big.)"
+    },
+    "neighborConnections": {
+      "palisa (Opposite-ish)": "Supa refers to a flat, broad surface, while palisa describes a long, slender, stick-like object, making them opposite-ish in their typical form and dimension.",
+      "sike (Opposite-ish)": "Supa denotes a flat surface, contrasting with sike, which means something round, circular, or spherical, thus making them opposite-ish in shape or geometry."
     }
   },
   "suwi": {
@@ -1283,6 +1708,9 @@
       "noun": "mi moku e suwi. (I eat a sweet thing.)",
       "modifier": "telo li suwi. (The water is sweet.)",
       "verb": "mi suwi e telo. (I sweeten the water.)"
+    },
+    "neighborConnections": {
+      "ike (Antonym-ish)": "While 'suwi' means sweet, cute, or adorable, 'ike' is often its opposite, meaning bad, evil, or ugly."
     }
   },
   "tan": {
@@ -1296,6 +1724,9 @@
       "noun": "ni li tan. (This is the cause.)",
       "preposition": "mi kama tan tomo. (I come from the house.)",
       "verb": "ona li tan e pilin ike. (They cause bad feelings.)"
+    },
+    "neighborConnections": {
+      "kama (Result)": "Cause and Effect: 'tan' indicates the cause or origin of something, while 'kama' often signifies the resulting effect or what comes into being."
     }
   },
   "taso": {
@@ -1307,6 +1738,9 @@
     "aiExplanation": "taso is a versatile particle used to express contrast, limitation, or exclusivity. It can mean \"but\" or \"however,\" connecting two differing ideas, or \"only\" and \"just,\" indicating that something is restricted or unique. This flexibility allows it to both introduce exceptions and narrow the focus of a statement.",
     "grammarExamples": {
       "Adjective": "jan taso li kama. (Only people come.)"
+    },
+    "neighborConnections": {
+      "mute (Antonym)": "Antonym: 'taso' emphasizes 'only' or 'just one', which is the opposite of 'mute' meaning 'many' or 'much'."
     }
   },
   "tawa": {
@@ -1318,6 +1752,12 @@
     "aiExplanation": "tawa is a dynamic and incredibly versatile word. Its core meaning relates to movement, direction, and purpose, allowing it to function as a verb ('to move/go'), a preposition ('to/for/towards'), or even a modifier indicating motion. It's essential for expressing travel, giving things to someone, or indicating a recipient or beneficiary.",
     "grammarExamples": {
       "Preposition": "mi tawa tomo. (I go to the house.)"
+    },
+    "neighborConnections": {
+      "awen (Antonym)": "Antonym: 'tawa' implies movement towards something, while 'awen' means to stay or remain in place.",
+      "kama (Action)": "Action: 'kama' is an action of coming or arriving, which often involves 'tawa' (moving) towards a destination.",
+      "nasin (Context)": "Context: 'nasin' provides the path or method along which one might perform 'tawa' (movement) or direct something.",
+      "weka (Action)": "Action: While 'tawa' signifies movement generally or towards something, 'weka' specifically describes the action of moving something away or being absent."
     }
   },
   "telo": {
@@ -1331,6 +1771,11 @@
       "noun": "telo li pona. (Water is good.)",
       "modifier": "ijo telo li pona. (Wet things are good.)",
       "verb": "mi telo. (I am wet.)"
+    },
+    "neighborConnections": {
+      "ko (Opposite-ish)": "telo is fluid and formless, whereas ko refers to a thick, semi-solid substance that holds some form, making them opposite in fluidity.",
+      "kon (Opposite-ish)": "telo is a liquid state of matter, directly contrasting with kon which represents a gaseous state like air.",
+      "kiwen (Opposite-ish)": "telo signifies the fluid, pourable state of matter, standing in opposition to kiwen which denotes a hard, solid, and fixed object."
     }
   },
   "tenpo": {
@@ -1343,6 +1788,9 @@
     "grammarExamples": {
       "noun": "tenpo li pona. (Time is good.)",
       "modifier": "ilo tenpo li suli. (The time tool/clock is big.)"
+    },
+    "neighborConnections": {
+      "sike (Measurement)": "Measurement: 'sike' can mean a year or a cycle, which are specific measurements or durations of 'tenpo' (time)."
     }
   },
   "tomo": {
@@ -1355,6 +1803,9 @@
     "grammarExamples": {
       "noun": "ni li tomo. (This is a house.)",
       "modifier": "ona li jan tomo. (They are a house person.)"
+    },
+    "neighborConnections": {
+      "ma (Antonym-ish)": "Antonym-ish: 'tomo' means a house or building, an indoor, man-made space, while 'ma' means land or outdoor space, representing a contrasting concept of enclosed versus open."
     }
   },
   "tu": {
@@ -1368,6 +1819,10 @@
       "noun": "tu li pona. (Two is good.)",
       "modifier": "jan tu li lon. (Two people are present.)",
       "verb": "ona li tu. (It became two.)"
+    },
+    "neighborConnections": {
+      "kipisi (Synonym-ish)": "Synonym-ish: 'kipisi' means to cut or divide, which often results in two distinct parts, conceptually linking it to 'tu'.",
+      "wan (Neighbor)": "Neighbor: 'wan' means one, and 'tu' means two, making them sequential numerical neighbors often used in contrast."
     }
   },
   "unpa": {
@@ -1381,6 +1836,9 @@
       "noun": "unpa li pona. (Sex is good.)",
       "verb": "mi unpa. (I have sex.)",
       "modifier": "ona li jan unpa. (They are a sexual person.)"
+    },
+    "neighborConnections": {
+      "olin (Related)": "Related: 'olin' refers to love, affection, or compassion, which is a strong emotional connection often present in relationships where 'unpa' might occur."
     }
   },
   "uta": {
@@ -1394,6 +1852,10 @@
       "noun": "mi open e uta mi. (I open my mouth.)",
       "modifier": "sina jo e pali uta. (You have an oral job/task.)",
       "verb": "ona li uta e nimi mute. (She utters many words.)"
+    },
+    "neighborConnections": {
+      "moku (Action)": "uta is the body part primarily used for the action of moku (eating).",
+      "toki (Action)": "uta is the body part primarily used for the action of toki (speaking)."
     }
   },
   "utala": {
@@ -1407,6 +1869,10 @@
       "noun": "utala li ike. (Conflict is bad.)",
       "verb": "mi utala. (I fight.)",
       "modifier": "jan utala li kama. (The warrior comes.)"
+    },
+    "neighborConnections": {
+      "musi (Opposite-ish)": "While 'utala' means to fight or struggle, 'musi' means to play or have fun, often implying a lack of conflict or serious effort.",
+      "pona (Antonym-ish)": "As 'utala' involves conflict, struggle, or harm, it stands in opposition to 'pona', which means good, positive, or beneficial."
     }
   },
   "walo": {
@@ -1419,6 +1885,10 @@
     "grammarExamples": {
       "noun": "walo li pona. (White is good.)",
       "modifier": "suno walo li suli. (The white sun is big.)"
+    },
+    "neighborConnections": {
+      "kule (Category)": "Category: 'walo' describes a specific color, placing it within the broader category of 'kule' (color).",
+      "pimeja (Antonym)": "Antonym: 'walo' (white or light) is the direct opposite of 'pimeja' (black or dark)."
     }
   },
   "wan": {
@@ -1432,6 +1902,13 @@
       "noun": "wan li pona. (One is good.)",
       "modifier": "mi jo e akesi wan. (I have one lizard.)",
       "verb": "mi mute li wan. (We unite.)"
+    },
+    "neighborConnections": {
+      "ala (Opposite-ish)": "ala (none/zero) is an opposite-ish of wan (one) as it represents the absence of quantity, while wan represents a single unit.",
+      "ale (Opposite-ish)": "ale (all) is an opposite-ish of wan (one) because ale encompasses everything, contrasting with wan which specifies a single item.",
+      "ali (Opposite-ish)": "Similar to ale, ali (all) is an opposite-ish of wan (one) by representing the complete set as opposed to a solitary element.",
+      "mute (Antonym)": "mute (many) is an antonym to wan (one) as it expresses multiplicity, directly contrasting with singularity.",
+      "tu (Neighbor)": "tu (two) is a numerical neighbor to wan (one) as it is the very next number in the Toki Pona counting system."
     }
   },
   "waso": {
@@ -1444,6 +1921,12 @@
     "grammarExamples": {
       "noun": "waso li tawa. (The bird moves.)",
       "modifier": "kala waso li suwi. (Bird sound is sweet/pleasant.)"
+    },
+    "neighborConnections": {
+      "akesi (Category)": "Both 'waso' (bird) and 'akesi' (reptile/amphibian) are general categories of living creatures, specifically animals.",
+      "kala (Category)": "'Waso' (bird) and 'kala' (fish/marine animal) are both broad categories for different types of animals.",
+      "pipi (Category)": "'Waso' (bird) and 'pipi' (insect) are both terms used to categorize different kinds of small animals.",
+      "soweli (Category)": "Like 'waso' (bird), 'soweli' (land animal/mammal) serves as a broad classification for various animal types."
     }
   },
   "wawa": {
@@ -1458,6 +1941,9 @@
       "modifier": "jan wawa li pana e ijo. (A strong person gives things.)",
       "verb": "ona li wawa. (They are strong.)",
       "adverb": "ona li toki wawa. (They speak strongly.)"
+    },
+    "neighborConnections": {
+      "lili (Antonym-ish)": "lili, meaning small or weak, can be seen as an antonym to wawa, which means strong or powerful."
     }
   },
   "weka": {
@@ -1471,6 +1957,11 @@
       "noun": "weka li ike. (Trash is bad.)",
       "modifier": "tomo weka li suli. (The distant house is big.)",
       "verb": "mi weka e ilo. (I remove the tool.)"
+    },
+    "neighborConnections": {
+      "lon (Antonym)": "Antonym: 'lon' means present or existing, which is the opposite of 'weka' meaning absent or removed.",
+      "poka (Antonym)": "Antonym: 'poka' indicates being nearby or at one's side, which contrasts with 'weka' meaning away or removed.",
+      "tawa (Action)": "Action: 'tawa' means to move or go, and one can 'tawa' (move) something to make it 'weka' (away or removed)."
     }
   },
   "wile": {
@@ -1484,6 +1975,10 @@
       "noun": "ona li jo e wile suli. (They have a great desire.)",
       "verb": "mi wile e telo. (I want water.)",
       "modifier": "jan wile li kama. (The wanted person comes.)"
+    },
+    "neighborConnections": {
+      "ken (Related)": "ken is related to wile as both words function as pre-verbs that modify a subsequent verb to express different modalities, such as ability or desire.",
+      "sona (Related)": "sona is related to wile as both words describe internal states, with sona referring to knowledge or understanding and wile referring to desire or intention, often leading to actions involving one another."
     }
   },
   "ali": {
@@ -1497,6 +1992,11 @@
       "noun": "ali li pona. (Everything is good.)",
       "modifier": "jan ali li pona. (All people are good.)",
       "adverb": "mi wawa ali. (I am completely strong.)"
+    },
+    "neighborConnections": {
+      "ala (Antonym)": "Antonym: 'ali' means all or everything, while 'ala' means none or nothing.",
+      "mute (Synonym-ish)": "Synonym-ish: While 'ali' refers to every single one or the entirety, 'mute' indicates a large quantity or many of something.",
+      "wan (Opposite-ish)": "Opposite-ish: 'ali' encompasses the totality or all parts together, whereas 'wan' specifies a single unit or item."
     }
   },
   "epiku": {
@@ -1530,6 +2030,9 @@
     "aiExplanation": "kijetesantakalu is a specific, humorous word for procyonids (raccoons) or mustelids (otters). It is famously long, contrasting with Toki Pona’s usual brevity.",
     "grammarExamples": {
       "Noun": "kijetesantakalu li moku e telo. (The raccoon drinks water.)"
+    },
+    "neighborConnections": {
+      "soweli (Category)": "Category: 'kijetesantakalu' (raccoon) is a specific kind of 'soweli' (animal)."
     }
   },
   "kin": {
@@ -1541,6 +2044,9 @@
     "aiExplanation": "kin adds emphasis, meaning also, too, indeed, or even. It highlights that the preceding word is included or affirmed.",
     "grammarExamples": {
       "Adjective": "pipi kin li lon. (Even the bug is here.)"
+    },
+    "neighborConnections": {
+      "a (Synonym)": "Synonym: Both 'kin' and 'a' can serve as particles to add emphasis or intensity to a word or phrase in Toki Pona, though 'a' often carries more emotional nuance."
     }
   },
   "kipisi": {
@@ -1552,6 +2058,9 @@
     "aiExplanation": "kipisi means to cut, divide, or separate. It can refer to physical cutting or conceptual divisions.",
     "grammarExamples": {
       "Verb": "mi kipisi e kili. (I cut the fruit.)"
+    },
+    "neighborConnections": {
+      "tu (Synonym-ish)": "While 'kipisi' means to cut or divide generally, 'tu' can specifically imply dividing something into two parts, making it a related action."
     }
   },
   "kokosila": {
@@ -1563,6 +2072,9 @@
     "aiExplanation": "kokosila means to speak a non-Toki Pona language in a Toki Pona environment. It’s a playful term for breaking the immersion.",
     "grammarExamples": {
       "Verb": "mi kokosila. (I make a rustling sound.)"
+    },
+    "neighborConnections": {
+      "toki (Related)": "kokosila is a specific, often informal or nonsensical, form of toki (speech or communication)."
     }
   },
   "ku": {
@@ -1574,6 +2086,10 @@
     "aiExplanation": "ku refers to using or interacting with the Toki Pona Dictionary (2021). It represents the expansion and community-driven evolution of the language.",
     "grammarExamples": {
       "Verb": "mi ku. (I consult the Toki Pona Dictionary.)"
+    },
+    "neighborConnections": {
+      "lipu (Category)": "Category: 'ku' is a specific type of 'lipu' (book or document), referring to the official Toki Pona dictionary.",
+      "pu (Related)": "Related: 'ku' (the dictionary) is a companion to 'pu' (the foundational book), compiling vocabulary and usage from and beyond it."
     }
   },
   "lanpan": {
@@ -1585,6 +2101,10 @@
     "aiExplanation": "lanpan means to get, take, seize, catch, or steal. It describes the active acquisition of an object.",
     "grammarExamples": {
       "Verb": "mi lanpan e telo. (I seize the water.)"
+    },
+    "neighborConnections": {
+      "jo (Result)": "Result: When you 'lanpan' (take or acquire) something, you 'jo' (have or hold) it as a result.",
+      "pana (Antonym)": "Antonym: 'lanpan' means to take or receive, which is the opposite action of 'pana' (to give or send)."
     }
   },
   "meso": {
@@ -1651,6 +2171,10 @@
     "aiExplanation": "oko specifically refers to the eye as an organ. While lukin covers the action of seeing, oko is the physical eye itself.",
     "grammarExamples": {
       "Noun": "oko li pona. (The eye is good.)"
+    },
+    "neighborConnections": {
+      "kute (Category)": "Category: 'kute' (ear) and 'oko' (eye) are both fundamental sense organs, crucial for perceiving the world.",
+      "lukin (Related Action)": "Related Action: 'lukin' describes the action of seeing or looking, which is performed by 'oko', the eye."
     }
   },
   "soko": {
@@ -1662,6 +2186,10 @@
     "aiExplanation": "soko refers to mushrooms, fungi, or similar growths. It distinguishes these from ordinary green plants (kasi).",
     "grammarExamples": {
       "Noun": "mi moku e soko. (I eat mushrooms.)"
+    },
+    "neighborConnections": {
+      "kasi (Category)": "Category: 'soko' (mushroom) is often broadly categorized under 'kasi' (plant) in common Toki Pona usage, despite biological differences.",
+      "kili (Neighbor)": "Neighbor: 'kili' (fruit, vegetable) is a broader term that can include 'soko' (mushroom), especially when referring to edible parts."
     }
   },
   "tonsi": {
@@ -1673,6 +2201,11 @@
     "aiExplanation": "tonsi describes someone who is non-binary, trans, or gender-nonconforming. It embraces the diverse spectrum of gender expression.",
     "grammarExamples": {
       "Noun": "ona li tonsi. (They are non-binary/trans.)"
+    },
+    "neighborConnections": {
+      "jan (Category)": "Category: 'tonsi' describes a specific category of 'jan' (person), referring to individuals with non-binary or ambiguous gender identities.",
+      "meli (Counterpart)": "Counterpart: 'tonsi' serves as a gender counterpart to 'meli,' representing individuals whose gender identity is not exclusively female.",
+      "mije (Counterpart)": "Counterpart: 'tonsi' also serves as a gender counterpart to 'mije,' representing individuals whose gender identity is not exclusively male."
     }
   }
 }

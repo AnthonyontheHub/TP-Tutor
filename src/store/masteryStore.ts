@@ -24,7 +24,7 @@ import aiVocabCache from '../data/aiVocabCache.json';
 function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: MasteryStatus; type: 'word' | 'grammar'; sessionNotes: string; frequencyRank?: number; weight?: MasteryWeight }): VocabWord {
   const score = STATUS_MIDPOINT[v.status];
   const staticData: Partial<VocabContentEntry> = vocabContent[v.word] || {};
-  const aiData = (aiVocabCache as Record<string, { aiExplanation?: string; aiExamples?: Record<string, string>; grammarExamples?: Record<string, string> }>)[v.word.toLowerCase()] || {};
+  const aiData = (aiVocabCache as Record<string, { aiExplanation?: string; aiExamples?: Record<string, string>; grammarExamples?: Record<string, string>; neighborConnections?: Record<string, string> }>)[v.word.toLowerCase()] || {};
   const weight = v.weight;
 
   // Distribute initial score across roles
@@ -304,7 +304,7 @@ interface MasteryActions {
   clearAllSavedPhrases: () => Promise<void>;
   checkAssessments: (onTrigger: (word: VocabWord) => void) => void;
   switchProfile: (name: string) => void;
-  updateVocabAIContent: (wordId: string, content: { aiExplanation?: string; aiExamples?: Record<string, string>; grammarExamples?: Record<string, string> }) => void;
+  updateVocabAIContent: (wordId: string, content: { aiExplanation?: string; aiExamples?: Record<string, string>; grammarExamples?: Record<string, string>; neighborConnections?: Record<string, string> }) => void;
   updateSessionNotes: (wordId: string, notes: string) => void;
   resetProgress: () => void;
   chargeGrid: () => void;
@@ -2051,7 +2051,7 @@ export const useMasteryStore = create<MasteryStore>()(
               const base = mappedVocabulary.find(iv => iv.word === w.word);
               const staticData: Partial<VocabContentEntry> = vocabContent[w.word || ''] || {};
               const wordLower = (w.word || '').toLowerCase();
-              const aiData = (aiVocabCache as Record<string, { aiExplanation?: string; aiExamples?: Record<string, string> }>)[wordLower] || {};
+              const aiData = (aiVocabCache as Record<string, { aiExplanation?: string; aiExamples?: Record<string, string>; grammarExamples?: Record<string, string>; neighborConnections?: Record<string, string> }>)[wordLower] || {};
               const useCount = typeof w.useCount === 'number' ? w.useCount : 0;
               const frequencyRank = typeof w.frequencyRank === 'number' ? w.frequencyRank : (base?.frequencyRank ?? 999);
               const type = (w.type as 'word' | 'grammar') || (base?.type ?? 'word');
@@ -2108,6 +2108,8 @@ export const useMasteryStore = create<MasteryStore>()(
                 sessionNotes,
                 aiExplanation: (w.aiExplanation as string) || aiData?.aiExplanation || '',
                 aiExamples: (w.aiExamples as Record<string, string>) || aiData?.aiExamples,
+                grammarExamples: (w.grammarExamples as Record<string, string>) || aiData?.grammarExamples,
+                neighborConnections: (w.neighborConnections as Record<string, string>) || aiData?.neighborConnections,
                 partOfSpeech: w.partOfSpeech || (base?.partOfSpeech ?? ''),
                 lastReviewed: (w.lastReviewed as string) || new Date().toISOString(),
                 scoreHistory: (w.scoreHistory as ScoreHistoryEntry[]) || [],

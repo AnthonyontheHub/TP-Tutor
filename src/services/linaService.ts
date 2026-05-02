@@ -571,6 +571,24 @@ export async function fetchExamplesForWord(apiKey: string, word: string, partsOf
   }
 }
 
+export async function fetchNeighborConnections(apiKey: string, word: string, neighbors: string[], userContext?: string) {
+  if (!neighbors.length) return {};
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({
+    model: GEMINI_MODEL,
+    generationConfig: { responseMimeType: "application/json" },
+  });
+  const contextInstruction = userContext ? ` Context: ${userContext}.` : '';
+  const prompt = `Act as jan Lina, a Toki Pona teacher. For the word "${word}", briefly explain its connection (e.g. Opposite, Synonym, Category, etc.) to each of these neighbors: ${neighbors.join(', ')}.${contextInstruction} Return ONLY a JSON object mapping each neighbor string exactly as provided to a 1-sentence explanation of the connection, e.g. {"ala (none/zero)": "Opposite: 'ali' means all, while 'ala' means none."}`;
+  try {
+    const result = await model.generateContent(prompt);
+    return JSON.parse(sanitizeJson(result.response.text())) as Record<string, string>;
+  } catch (e) {
+    console.error('jan Lina Neighbors Error:', e);
+    return neighbors.reduce((acc, n) => ({ ...acc, [n]: 'A related Toki Pona word.' }), {} as Record<string, string>);
+  }
+}
+
 export function stripProposedChanges(text: string) {
   return text.split('---')[0].trim();
 }

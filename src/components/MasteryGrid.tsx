@@ -352,6 +352,7 @@ export default function MasteryGrid({
         onClose={() => setDrawerId(null)}
         onAskLina={onAskLina}
         isSandboxMode={isSandboxMode}
+        onWordSelect={(w) => setDrawerId(w)}
       />
     </div>
   );

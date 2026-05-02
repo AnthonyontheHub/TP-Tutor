@@ -243,6 +243,7 @@ export interface VocabWord {
   aiExplanation?: string;
   aiExamples?: Record<string, string>;
   grammarExamples?: Record<string, string>;
+  neighborConnections?: Record<string, string>;
 
   // Deep Knowledge Scoring
   lastReviewed: string; // ISO timestamp
