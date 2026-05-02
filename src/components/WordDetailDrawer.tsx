@@ -270,20 +270,43 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
               </section>
             </div>
 
-            <div style={{ marginBottom: '32px' }}>
-              <section className="glass-panel" style={{ padding: '15px' }}>
-                <h3 className="section-title" style={{ fontSize: '0.6rem' }}>Neighbors</h3>
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{neighbors.length > 0 ? neighbors.slice(0, 4).join(', ') : '-'}</div>
-                {neighbors.length > 4 && (
-                  <button type="button"
-                    onClick={() => setIsNeighborsModalOpen(true)}
-                    style={{ background: 'none', border: 'none', color: 'var(--gold)', fontSize: '0.65rem', cursor: 'pointer', marginTop: '8px', padding: 0 }}
-                  >
-                    VIEW ALL
-                  </button>
-                )}
-              </section>
-            </div>
+            {filteredNeighbors.length > 0 && (
+              <div style={{ marginBottom: '32px' }}>
+                <section className="glass-panel" style={{ padding: '15px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                    <h3 className="section-title" style={{ fontSize: '0.6rem', margin: 0 }}>Neighbors</h3>
+                  </div>
+                  <div style={{ display: 'grid', gap: '8px' }}>
+                    {filteredNeighbors.slice(0, 4).map(n => {
+                      const pureName = n.split(' ')[0];
+                      return (
+                        <div key={n} style={{ background: 'rgba(255,255,255,0.03)', padding: '10px', borderRadius: '4px', borderLeft: '2px solid var(--amber)' }}>
+                          <button type="button" 
+                            onClick={() => onWordSelect?.(pureName)}
+                            style={{ background: 'none', border: 'none', padding: 0, margin: 0, fontSize: '0.75rem', color: 'var(--amber)', fontWeight: 900, textTransform: 'uppercase', marginBottom: '4px', cursor: 'pointer', textAlign: 'left' }}
+                          >
+                            {n}
+                          </button>
+                          {neighborConnections?.[n] ? (
+                            <div style={{ fontSize: '0.85rem', color: '#eee', lineHeight: '1.4' }}>{neighborConnections[n]}</div>
+                          ) : (
+                            <div style={{ height: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '2px', width: '80%' }} />
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {filteredNeighbors.length > 4 && (
+                    <button type="button"
+                      onClick={() => setIsNeighborsModalOpen(true)}
+                      style={{ background: 'none', border: 'none', color: 'var(--gold)', fontSize: '0.65rem', cursor: 'pointer', marginTop: '12px', padding: 0, fontWeight: 900, letterSpacing: '0.05em' }}
+                    >
+                      VIEW ALL {filteredNeighbors.length} NEIGHBORS
+                    </button>
+                  )}
+                </section>
+              </div>
+            )}
 
             <section style={{ marginBottom: '32px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
