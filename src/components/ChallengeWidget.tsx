@@ -1,64 +1,103 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
+import { Clock, Zap, Info } from 'lucide-react';
 
 const ChallengeWidget: React.FC = () => {
-  const { currentChallenge, generateWeeklyChallenge } = useMasteryStore();
-  const [isExpanded, setIsEditing] = useState(false); // Using setIsExpanded instead of setIsEditing but following naming style
+  const { 
+    currentChallenge, 
+    currentDailyChallenge,
+    dailySnoozedUntil,
+    weeklySnoozedUntil,
+    snoozeChallenge
+  } = useMasteryStore();
+  
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [now, setNow] = useState(new Date());
 
-  if (!currentChallenge) {
-    return (
-      <div 
-        onClick={() => generateWeeklyChallenge()}
-        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid #333', padding: '12px 20px', borderRadius: '8px', cursor: 'pointer' }}
-      >
-        <div style={{ color: 'var(--gold)', fontSize: '0.65rem', fontWeight: 900, letterSpacing: '0.1em' }}>WEEKLY CHALLENGE</div>
-        <div style={{ color: 'white', fontSize: '0.85rem', marginTop: '4px' }}>Generating challenge...</div>
-      </div>
-    );
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 60000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const dailySnoozed = dailySnoozedUntil && new Date(dailySnoozedUntil) > now;
+  const weeklySnoozed = weeklySnoozedUntil && new Date(weeklySnoozedUntil) > now;
+
+  // Logic: Show Daily if available and not snoozed and not completed.
+  // Otherwise show Weekly if available and not snoozed and not completed.
+  let activeChallenge: any = null;
+  let challengeType: 'daily' | 'weekly' = 'daily';
+
+  if (currentDailyChallenge && !dailySnoozed && !currentDailyChallenge.completed) {
+    activeChallenge = currentDailyChallenge;
+    challengeType = 'daily';
+  } else if (currentChallenge && !weeklySnoozed && !currentChallenge.completed) {
+    activeChallenge = currentChallenge;
+    challengeType = 'weekly';
   }
 
-  const { title, description, currentCount, targetCount, completed, xpReward } = currentChallenge;
+  if (!activeChallenge) return null;
+
+  const { title, description, currentCount, targetCount, xpReward } = activeChallenge;
   const progress = Math.min((currentCount / targetCount) * 100, 100);
 
   return (
     <motion.div 
       layout
-      onClick={() => setIsEditing(!isExpanded)}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
       style={{ 
-        background: 'rgba(255,255,255,0.05)', 
-        border: '1px solid var(--border)', 
-        padding: '12px 20px', 
-        borderRadius: '8px', 
+        background: 'rgba(255,255,255,0.03)', 
+        border: '1px solid rgba(255,255,255,0.08)', 
+        padding: '16px', 
+        borderRadius: '16px', 
         cursor: 'pointer',
         width: '100%',
-        boxSizing: 'border-box'
+        boxSizing: 'border-box',
+        position: 'relative'
       }}
+      onClick={() => setIsExpanded(!isExpanded)}
+      className="group hover:bg-white/5 transition-colors"
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div style={{ flex: 1 }}>
-          <div style={{ color: 'var(--gold)', fontSize: '0.65rem', fontWeight: 900, letterSpacing: '0.1em' }}>WEEKLY CHALLENGE</div>
-          <div style={{ color: 'white', fontSize: '0.9rem', fontWeight: 800, marginTop: '2px' }}>{title}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+            {challengeType === 'daily' ? <Zap size={10} className="text-gold" /> : <Clock size={10} className="text-gold" />}
+            <span style={{ color: 'var(--gold)', fontSize: '0.55rem', fontWeight: 900, letterSpacing: '0.2em', textTransform: 'uppercase' }}>
+              {challengeType === 'daily' ? 'Daily Objective' : 'Weekly Milestone'}
+            </span>
+          </div>
+          <div style={{ color: 'white', fontSize: '0.9rem', fontWeight: 800, lineHeight: 1.2 }}>{title}</div>
         </div>
-        <div style={{ textAlign: 'right', marginLeft: '12px' }}>
-          {completed ? (
-            <span style={{ color: '#22c55e', fontSize: '0.75rem', fontWeight: 900 }}>✅ COMPLETE</span>
-          ) : (
-            <span style={{ color: 'var(--gold)', fontSize: '0.75rem', fontWeight: 900 }}>+{xpReward} XP</span>
-          )}
+        
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
+          <div style={{ color: 'var(--gold)', fontSize: '0.7rem', fontWeight: 900 }}>+{xpReward} XP</div>
+          <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              snoozeChallenge(challengeType);
+            }}
+            className="px-2 py-1 bg-white/5 border border-white/10 rounded-md text-[0.55rem] font-black text-white/30 hover:text-white hover:bg-white/10 transition-all uppercase tracking-widest"
+          >
+            Snooze
+          </button>
         </div>
       </div>
 
-      <div style={{ height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', marginTop: '10px', overflow: 'hidden' }}>
+      <div style={{ height: '3px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', marginTop: '12px', overflow: 'hidden' }}>
         <motion.div 
           initial={{ width: 0 }}
           animate={{ width: `${progress}%` }}
-          style={{ height: '100%', background: 'var(--gold)', borderRadius: '2px' }}
+          style={{ height: '100%', background: 'var(--gold)', boxShadow: '0 0 10px rgba(255,215,0,0.3)' }}
         />
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px', fontSize: '0.65rem', opacity: 0.5, fontWeight: 800 }}>
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px', fontSize: '0.6rem', opacity: 0.3, fontWeight: 800, letterSpacing: '0.05em' }}>
         <span>{currentCount} / {targetCount}</span>
-        {!isExpanded && <span>TAP TO SEE MORE</span>}
+        <div className="flex items-center gap-1">
+          <Info size={8} />
+          <span>{isExpanded ? 'TAP TO COLLAPSE' : 'TAP FOR DETAILS'}</span>
+        </div>
       </div>
 
       <AnimatePresence>
@@ -69,7 +108,7 @@ const ChallengeWidget: React.FC = () => {
             exit={{ height: 0, opacity: 0 }}
             style={{ overflow: 'hidden' }}
           >
-            <p style={{ fontSize: '0.8rem', opacity: 0.7, marginTop: '12px', lineHeight: '1.4', marginBottom: 0 }}>
+            <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginTop: '12px', lineHeight: '1.6', marginBottom: 0 }}>
               {description}
             </p>
           </motion.div>

@@ -10,6 +10,7 @@ import {
   type CurriculumLevel, type NodeStatus, type CommonPhrase, type PosRole,
   type SmallRank, type CeremonialRank, type Badge, type MasteryWeight, SMALL_RANKS,
   CEREMONIAL_RANKS, ALL_BADGES, type SessionLogEntry, type WeeklyChallenge,
+  type DailyChallenge,
   type RoleMatrix, type MasteryEvent, type ScoreHistoryEntry
 } from '../types/mastery';
 import type { VocabContentEntry } from '../data/vocabContent';
@@ -20,6 +21,7 @@ import { curriculumRoadmap } from '../data/curriculum';
 import { vocabContent } from '../data/vocabContent';
 import { TOKI_PONA_DICTIONARY, WORD_FREQUENCY } from '../data/tokiPonaDictionary';
 import aiVocabCache from '../data/aiVocabCache.json';
+import { generateAIChallenge, resolveApiKey } from '../services/linaService';
 
 function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: MasteryStatus; type: 'word' | 'grammar'; sessionNotes: string; frequencyRank?: number; weight?: MasteryWeight; sitelenPona?: string; sitelenEtymology?: string; neighborConnections?: Record<string, string>; grammarExamples?: Record<string, string> }): VocabWord {
   const score = STATUS_MIDPOINT[v.status];
@@ -347,7 +349,9 @@ interface MasteryActions {
   // Prompt C Actions
   startSessionTimer: () => void;
   commitSessionLog: (entry: Omit<SessionLogEntry, 'id' | 'durationMinutes'>) => void;
-  generateWeeklyChallenge: () => void;
+  generateWeeklyChallenge: () => Promise<void>;
+  generateDailyChallenge: () => Promise<void>;
+  snoozeChallenge: (type: 'daily' | 'weekly') => void;
   progressChallenge: (amount?: number, type?: WeeklyChallenge['type'], wordId?: string) => void;
   clearRankAcknowledgement: () => void;
 }
@@ -408,7 +412,10 @@ interface MasteryState {
   sessionLog: SessionLogEntry[];
   sessionStartTime: string;
   currentChallenge: WeeklyChallenge | null;
+  currentDailyChallenge: DailyChallenge | null;
   completedChallenges: WeeklyChallenge[];
+  dailySnoozedUntil: string | null;
+  weeklySnoozedUntil: string | null;
   pendingRankAcknowledgement: string | null;
 }
 
@@ -523,7 +530,10 @@ export const useMasteryStore = create<MasteryStore>()(
       sessionLog: [],
       sessionStartTime: '',
       currentChallenge: null,
+      currentDailyChallenge: null,
       completedChallenges: [],
+      dailySnoozedUntil: null,
+      weeklySnoozedUntil: null,
       pendingRankAcknowledgement: null,
 
       setHasCompletedSetup: (val) => { set({ hasCompletedSetup: val }); void get().syncToCloud(); },
@@ -1424,124 +1434,107 @@ export const useMasteryStore = create<MasteryStore>()(
         void get().syncToCloud();
       },
 
-      generateWeeklyChallenge: () => {
-        const now = new Date();
-        const day = now.getDay(); // 0 (Sun) to 6 (Sat)
-        const diff = now.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
-        const monday = new Date(now.setDate(diff));
-        monday.setHours(0,0,0,0);
-        const weekStartDate = monday.toISOString().split('T')[0];
 
-        const { currentChallenge, vocabulary } = get();
-        if (currentChallenge && currentChallenge.weekStartDate === weekStartDate) return;
+      generateWeeklyChallenge: async () => {
+        const { vocabulary, totalXP } = get();
+        const apiKey = resolveApiKey();
+        if (!apiKey) return;
 
-        if (currentChallenge && new Date(currentChallenge.expiresDate) < new Date()) {
-           set(state => ({ completedChallenges: [currentChallenge, ...state.completedChallenges] }));
-        }
-
-        const templates: { type: WeeklyChallenge['type'], title: string, description: string, targetCount: number, xpReward: number }[] = [
-          {
-            type: 'word_usage',
-            title: "Use [word] in 3 different sentences",
-            description: "Show jan Lina you can use [word] as a noun, verb, and modifier.",
-            targetCount: 3, xpReward: 150
-          },
-          {
-            type: 'session_count',
-            title: "Complete 3 sessions this week",
-            description: "Show up three times. Consistency beats intensity.",
-            targetCount: 3, xpReward: 200
-          },
-          {
-            type: 'word_progression',
-            title: "Get any word from Introduced to Practicing",
-            description: "Push a new word deeper into your memory.",
-            targetCount: 1, xpReward: 175
-          },
-          {
-            type: 'prove_it_usage',
-            title: "Use [word] correctly in a Prove It drill",
-            description: "Submit a Prove It sentence using [word] and have jan Lina confirm it.",
-            targetCount: 1, xpReward: 125
-          },
-          {
-            type: 'convo_length',
-            title: "Have a 10-message conversation with jan Lina",
-            description: "Go deep. Ten messages back and forth in one session.",
-            targetCount: 10, xpReward: 225
-          },
-          {
-            type: 'phrase_save',
-            title: "Save 2 new phrases to The Archive",
-            description: "Build your personal phrase library.",
-            targetCount: 2, xpReward: 100
-          },
-        ];
-
-        const template = templates[Math.floor(Math.random() * templates.length)];
-        const candidates = vocabulary.filter(w => w.status === 'introduced' || w.status === 'practicing');
-        const randomWord = candidates.length > 0 ? candidates[Math.floor(Math.random() * candidates.length)].word : 'toki';
-        
-        const expires = new Date(monday);
-        expires.setDate(expires.getDate() + 6);
-        expires.setHours(23, 59, 59, 999);
-
-        const newChallenge: WeeklyChallenge = {
-          id: crypto.randomUUID(),
-          type: template.type,
-          weekStartDate,
-          title: template.title.replace('[word]', randomWord),
-          description: template.description.replace('[word]', randomWord),
-          targetWord: randomWord,
-          targetCount: template.targetCount,
-          currentCount: 0,
-          completed: false,
-          xpReward: template.xpReward,
-          expiresDate: expires.toISOString()
-        };
-
+        const newChallenge = await generateAIChallenge(apiKey, vocabulary, totalXP, 'weekly');
         set({ currentChallenge: newChallenge });
         void get().syncToCloud();
       },
 
+      generateDailyChallenge: async () => {
+        const { vocabulary, totalXP } = get();
+        const apiKey = resolveApiKey();
+        if (!apiKey) return;
+
+        const newChallenge = await generateAIChallenge(apiKey, vocabulary, totalXP, 'daily');
+        set({ currentDailyChallenge: newChallenge });
+        void get().syncToCloud();
+      },
+
+      snoozeChallenge: (type: 'daily' | 'weekly') => {
+        const now = new Date();
+        if (type === 'daily') {
+          const snoozedUntil = new Date(now.getTime() + 90 * 60000); // 90 minutes
+          set({ dailySnoozedUntil: snoozedUntil.toISOString() });
+        } else {
+          const snoozedUntil = new Date(now.getTime() + 36 * 3600000); // 36 hours
+          set({ weeklySnoozedUntil: snoozedUntil.toISOString() });
+        }
+        void get().syncToCloud();
+      },
+
       progressChallenge: (amount = 1, type?: WeeklyChallenge['type'], wordId?: string) => {
-        const { currentChallenge, vocabulary } = get();
-        if (!currentChallenge || currentChallenge.completed) return;
+        const { currentChallenge, currentDailyChallenge, vocabulary } = get();
+        const now = new Date().toISOString();
 
-        // If type is specified, only progress if it matches
-        if (type && currentChallenge.type !== type) return;
-        
-        // If targetWord is specified for the challenge, check if it matches
-        if (currentChallenge.targetWord && wordId && currentChallenge.targetWord.toLowerCase() !== wordId.toLowerCase()) return;
+        // Progress Weekly
+        if (currentChallenge && !currentChallenge.completed) {
+          const matchesType = !type || currentChallenge.type === type;
+          const matchesWord = !currentChallenge.targetWord || !wordId || currentChallenge.targetWord.toLowerCase() === wordId.toLowerCase();
 
-        const newCount = Math.min(currentChallenge.currentCount + amount, currentChallenge.targetCount);
-        const completed = newCount >= currentChallenge.targetCount;
-
-        set(state => ({
-          currentChallenge: state.currentChallenge ? {
-            ...state.currentChallenge,
-            currentCount: newCount,
-            completed
-          } : null
-        }));
-
-        if (completed) {
-          const sorted = [...vocabulary].sort((a,b) => (b.baseScore || 0) - (a.baseScore || 0));
-          const bestWord = sorted[0];
-          if (bestWord) {
-            const now = new Date().toISOString();
-            const newScore = Math.min((bestWord.baseScore || 0) + currentChallenge.xpReward, 1000);
+          if (matchesType && matchesWord) {
+            const newCount = Math.min(currentChallenge.currentCount + amount, currentChallenge.targetCount);
+            const completed = newCount >= currentChallenge.targetCount;
+            
             set(state => ({
-              vocabulary: state.vocabulary.map(w => w.id === bestWord.id ? {
-                ...w,
-                baseScore: newScore,
-                confidenceScore: newScore,
-                status: scoreToStatus(newScore),
-                scoreHistory: [{ date: now, change: currentChallenge.xpReward, reason: `Weekly challenge complete: ${currentChallenge.title}` }, ...(w.scoreHistory || [])].slice(0, 5)
-              } : w)
+              currentChallenge: state.currentChallenge ? { ...state.currentChallenge, currentCount: newCount, completed } : null
             }));
+
+            if (completed) {
+              const sorted = [...vocabulary].sort((a,b) => (b.baseScore || 0) - (a.baseScore || 0));
+              const bestWord = sorted[0];
+              if (bestWord) {
+                const newScore = Math.min((bestWord.baseScore || 0) + currentChallenge.xpReward, 1000);
+                set(state => ({
+                  vocabulary: state.vocabulary.map(w => w.id === bestWord.id ? {
+                    ...w,
+                    baseScore: newScore,
+                    confidenceScore: newScore,
+                    status: scoreToStatus(newScore),
+                    scoreHistory: [{ date: now, change: currentChallenge.xpReward, reason: `Weekly challenge complete: ${currentChallenge.title}` }, ...(w.scoreHistory || [])].slice(0, 5)
+                  } : w)
+                }));
+              }
+            }
           }
         }
+
+        // Progress Daily
+        if (currentDailyChallenge && !currentDailyChallenge.completed) {
+          const matchesType = !type || currentDailyChallenge.type === type;
+          const matchesWord = !currentDailyChallenge.targetWord || !wordId || currentDailyChallenge.targetWord.toLowerCase() === wordId.toLowerCase();
+
+          if (matchesType && matchesWord) {
+            const newCount = Math.min(currentDailyChallenge.currentCount + amount, currentDailyChallenge.targetCount);
+            const completed = newCount >= currentDailyChallenge.targetCount;
+            
+            set(state => ({
+              currentDailyChallenge: state.currentDailyChallenge ? { ...state.currentDailyChallenge, currentCount: newCount, completed } : null
+            }));
+
+            if (completed) {
+              const sorted = [...vocabulary].sort((a,b) => (b.baseScore || 0) - (a.baseScore || 0));
+              const bestWord = sorted[0];
+              if (bestWord) {
+                const newScore = Math.min((bestWord.baseScore || 0) + currentDailyChallenge.xpReward, 1000);
+                set(state => ({
+                  vocabulary: state.vocabulary.map(w => w.id === bestWord.id ? {
+                    ...w,
+                    baseScore: newScore,
+                    confidenceScore: newScore,
+                    status: scoreToStatus(newScore),
+                    scoreHistory: [{ date: now, change: currentDailyChallenge.xpReward, reason: `Daily challenge complete: ${currentDailyChallenge.title}` }, ...(w.scoreHistory || [])].slice(0, 5)
+                  } : w)
+                }));
+              }
+            }
+          }
+        }
+
         void get().syncToCloud();
       },
 
@@ -1585,6 +1578,9 @@ export const useMasteryStore = create<MasteryStore>()(
           confusionPairs: [],
           sessionLog: [],
           currentChallenge: null,
+          currentDailyChallenge: null,
+          dailySnoozedUntil: null,
+          weeklySnoozedUntil: null,
           completedChallenges: [],
           pendingRankAcknowledgement: null,
           pendingProveItResponses: [],
@@ -1643,6 +1639,9 @@ export const useMasteryStore = create<MasteryStore>()(
           confusionPairs: [],
           sessionLog: [],
           currentChallenge: null,
+          currentDailyChallenge: null,
+          dailySnoozedUntil: null,
+          weeklySnoozedUntil: null,
           completedChallenges: [],
           pendingRankAcknowledgement: null,
           lastStreakCheck: '',
@@ -1687,6 +1686,9 @@ export const useMasteryStore = create<MasteryStore>()(
           confusionPairs: [],
           sessionLog: [],
           currentChallenge: null,
+          currentDailyChallenge: null,
+          dailySnoozedUntil: null,
+          weeklySnoozedUntil: null,
           completedChallenges: [],
           pendingRankAcknowledgement: null,
           lastStreakCheck: '',
@@ -1907,7 +1909,7 @@ export const useMasteryStore = create<MasteryStore>()(
         const { vocabulary, curriculums, lastUpdated, studentName, totalXP, profile, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, isMainProfile, widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, cloudSynced, gridChargeUntil, songs, commonPhrases, lastStreakCheck, learningDays, confusionPairs, pendingProveItResponses,
             earnedCeremonialRanks, lastSmallRankTitle, earnedBadges, totalProveItSubmitted,
             streakShields, xpMultiplier, lastStreakMilestone, pendingComebackBonus, sessionXPRecord,
-            sessionLog, currentChallenge, completedChallenges, pendingRankAcknowledgement, newRankUnlocked,
+            sessionLog, currentChallenge, currentDailyChallenge, dailySnoozedUntil, weeklySnoozedUntil, completedChallenges, pendingRankAcknowledgement, newRankUnlocked,
             activeCurriculumId, activeModuleId, selectedWords, lessonFilter,
             completedNodeIds, seenIntroductions, completedActivities, masteryHistory } = get();
         const targetId = explicitUserId || userId;
@@ -1946,7 +1948,7 @@ export const useMasteryStore = create<MasteryStore>()(
             lastStreakCheck, learningDays, completedNodeIds, seenIntroductions, confusionPairs, pendingProveItResponses,
             earnedCeremonialRanks, lastSmallRankTitle, earnedBadges, totalProveItSubmitted,
             streakShields, xpMultiplier, lastStreakMilestone, pendingComebackBonus, sessionXPRecord,
-            sessionLog, currentChallenge, completedChallenges, pendingRankAcknowledgement, newRankUnlocked,
+            sessionLog, currentChallenge, currentDailyChallenge, dailySnoozedUntil, weeklySnoozedUntil, completedChallenges, pendingRankAcknowledgement, newRankUnlocked,
             activeCurriculumId, activeModuleId, selectedWords, lessonFilter, completedActivities, masteryHistory
           }), { merge });
         } catch (err) {
@@ -2199,6 +2201,9 @@ export const useMasteryStore = create<MasteryStore>()(
             sessionXPRecord: data.sessionXPRecord || 0,
             sessionLog: data.sessionLog || [],
             currentChallenge: data.currentChallenge || null,
+            currentDailyChallenge: data.currentDailyChallenge || null,
+            dailySnoozedUntil: data.dailySnoozedUntil || null,
+            weeklySnoozedUntil: data.weeklySnoozedUntil || null,
             completedChallenges: data.completedChallenges || [],
             pendingRankAcknowledgement: data.pendingRankAcknowledgement || null,
             newRankUnlocked: data.newRankUnlocked || null,

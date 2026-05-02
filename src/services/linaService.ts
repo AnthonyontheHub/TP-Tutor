@@ -715,3 +715,79 @@ export async function fetchSessionRecap(
       : 'Session complete! Keep practising.';
   }
 }
+export async function generateAIChallenge(apiKey: string, vocabulary: VocabWord[], totalXP: number, type: 'daily' | 'weekly'): Promise<any> {
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({
+    model: GEMINI_MODEL,
+    generationConfig: { responseMimeType: "application/json" },
+  });
+
+  const candidates = vocabulary.filter(w => w.status === 'introduced' || w.status === 'practicing');
+  const vocabSummary = candidates.map(v => `${v.word} (${v.status})`).slice(0, 10).join(', ');
+  
+  const prompt = `Act as jan Lina, a Toki Pona teacher. Generate a ${type} challenge for a student with ${totalXP} XP.
+  Current priority words: ${vocabSummary || 'None (use common words like toki, pona, etc.)'}
+
+  Available Challenge Types:
+  - word_usage: Use [word] in conversation.
+  - session_count: Start X new sessions.
+  - word_progression: Move [word] to the next status level.
+  - prove_it_usage: Use [word] in a Prove It sentence.
+  - convo_length: Have a conversation of at least X messages.
+  - phrase_save: Save X new phrases.
+
+  Return a JSON object matching this structure:
+  {
+    "type": "one of the types above",
+    "title": "Short catchy title",
+    "description": "Clear instruction",
+    "targetWord": "optional word if applicable",
+    "targetCount": number,
+    "xpReward": number
+  }
+  
+  For Daily challenges, set targetCount lower (e.g. 1-3). For Weekly, set higher (e.g. 5-10 or complex tasks).
+  Make the title and description personal and encouraging in jan Lina's voice.
+  XP Rewards: Daily (50-100), Weekly (150-300).
+  `;
+
+  try {
+    const result = await model.generateContent(prompt);
+    const data = JSON.parse(sanitizeJson(result.response.text()));
+    
+    const now = new Date();
+    const expires = new Date(now);
+    if (type === 'daily') {
+      expires.setHours(23, 59, 59, 999);
+    } else {
+      expires.setDate(expires.getDate() + 7);
+    }
+
+    const challenge = {
+      id: crypto.randomUUID(),
+      ...data,
+      currentCount: 0,
+      completed: false,
+      expiresDate: expires.toISOString(),
+      ...(type === 'daily' ? { startDate: now.toISOString() } : { weekStartDate: now.toISOString() })
+    };
+    
+    return challenge;
+  } catch (e) {
+    console.error('AI Challenge Generation Error:', e);
+    const fallback: any = {
+      id: crypto.randomUUID(),
+      type: 'word_usage',
+      title: "Daily Practice",
+      description: "Use 'toki' in a sentence today.",
+      targetWord: 'toki',
+      targetCount: 1,
+      currentCount: 0,
+      completed: false,
+      xpReward: 50,
+      expiresDate: new Date(Date.now() + 86400000).toISOString(),
+      ...(type === 'daily' ? { startDate: new Date().toISOString() } : { weekStartDate: new Date().toISOString() })
+    };
+    return fallback;
+  }
+}

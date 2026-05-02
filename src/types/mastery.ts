@@ -341,6 +341,10 @@ export interface MasteryMap {
   savedPhrases: (string | SavedPhrase)[];
   currentStreak: number;
   lastActiveDate: string;
+
+  // Challenge Snooze Persistence
+  dailySnoozedUntil?: string | null;
+  weeklySnoozedUntil?: string | null;
 }
 
 
@@ -437,6 +441,20 @@ export interface WeeklyChallenge {
   id: string;
   type: 'word_usage' | 'session_count' | 'word_progression' | 'prove_it_usage' | 'convo_length' | 'phrase_save';
   weekStartDate: string;
+  title: string;
+  description: string;
+  targetWord?: string;
+  targetCount: number;
+  currentCount: number;
+  completed: boolean;
+  xpReward: number;
+  expiresDate: string;
+}
+
+export interface DailyChallenge {
+  id: string;
+  type: 'word_usage' | 'session_count' | 'word_progression' | 'prove_it_usage' | 'convo_length' | 'phrase_save';
+  startDate: string;
   title: string;
   description: string;
   targetWord?: string;
