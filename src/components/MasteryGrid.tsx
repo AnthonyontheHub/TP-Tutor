@@ -1,7 +1,7 @@
 /* src/components/MasteryGrid.tsx */
 import { useState, useMemo, memo, useCallback } from 'react';
 import { List } from 'react-window';
-import type { ListChildComponentProps } from 'react-window';
+import type { RowComponentProps } from 'react-window';
 import { AutoSizer } from 'react-virtualized-auto-sizer';
 import { useMasteryStore } from '../store/masteryStore';
 import VocabCard from './VocabCard';
@@ -25,7 +25,7 @@ const STATUS_RANK: Record<MasteryStatus, number> = {
 };
 
 // Memoized Row component to prevent unnecessary re-renders
-const Row = memo(({ index, style, data }: ListChildComponentProps) => {
+const Row = memo(({ index, style, data }: RowComponentProps<{ data: any }>) => {
   const { 
     items, columnCount, gap, selectedWords, activeFilter, 
     relatedWordIds, isSandboxMode, handleCardClick, handleCardLongPress,
@@ -300,8 +300,8 @@ export default function MasteryGrid({
 
       {viewMode === 'card' ? (
         <div style={{ position: 'relative', flex: 1, pointerEvents: 'auto', width: '100%' }}>
-          <AutoSizer>
-            {({ height, width }: { height: number; width: number }) => {
+          <AutoSizer
+            renderProp={({ height, width }: { height: number | undefined; width: number | undefined }) => {
               if (!height || !width) return null;
 
               const gap = 10;
@@ -329,7 +329,7 @@ export default function MasteryGrid({
                 />
               );
             }}
-          </AutoSizer>
+          />
         </div>
       ) : (
         <div className="mastery-grid__table-wrapper" style={{ overflowX: 'auto', background: 'rgba(0,0,0,0.2)', borderRadius: '8px', border: '1px solid #222' }}>
