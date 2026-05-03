@@ -54,7 +54,7 @@ export const SessionOverlay: React.FC = () => {
           <div className="text-white text-center">
             <h2 className="text-2xl font-bold mb-4 uppercase">Activity Under Construction</h2>
             <p className="text-gray-400 mb-8 font-mono text-xs uppercase tracking-widest">Type: {type}</p>
-            <button type="button" 
+            <button 
               onClick={() => handleComplete()}
               className="px-8 py-3 bg-white text-black font-black rounded-full"
             >
@@ -69,7 +69,7 @@ export const SessionOverlay: React.FC = () => {
     <div className="fixed inset-0 bg-black/90 backdrop-blur-3xl z-[100] flex flex-col overflow-y-auto">
       {/* Top Header */}
       <div className="flex justify-end p-6">
-        <button type="button" 
+        <button 
           onClick={handleClose}
           className="p-3 bg-white/5 border border-white/10 rounded-full text-white/40 hover:text-white hover:bg-white/10 transition-all active:scale-95"
         >
@@ -102,13 +102,13 @@ export const SessionOverlay: React.FC = () => {
                 <p className="text-gray-400 text-sm leading-relaxed">Your progress will not be saved for this activity.</p>
               </div>
               <div className="flex flex-col gap-3">
-                <button type="button" 
+                <button 
                   onClick={confirmAbandon}
                   className="w-full py-4 bg-rose-600 text-white font-black uppercase tracking-[0.2em] rounded-xl hover:bg-rose-500 transition-all"
                 >
                   Confirm Exit
                 </button>
-                <button type="button" 
+                <button 
                   onClick={() => setShowConfirm(false)}
                   className="w-full py-4 bg-white/5 text-white/60 font-bold uppercase tracking-[0.2em] rounded-xl hover:bg-white/10 transition-all"
                 >

@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LogOut, Loader2 } from 'lucide-react';
 import { generateSortItems } from '../../services/geminiService';
-import type { UserProfile } from '../../types/mastery';
 
 interface SortItem {
   label: string;
@@ -10,7 +9,7 @@ interface SortItem {
 }
 
 interface PhilosophySorterProps {
-  userProfile: UserProfile;
+  userProfile: any;
   curriculumContext?: string;
   vocabList?: string[];
   onSessionEnd: (results: { score: number; total: number }) => void;
@@ -23,7 +22,7 @@ export const PhilosophySorter: React.FC<PhilosophySorterProps> = ({ userProfile,
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  const loadItems = useCallback(async () => {
+  const loadItems = async () => {
     setLoading(true);
     try {
       const context = vocabList && vocabList.length > 0 
@@ -38,11 +37,11 @@ export const PhilosophySorter: React.FC<PhilosophySorterProps> = ({ userProfile,
     } finally {
       setLoading(false);
     }
-  }, [userProfile, curriculumContext, vocabList]);
+  };
 
   useEffect(() => { 
     loadItems(); 
-  }, [loadItems]);
+  }, [userProfile]);
 
   const handleSort = (category: 'pona' | 'ike') => {
     if (items[currentIndex].category === category) {
@@ -83,11 +82,12 @@ export const PhilosophySorter: React.FC<PhilosophySorterProps> = ({ userProfile,
               }}
               initial={{ opacity: 0, scale: 0.8, x: 0 }}
               animate={{ opacity: 1, scale: 1, x: 0 }}
-              exit={{
+              exit={(custom) => ({
                 opacity: 0,
                 scale: 0.5,
+                x: custom === 'ike' ? 200 : -200,
                 transition: { duration: 0.2 }
-              }}
+              })}
               className="w-64 h-40 bg-black/60 backdrop-blur-2xl border border-white/10 rounded-3xl flex items-center justify-center p-6 text-center cursor-grab active:cursor-grabbing shadow-2xl"
             >
               <p className="text-lg font-light italic text-white/90">"{items[currentIndex].label}"</p>
@@ -97,13 +97,13 @@ export const PhilosophySorter: React.FC<PhilosophySorterProps> = ({ userProfile,
       </div>
 
       <div className="flex w-full gap-8">
-        <button type="button"
+        <button 
           onClick={() => handleSort('pona')} 
           className="flex-1 py-6 rounded-2xl border border-cyan-500/20 bg-cyan-500/5 text-cyan-400 font-black uppercase tracking-[0.3em] hover:bg-cyan-500/10 hover:border-cyan-500/50 transition-all active:scale-95"
         >
           PONA
         </button>
-        <button type="button"
+        <button 
           onClick={() => handleSort('ike')} 
           className="flex-1 py-6 rounded-2xl border border-rose-500/20 bg-rose-500/5 text-rose-400 font-black uppercase tracking-[0.3em] hover:bg-rose-500/10 hover:border-rose-500/50 transition-all active:scale-95"
         >
@@ -111,7 +111,7 @@ export const PhilosophySorter: React.FC<PhilosophySorterProps> = ({ userProfile,
         </button>
       </div>
 
-      <button type="button"
+      <button 
         onClick={() => onSessionEnd({ score, total })} 
         className="mt-16 flex items-center gap-3 text-[10px] uppercase tracking-[0.5em] text-white/20 hover:text-cyan-500 transition-all group py-2 px-6 border border-transparent hover:border-cyan-500/20 rounded-full"
       >

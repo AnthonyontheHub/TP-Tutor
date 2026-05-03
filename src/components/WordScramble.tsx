@@ -73,7 +73,7 @@ export default function WordScramble({ nodeId, vocabList, onComplete }: { nodeId
     setScrambled(shuffled);
     setSelected([]);
     setIsCorrect(false);
-  }, [currentIndex, currentWord]);
+  }, [currentIndex]);
 
   const handleTileClick = (letter: ScrambledLetter) => {
     if (isCorrect) return;
@@ -114,7 +114,7 @@ export default function WordScramble({ nodeId, vocabList, onComplete }: { nodeId
           <div className="mb-8 p-3 bg-[#D4AF371a] border border-[#D4AF3733] rounded-lg">
             <p className="text-[#D4AF37] text-xs font-mono uppercase tracking-widest font-bold">Node Activity Requirement Met! +30% Readiness</p>
           </div>
-          <button type="button" onClick={resetGame} className="px-8 py-3 bg-[#D4AF37] text-black font-bold rounded-full transition-all hover:scale-105">Play Again</button>
+          <button onClick={resetGame} className="px-8 py-3 bg-[#D4AF37] text-black font-bold rounded-full transition-all hover:scale-105">Play Again</button>
         </motion.div>
       </div>
     );
@@ -138,14 +138,14 @@ export default function WordScramble({ nodeId, vocabList, onComplete }: { nodeId
           <AnimatePresence mode="popLayout">
             {selected.length === 0 && <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 0.3 }} exit={{ opacity: 0 }} className="absolute text-xs font-mono uppercase tracking-[0.3em]">Assemble Word</motion.div>}
             {selected.map((letter) => (
-              <motion.button type="button" key={letter.id} layoutId={letter.id} onClick={() => handleRemoveClick(letter)} className="w-12 h-16 md:w-14 md:h-20 bg-white text-black flex items-center justify-center text-2xl md:text-3xl font-bold rounded-lg shadow-[0_4px_0_#ccc] active:translate-y-1 active:shadow-none transition-all cursor-pointer" animate={isCorrect ? { backgroundColor: "#00FF00", boxShadow: "0 0 20px rgba(0, 255, 0, 0.4)", y: [0, -10, 0] } : {}} transition={isCorrect ? { duration: 0.4, repeat: 0, delay: selected.indexOf(letter) * 0.05 } : { type: "spring", stiffness: 300, damping: 30 }}>{letter.char}</motion.button>
+              <motion.button key={letter.id} layoutId={letter.id} onClick={() => handleRemoveClick(letter)} className="w-12 h-16 md:w-14 md:h-20 bg-white text-black flex items-center justify-center text-2xl md:text-3xl font-bold rounded-lg shadow-[0_4px_0_#ccc] active:translate-y-1 active:shadow-none transition-all cursor-pointer" animate={isCorrect ? { backgroundColor: "#00FF00", boxShadow: "0 0 20px rgba(0, 255, 0, 0.4)", y: [0, -10, 0] } : {}} transition={isCorrect ? { duration: 0.4, repeat: 0, delay: selected.indexOf(letter) * 0.05 } : { type: "spring", stiffness: 300, damping: 30 }}>{letter.char}</motion.button>
             ))}
           </AnimatePresence>
         </div>
         <div className="grid grid-cols-4 gap-4 md:gap-6 justify-center">
           <AnimatePresence mode="popLayout">
             {scrambled.map((letter) => (
-              <motion.button type="button" key={letter.id} layoutId={letter.id} onClick={() => handleTileClick(letter)} className="w-12 h-16 md:w-14 md:h-20 bg-[#1a1a1a] border border-[#ffffff20] text-white flex items-center justify-center text-2xl md:text-3xl font-bold rounded-lg shadow-[0_4px_0_#000] active:translate-y-1 active:shadow-none transition-all cursor-pointer hover:bg-[#252525]" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={{ type: "spring", stiffness: 500, damping: 30 }}>{letter.char}</motion.button>
+              <motion.button key={letter.id} layoutId={letter.id} onClick={() => handleTileClick(letter)} className="w-12 h-16 md:w-14 md:h-20 bg-[#1a1a1a] border border-[#ffffff20] text-white flex items-center justify-center text-2xl md:text-3xl font-bold rounded-lg shadow-[0_4px_0_#000] active:translate-y-1 active:shadow-none transition-all cursor-pointer hover:bg-[#252525]" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={{ type: "spring", stiffness: 500, damping: 30 }}>{letter.char}</motion.button>
             ))}
           </AnimatePresence>
         </div>
@@ -154,14 +154,14 @@ export default function WordScramble({ nodeId, vocabList, onComplete }: { nodeId
             {isCorrect && (
               <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -20, opacity: 0 }} className="flex flex-col items-center gap-4">
                 <div className="flex items-center gap-2 text-[#00FF00]"><CheckCircle2 className="w-5 h-5" /><span className="font-mono uppercase tracking-[0.2em] font-bold">Excellent!</span></div>
-                <button type="button" onClick={nextWord} className="group flex items-center gap-2 px-6 py-2 bg-white text-black font-bold rounded-full hover:bg-[#D4AF37] transition-colors">{currentIndex === words.length - 1 ? 'Finish' : 'Next Word'}<ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></button>
+                <button onClick={nextWord} className="group flex items-center gap-2 px-6 py-2 bg-white text-black font-bold rounded-full hover:bg-[#D4AF37] transition-colors">{currentIndex === words.length - 1 ? 'Finish' : 'Next Word'}<ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></button>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
       </main>
       <footer className="w-full max-w-md py-8 flex justify-center">
-        <button type="button" onClick={() => { setScrambled([...scrambled, ...selected].sort(() => Math.random() - 0.5)); setSelected([]); setIsCorrect(false); }} disabled={isCorrect} className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-gray-500 hover:text-white disabled:opacity-0 transition-all"><RefreshCcw className="w-3 h-3" />Reset word</button>
+        <button onClick={() => { setScrambled([...scrambled, ...selected].sort(() => Math.random() - 0.5)); setSelected([]); setIsCorrect(false); }} disabled={isCorrect} className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-gray-500 hover:text-white disabled:opacity-0 transition-all"><RefreshCcw className="w-3 h-3" />Reset word</button>
       </footer>
     </div>
   );

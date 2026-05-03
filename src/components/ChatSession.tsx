@@ -1,11 +1,10 @@
 /* src/components/ChatSession.tsx */
-import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { m, LazyMotion, domMax, AnimatePresence } from 'framer-motion';
+import { useState, useRef, useEffect } from 'react';
+import { m, LazyMotion, domMax } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
 import { useChatStore } from '../store/chatStore';
 import type { ChatMessage } from '../store/chatStore';
 import { STATUS_MIDPOINT } from '../types/mastery';
-import type { MasteryStatus } from '../types/mastery';
 import {
   buildTutorPrompt, buildChatPrompt, buildMasteryCourtPrompt, streamCompletion, stripProposedChanges,
   parseProposedChanges, parseSessionSummaryNotes, resolveApiKey,
@@ -35,9 +34,9 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
   const updateSession = useChatStore(state => state.updateSession);
   const removeSession = useChatStore(state => state.removeSession);
 
-  const messages = useMemo(() => session?.messages || [], [session?.messages]);
-  const history = useMemo(() => session?.history || [], [session?.history]);
-  const sessionDeltas = useMemo(() => session?.sessionDeltas || [], [session?.sessionDeltas]);
+  const messages = session?.messages || [];
+  const history = session?.history || [];
+  const sessionDeltas = session?.sessionDeltas || [];
   const chatContext = session?.context || 'GENERAL';
 
   const [input, setInput] = useState('');
@@ -45,10 +44,9 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
   const [showRecap, setShowRecap] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
   const [summaryText, setSummaryText] = useState('');
-  const [showDictionary, setShowDictionary] = useState(false);
-  const [dictSearch, setDictSearch] = useState('');
   const [sessionXP, setSessionXP] = useState(0);
   const [startingTotalXP, setStartingTotalXP] = useState(0);
+  const [userMsgCount, setUserMsgCount] = useState(0);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const yesterdayWasActive = useRef(false);
 
@@ -65,6 +63,7 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
   const setLastUpdated      = useMasteryStore(s => s.setLastUpdated);
   const studentName         = useMasteryStore(s => s.studentName);
   const profile             = useMasteryStore(s => s.profile);
+  const lore                = useMasteryStore(s => s.lore);
   const checkNodeReadiness  = useMasteryStore(s => s.checkNodeReadiness);
   const curriculums         = useMasteryStore(s => s.curriculums);
 
@@ -167,184 +166,6 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
     }
   };
 
-  const triggerProactiveGreeting = useCallback(async (context: string, overrideKey?: string) => {
-    if (!isSandboxMode && !resolveApiKey(overrideKey)) return;
-    startSessionTimer();
-    setIsLoading(true);
-    const assistantId = crypto.randomUUID();
-    
-    const initialAssistantMsg: ChatMessage = { id: assistantId, role: 'assistant', displayContent: '· · ·', raw: '' };
-    updateSession(sessionId, { messages: [initialAssistantMsg] });
-    
-    if (isSandboxMode) {
-      const finalMsg = { ...initialAssistantMsg, displayContent: SANDBOX_RESPONSE, raw: SANDBOX_RESPONSE };
-      updateSession(sessionId, { 
-        messages: [finalMsg],
-        history: [{ role: 'assistant', content: SANDBOX_RESPONSE }]
-      });
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      const key = resolveApiKey(overrideKey);
-      const state = useMasteryStore.getState();
-      const userContext = stringifyUserContext(state.profile);
-      const currentSession = useChatStore.getState().sessions.find(s => s.id === sessionId);
-      const latestChatContext = currentSession?.context || 'GENERAL';
-      const payload = currentSession?.contextPayload;
-      const vibe = currentSession?.vibe ?? 'chill';
-
-      const activeNodes = state.curriculums.flatMap(l => l.nodes);
-
-      const sys = latestChatContext === 'MASTERY_COURT'
-        ? buildMasteryCourtPrompt(state.vocabulary, displayName, userContext)
-        : latestChatContext === 'LESSON' 
-          ? buildTutorPrompt(state.vocabulary, activeNodes, displayName, userContext, undefined, undefined, vibe, yesterdayWasActive.current, getRegressionCandidates(7), getTopConfusionPairs(5), pendingProveItResponses, xpMultiplier, currentChallenge, pendingRankAcknowledgement, currentSession?.mode)
-          : buildChatPrompt(state.vocabulary, displayName, userContext, latestChatContext, payload, yesterdayWasActive.current, getTopConfusionPairs(5), xpMultiplier, pendingRankAcknowledgement, currentSession?.mode);
-      
-      let introId: string | null = null;
-      if (latestChatContext === 'LESSON') {
-        const match = context.match(/for "(.*?)"/);
-        introId = match ? `lesson_${match[1]}` : 'lesson_general';
-      } else if (context.includes('Daily Review')) {
-        introId = 'daily_review';
-      } else if (context.includes('Archive Practice') || context.includes('practice my saved phrases')) {
-        introId = 'archive_practice';
-      } else if (context.includes('Start a general conversation')) {
-        introId = 'general_chat';
-      }
-
-      let finalContext = context;
-      if (introId && !seenIntroductions.includes(introId)) {
-        finalContext += `\n[SYSTEM: This is the FIRST TIME the student has entered this specific mode or lesson. Before proceeding with the session as normal, take a moment to introduce yourself in this context and explain briefly what the goal of this module is and how you will be helping them master it. Keep it casual and helpful in your jan Lina personality.]`;
-      }
-
-      const triggerMsg = `[SYSTEM: Start the session now based on this context: ${finalContext}. Greet the student and proceed naturally.]`;
-      let full = '';
-      for await (const chunk of streamCompletion(key, sys, [{ role: 'user', content: triggerMsg }])) {
-        full += chunk;
-        const currentSession = useChatStore.getState().sessions.find(s => s.id === sessionId);
-        if (!currentSession) break;
-
-        updateSession(sessionId, {
-          messages: currentSession.messages.map(msg => msg.id === assistantId ? { ...msg, displayContent: stripProposedChanges(full), raw: full } : msg)
-        });
-      }
-      updateSession(sessionId, {
-        history: [
-          { role: 'user', content: triggerMsg },
-          { role: 'assistant', content: full }
-        ]
-      });
-      if (introId) completeIntroduction(introId);
-    } catch (e) {
-      console.error(e);
-      updateSession(sessionId, {
-        messages: [{ id: assistantId, role: 'assistant', displayContent: "pakala!" }]
-      });
-    } finally { setIsLoading(false); }
-  }, [sessionId, updateSession, isSandboxMode, startSessionTimer, displayName, getRegressionCandidates, getTopConfusionPairs, pendingProveItResponses, xpMultiplier, currentChallenge, pendingRankAcknowledgement, seenIntroductions, completeIntroduction]);
-
-  const sendToLina = useCallback(async (txt: string, overrideKey?: string) => {
-    if (isLoading || !txt.trim()) return;
-    if (!isSandboxMode && !resolveApiKey(overrideKey)) return;
-    setIsLoading(true);
-    setInput('');
-    
-    const newUserMsg: ChatMessage = { id: crypto.randomUUID(), role: 'user', displayContent: txt };
-    const assistantId = crypto.randomUUID();
-    const newAssistantMsg: ChatMessage = { id: assistantId, role: 'assistant', displayContent: '· · ·', raw: '' };
-    
-    updateSession(sessionId, { 
-      messages: [...messages, newUserMsg, newAssistantMsg],
-      history: [...history, { role: 'user', content: txt }]
-    });
-
-    if (isSandboxMode) {
-      updateSession(sessionId, {
-        messages: (useChatStore.getState().sessions.find(s => s.id === sessionId)?.messages || []).map(msg => msg.id === assistantId ? { ...msg, displayContent: SANDBOX_RESPONSE, raw: SANDBOX_RESPONSE } : msg),
-        history: [...history, { role: 'user', content: txt }, { role: 'assistant', content: SANDBOX_RESPONSE }]
-      });
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      const key = resolveApiKey(overrideKey);
-      const state = useMasteryStore.getState();
-      const userContext = stringifyUserContext(state.profile);
-      const currentSession = useChatStore.getState().sessions.find(s => s.id === sessionId);
-      const latestChatContext = currentSession?.context || 'GENERAL';
-      const payload = currentSession?.contextPayload;
-      const vibe = currentSession?.vibe ?? 'chill';
-
-      const activeNodes = state.curriculums.flatMap(l => l.nodes);
-
-      const sys = latestChatContext === 'MASTERY_COURT'
-        ? buildMasteryCourtPrompt(state.vocabulary, displayName, userContext)
-        : latestChatContext === 'LESSON'
-          ? buildTutorPrompt(state.vocabulary, activeNodes, displayName, userContext, undefined, undefined, vibe, yesterdayWasActive.current, getRegressionCandidates(7), getTopConfusionPairs(5), pendingProveItResponses, xpMultiplier, currentChallenge, pendingRankAcknowledgement, currentSession?.mode)
-          : buildChatPrompt(state.vocabulary, displayName, userContext, latestChatContext, payload, yesterdayWasActive.current, getTopConfusionPairs(5), xpMultiplier, pendingRankAcknowledgement, currentSession?.mode);
-
-      const windowedHistory: { role: 'user' | 'assistant'; content: string }[] =
-        [...history, { role: 'user' as const, content: txt }].slice(-HISTORY_WINDOW);
-      let full = '';
-      for await (const chunk of streamCompletion(key, sys, windowedHistory)) {
-        full += chunk;
-        const currentSession = useChatStore.getState().sessions.find(s => s.id === sessionId);
-        if (!currentSession) break; // User closed chat
-
-        updateSession(sessionId, {
-          messages: currentSession.messages.map(msg => 
-            msg.id === assistantId ? { ...msg, displayContent: stripProposedChanges(full), raw: full } : msg
-          )
-        });
-      }
-      const changes = parseProposedChanges(full);
-      const updatedMessages = (useChatStore.getState().sessions.find(s => s.id === sessionId)?.messages || []).map(msg => 
-        msg.id === assistantId ? { ...msg, proposedChanges: changes || undefined } : msg
-      );
-      
-      const newDeltas = [...sessionDeltas];
-      if (changes && changes.length > 0) {
-        if (latestChatContext === 'MASTERY_COURT') {
-          for (const change of changes) {
-            if (change.type === 'vocab' && change.newStatus) {
-              const targetScore = STATUS_MIDPOINT[change.newStatus];
-              const v = vocabulary.find(vw => vw.id === change.id || vw.word.toLowerCase() === change.id.toLowerCase());
-              const currentScore = v?.baseScore ?? 0;
-              const delta = Math.round((targetScore - currentScore) / 3);
-              if (delta !== 0) {
-                updateVocabStatus(change.id, 'noun', delta);
-                updateVocabStatus(change.id, 'verb', delta);
-                updateVocabStatus(change.id, 'mod', delta);
-              }
-            }
-            if (change.type === 'vocab_production' && change.newStatus) updateProductionStatus(change.id, change.newStatus);
-            if (change.type === 'vocab_recognition' && change.newStatus) updateRecognitionStatus(change.id, change.newStatus);
-            if (change.type === 'confusion' && change.wordB) recordConfusion(change.id, change.wordB);
-            if (change.type === 'example' && change.exampleSentence) setPinnedExample(change.id, change.exampleSentence);
-          }
-        }
-        newDeltas.push(...changes);
-      }
-
-      updateSession(sessionId, {
-        messages: updatedMessages,
-        history: [...history, { role: 'user', content: txt }, { role: 'assistant', content: full }],
-        sessionDeltas: newDeltas
-      });
-    } catch (e) {
-      console.error(e);
-      updateSession(sessionId, {
-        messages: (useChatStore.getState().sessions.find(s => s.id === sessionId)?.messages || []).map(msg => 
-          msg.id === assistantId ? { ...msg, displayContent: "pakala!" } : msg
-        )
-      });
-    } finally { setIsLoading(false); }
-  }, [isLoading, isSandboxMode, sessionId, updateSession, messages, history, displayName, getRegressionCandidates, getTopConfusionPairs, pendingProveItResponses, xpMultiplier, currentChallenge, pendingRankAcknowledgement, sessionDeltas, vocabulary, updateVocabStatus, updateProductionStatus, updateRecognitionStatus, recordConfusion, setPinnedExample]);
-
   useEffect(() => {
     if (!isActive || !pendingPrompt) return;
     yesterdayWasActive.current = runMorningStreakCheck();
@@ -388,6 +209,8 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
     setInput('');
     const key = resolveApiKey();
     
+    // PROACTIVE INITIALIZATION:
+    // If it's a [SYSTEM: ...] prompt, treat it as hidden context and trigger jan Lina
     const isProactive = pendingPrompt.startsWith('[SYSTEM:');
     
     if (isProactive) {
@@ -397,23 +220,97 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
     }
     
     clearPrompt?.();
-  }, [isActive, pendingPrompt, isSandboxMode, clearPrompt, sessionId, updateSession, runMorningStreakCheck, awardBadge, getStatusSummary, triggerProactiveGreeting, sendToLina]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isActive, pendingPrompt, isSandboxMode, clearPrompt]);
+
+  async function triggerProactiveGreeting(context: string, overrideKey?: string) {
+    if (!isSandboxMode && !resolveApiKey(overrideKey)) return;
+    startSessionTimer();
+    setIsLoading(true);
+    const assistantId = crypto.randomUUID();
+    
+    const initialAssistantMsg: ChatMessage = { id: assistantId, role: 'assistant', displayContent: '· · ·', raw: '' };
+    updateSession(sessionId, { messages: [initialAssistantMsg] });
+    
+    if (isSandboxMode) {
+      const finalMsg = { ...initialAssistantMsg, displayContent: SANDBOX_RESPONSE, raw: SANDBOX_RESPONSE };
+      updateSession(sessionId, { 
+        messages: [finalMsg],
+        history: [{ role: 'assistant', content: SANDBOX_RESPONSE }]
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const key = resolveApiKey(overrideKey);
+      const state = useMasteryStore.getState();
+      const userContext = stringifyUserContext(state.profile, state.lore);
+      const currentSession = useChatStore.getState().sessions.find(s => s.id === sessionId) as any;
+      const latestChatContext = currentSession?.context || 'GENERAL';
+      const payload = currentSession?.contextPayload;
+      const vibe = currentSession?.vibe ?? 'chill';
+
+      const activeNodes = state.curriculums.flatMap(l => l.nodes.map(n => ({ id: n.id, title: n.title, status: n.status, sessionNotes: '' })));
+
+      const sys = latestChatContext === 'MASTERY_COURT'
+        ? buildMasteryCourtPrompt(state.vocabulary, displayName, userContext)
+        : latestChatContext === 'LESSON' 
+          ? buildTutorPrompt(state.vocabulary, activeNodes, displayName, userContext, undefined, undefined, vibe, yesterdayWasActive.current, getRegressionCandidates(7), getTopConfusionPairs(5), pendingProveItResponses, xpMultiplier, currentChallenge, pendingRankAcknowledgement)
+          : buildChatPrompt(state.vocabulary, displayName, userContext, latestChatContext, payload, yesterdayWasActive.current, getTopConfusionPairs(5), xpMultiplier, pendingRankAcknowledgement);
+      
+      let introId: string | null = null;
+      if (latestChatContext === 'LESSON') {
+        const match = context.match(/for "(.*?)"/);
+        introId = match ? `lesson_${match[1]}` : 'lesson_general';
+      } else if (context.includes('Daily Review')) {
+        introId = 'daily_review';
+      } else if (context.includes('Archive Practice') || context.includes('practice my saved phrases')) {
+        introId = 'archive_practice';
+      } else if (context.includes('Start a general conversation')) {
+        introId = 'general_chat';
+      }
+
+      let finalContext = context;
+      if (introId && !seenIntroductions.includes(introId)) {
+        finalContext += `\n[SYSTEM: This is the FIRST TIME the student has entered this specific mode or lesson. Before proceeding with the session as normal, take a moment to introduce yourself in this context and explain briefly what the goal of this module is and how you will be helping them master it. Keep it casual and helpful in your jan Lina personality.]`;
+      }
+
+      const triggerMsg = `[SYSTEM: Start the session now based on this context: ${finalContext}. Greet the student and proceed naturally.]`;
+      let full = '';
+      for await (const chunk of streamCompletion(key, sys, [{ role: 'user', content: triggerMsg }])) {
+        full += chunk;
+        const currentSession = useChatStore.getState().sessions.find(s => s.id === sessionId);
+        if (!currentSession) break;
+
+        updateSession(sessionId, {
+          messages: currentSession.messages.map(msg => msg.id === assistantId ? { ...msg, displayContent: stripProposedChanges(full), raw: full } : msg)
+        });
+      }
+      updateSession(sessionId, {
+        history: [
+          { role: 'user', content: triggerMsg },
+          { role: 'assistant', content: full }
+        ]
+      });
+      if (introId) completeIntroduction(introId);
+    } catch (e) {
+      console.error(e);
+      updateSession(sessionId, {
+        messages: [{ id: assistantId, role: 'assistant', displayContent: "pakala!" }]
+      });
+    } finally { setIsLoading(false); }
+  }
 
   async function handleCloseWithoutSaving() {
-    if (messages.length > 0 || sessionDeltas.length > 0) {
-      if (!window.confirm("Abandon chat session? Any pending progress calibrations will not be saved.")) return;
+    if (messages.length > 0) {
+      if (!window.confirm("Abandon chat session? Progress and history will not be saved.")) return;
     }
     removeSession(sessionId);
     onEndSession();
   }
 
   async function finalizeSessionAndSave() {
-    const sessionData = useChatStore.getState().sessions.find(s => s.id === sessionId);
-    if (!sessionData) return;
-    const deltas = sessionData.sessionDeltas;
-    
-    updateSession(sessionId, { sessionDeltas: [] });
-
     const lastAsstMsg = messages.filter(m => m.role === 'assistant').pop();
     if (lastAsstMsg && lastAsstMsg.raw) {
        const summaryNotes = parseSessionSummaryNotes(lastAsstMsg.raw);
@@ -422,22 +319,30 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
        }
     }
 
+    const deltas = sessionDeltas;
+
+    // XP Calculation for Recap
     let totalXP = 0;
     const wordsMoved: { word: string; oldStatus: MasteryStatus; newStatus: MasteryStatus; hardened?: boolean; roleMastered: boolean }[] = [];
     
     for (const change of deltas) {
       const vocabWord = vocabulary.find(v => v.id === change.id || v.word.toLowerCase() === change.id.toLowerCase());
+      const multiplier = WORD_FREQUENCY[vocabWord?.word.toLowerCase() || ''] ?? 1.0;
       
-      if (change.type === 'vocab' && change.points) {
-        totalXP += change.points;
-        if (vocabWord) {
-          wordsMoved.push({
-            word: vocabWord.word,
-            oldStatus: vocabWord.status,
-            newStatus: vocabWord.status,
-            roleMastered: false
-          });
-        }
+      if (change.newStatus) {
+         const oldScore = vocabWord?.baseScore || 0;
+         const newScore = STATUS_MIDPOINT[change.newStatus];
+         let diff = newScore - oldScore;
+         if (diff > 0) diff *= xpMultiplier;
+         totalXP += diff * multiplier;
+         
+         wordsMoved.push({
+           word: vocabWord?.word || change.id,
+           oldStatus: vocabWord?.status || 'not_started',
+           newStatus: change.newStatus,
+           hardened: vocabWord?.hardened,
+           roleMastered: false // Simplified for now
+         });
       }
     }
     totalXP = Math.round(totalXP);
@@ -448,20 +353,18 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
       return; 
     }
 
+    // Mark that a session happened
     if (!earnedBadges.some(b => b.id === 'first_session')) {
       awardBadge('first_session');
     }
     
     for (const change of deltas) {
-      if (change.type === 'vocab' && change.role && change.points) {
-        updateVocabStatus(change.id, change.role, change.points);
-      } else if (change.type === 'confusion' && change.wordB) {
-        recordConfusion(change.id, change.wordB);
-      } else if (change.type === 'example' && change.exampleSentence) {
-        setPinnedExample(change.id, change.exampleSentence);
-      } else if (change.type === 'node' && (change.newStatus === 'mastered' || change.newStatus === 'confident')) {
-        completeNode(change.id);
-      }
+      if (change.type === 'vocab' && change.newStatus) updateVocabStatus(change.id, change.newStatus);
+      if (change.type === 'vocab_production' && change.newStatus) updateProductionStatus(change.id, change.newStatus);
+      if (change.type === 'vocab_recognition' && change.newStatus) updateRecognitionStatus(change.id, change.newStatus);
+      if (change.type === 'confusion' && change.wordB) recordConfusion(change.id, change.wordB);
+      if (change.type === 'example' && change.exampleSentence) setPinnedExample(change.id, change.exampleSentence);
+      if (change.type === 'node' && (change.newStatus === 'mastered' || change.newStatus === 'confident')) completeNode(change.id);
     }
     
     setLastUpdated(new Date().toLocaleDateString());
@@ -469,6 +372,7 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
 
     if (chatContext === 'LESSON') clearProveItResponses();
 
+    // Gamification Updates
     updateSessionXPRecord(totalXP);
     const badgesBefore = earnedBadges.map(b => b.id);
     const ranksBefore = earnedCeremonialRanks.map(r => r.id);
@@ -483,15 +387,16 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
 
     setSessionXP(totalXP);
 
+    // Commit Log
     commitSessionLog({
       date: new Date().toISOString(),
-      title: session?.title || 'Session Summary',
+      title: currentSession?.title || 'Session Summary',
       context: chatContext,
       xpEarned: totalXP,
-      grade: totalXP > 300 ? 'S' : totalXP > 150 ? 'A' : totalXP > 50 ? 'B' : totalXP > 0 ? 'C' : null,
-      wordsChanged: wordsMoved.map(w => ({ word: w.word, fromStatus: w.oldStatus, toStatus: vocabulary.find(v => v.word === w.word)?.status || w.oldStatus })),
+      grade: totalXP > 500 || wordsMoved.some(w => w.newStatus === 'mastered') ? 'S' : totalXP > 250 ? 'A' : totalXP > 100 ? 'B' : totalXP > 0 ? 'C' : null,
+      wordsChanged: wordsMoved.map(w => ({ word: w.word, fromStatus: w.oldStatus, toStatus: w.newStatus })),
       smallRankAtClose: getStatusSummary().rankTitle,
-      sessionRecapText: '', 
+      sessionRecapText: '', // Will be filled if needed, but SessionRecap doesn't strictly need it from log
       badgesEarned: newBadges,
       ceremonialRanksEarned: newRanks,
       streakAtClose: currentStreak,
@@ -524,15 +429,15 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
       }
 
       const state = useMasteryStore.getState();
-      const userContext = stringifyUserContext(state.profile);
-      const currentSession = useChatStore.getState().sessions.find(s => s.id === sessionId);
+      const userContext = stringifyUserContext(state.profile, state.lore);
+      const currentSession = useChatStore.getState().sessions.find(s => s.id === sessionId) as any;
+      const latestChatContext = currentSession?.context || 'GENERAL';
       const vibe = currentSession?.vibe ?? 'chill';
-      const activeNodes = state.curriculums.flatMap(l => l.nodes);
+      const activeNodes = state.curriculums.flatMap(l => l.nodes.map(n => ({ id: n.id, title: n.title, status: n.status, sessionNotes: '' })));
 
-      const sys = buildTutorPrompt(state.vocabulary, activeNodes, displayName, userContext, undefined, undefined, vibe, yesterdayWasActive.current, getRegressionCandidates(7), getTopConfusionPairs(5), pendingProveItResponses, xpMultiplier, currentChallenge, pendingRankAcknowledgement, currentSession?.mode);
+      const sys = buildTutorPrompt(state.vocabulary, activeNodes, displayName, userContext, undefined, undefined, vibe, yesterdayWasActive.current, getRegressionCandidates(7), getTopConfusionPairs(5), pendingProveItResponses, xpMultiplier, currentChallenge, pendingRankAcknowledgement);
 
-      const windowedHistory: { role: 'user' | 'assistant'; content: string }[] =
-        [...history, { role: 'user' as const, content: summaryPrompt }].slice(-HISTORY_WINDOW);
+      const windowedHistory = [...history, { role: 'user', content: summaryPrompt }].slice(-HISTORY_WINDOW);
       let full = '';
       for await (const chunk of streamCompletion(key, sys, windowedHistory)) {
         full += chunk;
@@ -549,12 +454,100 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
     }
   }
 
+  async function sendToLina(txt: string, overrideKey?: string) {
+    if (isLoading || !txt.trim()) return;
+    if (!isSandboxMode && !resolveApiKey(overrideKey)) return;
+    setIsLoading(true);
+    setInput('');
+    
+    const newUserMsg: ChatMessage = { id: crypto.randomUUID(), role: 'user', displayContent: txt };
+    const assistantId = crypto.randomUUID();
+    const newAssistantMsg: ChatMessage = { id: assistantId, role: 'assistant', displayContent: '· · ·', raw: '' };
+    
+    updateSession(sessionId, { 
+      messages: [...messages, newUserMsg, newAssistantMsg],
+      history: [...history, { role: 'user', content: txt }]
+    });
+
+    if (isSandboxMode) {
+      updateSession(sessionId, {
+        messages: (session?.messages || []).map(msg => msg.id === assistantId ? { ...msg, displayContent: SANDBOX_RESPONSE, raw: SANDBOX_RESPONSE } : msg),
+        history: [...history, { role: 'user', content: txt }, { role: 'assistant', content: SANDBOX_RESPONSE }]
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const key = resolveApiKey(overrideKey);
+      const state = useMasteryStore.getState();
+      const userContext = stringifyUserContext(state.profile, state.lore);
+      const currentSession = useChatStore.getState().sessions.find(s => s.id === sessionId) as any;
+      const latestChatContext = currentSession?.context || 'GENERAL';
+      const payload = currentSession?.contextPayload;
+      const vibe = currentSession?.vibe ?? 'chill';
+
+      const activeNodes = state.curriculums.flatMap(l => l.nodes.map(n => ({ id: n.id, title: n.title, status: n.status, sessionNotes: '' })));
+
+      const sys = latestChatContext === 'MASTERY_COURT'
+        ? buildMasteryCourtPrompt(state.vocabulary, displayName, userContext)
+        : latestChatContext === 'LESSON'
+          ? buildTutorPrompt(state.vocabulary, activeNodes, displayName, userContext, undefined, undefined, vibe, yesterdayWasActive.current, getRegressionCandidates(7), getTopConfusionPairs(5), pendingProveItResponses, xpMultiplier, currentChallenge, pendingRankAcknowledgement)
+          : buildChatPrompt(state.vocabulary, displayName, userContext, latestChatContext, payload, yesterdayWasActive.current, getTopConfusionPairs(5), xpMultiplier, pendingRankAcknowledgement);
+
+      const windowedHistory = [...history, { role: 'user', content: txt }].slice(-HISTORY_WINDOW);
+      let full = '';
+      for await (const chunk of streamCompletion(key, sys, windowedHistory)) {
+        full += chunk;
+        const currentSession = useChatStore.getState().sessions.find(s => s.id === sessionId);
+        if (!currentSession) break; // User closed chat
+
+        updateSession(sessionId, {
+          messages: currentSession.messages.map(msg => 
+            msg.id === assistantId ? { ...msg, displayContent: stripProposedChanges(full), raw: full } : msg
+          )
+        });
+      }
+      const changes = parseProposedChanges(full);
+      const updatedMessages = (useChatStore.getState().sessions.find(s => s.id === sessionId)?.messages || []).map(msg => 
+        msg.id === assistantId ? { ...msg, proposedChanges: changes || undefined } : msg
+      );
+      
+      const newDeltas = [...sessionDeltas];
+      if (changes && changes.length > 0) {
+        if (latestChatContext === 'MASTERY_COURT') {
+          for (const change of changes) {
+            if (change.type === 'vocab' && change.newStatus) updateVocabStatus(change.id, change.newStatus);
+            if (change.type === 'vocab_production' && change.newStatus) updateProductionStatus(change.id, change.newStatus);
+            if (change.type === 'vocab_recognition' && change.newStatus) updateRecognitionStatus(change.id, change.newStatus);
+            if (change.type === 'confusion' && change.wordB) recordConfusion(change.id, change.wordB);
+            if (change.type === 'example' && change.exampleSentence) setPinnedExample(change.id, change.exampleSentence);
+          }
+        }
+        newDeltas.push(...changes);
+      }
+
+      updateSession(sessionId, {
+        messages: updatedMessages,
+        history: [...history, { role: 'user', content: txt }, { role: 'assistant', content: full }],
+        sessionDeltas: newDeltas
+      });
+    } catch (e) {
+      console.error(e);
+      updateSession(sessionId, {
+        messages: (useChatStore.getState().sessions.find(s => s.id === sessionId)?.messages || []).map(msg => 
+          msg.id === assistantId ? { ...msg, displayContent: "pakala!" } : msg
+        )
+      });
+    } finally { setIsLoading(false); }
+  }
+
   return (
     <LazyMotion features={domMax}>
       <m.div
         className="chat-drawer"
         initial={{ x: '100%' }}
-        animate={{ x: 0, height: isMinimized ? 'var(--header-height)' : '92dvh' }}
+        animate={{ x: 0, height: isMinimized ? 'var(--header-height)' : '100%' }}
         exit={{ x: '100%' }}
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
         onMouseUp={handleTextSelection}
@@ -570,6 +563,7 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
           right: 0,
           boxShadow: '-10px 0 30px rgba(0,0,0,0.5)',
           borderLeft: '1px solid var(--border)',
+          zIndex: 6000,
           ...style
         }}
       >
@@ -585,42 +579,25 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <h2 style={{ fontSize: '0.8rem', fontWeight: 900, letterSpacing: '0.2em', color: 'var(--gold)', margin: 0 }}>{chatContext === 'GENERAL' ? 'jan LINA LINK' : chatContext}</h2>
-            {sessionXP !== 0 && (
-              <div style={{ fontSize: '0.7rem', color: sessionXP < 0 ? '#ef4444' : 'var(--gold)', fontWeight: 800 }}>
-                {sessionXP > 0 ? '+' : ''}{sessionXP} XP {xpMultiplier > 1.0 && sessionXP > 0 && '🔥'}
+            {sessionXP > 0 && (
+              <div style={{ fontSize: '0.7rem', color: 'var(--gold)', fontWeight: 800 }}>
+                +{sessionXP} XP {xpMultiplier > 1.0 && '🔥'}
               </div>
             )}
           </div>
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <button type="button"
-              onClick={() => setShowDictionary(true)}
-              style={{ 
-                background: 'rgba(255, 191, 0, 0.1)', 
-                border: '1px solid var(--gold)', 
-                color: 'var(--gold)', 
-                fontSize: '0.65rem', 
-                cursor: 'pointer', 
-                fontWeight: 900,
-                padding: '4px 8px',
-                borderRadius: '4px',
-                letterSpacing: '0.05em'
-              }}
-            >
-              📖 DICT
-            </button>
-
-            <button type="button"
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button 
               onClick={onMinimize}
-              style={{ background: 'none', border: 'none', color: '#666', fontSize: '0.8rem', cursor: 'pointer', fontWeight: 900 }}
+              style={{ background: 'none', border: 'none', color: 'var(--gold)', fontSize: '0.8rem', cursor: 'pointer', fontWeight: 900 }}
             >
               {isMinimized ? 'EXPAND' : 'MINIMIZE'}
             </button>
-            <button type="button"
+            <button 
               onClick={handleCloseWithoutSaving} 
               style={{ 
                 background: 'none', 
                 border: 'none', 
-                color: '#666', 
+                color: 'var(--gold)', 
                 fontSize: '1.2rem', 
                 cursor: 'pointer',
                 padding: '8px',
@@ -638,8 +615,8 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
         </header>
 
         {translateBubble && (
-          <div onMouseDown={e => e.stopPropagation()} className="chat-translate-bubble" style={{ top: translateBubble.top, left: translateBubble.left }}>
-            {translateBubble.result ? <div style={{ lineHeight: '1.4' }}>{translateBubble.result}</div> : <button type="button" onClick={handleTranslateClick} style={{ background: 'var(--gold)', border: 'none', borderRadius: '2px', color: 'black', padding: '4px 8px', fontWeight: 900, cursor: 'pointer', fontSize: '0.7rem' }}>{translateBubble.loading ? '...' : 'TRANSLATE'}</button>}
+          <div onMouseDown={e => e.stopPropagation()} style={{ position: 'fixed', top: translateBubble.top, left: translateBubble.left, transform: 'translateX(-50%)', zIndex: 7000, background: '#222', border: '1px solid #444', borderRadius: '4px', padding: '8px 12px', boxShadow: '0 4px 12px rgba(0,0,0,0.5)', fontSize: '0.8rem', color: 'white', minWidth: '100px', textAlign: 'center' }}>
+            {translateBubble.result ? <div style={{ lineHeight: '1.4' }}>{translateBubble.result}</div> : <button onClick={handleTranslateClick} style={{ background: 'var(--gold)', border: 'none', borderRadius: '2px', color: 'black', padding: '4px 8px', fontWeight: 900, cursor: 'pointer', fontSize: '0.7rem' }}>{translateBubble.loading ? '...' : 'TRANSLATE'}</button>}
           </div>
         )}
 
@@ -657,7 +634,7 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
                 <div style={{ color: 'var(--gold)', fontSize: '0.6rem', fontWeight: 900, letterSpacing: '0.1em' }}>
                   {msg.role === 'assistant' ? 'jan LINA' : (displayName.toUpperCase())}
                 </div>
-                <button type="button"
+                <button 
                   onClick={() => handleCopy(msg.displayContent || '', msg.id)}
                   style={{
                     background: 'none',
@@ -681,55 +658,6 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
           <div ref={messagesEndRef} />
         </div>
 
-        <AnimatePresence>
-          {showDictionary && (
-            <m.div
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              style={{
-                position: 'absolute',
-                top: 'var(--header-height)',
-                right: 0,
-                bottom: 0,
-                width: '100%',
-                background: 'rgba(5,5,5,0.98)',
-                zIndex: 10,
-                display: 'flex',
-                flexDirection: 'column',
-                borderLeft: '1px solid var(--border)'
-              }}
-            >
-              <div style={{ padding: '16px', borderBottom: '1px solid var(--border)', display: 'flex', gap: '8px', alignItems: 'center' }}>
-                 <input 
-                   autoFocus
-                   value={dictSearch}
-                   onChange={e => setDictSearch(e.target.value)}
-                   placeholder="Search Toki Pona word..."
-                   style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', color: 'white', padding: '10px', borderRadius: '4px', outline: 'none', fontSize: '0.9rem' }}
-                 />
-                 <button onClick={() => { setShowDictionary(false); setDictSearch(''); }} style={{ background: 'none', border: 'none', color: 'var(--gold)', fontWeight: 900, cursor: 'pointer', fontSize: '0.8rem' }}>CLOSE</button>
-              </div>
-              <div style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
-                 {vocabulary.filter(v => v.word.toLowerCase().includes(dictSearch.toLowerCase()) || v.meanings.toLowerCase().includes(dictSearch.toLowerCase())).map(v => (
-                   <div key={v.id} style={{ padding: '12px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ color: 'var(--gold)', fontSize: '1.2rem', fontWeight: 900 }}>{v.word}</span>
-                        <span style={{ fontSize: '0.65rem', color: '#888', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.1em' }}>{v.partOfSpeech}</span>
-                     </div>
-                     <div style={{ fontSize: '0.9rem', color: '#ccc', marginTop: '6px', lineHeight: '1.4' }}>{v.meanings}</div>
-                     <button type="button" onClick={() => { setDictSearch(''); setShowDictionary(false); sendToLina(`[SYSTEM: Briefly explain the word "${v.word}" and give an example.]`); }} style={{ marginTop: '12px', background: 'rgba(255,191,0,0.1)', border: '1px solid var(--gold)', color: 'var(--gold)', fontSize: '0.65rem', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontWeight: 900, letterSpacing: '0.05em' }}>ASK LINA ABOUT THIS</button>
-                   </div>
-                 ))}
-                 {vocabulary.filter(v => v.word.toLowerCase().includes(dictSearch.toLowerCase()) || v.meanings.toLowerCase().includes(dictSearch.toLowerCase())).length === 0 && (
-                   <div style={{ color: '#666', textAlign: 'center', marginTop: '40px', fontSize: '0.9rem' }}>No words found matching "{dictSearch}"</div>
-                 )}
-              </div>
-            </m.div>
-          )}
-        </AnimatePresence>
-
         <div style={{ padding: '16px', background: 'rgba(5,5,5,0.5)', borderTop: '1px solid var(--border)', display: isMinimized ? 'none' : 'flex', flexDirection: 'column', gap: '12px' }}>
           <div style={{ display: 'flex', gap: '8px' }}>
             <input 
@@ -739,9 +667,9 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
               placeholder={chatContext === 'GENERAL' ? "Ask jan Lina something..." : "Type your response..."} 
               style={{ flex: 1, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: '2px', padding: '12px', color: 'white', outline: 'none', fontSize: '0.9rem' }} 
             />
-            <button type="button" onClick={() => sendToLina(input)} disabled={isLoading} style={{ background: 'var(--gold)', border: 'none', borderRadius: '2px', padding: '0 20px', color: 'black', fontWeight: 900, cursor: 'pointer', opacity: isLoading ? 0.6 : 1 }}>{isLoading ? '...' : 'SEND'}</button>
+            <button onClick={() => sendToLina(input)} disabled={isLoading} style={{ background: 'var(--gold)', border: 'none', borderRadius: '2px', padding: '0 20px', color: 'black', fontWeight: 900, cursor: 'pointer', opacity: isLoading ? 0.6 : 1 }}>{isLoading ? '...' : 'SEND'}</button>
           </div>
-          <button type="button"
+          <button 
             onClick={handleEndLesson} 
             disabled={isLoading}
             style={{ 
@@ -757,7 +685,7 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
               letterSpacing: '0.1em'
             }}
           >
-            O PINI (GET SUMMARY & FINISH)
+            O PINI (END LESSON)
           </button>
         </div>
 
@@ -777,16 +705,16 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
               }
               return undefined;
             })()}
-            onClose={async () => {
-              await finalizeSessionAndSave();
+            onClose={() => {
               setShowSummary(false);
+              finalizeSessionAndSave();
             }}
           />
         )}
 
         {showRecap && (
           <SessionRecap
-            sessionTitle={session?.title || 'Session Summary'}
+            sessionTitle={currentSession?.title || 'Session Summary'}
             totalXPEarned={sessionXP}
             prevTotalXP={startingTotalXP}
             xpMultiplier={xpMultiplier}

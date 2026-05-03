@@ -72,6 +72,14 @@ export const STATUS_MIDPOINT: Record<MasteryStatus, number> = {
 
 // ─── Profile ──────────────────────────────────────────────────────────
 
+export interface Pet {
+  id: string;           // unique key (timestamp-based)
+  name: string;
+  species: string;      // e.g. Dog, Cat, Bird, Fish, Rabbit, Other
+  breed?: string;       // optional freeform breed/type
+  emoji?: string;       // chosen or auto-derived emoji
+}
+
 export interface ProgressSnapshot {
   date: string;
   xp: number;
@@ -120,6 +128,9 @@ export interface UserProfile {
   gamingGenres?: string[];
   gamingPlatforms?: string[];
 
+  // Pets
+  pets?: Pet[];
+
   // Daily Life
   chronotype?: string | null;
   workSchedule?: string | null;
@@ -139,10 +150,10 @@ export interface ScoreHistoryEntry {
   reason: string;
 }
 
-export interface RoleMatrix {
+export interface PartOfSpeechScores {
   noun: number;
   verb: number;
-  mod: number;
+  modifier: number;
 }
 
 // ─── Linguistic & Teaching Types ────────────────────────────────────────
@@ -220,20 +231,18 @@ export interface Chapter {
 
 export type ItemType = 'word' | 'grammar';
 
-export type MasteryWeight = 'pillar' | 'working' | 'bonus' | 'ku';
+export type MasteryWeight = 'pillar' | 'working' | 'bonus';
 
 export interface VocabWord {
   id: string;
   word: string;
   partOfSpeech: string;
   meanings: string;
-  type: ItemType;
+  type: ItemType; 
   // baseScore is the source of truth (0–1000).
   // status is derived from it via scoreToStatus() and kept in sync.
   baseScore: number;
-  // legacy field kept for migration of cloud/local data; prefer baseScore.
-  confidenceScore?: number;
-  roleMatrix: RoleMatrix;
+  confidenceScore: number; // Legacy support
   status: MasteryStatus;
   weight?: MasteryWeight;
   useCount: number;
@@ -242,12 +251,9 @@ export interface VocabWord {
   sessionNotes: string;
   aiExplanation?: string;
   aiExamples?: Record<string, string>;
-  grammarExamples?: Record<string, string>;
-  neighborConnections?: Record<string, string>;
-  sitelenPona?: string;
-  sitelenEtymology?: string;
 
   // Deep Knowledge Scoring
+  partOfSpeechScores: PartOfSpeechScores;
   lastReviewed: string; // ISO timestamp
   scoreHistory: ScoreHistoryEntry[];
   hardened: boolean;
@@ -296,11 +302,9 @@ export interface CurriculumNode {
   requiredVocabIds: string[];
   requiredGrammarIds: string[];
   status: NodeStatus;
-  sessionNotes?: string;
   richContent?: ContentBlock[];
   visualFramework?: string;
   requiredWordIds?: string[];
-  infographicUrl?: string;
   suggestedMethod?: 'Jan Lina Chat' | 'Builder Drill' | 'Quiz';
   type?: 'Topic' | 'Drill' | 'Checkpoint';
   activities?: string[];
@@ -323,6 +327,24 @@ export interface SavedPhrase {
 
 // ─── Discography ──────────────────────────────────────────────────────────────
 
+export interface SongBlock {
+  type: 'verse' | 'chorus' | 'bridge' | 'outro';
+  tp: string;
+  en: string;
+}
+
+export interface Song {
+  id: string;
+  title: string;
+  blocks: SongBlock[];
+}
+
+export interface Album {
+  id: string;
+  title: string;
+  songs: Song[];
+}
+
 export interface CommonPhrase {
   category: string;
   tp: string;
@@ -341,10 +363,6 @@ export interface MasteryMap {
   savedPhrases: (string | SavedPhrase)[];
   currentStreak: number;
   lastActiveDate: string;
-
-  // Challenge Snooze Persistence
-  dailySnoozedUntil?: string | null;
-  weeklySnoozedUntil?: string | null;
 }
 
 
@@ -376,17 +394,16 @@ export interface Badge {
 }
 
 export const SMALL_RANKS: SmallRank[] = [
-  { xpThreshold: 0,       title: 'jan lili' },
-  { xpThreshold: 500,     title: 'jan pi toki' },
-  { xpThreshold: 1500,    title: 'jan toki' },
-  { xpThreshold: 3000,    title: 'jan sona lili' },
-  { xpThreshold: 5000,    title: 'jan sona' },
-  { xpThreshold: 8000,    title: 'jan sona mute' },
-  { xpThreshold: 12000,   title: 'jan pona pi toki pona' },
-  { xpThreshold: 18000,   title: 'jan pi nasin toki' },
-  { xpThreshold: 25000,   title: 'jan wawa pi toki pona' },
-  { xpThreshold: 35000,   title: 'jan sona sewi' },
-  { xpThreshold: 100000,  title: 'jan Sonja' },
+  { xpThreshold: 0,      title: 'jan lili' },
+  { xpThreshold: 500,    title: 'jan pi toki' },
+  { xpThreshold: 1500,   title: 'jan toki' },
+  { xpThreshold: 3000,   title: 'jan sona lili' },
+  { xpThreshold: 5000,   title: 'jan sona' },
+  { xpThreshold: 8000,   title: 'jan sona mute' },
+  { xpThreshold: 12000,  title: 'jan pona pi toki pona' },
+  { xpThreshold: 18000,  title: 'jan pi nasin toki' },
+  { xpThreshold: 25000,  title: 'jan wawa pi toki pona' },
+  { xpThreshold: 35000,  title: 'jan sona sewi' },
 ];
 
 export const CEREMONIAL_RANKS: CeremonialRank[] = [
@@ -441,20 +458,6 @@ export interface WeeklyChallenge {
   id: string;
   type: 'word_usage' | 'session_count' | 'word_progression' | 'prove_it_usage' | 'convo_length' | 'phrase_save';
   weekStartDate: string;
-  title: string;
-  description: string;
-  targetWord?: string;
-  targetCount: number;
-  currentCount: number;
-  completed: boolean;
-  xpReward: number;
-  expiresDate: string;
-}
-
-export interface DailyChallenge {
-  id: string;
-  type: 'word_usage' | 'session_count' | 'word_progression' | 'prove_it_usage' | 'convo_length' | 'phrase_save';
-  startDate: string;
   title: string;
   description: string;
   targetWord?: string;

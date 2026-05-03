@@ -113,9 +113,9 @@ const SessionRecap: React.FC<SessionRecapProps> = ({
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          style={{ color: totalXPEarned < 0 ? '#ef4444' : 'var(--gold)', fontWeight: 800 }}
+          style={{ color: 'var(--gold)', fontWeight: 800 }}
         >
-          {totalXPEarned > 0 ? `+${totalXPEarned}` : totalXPEarned} XP {isPersonalBest && <span style={{ background: 'var(--gold)', color: 'black', padding: '2px 8px', borderRadius: '4px', marginLeft: '8px', fontSize: '0.7rem' }}>NEW PERSONAL BEST</span>}
+          +{totalXPEarned} XP {isPersonalBest && <span style={{ background: 'var(--gold)', color: 'black', padding: '2px 8px', borderRadius: '4px', marginLeft: '8px', fontSize: '0.7rem' }}>NEW PERSONAL BEST</span>}
         </motion.div>
         {xpMultiplier > 1.0 && (
           <div style={{ fontSize: '0.8rem', marginTop: '8px', color: '#ff4d4d', fontWeight: 900 }}>
@@ -184,7 +184,7 @@ const SessionRecap: React.FC<SessionRecapProps> = ({
             >
               <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)', animation: 'shimmer 2s infinite' }} />
               <h3 style={{ fontSize: '0.7rem', color: 'var(--gold)', letterSpacing: '0.2em', margin: '0 0 8px 0' }}>NEW RANK UNLOCKED</h3>
-              <div style={{ fontSize: '1.5rem', fontWeight: 900, marginBottom: '8px' }}>{newRankUnlocked.title}</div>
+              <div style={{ fontSize: '1.5rem', fontWeight: 900, marginBottom: '8px' }}>{'title' in newRankUnlocked ? newRankUnlocked.title : (newRankUnlocked as any).label}</div>
               <p style={{ fontSize: '0.8rem', opacity: 0.7, margin: 0 }}>{'description' in newRankUnlocked ? newRankUnlocked.description : 'Higher XP reached'}</p>
             </motion.div>
           )}
@@ -198,7 +198,7 @@ const SessionRecap: React.FC<SessionRecapProps> = ({
 
       </div>
 
-      <button type="button" 
+      <button 
         onClick={onContinue}
         style={{
           marginTop: 'auto',

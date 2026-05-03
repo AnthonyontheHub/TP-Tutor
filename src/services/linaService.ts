@@ -1,8 +1,8 @@
-import type { VocabWord, MasteryStatus, UserProfile, ReviewVibe, WeeklyChallenge, CurriculumNode } from '../types/mastery';
+import type { VocabWord, MasteryStatus, UserProfile, ReviewVibe, WeeklyChallenge } from '../types/mastery';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { TOKI_PONA_DICTIONARY } from '../data/tokiPonaDictionary';
 
-const GEMINI_MODEL = "gemma-4-31b-it";
+const GEMINI_MODEL = "gemini-2.5-flash";
 
 /**
  * Builds a simple literal translation for offline use or as a fallback.
@@ -74,17 +74,19 @@ export function stringifyUserContext(profile: UserProfile, lore?: string): strin
     profile.socialPreference ? `Social Preference: ${profile.socialPreference}` : null,
   ].filter(Boolean).join(', ');
 
+  const pets = profile.pets?.length
+    ? `Pets: ${profile.pets.map(p => `${p.name} the ${p.breed ? `${p.breed} ` : ''}${p.species}`).join(', ')}`
+    : '';
+
   const loreStr = lore ? `\n\nBACKGROUND LORE:\n${lore}` : '';
 
-  return `${profileStr}. Personality: ${personality}. Beliefs: ${beliefs}. Health: ${health}. Media: ${media}. Daily Life: ${dailyLife}.${loreStr}`;
+  return `${profileStr}. Personality: ${personality}. Beliefs: ${beliefs}. Health: ${health}. Media: ${media}. Daily Life: ${dailyLife}.${pets ? ` ${pets}.` : ''}${loreStr}`;
 }
 
 export interface ProposedChange {
   type: 'vocab' | 'concept' | 'node' | 'vocab_production' | 'vocab_recognition' | 'confusion' | 'example';
   id: string;
   newStatus?: MasteryStatus;
-  role?: 'noun' | 'verb' | 'mod';
-  points?: number;
   wordB?: string;
   exampleSentence?: string;
 }
@@ -112,19 +114,20 @@ export function parseSessionSummaryNotes(text: string): SessionSummaryNote[] | n
   return notes.length > 0 ? notes : null;
 }
 
-// Resolves the API key strictly from user settings (localStorage).
+// Resolves the API key with env-var fallback for local dev.
 export function resolveApiKey(overrideKey?: string): string {
   // If sandbox mode is explicitly on via localStorage, return empty
   if (localStorage.getItem('tp_sandbox_mode') === 'true') return '';
 
   return overrideKey
     || localStorage.getItem('TP_GEMINI_KEY')
+    || (import.meta.env.VITE_GEMINI_API_KEY as string | undefined)
     || '';
 }
 
 export function buildTutorPrompt(
-  vocabulary: VocabWord[],
-  concepts: CurriculumNode[],
+  vocabulary: any[],
+  concepts: any[],
   studentName: string,
   userContext?: string,
   activeCurriculumTitle?: string,
@@ -136,8 +139,7 @@ export function buildTutorPrompt(
   pendingProveIt?: { word: string, sentence: string, date: string }[],
   xpMultiplier: number = 1.0,
   currentChallenge?: WeeklyChallenge | null,
-  pendingRankAcknowledgement?: string | null,
-  mode: 'chat_buddy' | 'instructor' = 'chat_buddy'
+  pendingRankAcknowledgement?: string | null
 ) {
   const activeVocab = vocabulary
     .map(v => `${v.word} (overall: ${v.status}, production: ${v.productionStatus || 'same'}, recognition: ${v.recognitionStatus || 'same'}) - Notes: ${v.sessionNotes || 'None'}`)
@@ -186,11 +188,7 @@ export function buildTutorPrompt(
 
   return `
     You are jan Lina, an expert Toki Pona teacher.
-    STRICT RULE: NEVER output your internal monologue, thought process, meta-text, or planning steps. ONLY output the actual spoken dialogue you are saying to the user.
-    ${mode === 'chat_buddy' 
-      ? `Personality: You are like a cool older sister who happens to be fluent in Toki Pona. You're casual, a little playful, and keep it real. You're encouraging without being cheesy, and call things out directly but warmly. You never sound like a textbook.`
-      : `Personality: You are a strict, focused instructor. Your goal is rigorous Q&A, providing exercises and translations based on the category. No small talk. Enforce a 2-strike rule for incorrect answers: the first wrong answer gets a simple "incorrect, try again" without explanation, and the second wrong answer gets a detailed explanation of what was wrong.`
-    }
+    Personality: You are like a cool older sister who happens to be fluent in Toki Pona. You're casual, a little playful, and keep it real. You're encouraging without being cheesy, and call things out directly but warmly. You never sound like a textbook.
     
     The student's name is ${studentName}.${contextStr}
 
@@ -246,24 +244,14 @@ export function buildTutorPrompt(
 
     FORMAT FOR PROPOSED CHANGES:
     ---
-    CHANGE: vocab | [word_id] | [role] | [points]
+    CHANGE: vocab | [word_id] | [new_status]
     CHANGE: concept | [concept_id] | [new_status]
+    CHANGE: vocab_production | [word_id] | [new_status]
+    CHANGE: vocab_recognition | [word_id] | [new_status]
     CONFUSION: [wordA] | [wordB]
     EXAMPLE: [word_id] | [toki pona sentence] ([english translation])
     ---
-    Roles: noun, verb, mod.
-    Points: typically 10-50 based on Sync Rate.
-
-    YOUR RULES FOR NEURAL RESONANCE (SCORING):
-    Identify which Role (noun, verb, or mod) the student used for a word and award points based on their "Sync Rate":
-    1. Base Sync (+10 pts): Standard correct usage.
-    2. Structural Sync (+25 pts): Correct use of 'e', 'la', or 'pi' in the same sentence.
-    3. Lore Sync (2.0x multiplier): Referencing their personal background/lore.
-    Example: CHANGE: vocab | moku | verb | 20 (Base + Lore Sync)
-    Example: CHANGE: vocab | tomo | noun | 35 (Base + Structural Sync)
-    
-    IMPORTANT: You have full visibility of the student's status. If a word role node is maxed (333), focus on other roles.
-
+    Statuses: introduced, practicing, confident, mastered.
 
     YOUR RULES FOR CURRICULUM NODES:
     If the current session is a structured lesson, and the student has demonstrated mastery of the CONCEPT or TOPIC (even if no specific vocabulary was required), you may propose completing the node:
@@ -280,8 +268,7 @@ export function buildChatPrompt(
   yesterdayWasActive?: boolean,
   confusionPairs?: { wordA: string, wordB: string }[],
   xpMultiplier: number = 1.0,
-  pendingRankAcknowledgement?: string | null,
-  mode: 'chat_buddy' | 'instructor' = 'chat_buddy'
+  pendingRankAcknowledgement?: string | null
 ) {
   const activeVocab = vocabulary
     .map(v => `${v.word} (overall: ${v.status}, production: ${v.productionStatus || 'same'}, recognition: ${v.recognitionStatus || 'same'}) - Notes: ${v.sessionNotes || 'None'}`)
@@ -316,11 +303,7 @@ export function buildChatPrompt(
 
   return `
     You are jan Lina, an expert Toki Pona teacher.
-    STRICT RULE: NEVER output your internal monologue, thought process, meta-text, or planning steps. ONLY output the actual spoken dialogue you are saying to the user.
-    ${mode === 'chat_buddy' 
-      ? `Personality: You are like a cool older sister who happens to be fluent in Toki Pona. You're casual, a little playful, and keep it real. You're encouraging without being cheesy, and call things out directly but warmly. You never sound like a textbook.`
-      : `Personality: You are a strict, focused instructor. Your goal is rigorous Q&A, providing exercises and translations based on the category. No small talk. Enforce a 2-strike rule for incorrect answers: the first wrong answer gets a simple "incorrect, try again" without explanation, and the second wrong answer gets a detailed explanation of what was wrong.`
-    }
+    Personality: You are like a cool older sister who happens to be fluent in Toki Pona. You're casual, a little playful, and keep it real. You're encouraging without being cheesy, and call things out directly but warmly. You never sound like a textbook.
 
     The student's name is ${studentName}.${contextStr}
 
@@ -374,24 +357,14 @@ export function buildChatPrompt(
 
     FORMAT FOR PROPOSED CHANGES:
     ---
-    CHANGE: vocab | [word_id] | [role] | [points]
+    CHANGE: vocab | [word_id] | [new_status]
     CHANGE: concept | [concept_id] | [new_status]
+    CHANGE: vocab_production | [word_id] | [new_status]
+    CHANGE: vocab_recognition | [word_id] | [new_status]
     CONFUSION: [wordA] | [wordB]
     EXAMPLE: [word_id] | [toki pona sentence] ([english translation])
     ---
-    Roles: noun, verb, mod.
-    Points: typically 10-50 based on Sync Rate.
-
-    YOUR RULES FOR NEURAL RESONANCE (SCORING):
-    Identify which Role (noun, verb, or mod) the student used for a word and award points based on their "Sync Rate":
-    1. Base Sync (+10 pts): Standard correct usage.
-    2. Structural Sync (+25 pts): Correct use of 'e', 'la', or 'pi' in the same sentence.
-    3. Lore Sync (2.0x multiplier): Referencing their personal background/lore.
-    Example: CHANGE: vocab | moku | verb | 20 (Base + Lore Sync)
-    Example: CHANGE: vocab | tomo | noun | 35 (Base + Structural Sync)
-    
-    IMPORTANT: You have full visibility of the student's status. If a word role node is maxed (333), focus on other roles.
-
+    Statuses: introduced, practicing, confident, mastered.
 
     YOUR RULES FOR CURRICULUM NODES:
     If the current session is a structured lesson, and the student has demonstrated mastery of the CONCEPT or TOPIC (even if no specific vocabulary was required), you may propose completing the node:
@@ -408,7 +381,6 @@ export function buildMasteryCourtPrompt(vocabulary: any[], studentName: string, 
 
   return `
     You are jan Lina, an expert Toki Pona teacher.
-    STRICT RULE: NEVER output your internal monologue, thought process, meta-text, or planning steps. ONLY output the actual spoken dialogue you are saying to the user.
     Personality: You are like a cool older sister who happens to be fluent in Toki Pona. You're casual, a little playful, and keep it real. You're encouraging without being cheesy, and call things out directly but warmly. You never sound like a textbook. However, you know this is a formal review, not casual chat.
 
     The student's name is ${studentName}.${contextStr}
@@ -436,24 +408,14 @@ export function buildMasteryCourtPrompt(vocabulary: any[], studentName: string, 
 
     FORMAT FOR PROPOSED CHANGES:
     ---
-    CHANGE: vocab | [word_id] | [role] | [points]
+    CHANGE: vocab | [word_id] | [new_status]
     CHANGE: concept | [concept_id] | [new_status]
+    CHANGE: vocab_production | [word_id] | [new_status]
+    CHANGE: vocab_recognition | [word_id] | [new_status]
     CONFUSION: [wordA] | [wordB]
     EXAMPLE: [word_id] | [toki pona sentence] ([english translation])
     ---
-    Roles: noun, verb, mod.
-    Points: typically 10-50 based on Sync Rate.
-
-    YOUR RULES FOR NEURAL RESONANCE (SCORING):
-    Identify which Role (noun, verb, or mod) the student used for a word and award points based on their "Sync Rate":
-    1. Base Sync (+10 pts): Standard correct usage.
-    2. Structural Sync (+25 pts): Correct use of 'e', 'la', or 'pi' in the same sentence.
-    3. Lore Sync (2.0x multiplier): Referencing their personal background/lore.
-    Example: CHANGE: vocab | moku | verb | 20 (Base + Lore Sync)
-    Example: CHANGE: vocab | tomo | noun | 35 (Base + Structural Sync)
-    
-    IMPORTANT: You have full visibility of the student's status. If a word role node is maxed (333), focus on other roles.
-
+    Statuses: introduced, practicing, confident, mastered.
 
     YOUR RULES FOR CURRICULUM NODES:
     If the current session is a structured lesson, and the student has demonstrated mastery of the CONCEPT or TOPIC (even if no specific vocabulary was required), you may propose completing the node:
@@ -486,22 +448,6 @@ function sanitizeJson(text: string): string {
   return text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
 }
 
-export type RoadmapLevelLite = { nodes: { id: string; title: string }[] };
-export function getRoadmapLessonPrompt(curriculums: RoadmapLevelLite[], currentPositionNodeId: string, reviewVibe: ReviewVibe | null) {
-  const activeNode = curriculums.flatMap(l => l.nodes).find(n => n.id === currentPositionNodeId);
-  const nodeTitle = activeNode?.title || 'Current Module';
-
-  if (reviewVibe === 'chill') {
-    return `[SYSTEM: Roadmap Lesson - NEW CONCEPT. Focus strictly on current module items for "${nodeTitle}".]`;
-  } else if (reviewVibe === 'deep') {
-    return `[SYSTEM: Roadmap Lesson - REVIEW. Mix items from "${nodeTitle}" with previously introduced words.]`;
-  } else if (reviewVibe === 'intense') {
-    return `[SYSTEM: Roadmap Lesson - QUIZ / LEVEL UP. Conduct a proficiency test on the current module "${nodeTitle}".]`;
-  } else {
-    return `[SYSTEM: Roadmap Lesson. Continue "${nodeTitle}" with a mix of new material and past review.]`;
-  }
-}
-
 export async function fetchSentenceSuggestions(apiKey: string, words: string[], userContext?: string) {
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({
@@ -528,6 +474,19 @@ export async function fetchQuickTranslation(apiKey: string, text: string) {
     return result.response.text().trim();
   } catch (e) {
     console.error('jan Lina Translation Error:', e);
+    return null;
+  }
+}
+
+export async function fetchEnglishToTokiPona(apiKey: string, text: string): Promise<string | null> {
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
+  const prompt = `Translate this English phrase into natural, simple Toki Pona: "${text}". Provide ONLY the Toki Pona translation, no other text, quotes, or explanation.`;
+  try {
+    const result = await model.generateContent(prompt);
+    return result.response.text().trim();
+  } catch (e) {
+    console.error('jan Lina EN→TP Translation Error:', e);
     return null;
   }
 }
@@ -574,29 +533,11 @@ export async function fetchExamplesForWord(apiKey: string, word: string, partsOf
   }
 }
 
-export async function fetchNeighborConnections(apiKey: string, word: string, neighbors: string[], userContext?: string) {
-  if (!neighbors.length) return {};
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({
-    model: GEMINI_MODEL,
-    generationConfig: { responseMimeType: "application/json" },
-  });
-  const contextInstruction = userContext ? ` Context: ${userContext}.` : '';
-  const prompt = `Act as jan Lina, a Toki Pona teacher. For the word "${word}", briefly explain its connection (e.g. Opposite, Synonym, Category, etc.) to each of these neighbors: ${neighbors.join(', ')}.${contextInstruction} Return ONLY a JSON object mapping each neighbor string exactly as provided to a 1-sentence explanation of the connection, e.g. {"ala (none/zero)": "Opposite: 'ali' means all, while 'ala' means none."}`;
-  try {
-    const result = await model.generateContent(prompt);
-    return JSON.parse(sanitizeJson(result.response.text())) as Record<string, string>;
-  } catch (e) {
-    console.error('jan Lina Neighbors Error:', e);
-    return neighbors.reduce((acc, n) => ({ ...acc, [n]: 'A related Toki Pona word.' }), {} as Record<string, string>);
-  }
-}
-
 export function stripProposedChanges(text: string) {
   return text.split('---')[0].trim();
 }
 
-// Parses "CHANGE: vocab | word_id | role | points", "CHANGE: concept | id | new_status", etc.
+// Parses "CHANGE: vocab | word_id | new_status" and "CHANGE: concept | id | new_status"
 export function parseProposedChanges(text: string): ProposedChange[] | null {
   const VALID_STATUSES: MasteryStatus[] = ['not_started', 'introduced', 'practicing', 'confident', 'mastered'];
   const changes: ProposedChange[] = [];
@@ -619,26 +560,14 @@ export function parseProposedChanges(text: string): ProposedChange[] | null {
 
     if (!/change:\s*(vocab|concept|node|vocab_production|vocab_recognition)/i.test(line)) continue;
     const parts = line.split('|').map(p => p.trim());
-    
+    if (parts.length < 3) continue;
     const typeMatch = parts[0].match(/change:\s*(vocab|concept|node|vocab_production|vocab_recognition)/i);
     if (!typeMatch) continue;
     const type = typeMatch[1].toLowerCase() as any;
     const id = parts[1];
-
-    if (type === 'vocab' && parts.length >= 4) {
-      // New format: CHANGE: vocab | [word_id] | [role] | [points]
-      changes.push({
-        type: 'vocab',
-        id,
-        role: parts[2] as 'noun' | 'verb' | 'mod',
-        points: parseInt(parts[3], 10) || 0
-      });
-    } else if (parts.length >= 3) {
-      // legacy or other types: CHANGE: [type] | [id] | [new_status]
-      const rawStatus = parts[2].toLowerCase().replace(/[^a-z_]/g, '') as MasteryStatus;
-      if (id && (VALID_STATUSES.includes(rawStatus) || rawStatus === 'mastered')) {
-        changes.push({ type, id, newStatus: rawStatus });
-      }
+    const rawStatus = parts[2].toLowerCase().replace(/[^a-z_]/g, '') as MasteryStatus;
+    if (id && (VALID_STATUSES.includes(rawStatus) || rawStatus === 'mastered')) {
+      changes.push({ type, id, newStatus: rawStatus });
     }
   }
   return changes.length > 0 ? changes : null;
@@ -681,19 +610,6 @@ export function detectSessionTitle(prompt: string): string {
   return 'jan LINA LINK';
 }
 
-export async function fetchEnglishToTokiPona(apiKey: string, text: string) {
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
-  const prompt = `Translate this English sentence to Toki Pona: "${text}". Provide ONLY the direct Toki Pona translation, no other text, quotes, or explanation.`;
-  try {
-    const result = await model.generateContent(prompt);
-    return result.response.text().trim();
-  } catch (e) {
-    console.error('jan Lina EN->TP Translation Error:', e);
-    return null;
-  }
-}
-
 export async function fetchSessionRecap(
   apiKey: string,
   changes: ProposedChange[]
@@ -713,89 +629,5 @@ export async function fetchSessionRecap(
     return improved.length
       ? `Session complete! Great work on: ${improved.join(', ')}.`
       : 'Session complete! Keep practising.';
-  }
-}
-export async function generateAIChallenge(apiKey: string, vocabulary: VocabWord[], totalXP: number, type: 'daily' | 'weekly'): Promise<any> {
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({
-    model: GEMINI_MODEL,
-    generationConfig: { responseMimeType: "application/json" },
-  });
-
-  const candidates = vocabulary.filter(w => w.status === 'introduced' || w.status === 'practicing');
-  const vocabSummary = candidates.map(v => `${v.word} (${v.status})`).slice(0, 10).join(', ');
-  
-  const prompt = `Act as jan Lina, a Toki Pona teacher. Generate a ${type} challenge for a student with ${totalXP} XP.
-  
-  DYNAMIC SCALING RULES:
-  - targetCount = (TotalXP / 5000) + [Base Count].
-    (Base Counts: word_usage: 3, session_count: 2, word_progression: 1, prove_it_usage: 1, convo_length: 5, phrase_save: 2)
-    Example: At 30,000 XP, word_usage target should be around (30000/5000) + 3 = 9.
-  - xpReward = (TotalXP / 1000) + 150.
-    Example: At 30,000 XP, reward should be (30000/1000) + 150 = 180.
-  
-  Current priority words: ${vocabSummary || 'None (use common words like toki, pona, etc.)'}
-  If the student is high level (e.g. >20k XP), prioritize words in 'practicing' status for 'word_progression' to push them toward 'mastered'.
-
-  Available Challenge Types:
-  - word_usage: Use [word] in conversation.
-  - session_count: Start X new sessions.
-  - word_progression: Move [word] to the next status level.
-  - prove_it_usage: Use [word] in a Prove It sentence.
-  - convo_length: Have a conversation of at least X messages in one session.
-  - phrase_save: Save X new phrases to The Archive.
-
-  Return a JSON object:
-  {
-    "type": "one of the types above",
-    "title": "Short catchy title in jan Lina's voice",
-    "description": "Clear instruction in jan Lina's voice",
-    "targetWord": "optional word if applicable",
-    "targetCount": number (calculated based on rules),
-    "xpReward": number (calculated based on rules)
-  }
-  
-  For Daily challenges, you can slightly reduce targetCount (e.g. 50% of the calculated value, min 1).
-  Make the title and description personal and encouraging.
-  `;
-
-  try {
-    const result = await model.generateContent(prompt);
-    const data = JSON.parse(sanitizeJson(result.response.text()));
-    
-    const now = new Date();
-    const expires = new Date(now);
-    if (type === 'daily') {
-      expires.setHours(23, 59, 59, 999);
-    } else {
-      expires.setDate(expires.getDate() + 7);
-    }
-
-    const challenge = {
-      id: crypto.randomUUID(),
-      ...data,
-      currentCount: 0,
-      completed: false,
-      expiresDate: expires.toISOString(),
-      ...(type === 'daily' ? { startDate: now.toISOString() } : { weekStartDate: now.toISOString() })
-    };
-    
-    return challenge;
-  } catch (e) {
-    console.error('AI Challenge Generation Error:', e);
-    const fallback: any = {
-      id: crypto.randomUUID(),
-      type: 'word_usage',
-      title: "Daily Practice",
-      description: "Use 'toki' in a sentence today.",
-      targetWord: 'toki',
-      targetCount: 1,
-      currentCount: 0,
-      completed: false,
-      xpReward: 50,
-      expiresDate: new Date(Date.now() + 86400000).toISOString(),
-      ...(type === 'daily' ? { startDate: new Date().toISOString() } : { weekStartDate: new Date().toISOString() })
-    };
-    return fallback;
   }
 }

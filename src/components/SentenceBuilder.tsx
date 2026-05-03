@@ -1,4 +1,5 @@
 /* src/components/SentenceBuilder.tsx */
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
 
@@ -65,9 +66,10 @@ export default function SentenceBuilder({
           }}>
             {selectedWords.map((word, idx) => {
               const vocab = vocabulary.find(v => v.word.toLowerCase() === word.toLowerCase());
+              // Take the first meaning (before any comma or semicolon)
               const hint = vocab?.meanings?.split(/[;,]/)[0].trim() || '?';
               return (
-                <span key={`${word}-${idx}`}>
+                <span key={idx}>
                   {hint}{idx < selectedWords.length - 1 ? ' | ' : ''}
                 </span>
               );
@@ -96,22 +98,12 @@ export default function SentenceBuilder({
             }}>
               {selectedWords.map((word, idx) => (
                 <span 
-                  key={`${word}-${idx}`}
-                  role="button"
-                  tabIndex={0}
+                  key={idx}
                   onClick={() => {
                     const newWords = [...selectedWords];
                     newWords.splice(idx, 1);
                     setSelectedWords(newWords);
                   }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      const newWords = [...selectedWords];
-                      newWords.splice(idx, 1);
-                      setSelectedWords(newWords);
-                    }
-                  }}
-                  aria-label={`Remove ${word}`}
                   style={{ 
                     cursor: 'pointer',
                     transition: 'all 0.2s'
@@ -159,7 +151,6 @@ export default function SentenceBuilder({
 function IconButton({ onClick, icon, label, color = 'white' }: { onClick: () => void, icon: string, label: string, color?: string }) {
   return (
     <button
-      type="button"
       onClick={onClick}
       style={{
         background: 'none',

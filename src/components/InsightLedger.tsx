@@ -55,7 +55,7 @@ const InsightLedger: React.FC<Props> = ({ onClose }) => {
       >
         <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h2 style={{ fontSize: '1rem', fontWeight: 900, letterSpacing: '0.2em', margin: 0 }}>INSIGHT LOG</h2>
-          <button type="button" 
+          <button 
             onClick={onClose}
             style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer', padding: '4px' }}
           >
@@ -79,7 +79,7 @@ const InsightLedger: React.FC<Props> = ({ onClose }) => {
             }}>
               <div>
                 <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#eee' }}>{event.label}</div>
-                <div style={{ fontSize: '0.9rem', fontWeight: 900, color: event.change < 0 ? '#ef4444' : 'var(--gold)' }}>
+                <div style={{ fontSize: '0.9rem', fontWeight: 900, color: 'var(--gold)' }}>
                   {event.change > 0 ? `+${event.change}` : event.change}
                 </div>
               </div>

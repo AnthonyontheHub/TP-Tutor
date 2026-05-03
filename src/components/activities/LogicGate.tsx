@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LogOut } from 'lucide-react';
-import type { UserProfile } from '../../types/mastery';
+import { Sparkles, ArrowRight, RotateCcw, CheckCircle2, XCircle, LogOut } from 'lucide-react';
 
 interface Statement {
   statement: string;
@@ -10,7 +9,7 @@ interface Statement {
 }
 
 interface LogicGateProps {
-  userProfile: UserProfile;
+  userProfile: any;
   curriculumContext?: string;
   onComplete?: (results: { score: number; total: number }) => void;
 }
@@ -108,7 +107,7 @@ export const LogicGate: React.FC<LogicGateProps> = ({ userProfile, onComplete })
               <div className={`p-6 rounded-2xl border ${lastAnswerCorrect ? 'border-[#FFD700]/30 bg-[#FFD700]/5' : 'border-red-500/30 bg-red-500/5'}`}>
                 <p className="text-sm tracking-wide leading-relaxed text-white/80">{currentStatement?.explanation}</p>
               </div>
-              <button type="button" 
+              <button 
                 onClick={getNextStatement}
                 className="w-full py-5 bg-[#FFD700] text-black font-black uppercase tracking-[0.3em] rounded-2xl hover:scale-[1.02] transition-all"
               >
@@ -117,14 +116,14 @@ export const LogicGate: React.FC<LogicGateProps> = ({ userProfile, onComplete })
             </motion.div>
           ) : (
             <div className="flex gap-4">
-              <button type="button" 
+              <button 
                 onClick={() => handleAnswer(true)}
                 className="flex-1 py-10 rounded-2xl border border-white/5 bg-white/5 hover:border-[#FFD700]/50 hover:bg-[#FFD700]/5 group transition-all"
               >
                 <span className="block text-[#FFD700] text-xl font-black tracking-[0.2em] uppercase group-hover:scale-110 transition-transform">pona</span>
                 <span className="text-[10px] uppercase tracking-[0.2em] opacity-40">Simple / True</span>
               </button>
-              <button type="button" 
+              <button 
                 onClick={() => handleAnswer(false)}
                 className="flex-1 py-10 rounded-2xl border border-white/5 bg-white/5 hover:border-red-500/50 hover:bg-red-500/5 group transition-all"
               >
@@ -137,7 +136,7 @@ export const LogicGate: React.FC<LogicGateProps> = ({ userProfile, onComplete })
       </div>
 
       <div className="flex justify-center">
-        <button type="button" 
+        <button 
           onClick={() => onComplete?.({ score, total: totalAttempted })}
           className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.5em] text-white/20 hover:text-[#FFD700] transition-all group py-3 px-6 border border-transparent hover:border-[#FFD700]/20 rounded-full"
         >

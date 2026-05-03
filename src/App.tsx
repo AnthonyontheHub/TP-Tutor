@@ -22,13 +22,8 @@ export type AppPanel = 'profile' | 'settings' | 'instructions' | 'achievements' 
 
 export default function App() {
   const { user, loading } = useAuthStore();
-  const { hasCompletedSetup, isMainProfile, syncSongsWithData } = useMasteryStore();
+  const { hasCompletedSetup, isMainProfile } = useMasteryStore();
   const rawSessions = useChatStore(s => s.sessions);
-
-  useEffect(() => {
-    syncSongsWithData();
-  }, [syncSongsWithData]);
-
   const { addSession, removeSession, updateSession } = useChatStore();
 
   const chatSessions = Array.isArray(rawSessions) ? rawSessions : [];
@@ -128,7 +123,7 @@ export default function App() {
     );
   }, []);
 
-  const handleAskLina = useCallback((prompt: string, mode: 'chat_buddy' | 'instructor' = 'chat_buddy') => {
+  const handleAskLina = useCallback((prompt: string) => {
     addSession({
       id: generateId(),
       title: detectSessionTitle(prompt),
@@ -137,8 +132,7 @@ export default function App() {
       messages: [],
       history: [],
       sessionDeltas: [],
-      context: 'GENERAL',
-      mode
+      context: 'GENERAL'
     });
   }, [addSession]);
 
@@ -202,7 +196,7 @@ export default function App() {
       <AnimatePresence>
         {activePanels.map(panel => (
           <ModalWrapper key={panel} onClose={() => togglePanel(panel)}>
-             {panel === 'profile' && <UserProfilePanel isOpen={true} onClose={() => togglePanel('profile')} />}
+             {panel === 'profile' && <UserProfilePanel onClose={() => togglePanel('profile')} />}
              {panel === 'settings' && <SettingsPanel isOpen={true} onClose={() => togglePanel('settings')} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} onOpenLogbook={() => togglePanel('logbook')} onOpenMasteryCourt={() => { togglePanel('settings'); handleAskLina('[SYSTEM: The student has opened Mastery Court. You know why they\'re here. Greet them briefly, acknowledge your role, and ask what they\'d like to petition.]'); }} />}
              {panel === 'achievements' && <AchievementsPanel onClose={() => togglePanel('achievements')} />}
              {panel === 'instructions' && <InstructionsPanel isOpen={true} onClose={() => togglePanel('instructions')} />}
@@ -223,7 +217,7 @@ export default function App() {
         padding: '0 20px',
         gap: '12px',
         pointerEvents: 'none',
-        zIndex: 'var(--z-chat-dock)'
+        zIndex: 7000
       }}>
         {chatSessions.filter(s => s.isMinimized).map((session) => (
           <div 
@@ -253,7 +247,7 @@ export default function App() {
         ))}
       </div>
 
-      <div className="chat-manager-layer" style={{ pointerEvents: 'none', position: 'fixed', inset: 0, zIndex: 'var(--z-chat-manager)' }}>
+      <div className="chat-manager-layer" style={{ pointerEvents: 'none', position: 'fixed', inset: 0, zIndex: 6500 }}>
         <AnimatePresence>
           {chatSessions.filter(s => !s.isMinimized).map((session) => (
             <ChatSession 

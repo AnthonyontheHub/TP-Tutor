@@ -88,7 +88,7 @@ const SummaryReport: React.FC<SummaryReportProps> = ({
           </motion.div>
         )}
 
-        <button type="button" 
+        <button 
           onClick={onClose}
           style={{
             marginTop: '10px',

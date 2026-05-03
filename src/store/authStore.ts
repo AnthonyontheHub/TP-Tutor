@@ -29,7 +29,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   signIn: async () => {
     set({ loading: true, error: null });
     try {
-      if (import.meta.env.DEV) console.log('Attempting sign-in with popup...');
+      console.log('Attempting sign-in with popup...');
       await signInWithPopup(auth, googleProvider);
     } catch (error) {
       const authError = error as { code?: string; message?: string };
@@ -41,7 +41,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         || authError.code === 'auth/popup-closed-by-user'
         || authError.code === 'auth/cancelled-popup-request'
       ) {
-        if (import.meta.env.DEV) console.log('Switching to redirect mode...');
+        console.log('Switching to redirect mode...');
         try {
           await signInWithRedirect(auth, googleProvider);
         } catch (redirectError) {

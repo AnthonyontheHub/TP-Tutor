@@ -8,29 +8,18 @@ import {
   type MasteryStatus, type VocabWord, type StatusSummary, type SavedPhrase,
   type UserProfile, type ReviewVibe,
   type CurriculumLevel, type NodeStatus, type CommonPhrase, type PosRole,
-  type SmallRank, type CeremonialRank, type Badge, type MasteryWeight, SMALL_RANKS,
-  CEREMONIAL_RANKS, ALL_BADGES, type SessionLogEntry, type WeeklyChallenge,
-  type DailyChallenge,
-  type RoleMatrix, type MasteryEvent, type ScoreHistoryEntry
+  type SmallRank, type CeremonialRank, type Badge, SMALL_RANKS,
+  CEREMONIAL_RANKS, ALL_BADGES, type SessionLogEntry, type WeeklyChallenge
 } from '../types/mastery';
-import type { VocabContentEntry } from '../data/vocabContent';
 import { scoreToStatus, STATUS_MIDPOINT } from '../types/mastery';
-import type { Album } from '../types/discography';
 import { initialMasteryMap } from '../data/initialMasteryMap';
 import { curriculumRoadmap } from '../data/curriculum';
 import { vocabContent } from '../data/vocabContent';
 import { TOKI_PONA_DICTIONARY, WORD_FREQUENCY } from '../data/tokiPonaDictionary';
-import aiVocabCache from '../data/aiVocabCache.json';
-import { generateAIChallenge, resolveApiKey } from '../services/linaService';
 
-function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: MasteryStatus; type: 'word' | 'grammar'; sessionNotes: string; frequencyRank?: number; weight?: MasteryWeight; sitelenPona?: string; sitelenEtymology?: string; neighborConnections?: Record<string, string>; grammarExamples?: Record<string, string> }): VocabWord {
+function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: MasteryStatus; type: 'word' | 'grammar'; sessionNotes: string; frequencyRank?: number; weight?: 'pillar' | 'working' | 'bonus' }): VocabWord {
   const score = STATUS_MIDPOINT[v.status];
-  const staticData: Partial<VocabContentEntry> = vocabContent[v.word] || {};
-  const aiData = (aiVocabCache as Record<string, { aiExplanation?: string; aiExamples?: Record<string, string>; grammarExamples?: Record<string, string>; neighborConnections?: Record<string, string> }>)[v.word.toLowerCase()] || {};
-  const weight = v.weight;
-
-  // Distribute initial score across roles
-  const perRole = Math.floor(score / 3);
+  const staticData = vocabContent[v.word] || {};
 
   return {
     id: v.word,
@@ -40,19 +29,13 @@ function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: Maste
     type: v.type,
     baseScore: score,
     confidenceScore: score,
-    roleMatrix: { noun: perRole, verb: perRole, mod: perRole },
     status: v.status,
-    weight,
+    weight: v.weight,
     useCount: 0,
     frequencyRank: v.frequencyRank ?? 999,
     isMasteryCandidate: false,
     sessionNotes: v.sessionNotes,
-    aiExplanation: aiData.aiExplanation || '',
-    aiExamples: aiData.aiExamples,
-    grammarExamples: v.grammarExamples || aiData.grammarExamples,
-    neighborConnections: v.neighborConnections || aiData.neighborConnections,
-    sitelenPona: v.sitelenPona,
-    sitelenEtymology: v.sitelenEtymology,
+    partOfSpeechScores: { noun: 0, verb: 0, modifier: 0 },
     lastReviewed: new Date().toISOString(),
     scoreHistory: [],
     hardened: false,
@@ -83,169 +66,47 @@ function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: Maste
 
 const mappedVocabulary: VocabWord[] = initialMasteryMap.initialVocabulary.map(toFullVocabWord);
 
-const defaultSongs: Album[] = [
+const defaultSongs = [
   {
-    id: 'telo-lon-kiwen',
-    title: "telo lon kiwen",
-    year: 2022,
-    songs: [
-      { id: 'suno-lon-insa', title: 'suno lon insa', blocks: [] },
-      { id: 'telo-lon-kiwen-track', title: 'telo lon kiwen', blocks: [] },
-      { id: 'tenpo-li-moku-e-mi', title: 'tenpo li moku e mi', blocks: [] },
-      { id: 'eijelo-ilo', title: 'eijelo ilo', blocks: [] },
-      { id: 'kon-li-pini-e-moli', title: 'kon li pini e moli', blocks: [] },
-      { id: 'ma-suli-lon-monsi', title: 'ma suli lon monsi', blocks: [] },
-      { id: 'nasin-pi-pakala-ken', title: 'nasin pi pakala ken', blocks: [] },
-      { id: 'kalama-pi-pini-ala', title: 'kalama pi pini ala', blocks: [] },
-      { id: 'ante-suli-track', title: 'ante Suli', blocks: [] },
-      { id: 'pana-pi-wawa-pimeja', title: 'pana pi wawa pimeja', blocks: [] },
-      { id: 'suno-sewi', title: 'suno sewi', blocks: [] },
-      { id: 'awen-lape', title: 'awen lape', blocks: [] },
-      { id: 'kon-pi-sewi', title: 'kon pi sewi', blocks: [] },
-      { id: 'kon-kalama', title: 'kon kalama', blocks: [] },
-      { id: 'o-lon-poka-mi', title: 'o lon poka mi', blocks: [] },
-      { id: 'luka-mama', title: 'luka mama', blocks: [] },
-      { id: 'tenpo-awen-pini-ala', title: 'tenpo awen pini ala', blocks: [] },
-      { id: 'telo-suno', title: 'telo suno', blocks: [] }
-    ]
-  },
-  {
-    id: 'kalama-pi-kon-mi',
-    title: "kalama pi kon mi",
-    year: 2023,
-    songs: [
-      { id: 'mi-awen-lon-pimeja', title: 'mi awen lon pimeja', blocks: [] },
-      { id: 'mi-lon-ma-lili', title: 'mi lon ma lili', blocks: [] },
-      { id: 'seli-pi-sijelo', title: 'seli pi sijelo', blocks: [] },
-      { id: 'oko-pikon-sewi', title: 'oko pikon sewi', blocks: [] },
-      { id: 'mi-wile-pona', title: 'mi wile pona', blocks: [] },
-      { id: 'toki-ala', title: 'toki ala', blocks: [] },
-      { id: 'awa-en-awen', title: 'awa en awen', blocks: [] },
-      { id: 'noka-en-ma', title: 'noka en ma', blocks: [] },
-      { id: 'ni-li-nasa', title: 'ni li nasa', blocks: [] },
-      { id: 'mi-mute-o-musi', title: 'mi mute o musi', blocks: [] },
-      { id: 'mi-lon-ni-li-pona', title: 'mi lon ni li pona', blocks: [] },
-      { id: 'kalama-pi-kon-mi-track', title: 'kalama pi kon mi', blocks: [] }
-    ]
-  },
-  {
-    id: 'utala-kon',
+    id: "utala-kon",
     title: "utala kon",
-    year: 2024,
-    songs: [
-      { id: 'wawa-kama', title: 'wawa kama', blocks: [] },
-      { id: 'nasin-li-ken-ala', title: 'nasin li ken ala', blocks: [] },
-      { id: 'pini-li-kama', title: 'pini li kama', blocks: [] },
-      { id: 'toki-ike', title: 'toki ike', blocks: [] },
-      { id: 'lukin-moli', title: 'lukin moli', blocks: [] },
-      { id: 'mi-olin-e-ike', title: 'mi olin e ike', blocks: [] },
-      { id: 'mi-awen-lon-ni', title: 'mi awen lon ni', blocks: [] },
-      { id: 'pini-ala', title: 'pini ala', blocks: [] },
-      { id: 'pini-lon-tomo', title: 'pini lon tomo', blocks: [] }
+    tracks: [
+      { title: "01 wawa kama", blocks: [
+        { title: "Verse 1", tp: "mi tawa / mi tawa / mi tawa lon nasin / nasin li pini", en: "I go / I go / I go on the path / The path ends" },
+        { title: "Chorus", tp: "ona li lon / pini li kama / mi ken ala pini e tawa", en: "It is here / The end is coming / I cannot stop the movement" }
+      ]},
+      { title: "02 nasin li ken ala", blocks: [
+        { title: "Chorus", tp: "nasin li ken ala", en: "The path is not possible" }
+      ]},
+      { title: "03 pini li kama", blocks: [] },
+      { title: "04 toki ike", blocks: [] },
+      { title: "05 lukin moli", blocks: [] },
+      { title: "06 mi olin e ike", blocks: [] },
+      { title: "07 mi awen lon ni", blocks: [] },
+      { title: "08 pini ala", blocks: [] }
     ]
   },
   {
-    id: 'toki-nasa-kalama-pona-ep',
-    title: "toki nasa, kalama pona ep",
-    year: 2025,
-    songs: [
-      { 
-        id: 'o-tawa-wawa', 
-        title: 'o tawa wawa', 
-        blocks: [
-          { title: "Intro", tp: "(Hey!) (Hey!) (Hey!)", en: "(Hey!) (Hey!) (Hey!)" },
-          { title: "Verse 1", tp: "kalama li open / mi kute e wawa / sijelo mi li seli / tenpo ni li wawa / (wawa!) / mi pali ala / musi li lawa / sina seli mute / mi seli a", en: "The sound begins / I hear the power / My body is hot / This moment is powerful / (wawa!) / I am not doing anything / The music is leading / You are very hot / I am hot too" },
-          { title: "Pre-Chorus", tp: "mi ken ala lawa e pilin / telo loje li seli mute / sina tawa lon kon mi / (lon kon mi) / musi li lon insa mi / (insa mi) / ona li wawa!", en: "I cannot control the feeling / My blood is very warm / You move in my spirit / (in my spirit) / The music is inside me / (inside me) / It is powerful!" },
-          { title: "Chorus", tp: "o tawa! / musi li wawa / (musi li wawa) / o tawa! / seli li tawa / (seli li tawa) / mi musi / mi wawa / o tawa! / (TAWA!)", en: "Move! / The music is power / (the music is power) / Move! / The heat moves / (the heat moves) / I am having fun / I am strong / Move! / (MOVE!)" },
-          { title: "Verse 2", tp: "musi li kute / mi kute e musi / ona li uta / li uta e mi / wan, tu, tawa! / mi tawa mute / ona li wawa / mi tawa mute / (tawa mute!)", en: "The music is hearing / I hear the music / It is a mouth / And it kisses me / One, two, move! / I move a lot / It is powerful / I move a lot / (move a lot!)" },
-          { title: "Bridge", tp: "o kute e pilin / o kute e kalama / mi pali ala / musi li tawa e mi! / (ona li tawa e mi!) / mi seli! / mi wawa! / AH!", en: "Listen to the heart / Listen to the sound / I am not acting / The music moves me! / (it moves me!) / I'm burning! / I'm powerful! / AH!" },
-          { title: "Outro", tp: "musi li wawa / (wawa!) / seli li tawa / (tawa!) / o tawa! / musi!", en: "The music is power / (power!) / The heat moves / (moves!) / Move! / Music!" }
-        ] 
-      },
-      { 
-        id: 'lukin-sama', 
-        title: 'lukin sama', 
-        blocks: [
-          { title: "Intro", tp: "(Ooh-woah) (Ooh-woah)", en: "(Ooh-woah) (Ooh-woah)" },
-          { title: "Verse 1", tp: "mi lon tomo musi suli ni / suno mute li suli e kon / jan mute li musi li kalama / taso lukin mi li tawa sina / (tawa sina, tawa sina)", en: "I am at this big, fun house / Many lights make the air feel big / Many people are having fun and making noise / But my gaze goes to you / (to you, to you)" },
-          { title: "Pre-Chorus", tp: "tenpo li pona li open / pilin mi li wile e sina / o lukin tawa ma mi ni / o kama tawa mi", en: "The time is good and it is beginning / My heart wants you / Look toward this place of mine / Come to me" },
-          { title: "Chorus", tp: "jan pona o, o lukin e mi / mi wile e ni: sina pona / pilin olin li kama suli / lukin sina li sama mi anu seme? / (anu seme? anu seme?) / o lukin e mi, jan pona o", en: "O good person, look at me / I want this: for you to be good / The feeling of love is becoming great / Is your gaze like mine, or what? / (or what? or what?) / Look at me, good person" },
-          { title: "Post-Chorus", tp: "lukin, lukin, lukin / (o lukin e mi) / pona, pona, pona / (o pona e mi) / sama, sama, sama / (o sama e mi)", en: "Look, look, look / (look at me) / Good, good, good / (make me good) / Same, same, same / (make me the same)" },
-          { title: "Verse 2", tp: "lipu kasi li open lon insa / kili lili li suli e olin / mi utala ala e tenpo / mi olin e toki pi lukin sina / (lukin sina, lukin sina)", en: "A book of plants opens inside / Small fruits make love grow / I don't fight against time / I love the language of your gaze / (your gaze, your gaze)" },
-          { title: "Bridge", tp: "mu... mu... mu... (kalama pi pilin mi) / mu... mu... mu... (kalama pi pilin sina) / tenpo li awen lili / suno li tawa sike / o open e pilin pona", en: "mu... mu... mu... (sound of my heart) / mu... mu... mu... (sound of your heart) / Time stays a little while / The sun moves in a circle / Open up the good feeling" },
-          { title: "Outro", tp: "jan pona o / (o lukin) / lukin sama / (o pona) / mi olin e sina / (o open) / sama... / pona...", en: "Good person / (look) / Looking the same / (good) / I love you / (open) / Same... / Good..." }
-        ] 
-      },
-      { 
-        id: 'o-kule-e-kon', 
-        title: 'o kule e kon', 
-        blocks: [
-          { title: "Intro", tp: "Shimmering synth wash — no drums", en: "Shimmering synth wash — no drums" },
-          { title: "Verse 1", tp: "lili li lon, o lukin. / kule li wawa, li sewi. / suno li pini, li kama. / pini la, kon li tawa. / mi lili, mi lon poka. / (mi lon poka...)", en: "Smallness exists, look at it. / Color is strong, it is divine. / The light fades, and it returns. / When it ends, the air moves. / I am small, I am right beside you. / (right beside you...)" },
-          { title: "Chorus", tp: "o kule e kon! / o suno e wawa! / lili li sewi! / lete li pona! / mi mute li lon! / o pilin e ijo! / o pilin e ijo!", en: "Color the air! / Light up the energy! / Smallness is divine! / The cold is good! / We exist! / Feel something! / Feel something!" },
-          { title: "Verse 2", tp: "lete li moku e sijelo. / kon li moku e kon mi. / kule li lon, li pini ala. / lili o, o tawa insa. / o kute e toki pi lili.", en: "The cold bites the body. / The air consumes my breath. / Color is present, it does not end. / Oh small things, move within. / Listen to the voice of smallness." },
-          { title: "Outro", tp: "suno li lon. / (suno li lon.) / o lili. / (o lili.) / o kule.", en: "Light exists. / (light exists.) / Be small. / (be small.) / Be colorful." }
-        ] 
-      },
-      { 
-        id: 'kulupupona', 
-        title: 'KULUPUPONA', 
-        blocks: [
-          { title: "Intro", tp: "(o!) (o!) (mi mute o!) / tenpo ni li pona mute / (ni li pona!)", en: "(oh!) (oh!) (all of us oh!) / This time is so good / (this is good!)" },
-          { title: "Verse 1", tp: "o lukin e mi mute / mi lon ma pona / o pana e seli / (o pana!) / o moku e telo / (o moku!) / mi mute li tawa mute / nasin ante li ike / sina jo e suli / (sina jo!) / mi pana e wawa / (mi pana!)", en: "Look at all of us / We are in a good place / Give the warmth / (give!) / Drink the water / (drink!) / We are moving a lot / Other ways are bad / You have greatness / (you have!) / I give the strength / (I give!)" },
-          { title: "Pre-Chorus", tp: "ma li pimeja lon poka / la ni li seli li suno / mi mute li ken ala pakala / tan ni: sina lon poka mi", en: "The world is dark outside / But here is warm and glowing / We cannot be broken / Because you are here by my side" },
-          { title: "Chorus", tp: "kulupu pona li lon! / (li lon!) / mi mute li jo e mute! / (e mute!) / moku li pona / telo li pona / kalama ni li seli e pilin / kulupu pona li lon!", en: "The good community is here! / (is here!) / We have so much! / (so much!) / The food is good / The drink is good / This sound warms the heart / The good community is here!" },
-          { title: "Verse 2", tp: "sina moku e telo / mi pana e moku / mi jo e kon pona / mi mute li kulupu / (a!) / o kalama mute / o tawa suli / tenpo li tawa / la mi mute li awen / (awen!) (awen!) / mi pana e pona tawa sina / sina pana e pona tawa mi", en: "You drink / I give the food / I have a good spirit / We are a community / (ah!) / Make a lot of noise / Move big / As time goes by / We remain / (remain!) (remain!) / I give goodness to you / You give goodness to me" },
-          { title: "Bridge", tp: "ma li tawa mute / mi mute li lili / taso lon kulupu / mi suli / mi mute li jo e ni / ni li ale", en: "The world moves fast / We are small / But in the community / I am big / We have this / This is everything" },
-          { title: "Outro", tp: "pona! (pona!) / mi mute li lon! (o!) / ni li ale!", en: "Good! (good!) / We are here! (oh!) / This is everything!" }
-        ] 
-      },
-      { 
-        id: 'alasa-tawa-sin', 
-        title: 'alasa tawa sin', 
-        blocks: [
-          { title: "Verse 1", tp: "mi wile e wawa olin. / alasa li open lon poka. / mi utala e kon moku. / o awen lili, o lukin sin.", en: "I want the power of love. / The hunt begins nearby. / I fight against the consuming air. / Wait a little, look anew." },
-          { title: "Chorus", tp: "o alasa! o awen ala! / pini li lon poka ala! / wile li tawa suli! / kon sin li lon poka! / lon! tawa! sin! / (lon tawa sin!)", en: "Hunt! Do not wait! / The end is nowhere near! / Wanting becomes motion! / A new spirit is near! / Real! Motion! New! / (real motion new!)" },
-          { title: "Verse 2", tp: "pini li moku e wawa. / awen li moku e pilin. / mi wile e tawa suli. / alasa li suno sin.", en: "Endings consume strength. / Waiting consumes feeling. / I want great momentum. / The chase is a new sun." },
-          { title: "Bridge", tp: "tenpo pini li moli. / tenpo sin li lon. / mi alasa e suli olin. / pini li lon ala!", en: "Past time is dead. / New time is alive. / I chase the greatness of love. / There is no end!" },
-          { title: "Outro", tp: "alasa sin. / awen tawa. / (pona tawa mi.)", en: "A new hunt. / Keep moving. / (good for me.)" }
-        ] 
-      },
-      { 
-        id: 'kili-wawa', 
-        title: 'kili wawa', 
-        blocks: [
-          { title: "Intro", tp: "(O! O! O!)", en: "(O! O! O!)" },
-          { title: "Verse 1", tp: "moku li suli (suli) / kili li loje (loje) / mi pali e ni (mi pali) / tenpo li awen (awen)", en: "Eating is important (important) / The fruit is red (red) / I am doing this (I am doing) / Time remains (remains)" },
-          { title: "Chorus", tp: "o kalama nasa mute! / (o kalama!) / o tawa wawa suli! / (o tawa!) / mi moku e kili lili / ona li suli tawa mi / (li suli!) / moku! wawa! / (moku! wawa!) / nasa! pona! / (nasa! pona!)", en: "Make a lot of strange noise! / (noise!) / Move with great strength! / (move!) / I am eating a tiny fruit / It is huge to me / (is huge!) / Food! Power! / (food! power!) / Strange! Good! / (strange! good!)" },
-          { title: "Verse 2", tp: "wawa li pona (pona) / tawa li suli (suli) / mi lukin e ni (mi lukin) / tenpo li nasa (nasa)", en: "Power is good (good) / Movement is grand (grand) / I am looking at this (I am looking) / Time is strange (strange)" },
-          { title: "Middle 8", tp: "sina lukin ala lukin? / kili ni li wawa. / mi lon. / mi suli. / tenpo li pini. / moku.", en: "Are you looking or not? / This fruit is powerful. / I am here. / I am important. / Time is finished. / Eat." },
-          { title: "Outro", tp: "moku suli (moku suli) / mi wawa (mi wawa) / nasa (nasa) / pona (pona)", en: "Grand eating (grand eating) / I am strong (I am strong) / Strange (strange) / Good (good)" }
-        ] 
-      }
+    id: 'jan-olami',
+    title: "jan olin mi",
+    tracks: [
+      { title: "jan olin mi", blocks: [] },
+      { title: "tomo pona", blocks: [] },
+      { title: "suno li suli", blocks: [] },
+      { title: "tenpo pi olin ni", blocks: [] },
+      { title: "mi mute", blocks: [] }
     ]
   },
   {
-    id: 'pini-o-awen',
-    title: "pini o awen",
-    year: 2026,
-    songs: [
-      { id: 'lon-pimeja', title: 'lon pimeja', blocks: [] },
-      { id: 'mi-olin-e-tenpo', title: 'mi olin e tenpo', blocks: [] },
-      { id: 'mi-ala', title: 'mi ala', blocks: [] },
-      { id: 'olin-li-awen', title: 'olin li awen', blocks: [] },
-      { id: 'sona-pi-tenpo-pini', title: 'sona pi tenpo pini', blocks: [] },
-      { id: 'toki-lon-kon', title: 'toki lon kon', blocks: [] },
-      { id: 'tawa-awen', title: 'tawa awen', blocks: [] },
-      { id: 'utala-insa', title: 'utala insa', blocks: [] },
-      { id: 'ike-li-lawa', title: 'ike li lawa', blocks: [] },
-      { id: 'toki-pi-utala', title: 'toki pi utala', blocks: [] },
-      { id: 'lape-suli', title: 'lape suli', blocks: [] },
-      { id: 'ale-li-lon-mi', title: 'ale li lon mi', blocks: [] },
-      { id: 'sama-anu-seme', title: 'sama anu seme', blocks: [] },
-      { id: 'olin-pi-pini', title: 'olin pi pini', blocks: [] },
-      { id: 'tenpo-suno-tu', title: 'tenpo suno tu', blocks: [] },
-      { id: 'pona-li-kama', title: 'pona li kama', blocks: [] }
+    id: 'toki-nasa',
+    title: "toki nasa, kalama pona",
+    tracks: [
+      { title: "o tawa wawa", blocks: [] },
+      { title: "lukin sama", blocks: [] },
+      { title: "o kule e kon", blocks: [] },
+      { title: "KULUPU PONA", blocks: [] },
+      { title: "alasa tawa sin", blocks: [] },
+      { title: "kili wawa (Bonus Track)", blocks: [] }
     ]
   }
 ];
@@ -266,29 +127,27 @@ const defaultCommonPhrases = [
 interface MasteryActions {
   applyScoreUpdate: (nodeId: string, points: number, context: string) => void;
   calculateDecay: () => void;
-  applyScoreDeltas: (deltas: { wordId: string; role?: keyof RoleMatrix; delta: number }[]) => void;
-  updateVocabStatus: (wordIdOrText: string, role: keyof RoleMatrix, points: number) => void;
+  applyScoreDeltas: (deltas: { wordId: string; delta: number }[]) => void;
+  updateVocabStatus: (wordIdOrText: string, status: MasteryStatus) => void;
   cycleWordStatus: (wordId: string) => void;
   setLastUpdated: (date: string) => void;
   savePhrase: (phrase: string | SavedPhrase) => void;
   recordActivity: () => void;
   setStudentName: (name: string) => void;
-  updateProfile: (profile: Partial<UserProfile>) => Promise<void>;
-  setReviewVibe: (vibe: ReviewVibe) => Promise<void>;
-  setProfileImage: (url: string) => Promise<void>;
-  updatePhraseNote: (id: string, notes: string) => Promise<void>;
-  deletePhrase: (id: string) => Promise<void>;
+  updateProfile: (profile: Partial<UserProfile>) => void;
+  setReviewVibe: (vibe: ReviewVibe) => void;
+  setProfileImage: (url: string) => void;
+  updatePhraseNote: (id: string, notes: string) => void;
+  deletePhrase: (id: string) => void;
   resetAsNewUser: () => Promise<void>;
   resetProfileAndRunSetup: () => Promise<void>;
-  randomizeVocab: () => Promise<void>;
-  masterAllVocab: () => Promise<void>;
+  randomizeVocab: () => void;
+  masterAllVocab: () => void;
   clearLocalData: () => void;
   syncFromCloud: (userId: string, initialName?: string, initialProfileImage?: string) => Promise<Unsubscribe | void>;
   syncToCloud: (userId?: string, merge?: boolean, force?: boolean) => Promise<void>;
   getStatusSummary: () => StatusSummary & { xp: number; level: number; rankTitle: string };
   setHasCompletedSetup: (val: boolean) => void;
-  setSongs: (songs: Album[]) => void;
-  syncSongsWithData: () => void;
   updateNodeStatus: (nodeId: string, status: NodeStatus) => void;
   awardBadge: (badgeId: string) => void;
   checkAndAwardRanks: () => void;
@@ -298,21 +157,19 @@ interface MasteryActions {
   setWidgetDensity: (val: 'Compact' | 'Expanded') => void;
   setFogOfWar: (val: 'Strict' | 'Visible') => void;
   setShowCircuitPaths: (val: boolean) => void;
-  setKnowledgeCheckFrequency: (freq: 'daily' | 'session' | 'never') => Promise<void>;
-  setLastKnowledgeCheckDate: (date: string) => Promise<void>;
+  setKnowledgeCheckFrequency: (freq: 'daily' | 'session' | 'never') => void;
+  setLastKnowledgeCheckDate: (date: string) => void;
   setSelectedWords: (words: string[]) => void;
   addWordToSelection: (word: string) => void;
   removeWordFromSelection: (word: string) => void;
   toggleWordSelection: (word: string) => void;
   setLessonFilter: (wordIds: string[] | null) => void;
-  hardenWord: (wordId: string) => Promise<void>;
-  clearAllSavedPhrases: () => Promise<void>;
+  hardenWord: (wordId: string) => void;
+  clearAllSavedPhrases: () => void;
   checkAssessments: (onTrigger: (word: VocabWord) => void) => void;
   switchProfile: (name: string) => void;
-  updateVocabAIContent: (wordId: string, content: { aiExplanation?: string; aiExamples?: Record<string, string>; grammarExamples?: Record<string, string>; neighborConnections?: Record<string, string> }) => void;
+  updateVocabAIContent: (wordId: string, content: { aiExplanation?: string; aiExamples?: Record<string, string> }) => void;
   updateSessionNotes: (wordId: string, notes: string) => void;
-  resetProgress: () => void;
-  chargeGrid: () => void;
 
   // Feature 5
   recordLearningDay: (date: string) => void;
@@ -349,9 +206,7 @@ interface MasteryActions {
   // Prompt C Actions
   startSessionTimer: () => void;
   commitSessionLog: (entry: Omit<SessionLogEntry, 'id' | 'durationMinutes'>) => void;
-  generateWeeklyChallenge: () => Promise<void>;
-  generateDailyChallenge: () => Promise<void>;
-  snoozeChallenge: (type: 'daily' | 'weekly') => void;
+  generateWeeklyChallenge: () => void;
   progressChallenge: (amount?: number, type?: WeeklyChallenge['type'], wordId?: string) => void;
   clearRankAcknowledgement: () => void;
 }
@@ -359,7 +214,6 @@ interface MasteryActions {
 interface MasteryState {
   userId: string | null;
   studentName: string;
-  totalXP: number;
   profile: UserProfile;
   reviewVibe: ReviewVibe;
   profileImage: string;
@@ -378,7 +232,7 @@ interface MasteryState {
   activeActivity: { type: string, nodeId: string } | null;
   isMainProfile: boolean;
   cloudSynced: boolean;
-  songs: Album[];
+  songs: { id: string; title: string; tracks: { title: string; blocks: { title: string; tp: string; en: string }[] }[] }[];
   commonPhrases: CommonPhrase[];
   // Dashboard settings
   widgetDensity: 'Compact' | 'Expanded';
@@ -386,7 +240,6 @@ interface MasteryState {
   showCircuitPaths: boolean;
   knowledgeCheckFrequency: 'daily' | 'session' | 'never';
   lastKnowledgeCheckDate: string;
-  gridChargeUntil: string | null;
 
   // New Features
   completedActivities: Record<string, { id: string, stats?: { score: number, total: number } }[]>;
@@ -412,10 +265,7 @@ interface MasteryState {
   sessionLog: SessionLogEntry[];
   sessionStartTime: string;
   currentChallenge: WeeklyChallenge | null;
-  currentDailyChallenge: DailyChallenge | null;
   completedChallenges: WeeklyChallenge[];
-  dailySnoozedUntil: string | null;
-  weeklySnoozedUntil: string | null;
   pendingRankAcknowledgement: string | null;
 }
 
@@ -478,7 +328,6 @@ export const useMasteryStore = create<MasteryStore>()(
     (set, get) => ({
       userId: null,
       studentName: '',
-      totalXP: 0,
       profile: defaultProfile,
       reviewVibe: null,
       profileImage: '',
@@ -501,7 +350,6 @@ export const useMasteryStore = create<MasteryStore>()(
       showCircuitPaths: true,
       knowledgeCheckFrequency: 'session',
       lastKnowledgeCheckDate: '',
-      gridChargeUntil: null,
       cloudSynced: false,
       commonPhrases: defaultCommonPhrases,
       songs: defaultSongs,
@@ -530,23 +378,11 @@ export const useMasteryStore = create<MasteryStore>()(
       sessionLog: [],
       sessionStartTime: '',
       currentChallenge: null,
-      currentDailyChallenge: null,
       completedChallenges: [],
-      dailySnoozedUntil: null,
-      weeklySnoozedUntil: null,
       pendingRankAcknowledgement: null,
 
       setHasCompletedSetup: (val) => { set({ hasCompletedSetup: val }); void get().syncToCloud(); },
-      setSongs: (songs) => { set({ songs }); void get().syncToCloud(); },
-      syncSongsWithData: () => {
-        const { songs } = get();
 
-        const hasTelo = Array.isArray(songs) && songs.some(a => a.id === 'telo-lon-kiwen');
-        if (!Array.isArray(songs) || songs.length === 0 || !hasTelo) {
-          set({ songs: defaultSongs });
-          void get().syncToCloud();
-        }
-      },
       refreshCurriculumStatus: () => {
         set((state) => {
           let lastNodeMastery = 0; // Conceptual nodes stay active until sign-off
@@ -602,7 +438,6 @@ export const useMasteryStore = create<MasteryStore>()(
           completedNodeIds: [...new Set([...state.completedNodeIds, nodeId])]
         }));
         get().refreshCurriculumStatus();
-        get().chargeGrid();
         void get().syncToCloud();
       },
 
@@ -693,7 +528,7 @@ export const useMasteryStore = create<MasteryStore>()(
             updated = [...current, { id: activityId, stats }];
           }
 
-          const newState: Partial<MasteryStore> = {
+          const newState = {
             completedActivities: {
               ...state.completedActivities,
               [nodeId]: updated
@@ -701,12 +536,12 @@ export const useMasteryStore = create<MasteryStore>()(
           };
 
           if (stats) {
-            const insightEntry: MasteryEvent = {
+            const insightEntry = {
               label: activityId.toUpperCase().replace('-', ' '),
               change: Math.round(stats.score),
               timestamp: new Date().toISOString()
             };
-            newState.masteryHistory = [insightEntry, ...(state.masteryHistory || [])].slice(0, 50);
+            (newState as any).masteryHistory = [insightEntry, ...(state.masteryHistory || [])].slice(0, 50);
           }
 
           return newState;
@@ -726,19 +561,8 @@ export const useMasteryStore = create<MasteryStore>()(
         set((state) => {
           const vocab = state.vocabulary.map((w) => {
             if (w.id !== nodeId && w.word.toLowerCase() !== nodeId.toLowerCase()) return w;
-            
-            // Distribute points across roles while maintaining balance
-            const perRole = Math.floor(points / 3);
-            const remainder = points % 3;
-            const updatedMatrix = { ...w.roleMatrix };
-            
-            updatedMatrix.noun = clamp(updatedMatrix.noun + perRole + (remainder > 0 ? 1 : 0), 0, 334);
-            updatedMatrix.verb = clamp(updatedMatrix.verb + perRole + (remainder > 1 ? 1 : 0), 0, 334);
-            updatedMatrix.mod = clamp(updatedMatrix.mod + perRole, 0, 334);
-            
-            const newScore = Object.values(updatedMatrix).reduce((a, b) => a + b, 0);
-            const actualPoints = newScore - w.baseScore;
-            const historyEntry = { date: now, change: actualPoints, reason: context };
+            const newScore = clamp(w.baseScore + points, 0, 1000);
+            const historyEntry = { date: now, change: points, reason: context };
             
             const recentDrops = [historyEntry, ...(w.scoreHistory || [])]
               .filter(h => h.change < 0 && (new Date(now).getTime() - new Date(h.date).getTime() < 48 * 3600000));
@@ -747,7 +571,6 @@ export const useMasteryStore = create<MasteryStore>()(
 
             return {
               ...w,
-              roleMatrix: updatedMatrix,
               baseScore: newScore,
               confidenceScore: newScore,
               status: scoreToStatus(newScore),
@@ -774,73 +597,48 @@ export const useMasteryStore = create<MasteryStore>()(
         void get().syncToCloud();
       },
 
-      chargeGrid: () => {
-        const until = new Date();
-        until.setHours(until.getHours() + 24);
-        set({ gridChargeUntil: until.toISOString() });
-        void get().syncToCloud();
-      },
-
       calculateDecay: () => {
         const now = new Date();
-        const chargeUntil = get().gridChargeUntil;
-        if (chargeUntil && now < new Date(chargeUntil)) {
-          if (import.meta.env.DEV) console.log("Decay frozen: Grid is charged.");
-          return;
-        }
-
         const FORTY_EIGHT_HOURS = 48 * 60 * 60 * 1000;
         set((state) => ({
           vocabulary: state.vocabulary.map((w) => {
+            if (w.hardened) return w;
             const last = new Date(w.lastReviewed || 0).getTime();
-            if (now.getTime() - last <= FORTY_EIGHT_HOURS) return w;
+            if (now.getTime() - last > FORTY_EIGHT_HOURS) {
+              const decayAmount = -15; 
+              const newScore = clamp(w.baseScore - 15, 0, 1000);
+              if (newScore === w.baseScore) return w;
+              
+              const history = [{ date: now.toISOString(), change: decayAmount, reason: 'decay' }, ...(w.scoreHistory || [])].slice(0, 5);
+              const recentDrops = history.filter(h => h.change < 0 && (now.getTime() - new Date(h.date).getTime() < 48 * 3600000));
+              const totalDrop = Math.abs(recentDrops.reduce((acc, h) => acc + h.change, 0));
 
-            const updatedMatrix = { ...w.roleMatrix };
-            let totalDecay = 0;
-
-            (['noun', 'verb', 'mod'] as const).forEach(role => {
-              if (updatedMatrix[role] < 950) {
-                const prev = updatedMatrix[role];
-                updatedMatrix[role] = Math.max(0, prev - 5); // Decay 5 points per role if not hardened
-                totalDecay += (prev - updatedMatrix[role]);
-              }
-            });
-
-            if (totalDecay === 0) return w;
-
-            const newScore = Object.values(updatedMatrix).reduce((a, b) => a + b, 0);
-            const history = [{ date: now.toISOString(), change: -totalDecay, reason: 'neural_decay' }, ...(w.scoreHistory || [])].slice(0, 5);
-            
-            return {
-              ...w,
-              roleMatrix: updatedMatrix,
-              baseScore: newScore,
-              status: scoreToStatus(newScore),
-              scoreHistory: history,
-              isBleeding: totalDecay > 10
-            };
+              return {
+                ...w,
+                baseScore: newScore,
+                confidenceScore: newScore,
+                status: scoreToStatus(newScore),
+                scoreHistory: history,
+                isBleeding: totalDrop > 50
+              };
+            }
+            return w;
           })
         }));
         void get().syncToCloud();
       },
 
-      hardenWord: async (wordId) => {
+      hardenWord: (wordId) => {
         set(state => ({
-          vocabulary: state.vocabulary.map(w => (w.id === wordId || w.word === wordId) ? { 
-            ...w, 
-            hardened: true, 
-            baseScore: 1000, 
-            status: 'mastered',
-            roleMatrix: { noun: 334, verb: 333, mod: 333 } 
-          } : w)
+          vocabulary: state.vocabulary.map(w => (w.id === wordId || w.word === wordId) ? { ...w, hardened: true, baseScore: 1000, status: 'mastered' } : w)
         }));
         get().awardBadge('first_hardened');
-        await get().syncToCloud();
+        void get().syncToCloud();
       },
 
-      clearAllSavedPhrases: async () => {
+      clearAllSavedPhrases: () => {
         set({ savedPhrases: [] });
-        await get().syncToCloud();
+        void get().syncToCloud();
       },
 
       checkAssessments: (onTrigger) => {
@@ -855,7 +653,7 @@ export const useMasteryStore = create<MasteryStore>()(
         const now = new Date().toISOString();
         const { xpMultiplier, pendingComebackBonus } = get();
         let comebackApplied = false;
-        let sessionXPChange = 0;
+        let totalXPChange = 0;
 
         set((state) => {
           const updatedVocab = state.vocabulary.map((w, idx) => {
@@ -878,32 +676,23 @@ export const useMasteryStore = create<MasteryStore>()(
                comebackApplied = true;
             }
 
-            const targetRole = d.role || (w.partOfSpeech.toLowerCase().includes('verb') ? 'verb' : (w.partOfSpeech.toLowerCase().includes('adj') ? 'mod' : 'noun')) as keyof RoleMatrix;
-            
-            // NODE LOCKING: Role cannot gain points if > 100 ahead of lowest
-            const lowestRoleScore = Math.min(w.roleMatrix.noun, w.roleMatrix.verb, w.roleMatrix.mod);
-            if (effectiveDelta > 0 && w.roleMatrix[targetRole] >= lowestRoleScore + 100) {
-              if (import.meta.env.DEV) console.log(`Node Locked: ${w.word} ${targetRole} is too far ahead.`);
-              effectiveDelta = 0;
-            }
+            totalXPChange += effectiveDelta;
 
-            const updatedMatrix = { ...w.roleMatrix };
-            updatedMatrix[targetRole] = clamp(updatedMatrix[targetRole] + effectiveDelta, 0, 334);
-            const newScore = Object.values(updatedMatrix).reduce((a, b) => a + b, 0);
-            
-            sessionXPChange += effectiveDelta;
-
-            const historyReason = (pendingComebackBonus && idx === 0) ? 'neural_resonance + comeback_bonus' : 'neural_resonance';
+            const newScore = clamp((w.baseScore ?? 0) + effectiveDelta, 0, 1000);
+            const historyReason = (pendingComebackBonus && idx === 0) ? 'manual_delta + comeback_bonus' : 'manual_delta';
             
             const newStatus = scoreToStatus(newScore);
             if (newStatus === 'mastered' && w.status !== 'mastered') {
                setTimeout(() => get().awardBadge('first_master'), 0);
             }
+            if (newStatus === 'practicing' && w.status === 'introduced') {
+               setTimeout(() => get().progressChallenge(1, 'word_progression'), 0);
+            }
 
             return {
               ...w,
-              roleMatrix: updatedMatrix,
               baseScore: newScore,
+              confidenceScore: newScore,
               status: newStatus,
               useCount: (w.useCount ?? 0) + 1,
               lastReviewed: now,
@@ -912,49 +701,46 @@ export const useMasteryStore = create<MasteryStore>()(
           });
 
           const insightEntry = {
-            label: deltas.length === 1 ? deltas[0].wordId.toUpperCase() : "SESSION SYNC",
-            change: Math.round(sessionXPChange),
+            label: deltas.length === 1 ? deltas[0].wordId.toUpperCase() : "SESSION INSIGHTS",
+            change: Math.round(totalXPChange),
             timestamp: now
           };
 
           return {
             vocabulary: updatedVocab,
-            totalXP: state.totalXP + Math.round(sessionXPChange),
             masteryHistory: [insightEntry, ...(state.masteryHistory || [])].slice(0, 50),
             pendingComebackBonus: false
           };
         });
 
-        if (comebackApplied) get().awardBadge('comeback');
+        if (comebackApplied) {
+          get().awardBadge('comeback');
+        }
+
         get().refreshCurriculumStatus();
         get().recordActivity();
         void get().syncToCloud();
       },
 
-      updateVocabStatus: (wordIdOrText, role, points) => {
+      updateVocabStatus: (wordIdOrText, status) => {
         const now = new Date().toISOString();
         set((state) => ({
           vocabulary: state.vocabulary.map((w) => {
             if (w.id !== wordIdOrText && w.word.toLowerCase() !== wordIdOrText.toLowerCase()) return w;
             
-            let effectivePoints = points;
-            const lowestRoleScore = Math.min(w.roleMatrix.noun, w.roleMatrix.verb, w.roleMatrix.mod);
-            if (effectivePoints > 0 && w.roleMatrix[role] >= lowestRoleScore + 100) {
-              if (import.meta.env.DEV) console.log(`Node Locked: ${w.word} ${role} is too far ahead.`);
-              effectivePoints = 0;
+            if (status === 'practicing' && w.status === 'introduced') {
+              setTimeout(() => get().progressChallenge(1, 'word_progression'), 0);
             }
 
-            const updatedMatrix = { ...w.roleMatrix };
-            updatedMatrix[role] = clamp(updatedMatrix[role] + effectivePoints, 0, 334);
-            const newScore = Object.values(updatedMatrix).reduce((a, b) => a + b, 0);
-
+            const targetScore = STATUS_MIDPOINT[status];
+            const diff = targetScore - (w.baseScore || 0);
             return { 
               ...w, 
-              roleMatrix: updatedMatrix,
-              baseScore: newScore, 
-              status: scoreToStatus(newScore),
+              baseScore: targetScore, 
+              confidenceScore: targetScore, 
+              status,
               lastReviewed: now,
-              scoreHistory: [{ date: now, change: effectivePoints, reason: 'neural_override' }, ...(w.scoreHistory || [])].slice(0, 5)
+              scoreHistory: [{ date: now, change: diff, reason: 'status_override' }, ...(w.scoreHistory || [])].slice(0, 5)
             };
           }),
         }));
@@ -964,6 +750,7 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       cycleWordStatus: (wordId) => {
+        if (localStorage.getItem('tp_sandbox_mode') !== 'true') return;
         const now = new Date().toISOString();
         set((state) => ({
           vocabulary: state.vocabulary.map((w) => {
@@ -971,20 +758,9 @@ export const useMasteryStore = create<MasteryStore>()(
             const currentIndex = STATUS_ORDER.indexOf(w.status);
             const nextStatus = STATUS_ORDER[(currentIndex + 1) % STATUS_ORDER.length];
             const targetScore = STATUS_MIDPOINT[nextStatus];
-            
-            // Force balance roles to targetScore
-            const perRole = Math.floor(targetScore / 3);
-            const remainder = targetScore % 3;
-            const updatedMatrix = {
-              noun: perRole + (remainder > 0 ? 1 : 0),
-              verb: perRole + (remainder > 1 ? 1 : 0),
-              mod: perRole
-            };
-
             const diff = targetScore - (w.baseScore || 0);
             return { 
               ...w, 
-              roleMatrix: updatedMatrix,
               baseScore: targetScore, 
               confidenceScore: targetScore, 
               status: nextStatus,
@@ -1085,6 +861,7 @@ export const useMasteryStore = create<MasteryStore>()(
           let newShields = state.streakShields;
           let newLastStreakMilestone = state.lastStreakMilestone;
           let newPendingComebackBonus = state.pendingComebackBonus;
+          let shieldWasUsed = false;
 
           if (wasActiveYesterday) {
             newStreak += 1;
@@ -1098,6 +875,7 @@ export const useMasteryStore = create<MasteryStore>()(
             // Missed a day
             if (newShields > 0) {
               newShields -= 1;
+              shieldWasUsed = true;
               // Streak maintained by shield
             } else {
               // Comeback bonus check
@@ -1368,22 +1146,9 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       resetLearningProgress: async () => {
-        set((state) => ({
-          vocabulary: state.vocabulary.map(v => ({ 
-            ...v, 
-            baseScore: 0, 
-            confidenceScore: 0, 
-            status: 'not_started' as MasteryStatus,
-            useCount: 0,
-            scoreHistory: [],
-            rolesMastered: {},
-            hardened: false,
-            isBleeding: false,
-            recentPerformance: [],
-            productionStatus: undefined,
-            recognitionStatus: undefined,
-            pinnedExample: undefined
-          })),
+        set({
+          profile: defaultProfile,
+          vocabulary: mappedVocabulary.map(v => ({ ...v, baseScore: 0, confidenceScore: 0, status: 'not_started' as MasteryStatus })),
           curriculums: curriculumRoadmap,
           activeCurriculumId: null,
           activeModuleId: null,
@@ -1411,9 +1176,8 @@ export const useMasteryStore = create<MasteryStore>()(
           lastStreakCheck: '',
           pendingProveItResponses: [],
           totalProveItSubmitted: 0,
-          completedActivities: {},
-          masteryHistory: []
-        }));
+          completedActivities: {}
+        });
         localStorage.setItem('tp_sandbox_mode', 'false');
         get().refreshCurriculumStatus();
         await get().syncToCloud(undefined, false, true);
@@ -1434,175 +1198,156 @@ export const useMasteryStore = create<MasteryStore>()(
         void get().syncToCloud();
       },
 
+      generateWeeklyChallenge: () => {
+        const now = new Date();
+        const day = now.getDay(); // 0 (Sun) to 6 (Sat)
+        const diff = now.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+        const monday = new Date(now.setDate(diff));
+        monday.setHours(0,0,0,0);
+        const weekStartDate = monday.toISOString().split('T')[0];
 
-      generateWeeklyChallenge: async () => {
-        const { vocabulary, totalXP } = get();
-        const apiKey = resolveApiKey();
-        if (!apiKey) return;
+        const { currentChallenge, vocabulary } = get();
+        if (currentChallenge && currentChallenge.weekStartDate === weekStartDate) return;
 
-        const newChallenge = await generateAIChallenge(apiKey, vocabulary, totalXP, 'weekly');
+        if (currentChallenge && new Date(currentChallenge.expiresDate) < new Date()) {
+           set(state => ({ completedChallenges: [currentChallenge, ...state.completedChallenges] }));
+        }
+
+        const templates: { type: WeeklyChallenge['type'], title: string, description: string, targetCount: number, xpReward: number }[] = [
+          {
+            type: 'word_usage',
+            title: "Use [word] in 3 different sentences",
+            description: "Show jan Lina you can use [word] as a noun, verb, and modifier.",
+            targetCount: 3, xpReward: 150
+          },
+          {
+            type: 'session_count',
+            title: "Complete 3 sessions this week",
+            description: "Show up three times. Consistency beats intensity.",
+            targetCount: 3, xpReward: 200
+          },
+          {
+            type: 'word_progression',
+            title: "Get any word from Introduced to Practicing",
+            description: "Push a new word deeper into your memory.",
+            targetCount: 1, xpReward: 175
+          },
+          {
+            type: 'prove_it_usage',
+            title: "Use [word] correctly in a Prove It drill",
+            description: "Submit a Prove It sentence using [word] and have jan Lina confirm it.",
+            targetCount: 1, xpReward: 125
+          },
+          {
+            type: 'convo_length',
+            title: "Have a 10-message conversation with jan Lina",
+            description: "Go deep. Ten messages back and forth in one session.",
+            targetCount: 10, xpReward: 225
+          },
+          {
+            type: 'phrase_save',
+            title: "Save 2 new phrases to The Archive",
+            description: "Build your personal phrase library.",
+            targetCount: 2, xpReward: 100
+          },
+        ];
+
+        const template = templates[Math.floor(Math.random() * templates.length)];
+        const candidates = vocabulary.filter(w => w.status === 'introduced' || w.status === 'practicing');
+        const randomWord = candidates.length > 0 ? candidates[Math.floor(Math.random() * candidates.length)].word : 'toki';
+        
+        const expires = new Date(monday);
+        expires.setDate(expires.getDate() + 6);
+        expires.setHours(23, 59, 59, 999);
+
+        const newChallenge: WeeklyChallenge = {
+          id: crypto.randomUUID(),
+          type: template.type,
+          weekStartDate,
+          title: template.title.replace('[word]', randomWord),
+          description: template.description.replace('[word]', randomWord),
+          targetWord: randomWord,
+          targetCount: template.targetCount,
+          currentCount: 0,
+          completed: false,
+          xpReward: template.xpReward,
+          expiresDate: expires.toISOString()
+        };
+
         set({ currentChallenge: newChallenge });
         void get().syncToCloud();
       },
 
-      generateDailyChallenge: async () => {
-        const { vocabulary, totalXP } = get();
-        const apiKey = resolveApiKey();
-        if (!apiKey) return;
-
-        const newChallenge = await generateAIChallenge(apiKey, vocabulary, totalXP, 'daily');
-        set({ currentDailyChallenge: newChallenge });
-        void get().syncToCloud();
-      },
-
-      snoozeChallenge: (type: 'daily' | 'weekly') => {
-        const now = new Date();
-        if (type === 'daily') {
-          const snoozedUntil = new Date(now.getTime() + 90 * 60000); // 90 minutes
-          set({ dailySnoozedUntil: snoozedUntil.toISOString() });
-        } else {
-          const snoozedUntil = new Date(now.getTime() + 36 * 3600000); // 36 hours
-          set({ weeklySnoozedUntil: snoozedUntil.toISOString() });
-        }
-        void get().syncToCloud();
-      },
-
       progressChallenge: (amount = 1, type?: WeeklyChallenge['type'], wordId?: string) => {
-        const { currentChallenge, currentDailyChallenge, vocabulary } = get();
-        const now = new Date().toISOString();
+        const { currentChallenge, vocabulary } = get();
+        if (!currentChallenge || currentChallenge.completed) return;
 
-        // Progress Weekly
-        if (currentChallenge && !currentChallenge.completed) {
-          const matchesType = !type || currentChallenge.type === type;
-          const matchesWord = !currentChallenge.targetWord || !wordId || currentChallenge.targetWord.toLowerCase() === wordId.toLowerCase();
+        // If type is specified, only progress if it matches
+        if (type && currentChallenge.type !== type) return;
+        
+        // If targetWord is specified for the challenge, check if it matches
+        if (currentChallenge.targetWord && wordId && currentChallenge.targetWord.toLowerCase() !== wordId.toLowerCase()) return;
 
-          if (matchesType && matchesWord) {
-            const newCount = Math.min(currentChallenge.currentCount + amount, currentChallenge.targetCount);
-            const completed = newCount >= currentChallenge.targetCount;
-            
+        const newCount = Math.min(currentChallenge.currentCount + amount, currentChallenge.targetCount);
+        const completed = newCount >= currentChallenge.targetCount;
+
+        set(state => ({
+          currentChallenge: state.currentChallenge ? {
+            ...state.currentChallenge,
+            currentCount: newCount,
+            completed
+          } : null
+        }));
+
+        if (completed) {
+          const sorted = [...vocabulary].sort((a,b) => (b.baseScore || 0) - (a.baseScore || 0));
+          const bestWord = sorted[0];
+          if (bestWord) {
+            const now = new Date().toISOString();
+            const newScore = Math.min((bestWord.baseScore || 0) + currentChallenge.xpReward, 1000);
             set(state => ({
-              currentChallenge: state.currentChallenge ? { ...state.currentChallenge, currentCount: newCount, completed } : null
+              vocabulary: state.vocabulary.map(w => w.id === bestWord.id ? {
+                ...w,
+                baseScore: newScore,
+                confidenceScore: newScore,
+                status: scoreToStatus(newScore),
+                scoreHistory: [{ date: now, change: currentChallenge.xpReward, reason: `Weekly challenge complete: ${currentChallenge.title}` }, ...(w.scoreHistory || [])].slice(0, 5)
+              } : w)
             }));
-
-            if (completed) {
-              const sorted = [...vocabulary].sort((a,b) => (b.baseScore || 0) - (a.baseScore || 0));
-              const bestWord = sorted[0];
-              if (bestWord) {
-                const newScore = Math.min((bestWord.baseScore || 0) + currentChallenge.xpReward, 1000);
-                set(state => ({
-                  vocabulary: state.vocabulary.map(w => w.id === bestWord.id ? {
-                    ...w,
-                    baseScore: newScore,
-                    confidenceScore: newScore,
-                    status: scoreToStatus(newScore),
-                    scoreHistory: [{ date: now, change: currentChallenge.xpReward, reason: `Weekly challenge complete: ${currentChallenge.title}` }, ...(w.scoreHistory || [])].slice(0, 5)
-                  } : w)
-                }));
-              }
-            }
           }
         }
-
-        // Progress Daily
-        if (currentDailyChallenge && !currentDailyChallenge.completed) {
-          const matchesType = !type || currentDailyChallenge.type === type;
-          const matchesWord = !currentDailyChallenge.targetWord || !wordId || currentDailyChallenge.targetWord.toLowerCase() === wordId.toLowerCase();
-
-          if (matchesType && matchesWord) {
-            const newCount = Math.min(currentDailyChallenge.currentCount + amount, currentDailyChallenge.targetCount);
-            const completed = newCount >= currentDailyChallenge.targetCount;
-            
-            set(state => ({
-              currentDailyChallenge: state.currentDailyChallenge ? { ...state.currentDailyChallenge, currentCount: newCount, completed } : null
-            }));
-
-            if (completed) {
-              const sorted = [...vocabulary].sort((a,b) => (b.baseScore || 0) - (a.baseScore || 0));
-              const bestWord = sorted[0];
-              if (bestWord) {
-                const newScore = Math.min((bestWord.baseScore || 0) + currentDailyChallenge.xpReward, 1000);
-                set(state => ({
-                  vocabulary: state.vocabulary.map(w => w.id === bestWord.id ? {
-                    ...w,
-                    baseScore: newScore,
-                    confidenceScore: newScore,
-                    status: scoreToStatus(newScore),
-                    scoreHistory: [{ date: now, change: currentDailyChallenge.xpReward, reason: `Daily challenge complete: ${currentDailyChallenge.title}` }, ...(w.scoreHistory || [])].slice(0, 5)
-                  } : w)
-                }));
-              }
-            }
-          }
-        }
-
         void get().syncToCloud();
       },
 
       clearRankAcknowledgement: () => set({ pendingRankAcknowledgement: null }),
 
-      setStudentName: (name) => { set({ studentName: name }); void get().updateProfile({ firstName: name }); },
-      updateProfile: async (profileUpdate) => { 
+      setStudentName: (name) => { set({ studentName: name }); get().updateProfile({ firstName: name }); },
+      updateProfile: (profileUpdate) => { 
         set((state) => ({ 
           profile: { ...state.profile, ...profileUpdate } 
         })); 
-        await get().syncToCloud(); 
+        void get().syncToCloud(); 
       },
-      setReviewVibe: async (vibe) => { set({ reviewVibe: vibe }); await get().syncToCloud(); },
-      setProfileImage: async (url) => { set({ profileImage: url }); await get().syncToCloud(); },
+      setReviewVibe: (vibe) => { set({ reviewVibe: vibe }); void get().syncToCloud(); },
+      setProfileImage: (url) => { set({ profileImage: url }); void get().syncToCloud(); },
 
-      updatePhraseNote: async (id, notes) => {
+      updatePhraseNote: (id, notes) => {
         set((state) => ({
           savedPhrases: state.savedPhrases.map(p => {
             if (typeof p === 'string') return p === id ? { id, tp: p, en: 'Saved Phrase *', notes } : p;
             return p.id === id ? { ...p, notes } : p;
           })
         }));
-        await get().syncToCloud();
+        void get().syncToCloud();
       },
 
-      resetProgress: async () => {
-        set({
-          vocabulary: mappedVocabulary,
-          curriculums: curriculumRoadmap,
-          totalXP: 0,
-          activeCurriculumId: null,
-          activeModuleId: null,
-          currentPositionNodeId: 'phi_sim',
-          completedNodeIds: [],
-          completedActivities: {},
-          currentStreak: 0,
-          lastActiveDate: '',
-          lastStreakCheck: '',
-          learningDays: [],
-          seenIntroductions: [],
-          confusionPairs: [],
-          sessionLog: [],
-          currentChallenge: null,
-          currentDailyChallenge: null,
-          dailySnoozedUntil: null,
-          weeklySnoozedUntil: null,
-          completedChallenges: [],
-          pendingRankAcknowledgement: null,
-          pendingProveItResponses: [],
-          totalProveItSubmitted: 0,
-          sessionXPRecord: 0,
-          masteryHistory: [],
-          newRankUnlocked: null,
-          lastSmallRankTitle: 'jan lili',
-          earnedBadges: [],
-          earnedCeremonialRanks: [],
-        });
-        get().refreshCurriculumStatus();
-        await get().syncToCloud(undefined, true, true);
-      },
-
-      deletePhrase: async (id) => {
+      deletePhrase: (id) => {
         set((state) => ({
           savedPhrases: state.savedPhrases.filter(p =>
             typeof p === 'string' ? p !== id : p.id !== id
           )
         }));
-        await get().syncToCloud();
+        void get().syncToCloud();
       },
 
       resetAsNewUser: async () => {
@@ -1610,7 +1355,6 @@ export const useMasteryStore = create<MasteryStore>()(
         set({
           studentName: '',
           profile: defaultProfile,
-          totalXP: 0,
           reviewVibe: null,
           profileImage: '',
           savedPhrases: [],
@@ -1639,9 +1383,6 @@ export const useMasteryStore = create<MasteryStore>()(
           confusionPairs: [],
           sessionLog: [],
           currentChallenge: null,
-          currentDailyChallenge: null,
-          dailySnoozedUntil: null,
-          weeklySnoozedUntil: null,
           completedChallenges: [],
           pendingRankAcknowledgement: null,
           lastStreakCheck: '',
@@ -1660,7 +1401,6 @@ export const useMasteryStore = create<MasteryStore>()(
         set({
           studentName: '',
           profile: defaultProfile,
-          totalXP: 0,
           reviewVibe: null,
           profileImage: '',
           curriculums: curriculumRoadmap,
@@ -1686,9 +1426,6 @@ export const useMasteryStore = create<MasteryStore>()(
           confusionPairs: [],
           sessionLog: [],
           currentChallenge: null,
-          currentDailyChallenge: null,
-          dailySnoozedUntil: null,
-          weeklySnoozedUntil: null,
           completedChallenges: [],
           pendingRankAcknowledgement: null,
           lastStreakCheck: '',
@@ -1701,109 +1438,29 @@ export const useMasteryStore = create<MasteryStore>()(
         await get().syncToCloud(undefined, false, true);
       },
 
-      randomizeVocab: async () => {
-        const now = new Date().toISOString();
-        set((state) => {
-          let newTotalXP = 0;
-          const updatedVocab = state.vocabulary.map(w => {
+      randomizeVocab: () => {
+        if (localStorage.getItem('tp_sandbox_mode') !== 'true') return;
+        set((state) => ({
+          vocabulary: state.vocabulary.map(w => {
             const score = Math.floor(Math.random() * 1001);
-            newTotalXP += score;
-            
-            // Distribute score across roles fairly randomly but capped at 334
-            let remaining = score;
-            const noun = clamp(Math.floor(Math.random() * Math.min(remaining, 335)), 0, 334);
-            remaining -= noun;
-            const verb = clamp(Math.floor(Math.random() * Math.min(remaining, 335)), 0, 334);
-            remaining -= verb;
-            const mod = clamp(remaining, 0, 334);
-            
-            const balancedScore = noun + verb + mod; // Sum might be slightly different due to clamps
-
-            return { 
-              ...w, 
-              baseScore: balancedScore, 
-              confidenceScore: balancedScore, 
-              status: scoreToStatus(balancedScore),
-              roleMatrix: { noun, verb, mod },
-              lastReviewed: now,
-              useCount: Math.floor(Math.random() * 50)
-            };
-          });
-
-          const updatedCurriculums = state.curriculums.map(level => ({
-            ...level,
-            nodes: level.nodes.map(node => {
-              const rand = Math.random();
-              const status: NodeStatus = rand > 0.6 ? 'mastered' : (rand > 0.3 ? 'active' : 'locked');
-              return { ...node, status };
-            })
-          }));
-
-          const insightEntry = {
-            label: "CHAOS INJECTION",
-            change: 0,
-            timestamp: now
-          };
-
-          return {
-            vocabulary: updatedVocab,
-            totalXP: newTotalXP,
-            curriculums: updatedCurriculums,
-            masteryHistory: [insightEntry, ...(state.masteryHistory || [])].slice(0, 50)
-          };
-        });
+            return { ...w, baseScore: score, confidenceScore: score, status: scoreToStatus(score) };
+          })
+        }));
         get().refreshCurriculumStatus();
-        await get().syncToCloud();
+        void get().syncToCloud();
       },
 
-      masterAllVocab: async () => {
-        const now = new Date().toISOString();
-        set((state) => {
-          let newTotalXP = 0;
-          const updatedVocab = state.vocabulary.map(w => {
-            // Mastered range is 950-1000
-            const score = 950 + Math.floor(Math.random() * 51);
-            newTotalXP += score;
-            
-            const perRole = Math.floor(score / 3);
-            const remainder = score % 3;
-            const roleMatrix = {
-              noun: perRole + (remainder > 0 ? 1 : 0),
-              verb: perRole + (remainder > 1 ? 1 : 0),
-              mod: perRole
-            };
-
-            return { 
-              ...w, 
-              baseScore: score, 
-              confidenceScore: score, 
-              status: 'mastered' as MasteryStatus,
-              roleMatrix,
-              lastReviewed: now,
-              hardened: true
-            };
-          });
-
-          const updatedCurriculums = state.curriculums.map(level => ({
+      masterAllVocab: () => {
+        if (localStorage.getItem('tp_sandbox_mode') !== 'true') return;
+        set((state) => ({
+          vocabulary: state.vocabulary.map(w => ({ ...w, baseScore: 975, confidenceScore: 975, status: 'mastered' as MasteryStatus })),
+          curriculums: state.curriculums.map(level => ({
             ...level,
             nodes: level.nodes.map(node => ({ ...node, status: 'mastered' as const }))
-          }));
-
-          const insightEntry = {
-            label: "ASCENSION",
-            change: 0,
-            timestamp: now
-          };
-
-          return {
-            vocabulary: updatedVocab,
-            totalXP: newTotalXP,
-            curriculums: updatedCurriculums,
-            masteryHistory: [insightEntry, ...(state.masteryHistory || [])].slice(0, 50)
-          };
-        });
+          }))
+        }));
         get().refreshCurriculumStatus();
-        await get().syncToCloud();
+        void get().syncToCloud();
       },
 
       clearLocalData: () => {
@@ -1829,8 +1486,8 @@ export const useMasteryStore = create<MasteryStore>()(
       setWidgetDensity: (val) => { set({ widgetDensity: val }); void get().syncToCloud(); },
       setFogOfWar: (val) => { set({ fogOfWar: val }); void get().syncToCloud(); },
       setShowCircuitPaths: (val) => { set({ showCircuitPaths: val }); void get().syncToCloud(); },
-      setKnowledgeCheckFrequency: async (freq) => { set({ knowledgeCheckFrequency: freq }); await get().syncToCloud(); },
-      setLastKnowledgeCheckDate: async (date) => { set({ lastKnowledgeCheckDate: date }); await get().syncToCloud(); },
+      setKnowledgeCheckFrequency: (freq) => { set({ knowledgeCheckFrequency: freq }); void get().syncToCloud(); },
+      setLastKnowledgeCheckDate: (date) => { set({ lastKnowledgeCheckDate: date }); void get().syncToCloud(); },
 
       setSelectedWords: (words) => set({ selectedWords: words }),
       addWordToSelection: (word) => set((state) => ({ selectedWords: [...state.selectedWords, word] })),
@@ -1855,16 +1512,17 @@ export const useMasteryStore = create<MasteryStore>()(
       setLessonFilter: (wordIds) => set({ lessonFilter: wordIds }),
 
       getStatusSummary: () => {
-        const { vocabulary, totalXP } = get();
-        const summary = { not_started: 0, introduced: 0, practicing: 0, confident: 0, mastered: 0, xp: totalXP };
+        const { vocabulary } = get();
+        const summary = { not_started: 0, introduced: 0, practicing: 0, confident: 0, mastered: 0, xp: 0 };
         for (const word of vocabulary) {
           summary[word.status]++;
+          const multiplier = WORD_FREQUENCY[word.word.toLowerCase()] ?? 1.0;
+          summary.xp += (word.baseScore || 0) * multiplier;
         }
+        summary.xp = Math.round(summary.xp);
+        const level = Math.floor(summary.xp / 500) + 1;
         
-        // 100,000 XP scale level calculation
-        const level = Math.floor(totalXP / 1000) + 1;
-        
-        const rank = [...SMALL_RANKS].reverse().find(r => totalXP >= r.xpThreshold) || SMALL_RANKS[0];
+        const rank = [...SMALL_RANKS].reverse().find(r => summary.xp >= r.xpThreshold) || SMALL_RANKS[0];
         const rankTitle = rank.title;
 
         return { ...summary, level, rankTitle };
@@ -1874,7 +1532,6 @@ export const useMasteryStore = create<MasteryStore>()(
         set({
           studentName: name,
           profile: { ...defaultProfile, firstName: name },
-          totalXP: 0,
           reviewVibe: null,
           profileImage: '',
           savedPhrases: [],
@@ -1906,12 +1563,11 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       syncToCloud: async (explicitUserId, merge = true, force = false) => {
-        const { vocabulary, curriculums, lastUpdated, studentName, totalXP, profile, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, isMainProfile, widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, cloudSynced, gridChargeUntil, songs, commonPhrases, lastStreakCheck, learningDays, confusionPairs, pendingProveItResponses,
+        const { vocabulary, curriculums, lastUpdated, studentName, profile, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, isMainProfile, widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, cloudSynced, songs, commonPhrases, lastStreakCheck, learningDays, confusionPairs, pendingProveItResponses,
             earnedCeremonialRanks, lastSmallRankTitle, earnedBadges, totalProveItSubmitted,
             streakShields, xpMultiplier, lastStreakMilestone, pendingComebackBonus, sessionXPRecord,
-            sessionLog, currentChallenge, currentDailyChallenge, dailySnoozedUntil, weeklySnoozedUntil, completedChallenges, pendingRankAcknowledgement, newRankUnlocked,
-            activeCurriculumId, activeModuleId, selectedWords, lessonFilter,
-            completedNodeIds, seenIntroductions, completedActivities, masteryHistory } = get();
+            sessionLog, currentChallenge, completedChallenges, pendingRankAcknowledgement, newRankUnlocked,
+            activeCurriculumId, activeModuleId, selectedWords, lessonFilter } = get();
         const targetId = explicitUserId || userId;
 
         // Block premature syncs before cloud data has loaded — prevents stale
@@ -1942,13 +1598,13 @@ export const useMasteryStore = create<MasteryStore>()(
 
           await setDoc(doc(db, 'users', targetId), sanitize({
             vocabulary: partialVocab,
-            curriculums, lastUpdated, studentName, totalXP, profile, profileImage,
+            curriculums, lastUpdated, studentName, profile, profileImage,
             savedPhrases, currentStreak, lastActiveDate, hasCompletedSetup, currentPositionNodeId, isMainProfile,
-            widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, gridChargeUntil, songs, commonPhrases,
+            widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, songs, commonPhrases,
             lastStreakCheck, learningDays, completedNodeIds, seenIntroductions, confusionPairs, pendingProveItResponses,
             earnedCeremonialRanks, lastSmallRankTitle, earnedBadges, totalProveItSubmitted,
             streakShields, xpMultiplier, lastStreakMilestone, pendingComebackBonus, sessionXPRecord,
-            sessionLog, currentChallenge, currentDailyChallenge, dailySnoozedUntil, weeklySnoozedUntil, completedChallenges, pendingRankAcknowledgement, newRankUnlocked,
+            sessionLog, currentChallenge, completedChallenges, pendingRankAcknowledgement, newRankUnlocked,
             activeCurriculumId, activeModuleId, selectedWords, lessonFilter, completedActivities, masteryHistory
           }), { merge });
         } catch (err) {
@@ -2029,7 +1685,6 @@ export const useMasteryStore = create<MasteryStore>()(
             set({
               studentName: initialName,
               profile: { ...defaultProfile, firstName: initialName },
-              totalXP: 0,
               profileImage: initialProfileImage || '',
               savedPhrases: [],
               currentStreak: 0,
@@ -2048,22 +1703,17 @@ export const useMasteryStore = create<MasteryStore>()(
             return;
           }
 
-          type RawCloudVocab = Partial<VocabWord> & Record<string, unknown>;
-          const cloudVocabSource = (data.vocabulary as RawCloudVocab[] | undefined)
-            ?? (mappedVocabulary as unknown as RawCloudVocab[]);
-          const vocabulary: VocabWord[] = cloudVocabSource.map(
-            (w: RawCloudVocab) => {
+          const vocabulary = (data.vocabulary || mappedVocabulary).map(
+            (w: { word?: string; useCount?: number; frequencyRank?: number; type?: string; status?: MasteryStatus; [key: string]: unknown }) => {
               const base = mappedVocabulary.find(iv => iv.word === w.word);
-              const staticData: Partial<VocabContentEntry> = vocabContent[w.word || ''] || {};
-              const wordLower = (w.word || '').toLowerCase();
-              const aiData = (aiVocabCache as Record<string, { aiExplanation?: string; aiExamples?: Record<string, string>; grammarExamples?: Record<string, string>; neighborConnections?: Record<string, string> }>)[wordLower] || {};
+              const staticData = vocabContent[w.word || ''] || {};
               const useCount = typeof w.useCount === 'number' ? w.useCount : 0;
               const frequencyRank = typeof w.frequencyRank === 'number' ? w.frequencyRank : (base?.frequencyRank ?? 999);
-              const type = (w.type as 'word' | 'grammar') || (base?.type ?? 'word');
-              const weight = (w.weight as VocabWord['weight']) || base?.weight;
-
-              let sessionNotes = (typeof w.sessionNotes === 'string' ? w.sessionNotes : '') || '';
-              let meanings = (typeof w.meanings === 'string' ? w.meanings : '') || (base?.meanings ?? '');
+              const type = w.type || (base?.type ?? 'word');
+              const weight = w.weight || base?.weight;
+              
+              let sessionNotes = w.sessionNotes || '';
+              let meanings = w.meanings || (base?.meanings ?? '');
 
               // DATA MIGRATION: If meanings is missing/generic and sessionNotes contains definition-like text
               if ((!meanings || meanings === '') && sessionNotes.includes('.')) {
@@ -2077,47 +1727,31 @@ export const useMasteryStore = create<MasteryStore>()(
               }
 
               // Handle Migration to baseScore (0-1000)
-              let baseScore = (w.baseScore as number);
-              let status: MasteryStatus;
-
-              // STRICT DERIVATION FROM CONFIDENCE SCORE
-              if (typeof w.confidenceScore === 'number') {
-                baseScore = w.confidenceScore;
-                status = scoreToStatus(w.confidenceScore);
-              } else if (baseScore !== undefined) {
-                status = scoreToStatus(baseScore);
-              } else {
-                status = w.status || 'not_started';
-                baseScore = STATUS_MIDPOINT[status];
+              let baseScore = w.baseScore;
+              if (baseScore === undefined) {
+                // If we only have confidenceScore (0-500), map it
+                if (typeof w.confidenceScore === 'number') {
+                  baseScore = w.confidenceScore * 2;
+                } else {
+                  baseScore = STATUS_MIDPOINT[w.status as MasteryStatus || 'not_started'];
+                }
               }
 
-              const roleMatrix = (w.roleMatrix as RoleMatrix) || { 
-                noun: Math.floor(baseScore / 3), 
-                verb: Math.floor(baseScore / 3), 
-                mod: Math.floor(baseScore / 3) 
-              };
-
-              return {
-                ...w,
-                id: (w.id as string) || w.word || '',
-                word: w.word || '',
-                isMasteryCandidate: w.isMasteryCandidate ?? false,
+              return { 
+                ...w, 
                 baseScore,
-                status,
-                roleMatrix,
-                useCount,
-                frequencyRank,
+                confidenceScore: baseScore, // sync legacy
+                useCount, 
+                frequencyRank, 
                 type,
                 weight,
                 meanings,
                 sessionNotes,
-                aiExplanation: (w.aiExplanation as string) || aiData?.aiExplanation || '',
-                aiExamples: (w.aiExamples as Record<string, string>) || aiData?.aiExamples,
-                grammarExamples: (w.grammarExamples as Record<string, string>) || aiData?.grammarExamples,
-                neighborConnections: (w.neighborConnections as Record<string, string>) || aiData?.neighborConnections,
                 partOfSpeech: w.partOfSpeech || (base?.partOfSpeech ?? ''),
-                lastReviewed: (w.lastReviewed as string) || new Date().toISOString(),
-                scoreHistory: (w.scoreHistory as ScoreHistoryEntry[]) || [],
+                partOfSpeechScores: w.partOfSpeechScores || { noun: 0, verb: 0, modifier: 0 },
+                lastReviewed: w.lastReviewed || new Date().toISOString(),
+                scoreHistory: w.scoreHistory || [],
+
                 // Always hydrate from ground truth in code
                 phonetic: staticData.phonetic || '',
                 syllables: staticData.syllables || [],
@@ -2168,8 +1802,6 @@ export const useMasteryStore = create<MasteryStore>()(
             cloudSynced: true,
             vocabulary,
             curriculums: mergedCurriculums,
-            totalXP: data.totalXP || 0,
-            gridChargeUntil: data.gridChargeUntil || null,
             lastUpdated: data.lastUpdated || '',
             savedPhrases: data.savedPhrases || [],
             currentStreak: data.currentStreak || 0,
@@ -2201,9 +1833,6 @@ export const useMasteryStore = create<MasteryStore>()(
             sessionXPRecord: data.sessionXPRecord || 0,
             sessionLog: data.sessionLog || [],
             currentChallenge: data.currentChallenge || null,
-            currentDailyChallenge: data.currentDailyChallenge || null,
-            dailySnoozedUntil: data.dailySnoozedUntil || null,
-            weeklySnoozedUntil: data.weeklySnoozedUntil || null,
             completedChallenges: data.completedChallenges || [],
             pendingRankAcknowledgement: data.pendingRankAcknowledgement || null,
             newRankUnlocked: data.newRankUnlocked || null,
@@ -2273,21 +1902,16 @@ export const useMasteryStore = create<MasteryStore>()(
       },
       onRehydrateStorage: () => (state) => {
         if (state) {
-
           // Ensure critical array fields are always arrays and not empty if defaults exist
           if (!Array.isArray(state.commonPhrases) || state.commonPhrases.length === 0) {
             state.commonPhrases = defaultCommonPhrases;
           }
-          
-          const hasTelo = Array.isArray(state.songs) && state.songs.some((a: Album) => a.id === 'telo-lon-kiwen');
-          if (!Array.isArray(state.songs) || state.songs.length < 6 || !hasTelo) {
+          if (!Array.isArray(state.songs) || state.songs.length === 0) {
             state.songs = defaultSongs;
           }
-
           if (!Array.isArray(state.savedPhrases)) {
             state.savedPhrases = [];
           }
-
 
           // Merge static content on rehydration
           const mergedCurriculums = curriculumRoadmap.map(staticLevel => {
@@ -2304,68 +1928,6 @@ export const useMasteryStore = create<MasteryStore>()(
             };
           });
           state.curriculums = mergedCurriculums;
-
-          // Inject AI Cache Data on rehydration if missing
-          if (Array.isArray(state.vocabulary)) {
-            let needsSync = false;
-
-            // Cleanup: Remove deprecated grammar particle cards
-            const deprecatedParticles = ['particle_li', 'particle_e', 'particle_pi', 'particle_la'];
-            const initialCount = state.vocabulary.length;
-            state.vocabulary = state.vocabulary.filter(v => 
-              !deprecatedParticles.includes(v.word) && !deprecatedParticles.includes(v.id)
-            );
-            if (state.vocabulary.length !== initialCount) needsSync = true;
-
-            // Sync: Add missing nimi ku suli words
-            const currentWordSet = new Set(state.vocabulary.map(v => v.word));
-            const kuWordsToAdd = initialMasteryMap.initialVocabulary
-              .filter(v => v.weight === 'ku' && !currentWordSet.has(v.word))
-              .map(v => toFullVocabWord(v));
-            
-            if (kuWordsToAdd.length > 0) {
-              state.vocabulary = [...state.vocabulary, ...kuWordsToAdd];
-              needsSync = true;
-            }
-
-            state.vocabulary = state.vocabulary.map(v => {
-              let updated = v;
-              // Ensure KU weight is set correctly for known ku words
-              const isKu = initialMasteryMap.initialVocabulary.some(iv => iv.word === v.word && iv.weight === 'ku');
-              if (isKu && v.weight !== 'ku') {
-                updated = { ...updated, weight: 'ku' };
-                needsSync = true;
-              }
-
-              const aiData = (aiVocabCache as Record<string, any>)[v.word.toLowerCase()] || {};
-              
-              if (aiData.aiExplanation && (!updated.aiExplanation || updated.aiExplanation === '')) {
-                updated = { ...updated, aiExplanation: aiData.aiExplanation, aiExamples: aiData.aiExamples };
-                needsSync = true;
-              }
-
-              if (aiData.grammarExamples && !updated.grammarExamples) {
-                updated = { ...updated, grammarExamples: aiData.grammarExamples };
-                needsSync = true;
-              }
-              
-              const isBadConnections = updated.neighborConnections && Object.values(updated.neighborConnections).some((val: any) => val === 'A related Toki Pona word.');
-              if (aiData.neighborConnections && (!updated.neighborConnections || isBadConnections)) {
-                updated = { ...updated, neighborConnections: aiData.neighborConnections };
-                needsSync = true;
-              }
-
-              return updated;
-            });
-
-            if (needsSync) {
-              setTimeout(() => {
-                state.refreshCurriculumStatus();
-                void state.syncToCloud();
-              }, 1000);
-            }
-          }
-
           state.refreshCurriculumStatus();
         }
       }

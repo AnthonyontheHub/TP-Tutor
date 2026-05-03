@@ -106,7 +106,12 @@ export default function DailyStoicPopup() {
                 DAILY STOIC {phase === 1 ? '• MORNING' : phase === 2 ? '• CHALLENGE' : '• EVENING'}
               </span>
             </div>
-            <button type="button" onClick={() => setDevPhaseOverride(0)} style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer' }}>
+            <button type="button" onClick={() => {
+              if (phase === 1) dismissPhase1();
+              else if (phase === 2) completePhase2();
+              else if (phase === 3) completePhase3();
+              setDevPhaseOverride(null);
+            }} style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer' }}>
               <X size={16} />
             </button>
           </header>

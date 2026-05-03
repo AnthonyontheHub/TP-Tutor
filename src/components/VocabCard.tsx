@@ -3,45 +3,42 @@ import { useRef } from 'react';
 import type { VocabWord, MasteryStatus } from '../types/mastery';
 import { useMasteryStore } from '../store/masteryStore';
 import { soundService } from '../services/soundService';
-import { Circle, Sparkles, Zap, ShieldCheck, Crown, Info, MessageSquare } from 'lucide-react';
-import { initialMasteryMap } from '../data/initialMasteryMap';
 
 interface Props {
   word: VocabWord;
   onLongPress?: (word: VocabWord) => void;
   onClick?: (word: VocabWord) => void;
-  onAskLina?: (prompt: string, mode?: 'chat_buddy' | 'instructor') => void;
   isSandboxMode: boolean;
   isDimmed?: boolean;
   isSelected?: boolean;
   isRelated?: boolean;
 }
 
-const STATUS_ICONS: Record<MasteryStatus, React.ReactNode> = {
-  not_started: <Circle size={14} />,
-  introduced: <Sparkles size={14} />,
-  practicing: <Zap size={14} />,
-  confident: <ShieldCheck size={14} />,
-  mastered: <Crown size={14} />,
+const STATUS_ICONS: Record<MasteryStatus, string> = {
+  not_started: '⬜',
+  introduced: '🟣',
+  practicing: '🔵',
+  confident: '🟡',
+  mastered: '✅',
 };
 
-const STATUS_COLORS: Record<MasteryStatus, string> = {
-  not_started: '#6b7280',
+const RING_COLOR: Record<MasteryStatus, string> = {
+  not_started: '#ffffff',
   introduced: '#a855f7',
   practicing: '#3b82f6',
-  confident: '#eab308',
+  confident: '#f59e0b',
   mastered: '#22c55e',
 };
 
-const STATUS_GLOWS: Record<MasteryStatus, string> = {
-  not_started: 'rgba(107, 114, 128, 0.4)',
+const GLOW_COLOR: Record<MasteryStatus, string> = {
+  not_started: 'rgba(255, 255, 255, 0.4)',
   introduced: 'rgba(168, 85, 247, 0.6)',
   practicing: 'rgba(59, 130, 246, 0.6)',
-  confident: 'rgba(234, 179, 8, 0.6)',
+  confident: 'rgba(245, 158, 11, 0.6)',
   mastered: 'rgba(34, 197, 94, 0.85)',
 };
 
-export default function VocabCard({ word, onLongPress, onClick, onAskLina, isSandboxMode, isDimmed, isSelected, isRelated }: Props) {
+export default function VocabCard({ word, onLongPress, onClick, isSandboxMode, isDimmed, isSelected, isRelated }: Props) {
   const { cycleWordStatus } = useMasteryStore();
   const status = word.status;
 
@@ -103,35 +100,40 @@ export default function VocabCard({ word, onLongPress, onClick, onAskLina, isSan
 
   const handleCardClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    
+    // If it was a long press or a significant move, don't trigger a tap
     if (isLongPressActive.current || hasMovedSignificant.current) {
       isLongPressActive.current = false;
       hasMovedSignificant.current = false;
       return;
     }
+
     onClick?.(word);
   };
 
-  const handleDeepDive = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (onAskLina) {
-      onAskLina(`[SYSTEM: Deep-dive explanation for the word: '${word.word}']. Please explain its nuance and give me a unique example sentence.`, 'instructor');
-    }
-  };
-
-  const hasAIContent = !!(word.aiExplanation || (word.sessionNotes && word.sessionNotes.length > 0));
-  const statusColor = STATUS_COLORS[status];
-  const initialData = initialMasteryMap.initialVocabulary.find((v: any) => v.word === word.word);
-  const fullPartOfSpeech = initialData?.partOfSpeech || word.partOfSpeech || '';
+  const hasSavedInfo = !!(
+    (word.notes && word.notes.trim() !== '') || 
+    (word.customDefinition && word.customDefinition.trim() !== '') ||
+    (word.sessionNotes && word.sessionNotes.trim() !== '') ||
+    (word.userNotes && word.userNotes.trim() !== '')
+  );
 
   return (
     <div
-      className={`glass-panel vocab-card ${isSelected ? 'neon-border-gold active-pulse' : ''} ${isRelated ? 'is-related' : ''} touch-pan-y flex flex-col gap-1 transition-all duration-300 ease-in-out`}
+      className={`vocab-card vocab-card--${status} ${isSelected ? 'is-selected' : ''} ${isRelated ? 'is-related' : ''}`}
       style={{ 
-        opacity: isDimmed ? 0.3 : 1,
-        borderColor: isSelected ? 'var(--gold)' : (isDimmed ? '#222' : statusColor),
-        boxShadow: isSelected 
-          ? '0 0 20px rgba(255, 191, 0, 0.2)'
-          : (isDimmed ? 'none' : `0 0 10px ${STATUS_GLOWS[status]}`),
+        touchAction: 'none', 
+        borderLeftColor: isDimmed ? 'transparent' : RING_COLOR[status],
+        background: isDimmed ? 'rgba(0,0,0,0.5)' : (isSelected ? 'rgba(255,255,255,0.08)' : undefined),
+        borderColor: isSelected ? 'var(--gold)' : (isDimmed ? '#222' : undefined),
+        boxShadow: isDimmed 
+          ? 'none' 
+          : (isSelected 
+              ? `0 0 25px ${GLOW_COLOR[status]}, 0 0 10px ${GLOW_COLOR[status]}, inset 0 0 10px ${GLOW_COLOR[status]}`
+              : `0 0 15px ${GLOW_COLOR[status]}, 0 0 5px ${GLOW_COLOR[status]}`
+            ),
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        transform: isSelected ? 'scale(1.02)' : 'none',
         zIndex: isSelected ? 10 : (isRelated ? 5 : 1)
       }}
       onPointerDown={handlePointerDown}
@@ -140,85 +142,35 @@ export default function VocabCard({ word, onLongPress, onClick, onAskLina, isSan
       onPointerCancel={handlePointerCancel}
       onClick={handleCardClick}
     >
-      <div className="vocab-card__bg-symbol sitelen-pona">{word.sitelenPona || word.word}</div>
-
-      {/* Top Left POS Badges */}
-      {word.type !== 'grammar' && (
-        <div className="vocab-card__pos-badges">
-          {fullPartOfSpeech.split(',').map((role, i) => (
-            <span key={i} className="vocab-card__pos-badge">
-              {role.trim().charAt(0).toUpperCase()}
-            </span>
-          ))}
-        </div>
-      )}
-
-      {/* Top Right Icons */}
-      <div className="absolute top-2 right-2 flex gap-[6px] items-center">
-        {hasAIContent && (
-          <MessageSquare size={12} className="neon-text-gold opacity-80" />
-        )}
-        <div 
-          className="vocab-card__status p-1 rounded-[4px] bg-white/5"
-          onClick={handleStatusClick}
-          style={{ color: statusColor }}
-        >
-          {STATUS_ICONS[status]}
-        </div>
-      </div>
-
-      {/* Quick Action */}
       <div 
-        className="vocab-card__quick-action absolute bottom-2 right-2 text-[var(--gold)] cursor-pointer"
-        onClick={handleDeepDive}
+        className="vocab-card__status"
+        onClick={handleStatusClick}
+        onPointerDown={(e) => e.stopPropagation()}
       >
-        <Info size={14} />
+        {STATUS_ICONS[status]}
       </div>
 
-      {word.weight === 'ku' && (
-        <div 
-          className="absolute bottom-2 left-2 text-[0.5rem] font-black text-[var(--gold)] opacity-30 tracking-tighter"
-          style={{ pointerEvents: 'none' }}
-        >
-          KU
-        </div>
-      )}
-
       <div 
-        className="vocab-card__word font-black tracking-[0.15em] text-[0.85rem] text-[var(--text)] break-words mt-1" 
+        className="vocab-card__word" 
+        style={{ 
+          transition: 'all 0.3s ease', 
+        }}
       >
         {word.type === 'grammar' ? word.sessionNotes : word.word}
       </div>
-
-      {(() => {
-        const score = word.baseScore ?? 0;
-        const tiers = [
-          { min: 0, max: 200 },
-          { min: 201, max: 500 },
-          { min: 501, max: 750 },
-          { min: 751, max: 949 },
-          { min: 950, max: 1000 },
-        ];
-        const tier = tiers.find(t => score >= t.min && score <= t.max) || tiers[0];
-        const range = tier.max - tier.min || 1;
-        const pct = Math.round(((score - tier.min) / range) * 100);
-        return (
-          <div className="vocab-card__progress">
-            <div className="vocab-card__progress-track">
-              <div
-                className="vocab-card__progress-fill"
-                style={{ width: `${pct}%`, background: statusColor }}
-              />
-            </div>
-            <span className="vocab-card__progress-label" style={{ color: statusColor }}>
-              {pct}%
-            </span>
-          </div>
-        );
-      })()}
-
+      <div className="vocab-card__pos" style={{ opacity: isDimmed ? 0.7 : 1, transition: 'all 0.3s ease' }}>
+        {word.type === 'grammar' ? 'GRAMMAR' : word.partOfSpeech}
+      </div>
       {word.pinnedExample && (
-        <div className="text-[0.65rem] text-[var(--gold)] italic mt-[2px] opacity-60 leading-[1.2]">
+        <div style={{
+          fontSize: '0.65rem',
+          color: 'var(--gold)',
+          fontStyle: 'italic',
+          marginTop: '4px',
+          opacity: isDimmed ? 0.3 : 0.8,
+          lineHeight: 1.2,
+          transition: 'all 0.3s ease'
+        }}>
           "{word.pinnedExample}"
         </div>
       )}

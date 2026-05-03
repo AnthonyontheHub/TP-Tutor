@@ -7,7 +7,7 @@ export default function SetupScreen() {
   const [step, setStep] = useState(1);
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
-  const [sex, setSex] = useState<'Male' | 'Female' | 'Other' | ''>('');
+  const [sex, setSex] = useState('');
   const [location, setLocation] = useState('');
   const [tempImg, setTempImg] = useState('');
   
@@ -20,7 +20,7 @@ export default function SetupScreen() {
   const handleFinish = () => {
     if (name.trim()) {
       setStudentName(name.trim());
-      updateProfile({ age, sex: sex || null, locationString: location });
+      updateProfile({ age, sex, locationString: location });
       if (tempImg) setProfileImage(tempImg);
       setHasCompletedSetup(true);
     }
@@ -64,9 +64,8 @@ export default function SetupScreen() {
               <h1 style={{ fontSize: '2rem', fontWeight: 900, marginBottom: '8px', textAlign: 'center' }}>toki!</h1>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', textAlign: 'center', marginBottom: '24px' }}>Let's set up your student profile.</p>
               
-              <label htmlFor="setup-name" className="section-title">What is your name?</label>
+              <label className="section-title">What is your name?</label>
               <input 
-                id="setup-name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Student Name"
@@ -74,7 +73,7 @@ export default function SetupScreen() {
                 style={{ fontSize: '1.1rem', padding: '16px', textAlign: 'center' }}
                 autoFocus
               />
-              <button type="button" onClick={nextStep} disabled={!name.trim()} className="btn-review" style={{ width: '100%', marginTop: '12px' }}>NEXT</button>
+              <button onClick={nextStep} disabled={!name.trim()} className="btn-review" style={{ width: '100%', marginTop: '12px' }}>NEXT</button>
             </motion.div>
           )}
 
@@ -87,23 +86,20 @@ export default function SetupScreen() {
               
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
                 <div>
-                  <label htmlFor="setup-age" className="section-title">Age</label>
-                  <input id="setup-age" value={age} onChange={(e) => setAge(e.target.value)} placeholder="Age" className="settings-input" />
+                  <label className="section-title">Age</label>
+                  <input value={age} onChange={(e) => setAge(e.target.value)} placeholder="Age" className="settings-input" />
                 </div>
                 <div>
-                  <label htmlFor="setup-sex" className="section-title">Sex</label>
-                  <input id="setup-sex" value={sex} onChange={(e) => {
-                    const v = e.target.value;
-                    setSex(v === 'Male' || v === 'Female' || v === 'Other' ? v : '');
-                  }} placeholder="Male/Female/Other" className="settings-input" />
+                  <label className="section-title">Sex</label>
+                  <input value={sex} onChange={(e) => setSex(e.target.value)} placeholder="M/F/X" className="settings-input" />
                 </div>
               </div>
-              <label htmlFor="setup-location" className="section-title">Location</label>
-              <input id="setup-location" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Where are you from?" className="settings-input" />
+              <label className="section-title">Location</label>
+              <input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Where are you from?" className="settings-input" />
 
               <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
-                <button type="button" onClick={prevStep} className="btn-toggle" style={{ flex: 1 }}>BACK</button>
-                <button type="button" onClick={nextStep} className="btn-review" style={{ flex: 2, margin: 0 }}>NEXT</button>
+                <button onClick={prevStep} className="btn-toggle" style={{ flex: 1 }}>BACK</button>
+                <button onClick={nextStep} className="btn-review" style={{ flex: 2, margin: 0 }}>NEXT</button>
               </div>
             </motion.div>
           )}
@@ -118,24 +114,19 @@ export default function SetupScreen() {
               
               <div style={{ position: 'relative', width: '140px', height: '140px', margin: '0 auto 24px auto' }}>
                 <div 
-                  role="button"
-                  tabIndex={0}
                   onClick={() => fileInputRef.current?.click()}
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') fileInputRef.current?.click(); }}
-                  aria-label="Upload profile photo"
                   style={{ 
                     width: '100%', height: '100%', background: 'var(--surface)', borderRadius: '50%', 
                     display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem', 
                     cursor: 'pointer', border: '2px solid var(--border)', overflow: 'hidden'
                   }}
                 >
-                  {tempImg ? <img src={tempImg} alt="Profile preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👤'}
+                  {tempImg ? <img src={tempImg} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👤'}
                 </div>
                 <div style={{ 
                   position: 'absolute', bottom: '0', right: '0', background: 'var(--cyan)', 
                   width: '36px', height: '36px', borderRadius: '50%', display: 'flex', 
-                  alignItems: 'center', justifyContent: 'center', border: '4px solid var(--bg)', color: 'black', fontSize: '1rem',
-                  pointerEvents: 'none'
+                  alignItems: 'center', justifyContent: 'center', border: '4px solid var(--bg)', color: 'black', fontSize: '1rem'
                 }}>
                   +
                 </div>
@@ -148,18 +139,11 @@ export default function SetupScreen() {
                 </div>
               )}
 
-              <input 
-                type="file" 
-                ref={fileInputRef} 
-                onChange={handleFileChange} 
-                style={{ display: 'none' }} 
-                accept="image/*" 
-                aria-label="File upload"
-              />
+              <input type="file" ref={fileInputRef} onChange={handleFileChange} style={{ display: 'none' }} accept="image/*" />
 
               <div style={{ display: 'flex', gap: '12px' }}>
-                <button type="button" onClick={prevStep} className="btn-toggle" style={{ flex: 1 }}>BACK</button>
-                <button type="button" onClick={handleFinish} className="btn-review" style={{ flex: 2, margin: 0 }}>FINISH</button>
+                <button onClick={prevStep} className="btn-toggle" style={{ flex: 1 }}>BACK</button>
+                <button onClick={handleFinish} className="btn-review" style={{ flex: 2, margin: 0 }}>FINISH</button>
               </div>
             </motion.div>
           )}
