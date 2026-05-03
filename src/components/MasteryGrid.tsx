@@ -320,16 +320,13 @@ export default function MasteryGrid({
 
               return (
                 <List
-                  height={height}
-                  itemCount={rowCount}
-                  itemSize={rowHeight}
-                  width={width}
-                  itemData={combinedData}
+                  style={{ height, width, WebkitOverflowScrolling: 'touch', overflowX: 'hidden' }}
+                  rowCount={rowCount}
+                  rowHeight={rowHeight}
+                  rowComponent={Row}
+                  rowProps={{ data: combinedData }}
                   overscanCount={3}
-                  style={{ WebkitOverflowScrolling: 'touch', overflowX: 'hidden' }}
-                >
-                  {Row}
-                </List>
+                />
               );
             }}
           </AutoSizer>
