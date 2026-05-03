@@ -2,7 +2,7 @@ import type { VocabWord, MasteryStatus, UserProfile, ReviewVibe, WeeklyChallenge
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { TOKI_PONA_DICTIONARY } from '../data/tokiPonaDictionary';
 
-const GEMINI_MODEL = "gemini-2.5-flash";
+const GEMINI_MODEL = "gemini-2.0-flash";
 
 /**
  * Builds a simple literal translation for offline use or as a fallback.
@@ -188,6 +188,7 @@ export function buildTutorPrompt(
 
   return `
     You are jan Lina, an expert Toki Pona teacher.
+    CRITICAL: Output ONLY the final response in your persona's voice. NEVER output internal monologue, draft sentences, planning steps, or a restatement of your instructions. 
     Personality: You are like a cool older sister who happens to be fluent in Toki Pona. You're casual, a little playful, and keep it real. You're encouraging without being cheesy, and call things out directly but warmly. You never sound like a textbook.
     
     The student's name is ${studentName}.${contextStr}
@@ -278,7 +279,7 @@ export function buildChatPrompt(
 
   let contextOrientation = "The student opened the general chat. Greet them warmly and follow their lead.";
   if (chatContext === 'VOCAB_PANEL') {
-    contextOrientation = `The student is exploring a specific word. The word is: ${contextPayload}. Anchor your first response to this word and have a natural conversation about it — its feel, its uses, fun examples.`;
+    contextOrientation = `The student is exploring a specific word. The word is: ${contextPayload || 'a specific concept'}. Anchor your first response to this word and have a natural conversation about it — its feel, its uses, fun examples.`;
   } else if (chatContext === 'PHRASE_PRACTICE') {
     contextOrientation = `The student wants to practice a saved phrase: ${contextPayload}. Work through it conversationally — react to it, riff on it, ask them to try using it.`;
   } else if (chatContext === 'DAILY_REVIEW') {
@@ -303,6 +304,7 @@ export function buildChatPrompt(
 
   return `
     You are jan Lina, an expert Toki Pona teacher.
+    CRITICAL: Output ONLY the final response in your persona's voice. NEVER output internal monologue, draft sentences, planning steps, or a restatement of your instructions. 
     Personality: You are like a cool older sister who happens to be fluent in Toki Pona. You're casual, a little playful, and keep it real. You're encouraging without being cheesy, and call things out directly but warmly. You never sound like a textbook.
 
     The student's name is ${studentName}.${contextStr}
@@ -381,6 +383,7 @@ export function buildMasteryCourtPrompt(vocabulary: any[], studentName: string, 
 
   return `
     You are jan Lina, an expert Toki Pona teacher.
+    CRITICAL: Output ONLY the final response in your persona's voice. NEVER output internal monologue, draft sentences, planning steps, or a restatement of your instructions. 
     Personality: You are like a cool older sister who happens to be fluent in Toki Pona. You're casual, a little playful, and keep it real. You're encouraging without being cheesy, and call things out directly but warmly. You never sound like a textbook. However, you know this is a formal review, not casual chat.
 
     The student's name is ${studentName}.${contextStr}

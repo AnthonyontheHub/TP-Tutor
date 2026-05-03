@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { resolveApiKey } from './linaService';
 
-const GEMINI_MODEL = "gemini-2.5-flash";
+const GEMINI_MODEL = "gemini-2.0-flash";
 
 export async function generateChallenge(mode: 'selection' | 'input', userProfile?: any, curriculumContext?: string) {
   const apiKey = resolveApiKey();
