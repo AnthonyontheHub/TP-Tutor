@@ -1,6 +1,6 @@
 /* src/components/MasteryGrid.tsx */
 import { useState, useMemo, memo, useCallback } from 'react';
-import { FixedSizeList as List } from 'react-window';
+import { List } from 'react-window';
 import type { ListChildComponentProps } from 'react-window';
 import { AutoSizer } from 'react-virtualized-auto-sizer';
 import { useMasteryStore } from '../store/masteryStore';
@@ -300,8 +300,8 @@ export default function MasteryGrid({
 
       {viewMode === 'card' ? (
         <div style={{ position: 'relative', flex: 1, pointerEvents: 'auto', width: '100%' }}>
-          <AutoSizer
-            renderProp={({ height, width }: { height: number; width: number }) => {
+          <AutoSizer>
+            {({ height, width }: { height: number; width: number }) => {
               if (!height || !width) return null;
 
               const gap = 10;
@@ -332,7 +332,7 @@ export default function MasteryGrid({
                 </List>
               );
             }}
-          />
+          </AutoSizer>
         </div>
       ) : (
         <div className="mastery-grid__table-wrapper" style={{ overflowX: 'auto', background: 'rgba(0,0,0,0.2)', borderRadius: '8px', border: '1px solid #222' }}>
