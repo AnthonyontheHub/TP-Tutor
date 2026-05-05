@@ -1563,11 +1563,11 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       syncToCloud: async (explicitUserId, merge = true, force = false) => {
-        const { vocabulary, curriculums, lastUpdated, studentName, profile, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, isMainProfile, widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, cloudSynced, songs, commonPhrases, lastStreakCheck, learningDays, confusionPairs, pendingProveItResponses,
+        const { vocabulary, curriculums, lastUpdated, studentName, profile, profileImage, savedPhrases, currentStreak, lastActiveDate, userId, hasCompletedSetup, currentPositionNodeId, isMainProfile, widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, cloudSynced, songs, commonPhrases, lastStreakCheck, learningDays, completedNodeIds, seenIntroductions, confusionPairs, pendingProveItResponses,
             earnedCeremonialRanks, lastSmallRankTitle, earnedBadges, totalProveItSubmitted,
             streakShields, xpMultiplier, lastStreakMilestone, pendingComebackBonus, sessionXPRecord,
             sessionLog, currentChallenge, completedChallenges, pendingRankAcknowledgement, newRankUnlocked,
-            activeCurriculumId, activeModuleId, selectedWords, lessonFilter } = get();
+            activeCurriculumId, activeModuleId, selectedWords, lessonFilter, completedActivities, masteryHistory } = get();
         const targetId = explicitUserId || userId;
 
         // Block premature syncs before cloud data has loaded — prevents stale
