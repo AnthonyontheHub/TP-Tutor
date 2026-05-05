@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import { useAuthStore } from '../store/authStore';
 
-export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSandboxMode, onOpenLogbook, onOpenMasteryCourt }: {
+export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSandboxMode, onOpenLogbook, onOpenMasteryCourt, onOpenStoicArchive }: {
   isOpen: boolean;
   onClose: () => void;
   isSandboxMode: boolean;
   setIsSandboxMode: (val: boolean) => void;
   onOpenLogbook: () => void;
   onOpenMasteryCourt?: () => void;
+  onOpenStoicArchive?: () => void;
 }) {
   const {
     resetAsNewUser, masterAllVocab, randomizeVocab, isMainProfile,
@@ -92,12 +93,21 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
             VIEW TEACHER'S LOGBOOK
           </button>
           {onOpenMasteryCourt && (
-            <button 
+            <button
               onClick={onOpenMasteryCourt}
               className="btn-review"
               style={{ width: '100%', background: '#111', border: '1px solid #222', color: 'var(--gold)' }}
             >
               MASTERY COURT
+            </button>
+          )}
+          {onOpenStoicArchive && (
+            <button
+              onClick={onOpenStoicArchive}
+              className="btn-review"
+              style={{ width: '100%', background: '#111', border: '1px solid #222', color: 'var(--gold)' }}
+            >
+              📖 STOIC ARCHIVE
             </button>
           )}
         </div>
