@@ -12,6 +12,7 @@ import InstructionsPanel from './components/InstructionsPanel';
 import AchievementsPanel from './components/AchievementsPanel';
 import LogbookPanel from './components/LogbookPanel';
 import ChatSession from './components/ChatSession';
+import DailyStoicHistory from './components/DailyStoicHistory';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -29,6 +30,7 @@ export default function App() {
   const chatSessions = Array.isArray(rawSessions) ? rawSessions : [];
 
   const [activePanels, setActivePanels] = useState<AppPanel[]>([]);
+  const [showStoicHistory, setShowStoicHistory] = useState(false);
   const [isSandboxMode, setIsSandboxMode] = useState<boolean>(
     () => localStorage.getItem('tp_sandbox_mode') === 'true'
   );
@@ -197,13 +199,19 @@ export default function App() {
         {activePanels.map(panel => (
           <ModalWrapper key={panel} onClose={() => togglePanel(panel)}>
              {panel === 'profile' && <UserProfilePanel onClose={() => togglePanel('profile')} />}
-             {panel === 'settings' && <SettingsPanel isOpen={true} onClose={() => togglePanel('settings')} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} onOpenLogbook={() => togglePanel('logbook')} onOpenMasteryCourt={() => { togglePanel('settings'); handleAskLina('[SYSTEM: The student has opened Mastery Court. You know why they\'re here. Greet them briefly, acknowledge your role, and ask what they\'d like to petition.]'); }} />}
+             {panel === 'settings' && <SettingsPanel isOpen={true} onClose={() => togglePanel('settings')} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} onOpenLogbook={() => togglePanel('logbook')} onOpenMasteryCourt={() => { togglePanel('settings'); handleAskLina('[SYSTEM: The student has opened Mastery Court. You know why they\'re here. Greet them briefly, acknowledge your role, and ask what they\'d like to petition.]'); }} onOpenStoicArchive={() => { togglePanel('settings'); setShowStoicHistory(true); }} />}
              {panel === 'achievements' && <AchievementsPanel onClose={() => togglePanel('achievements')} />}
              {panel === 'instructions' && <InstructionsPanel isOpen={true} onClose={() => togglePanel('instructions')} />}
              {panel === 'logbook' && <LogbookPanel onClose={() => togglePanel('logbook')} />}
           </ModalWrapper>
         ))}
       </AnimatePresence>
+
+      <DailyStoicHistory
+        isOpen={showStoicHistory}
+        onClose={() => setShowStoicHistory(false)}
+        onAskLina={(prompt) => { setShowStoicHistory(false); handleAskLina(prompt); }}
+      />
 
       <div className="chat-dock" style={{
         position: 'fixed',
