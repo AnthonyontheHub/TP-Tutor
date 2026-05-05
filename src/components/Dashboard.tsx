@@ -405,22 +405,22 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
                '⚡ ARCHIVE'
              ) : '🚀 ROADMAP'}
           </button>
-          <div style={{ display: 'flex', flex: 1, background: 'var(--surface)', borderRadius: '4px', padding: '4px', border: '1px solid var(--border)', gap: '2px', minWidth: 0 }}>
+          <div style={{ display: 'flex', flex: 1, background: 'var(--surface)', borderRadius: '4px', padding: '2px', border: '1px solid var(--border)', gap: '2px', minWidth: 0 }}>
             <button
               onClick={() => setReviewVibe(reviewVibe === 'chill' ? null : 'chill')}
-              style={{ flex: 1, border: 'none', background: reviewVibe === 'chill' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'chill' ? 'black' : '#666', borderRadius: '2px', padding: '8px 2px', fontSize: '0.7rem', fontWeight: 900, cursor: 'pointer', minWidth: 0 }}
+              style={{ flex: 1, border: 'none', background: reviewVibe === 'chill' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'chill' ? 'black' : '#666', borderRadius: '2px', padding: '4px 2px', fontSize: '0.65rem', fontWeight: 900, cursor: 'pointer', minWidth: 0 }}
             >
               {activeView === 'vocab' ? 'CHILL' : activeView === 'archive' ? 'SAVES' : 'NEW'}
             </button>
             <button
               onClick={() => setReviewVibe(reviewVibe === 'deep' ? null : 'deep')}
-              style={{ flex: 1, border: 'none', background: reviewVibe === 'deep' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'deep' ? 'black' : '#666', borderRadius: '2px', padding: '8px 2px', fontSize: '0.7rem', fontWeight: 900, cursor: 'pointer', minWidth: 0 }}
+              style={{ flex: 1, border: 'none', background: reviewVibe === 'deep' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'deep' ? 'black' : '#666', borderRadius: '2px', padding: '4px 2px', fontSize: '0.65rem', fontWeight: 900, cursor: 'pointer', minWidth: 0 }}
             >
               {activeView === 'vocab' ? 'DEEP' : activeView === 'archive' ? 'EVERYDAY' : 'REVIEW'}
             </button>
             <button
               onClick={() => setReviewVibe(reviewVibe === 'intense' ? null : 'intense')}
-              style={{ flex: 1, border: 'none', background: reviewVibe === 'intense' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'intense' ? 'black' : '#666', borderRadius: '2px', padding: '8px 2px', fontSize: '0.7rem', fontWeight: 900, cursor: 'pointer', minWidth: 0 }}
+              style={{ flex: 1, border: 'none', background: reviewVibe === 'intense' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'intense' ? 'black' : '#666', borderRadius: '2px', padding: '4px 2px', fontSize: '0.65rem', fontWeight: 900, cursor: 'pointer', minWidth: 0 }}
             >
               {activeView === 'vocab' ? 'INTENSE' : activeView === 'archive' ? 'DISCO' : 'QUIZ'}
             </button>
