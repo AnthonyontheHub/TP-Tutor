@@ -168,7 +168,7 @@ interface MasteryActions {
   clearAllSavedPhrases: () => void;
   checkAssessments: (onTrigger: (word: VocabWord) => void) => void;
   switchProfile: (name: string) => void;
-  updateVocabAIContent: (wordId: string, content: { aiExplanation?: string; aiExamples?: Record<string, string> }) => void;
+  updateVocabAIContent: (wordId: string, content: { aiExplanation?: string; aiExamples?: Record<string, string>; grammarExamples?: Record<string, string> | null; neighborConnections?: Record<string, string> | null }) => void;
   updateSessionNotes: (wordId: string, notes: string) => void;
 
   // Feature 5
