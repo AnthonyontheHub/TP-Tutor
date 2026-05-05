@@ -395,7 +395,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
           <button
             onClick={handleDailyReview}
             className="btn-review"
-            style={{ flex: '0 0 auto', marginBottom: 0, padding: '8px 10px', fontSize: '0.7rem', fontWeight: 900, whiteSpace: 'nowrap' }}
+            style={{ flex: '0 0 auto', width: 'auto', maxWidth: '50%', marginBottom: 0, padding: '8px 10px', fontSize: '0.7rem', fontWeight: 900, whiteSpace: 'nowrap' }}
           >
             {activeView === 'vocab' ? '⚡ VOCAB PRACTICE' :
              activeView === 'archive' ? (
