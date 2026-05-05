@@ -251,6 +251,10 @@ export interface VocabWord {
   sessionNotes: string;
   aiExplanation?: string;
   aiExamples?: Record<string, string>;
+  grammarExamples?: Record<string, string>;
+  neighborConnections?: Record<string, string>;
+  sitelenPona?: string;
+  sitelenEtymology?: string;
 
   // Deep Knowledge Scoring
   partOfSpeechScores: PartOfSpeechScores;
