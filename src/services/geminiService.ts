@@ -1,10 +1,15 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { resolveApiKey } from './linaService';
 
 const GEMINI_MODEL = "gemini-2.5-flash";
 
+function resolveGamesApiKey(): string {
+  return localStorage.getItem('TP_GEMINI_KEY') 
+    || (import.meta.env.VITE_GEMINI_API_KEY as string | undefined) 
+    || '';
+}
+
 export async function generateChallenge(mode: 'selection' | 'input', userProfile?: any, curriculumContext?: string) {
-  const apiKey = resolveApiKey();
+  const apiKey = resolveGamesApiKey();
   if (!apiKey) throw new Error("API Key missing");
 
   const genAI = new GoogleGenerativeAI(apiKey);
@@ -39,7 +44,7 @@ export async function generateChallenge(mode: 'selection' | 'input', userProfile
 }
 
 export async function evaluateInput(complexThought: string, correctEssence: string, userInput: string) {
-  const apiKey = resolveApiKey();
+  const apiKey = resolveGamesApiKey();
   if (!apiKey) return { score: 0, feedback: "API Key missing" };
 
   const genAI = new GoogleGenerativeAI(apiKey);
@@ -71,7 +76,7 @@ Return JSON: {"score": number (0-100), "feedback": "Brief encouragement/correcti
 }
 
 export async function generateSortItems(userProfile: string | object, curriculumContext?: string) {
-  const apiKey = resolveApiKey();
+  const apiKey = resolveGamesApiKey();
   if (!apiKey) throw new Error("API Key missing");
 
   const genAI = new GoogleGenerativeAI(apiKey);

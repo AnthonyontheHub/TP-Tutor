@@ -44,6 +44,7 @@ export const PhilosophySorter: React.FC<PhilosophySorterProps> = ({ userProfile,
   }, [userProfile]);
 
   const handleSort = (category: 'pona' | 'ike') => {
+    if (!items[currentIndex]) return;
     if (items[currentIndex].category === category) {
       setScore(s => s + 1);
     }
@@ -97,18 +98,22 @@ export const PhilosophySorter: React.FC<PhilosophySorterProps> = ({ userProfile,
       </div>
 
       <div className="flex w-full gap-8">
-        <button 
-          onClick={() => handleSort('pona')} 
-          className="flex-1 py-6 rounded-2xl border border-cyan-500/20 bg-cyan-500/5 text-cyan-400 font-black uppercase tracking-[0.3em] hover:bg-cyan-500/10 hover:border-cyan-500/50 transition-all active:scale-95"
-        >
-          PONA
-        </button>
-        <button 
-          onClick={() => handleSort('ike')} 
-          className="flex-1 py-6 rounded-2xl border border-rose-500/20 bg-rose-500/5 text-rose-400 font-black uppercase tracking-[0.3em] hover:bg-rose-500/10 hover:border-rose-500/50 transition-all active:scale-95"
-        >
-          IKE
-        </button>
+        {items.length > 0 && items[currentIndex] ? (
+          <>
+            <button 
+              onClick={() => handleSort('pona')} 
+              className="flex-1 py-6 rounded-2xl border border-cyan-500/20 bg-cyan-500/5 text-cyan-400 font-black uppercase tracking-[0.3em] hover:bg-cyan-500/10 hover:border-cyan-500/50 transition-all active:scale-95"
+            >
+              PONA
+            </button>
+            <button 
+              onClick={() => handleSort('ike')} 
+              className="flex-1 py-6 rounded-2xl border border-rose-500/20 bg-rose-500/5 text-rose-400 font-black uppercase tracking-[0.3em] hover:bg-rose-500/10 hover:border-rose-500/50 transition-all active:scale-95"
+            >
+              IKE
+            </button>
+          </>
+        ) : null}
       </div>
 
       <button 

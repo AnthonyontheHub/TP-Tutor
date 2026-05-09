@@ -84,56 +84,64 @@ export const Essentializer = ({ userProfile, curriculumContext, onSessionEnd }) 
           </motion.div>
         ) : (
           <motion.div key="content" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="space-y-8">
-            <div className="bg-black/60 backdrop-blur-2xl border border-white/10 p-10 rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
-                <div className="absolute top-0 left-0 w-1.5 h-full bg-rose-600 shadow-[0_0_20px_rgba(225,29,72,0.5)]" />
-                <p className="text-xl md:text-2xl font-light leading-relaxed text-white/90 italic tracking-wide">"{currentChallenge.complexThought}"</p>
-            </div>
-            
-            <div className="space-y-4">
-              {!feedback ? (
-                mode === 'selection' ? (
-                  <div className="grid gap-4">
-                    {currentChallenge.options.map((opt, i) => (
-                      <button 
-                        key={i} 
-                        onClick={() => handleSelection(opt)} 
-                        className="w-full p-6 text-left rounded-2xl border border-white/5 bg-white/5 hover:border-rose-500/40 hover:bg-rose-500/10 transition-all group uppercase tracking-[0.15em] text-white/60 hover:text-white font-medium"
+            {currentChallenge ? (
+              <>
+                <div className="bg-black/60 backdrop-blur-2xl border border-white/10 p-10 rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
+                    <div className="absolute top-0 left-0 w-1.5 h-full bg-rose-600 shadow-[0_0_20px_rgba(225,29,72,0.5)]" />
+                    <p className="text-xl md:text-2xl font-light leading-relaxed text-white/90 italic tracking-wide">"{currentChallenge.complexThought}"</p>
+                </div>
+                
+                <div className="space-y-4">
+                  {!feedback ? (
+                    mode === 'selection' ? (
+                      <div className="grid gap-4">
+                        {currentChallenge.options.map((opt, i) => (
+                          <button 
+                            key={i} 
+                            onClick={() => handleSelection(opt)} 
+                            className="w-full p-6 text-left rounded-2xl border border-white/5 bg-white/5 hover:border-rose-500/40 hover:bg-rose-500/10 transition-all group uppercase tracking-[0.15em] text-white/60 hover:text-white font-medium"
+                          >
+                            {opt}
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="space-y-6">
+                        <textarea 
+                          value={userInput} 
+                          onChange={(e) => setUserInput(e.target.value)} 
+                          placeholder="Enter simple essence..." 
+                          className="w-full h-40 bg-black/60 border border-white/10 rounded-[2rem] p-6 text-white placeholder:text-white/10 focus:outline-none focus:border-rose-600/50 transition-all text-lg font-light resize-none" 
+                        />
+                        <button 
+                          onClick={handleInputSubmit} 
+                          disabled={!userInput || isSubmitting} 
+                          className="w-full py-5 bg-rose-600 text-white font-black uppercase tracking-[0.4em] rounded-2xl hover:bg-rose-500 shadow-[0_10px_30px_rgba(225,29,72,0.3)] transition-all"
+                        >
+                          {isSubmitting ? 'Evaluating...' : 'Submit Essence'}
+                        </button>
+                      </div>
+                    )
+                  ) : (
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+                       <div className={`p-8 rounded-[2rem] border ${feedback.score >= 70 ? 'border-rose-500/30 bg-rose-500/5' : 'border-white/10 bg-white/5'}`}>
+                          <p className="text-base text-white/80 leading-relaxed italic">"{feedback.feedback}"</p>
+                       </div>
+                       <button 
+                        onClick={loadNextChallenge} 
+                        className="w-full py-5 bg-rose-600 text-white font-black uppercase tracking-[0.4em] rounded-2xl hover:bg-rose-500 transition-all flex items-center justify-center gap-3"
                       >
-                        {opt}
+                        Next Challenge <ArrowRight className="w-5 h-5" />
                       </button>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="space-y-6">
-                    <textarea 
-                      value={userInput} 
-                      onChange={(e) => setUserInput(e.target.value)} 
-                      placeholder="Enter simple essence..." 
-                      className="w-full h-40 bg-black/60 border border-white/10 rounded-[2rem] p-6 text-white placeholder:text-white/10 focus:outline-none focus:border-rose-600/50 transition-all text-lg font-light resize-none" 
-                    />
-                    <button 
-                      onClick={handleInputSubmit} 
-                      disabled={!userInput || isSubmitting} 
-                      className="w-full py-5 bg-rose-600 text-white font-black uppercase tracking-[0.4em] rounded-2xl hover:bg-rose-500 shadow-[0_10px_30px_rgba(225,29,72,0.3)] transition-all"
-                    >
-                      {isSubmitting ? 'Evaluating...' : 'Submit Essence'}
-                    </button>
-                  </div>
-                )
-              ) : (
-                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-                   <div className={`p-8 rounded-[2rem] border ${feedback.score >= 70 ? 'border-rose-500/30 bg-rose-500/5' : 'border-white/10 bg-white/5'}`}>
-                      <p className="text-base text-white/80 leading-relaxed italic">"{feedback.feedback}"</p>
-                   </div>
-                   <button 
-                    onClick={loadNextChallenge} 
-                    className="w-full py-5 bg-rose-600 text-white font-black uppercase tracking-[0.4em] rounded-2xl hover:bg-rose-500 transition-all flex items-center justify-center gap-3"
-                  >
-                    Next Challenge <ArrowRight className="w-5 h-5" />
-                  </button>
-                </motion.div>
-              )}
-            </div>
+                    </motion.div>
+                  )}
+                </div>
+              </>
+            ) : (
+              <div style={{ textAlign: 'center', color: '#666', padding: '40px 0' }}>
+                Loading challenge...
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
