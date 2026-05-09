@@ -21,12 +21,12 @@ const KU_SULI_WORDS = new Set(['kokosila', 'lanpan', 'misikeke', 'epiku', 'jasim
 
 function normalizePartOfSpeech(pos: string): string {
   if (!pos) return pos;
-  return pos
-    .replace(/\bAdjective\b/g, 'Modifier')
-    .replace(/\bAdverb\b/g, 'Modifier')
-    .replace(/\bNumber\b/g, 'Modifier')
-    .replace(/\bInterrogative\b/g, 'Particle')
-    .replace(/\bOrdinal-marker\b/g, 'Particle');
+  if (pos === 'Adjective') return 'Modifier';
+  if (pos === 'Adverb') return 'Modifier';
+  if (pos === 'Number') return 'Modifier';
+  if (pos === 'Interrogative') return 'Particle';
+  if (pos === 'Ordinal-marker') return 'Particle';
+  return pos;
 }
 
 function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: MasteryStatus; type: 'word' | 'grammar'; sessionNotes: string; frequencyRank?: number; weight?: 'pillar' | 'working' | 'bonus' }): VocabWord {
