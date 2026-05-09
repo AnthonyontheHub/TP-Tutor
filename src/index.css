@@ -595,13 +595,13 @@ button:active { transform: scale(0.96); }
 /* ─── Sitelen Pona Font ────────────────────────────────────────────────── */
 @font-face {
   font-family: 'SitelenPona';
-  src: url('/linja-pona.otf') format('otf'); /* Assuming font is in public/ */
+  src: url('/linja-pona.otf') format('opentype'); /* Corrected format */
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 .sitelen-pona {
-  font-family: 'SitelenPona', 'Inter', system-ui, -apple-system, sans-serif !important;
+  font-family: 'SitelenPona', sans-serif !important; /* Simplified fallbacks and added !important */
   font-feature-settings: 'liga' 1; /* Enable ligatures */
 }
