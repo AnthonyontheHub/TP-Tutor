@@ -3,6 +3,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import VocabCard from './VocabCard';
 import WordDetailDrawer from './WordDetailDrawer';
+import ChallengeWidget from './ChallengeWidget';
 import type { MasteryStatus, VocabWord } from '../types/mastery';
 import { STATUS_META } from '../types/mastery';
 import { WORD_RELATIONSHIPS } from '../data/wordRelationships';
@@ -156,48 +157,55 @@ export default function MasteryGrid({
           gap: 10px;
           width: 100%;
         }
-      `}</style>
-      <div className="grid-toolbar" style={{ flexShrink: 0 }}>
-        <style>{`
-          .toolbar-input {
-            background: #111;
-            border: 1px solid #333;
-            border-radius: 6px;
-            color: white;
-            padding: 0 10px;
-            height: 36px;
-            font-size: 0.8rem;
-            box-sizing: border-box;
-          }
+        .grid-toolbar {
+          margin-top: 0;
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-top: none;
+          border-bottom-left-radius: 4px;
+          border-bottom-right-radius: 4px;
+          padding: 8px;
+          margin-bottom: 0;
+        }
+        .toolbar-input {
+          background: #111;
+          border: 1px solid #333;
+          border-radius: 6px;
+          color: white;
+          padding: 0 10px;
+          height: 36px;
+          font-size: 0.8rem;
+          box-sizing: border-box;
+        }
+        .grid-toolbar-inner {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+        .toolbar-group {
+          display: flex;
+          gap: 8px;
+          width: 100%;
+        }
+        .toolbar-group--left > * {
+          flex: 1;
+          min-width: 0;
+        }
+        .toolbar-group--right .sort-select {
+          flex: 1;
+          min-width: 0;
+        }
+        @media (min-width: 768px) {
           .grid-toolbar-inner {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 8px;
+            flex-direction: row;
           }
           .toolbar-group {
-            display: flex;
-            gap: 8px;
-            width: 100%;
-          }
-          .toolbar-group--left > * {
+            width: auto;
             flex: 1;
-            min-width: 0;
           }
-          .toolbar-group--right .sort-select {
-            flex: 1;
-            min-width: 0;
-          }
-          @media (min-width: 768px) {
-            .grid-toolbar-inner {
-              flex-direction: row;
-            }
-            .toolbar-group {
-              width: auto;
-              flex: 1;
-            }
-          }
-        `}</style>
+        }
+      `}</style>
+      <div className="grid-toolbar" style={{ flexShrink: 0 }}>
         <div className="grid-toolbar-inner">
           <div className="toolbar-group toolbar-group--left">
             <select
@@ -248,6 +256,10 @@ export default function MasteryGrid({
             </button>
           </div>
         </div>
+      </div>
+
+      <div style={{ marginTop: '12px', marginBottom: '12px' }}>
+        <ChallengeWidget />
       </div>
 
       {viewMode === 'card' ? (

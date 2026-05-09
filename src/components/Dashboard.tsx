@@ -181,57 +181,77 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
     <div className="dashboard">
       <style>{`
         .dashboard__header {
-          display: grid;
-          grid-template-areas: 
-            "title actions"
-            "identity identity";
-          grid-template-columns: 1fr auto;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
           background: var(--bg);
           border-bottom: 1px solid var(--border);
           position: sticky;
           top: 0;
           z-index: 100;
-          padding: 8px 16px;
-          gap: 12px 8px;
+          padding: 0 12px;
+          height: var(--header-height);
+          gap: 8px;
         }
 
-        .dashboard__header-title-area { grid-area: title; display: flex; align-items: center; }
-        .dashboard__header-identity-area { grid-area: identity; display: flex; align-items: center; gap: 8px; }
-        .dashboard__header-actions-area { grid-area: actions; display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+        .dashboard__header-left {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          min-width: 0;
+        }
+
+        .dashboard__header-right {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          flex-shrink: 0;
+        }
+
+        .dashboard__control-bar {
+          display: flex;
+          flex-direction: column;
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-top-left-radius: 4px;
+          border-top-right-radius: 4px;
+          padding: 4px;
+          gap: 4px;
+          margin-bottom: 0; /* Connected to grid toolbar */
+        }
+
+        .dashboard__quick-actions {
+          display: flex;
+          gap: 8px;
+          margin-top: 12px;
+          margin-bottom: 12px;
+        }
 
         @media (min-width: 768px) {
           .dashboard__header {
-            display: flex;
+            padding: 0 20px;
+          }
+          .dashboard__control-bar {
             flex-direction: row;
-            height: var(--header-height);
             align-items: center;
             justify-content: space-between;
-            padding: 0 20px;
-            gap: 0;
           }
-          .dashboard__header-identity-area {
-            margin-left: 12px;
+          .dashboard__tabs {
             flex: 1;
+            max-width: 400px;
           }
-          .dashboard__header-actions-area {
-            flex: none;
-          }
-        }
-
-        /* Adjust main content padding */
-        @media (max-width: 767px) {
-          .dashboard {
-            --header-offset: 108px;
+          .dashboard__review-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
           }
         }
       `}</style>
 
       <header className="dashboard__header">
-        <div className="dashboard__header-title-area">
-          <h1 className="dashboard__title" style={{ margin: 0 }}>TOKI PONA</h1>
-        </div>
-
-        <div className="dashboard__header-identity-area">
+        <div className="dashboard__header-left">
+          <h1 className="dashboard__title" style={{ margin: 0, fontSize: '1rem' }}>TOKI PONA</h1>
+          
           <button 
             onClick={() => onTogglePanel('profile')} 
             className="dashboard__profile-trigger"
@@ -239,12 +259,14 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
               ...getActiveStyle('profile'),
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
-              padding: '4px 12px 4px 4px',
+              gap: '6px',
+              padding: '2px 10px 2px 2px',
               borderRadius: '20px',
               background: 'rgba(255,255,255,0.03)',
               border: '1px solid rgba(255,255,255,0.05)',
-              flexShrink: 0
+              flexShrink: 1,
+              minWidth: 0,
+              height: '32px'
             }}
           >
             {profileImage ? (
@@ -252,178 +274,162 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
                 src={profileImage} 
                 alt="Profile"
                 style={{ 
-                  width: '32px', 
-                  height: '32px', 
+                  width: '26px', 
+                  height: '26px', 
                   borderRadius: '50%', 
                   objectFit: 'cover',
                   border: '1px solid rgba(255,255,255,0.1)'
                 }} 
               />
             ) : (
-              <span style={{ fontSize: '1.2rem', marginLeft: '4px' }}>👤</span>
+              <span style={{ fontSize: '1rem', marginLeft: '4px' }}>👤</span>
             )} 
-            <span style={{ fontSize: '0.75rem', fontWeight: 900 }}>{(profile?.tpName || studentName)?.toUpperCase() || 'STUDENT'}</span>
+            <span style={{ fontSize: '0.65rem', fontWeight: 900, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {(profile?.tpName || studentName)?.toUpperCase() || 'STUDENT'}
+            </span>
           </button>
+        </div>
 
-          <button 
-            onClick={() => setShowTrainingHub(true)} 
-            className="dashboard__icon-btn" 
-            style={{ 
-              width: '38px',
-              height: '38px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '1.2rem',
-              background: 'rgba(255,255,255,0.03)',
-              borderRadius: '50%',
-              border: '1px solid var(--border)'
-            }}
-            title="Training Hub"
-          >
-            🎮
-          </button>
-
-          <button
-            onClick={() => setShowFlashcards(true)}
-            className="dashboard__icon-btn"
-            style={{
-              width: '38px',
-              height: '38px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '1.1rem',
-              background: 'rgba(255,255,255,0.03)',
-              borderRadius: '50%',
-              border: '1px solid var(--border)'
-            }}
-            title="Flashcards"
-          >
-            🃏
-          </button>
+        <div className="dashboard__header-right">
+          {currentStreak > 0 && (
+            <div 
+              className="dashboard__streak" 
+              onClick={() => onTogglePanel('achievements')}
+              style={{ ...getActiveStyle('achievements'), margin: 0, padding: '4px 8px', fontSize: '0.75rem', height: '32px', display: 'flex', alignItems: 'center' }}
+            >
+              🔥 {currentStreak}
+            </div>
+          )}
           
           <OperationalIntelligenceWidget 
             onAskLina={onAskLina}
             onOpenAchievements={() => onTogglePanel('achievements')}
           />
-        </div>
-
-        <div className="dashboard__header-actions-area">
-          {currentStreak > 0 && (
-            <div 
-              className="dashboard__streak" 
-              onClick={() => onTogglePanel('achievements')}
-              style={{ ...getActiveStyle('achievements'), margin: 0 }}
-            >
-              🔥 {currentStreak}
-            </div>
-          )}
-          <button onClick={() => onTogglePanel('instructions')} className="dashboard__icon-btn" style={getActiveStyle('instructions')}>?</button>
-          <button onClick={() => setShowProveIt(true)} className="dashboard__icon-btn" title="Prove It Drill">🎯</button>
-          <div style={{ position: 'relative' }}>
-            <button onClick={() => onAskLina('[SYSTEM: Start a general conversation.]')} className="dashboard__icon-btn" style={getActiveStyle('chat' as any)}>💬</button>
-            {chatCount > 0 && (
-              <span style={{ position: 'absolute', top: '-5px', right: '-5px', background: 'var(--gold)', color: 'black', borderRadius: '50%', width: '18px', height: '18px', fontSize: '0.65rem', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--bg)', pointerEvents: 'none' }}>
-                {chatCount}
-              </span>
-            )}
-          </div>
-          <button onClick={() => onTogglePanel('settings')} className="dashboard__icon-btn" style={getActiveStyle('settings')}>⚙️</button>
+          
+          <button onClick={() => onTogglePanel('settings')} className="dashboard__icon-btn" style={{ ...getActiveStyle('settings'), width: '32px', height: '32px', fontSize: '0.9rem' }}>⚙️</button>
         </div>
       </header>
 
       <main className="dashboard__main" style={{ paddingBottom: '12rem' }}>
-        <div style={{ marginBottom: '20px' }}>
-          <ChallengeWidget />
-        </div>
         <ProgressSummary activeFilter={activeFilter} onFilterClick={setActiveFilter} />
-        
-        {/* Row 2: 3-Way Navigation Switcher */}
-        <div style={{
-          marginBottom: '8px',
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr 1fr',
-          gap: '4px',
-          padding: '4px',
-          background: 'var(--surface)',
-          borderRadius: '4px',
-          border: '1px solid var(--border)',
-          width: '100%',
-          boxSizing: 'border-box'
-        }}>
-          <button
-            onClick={() => setActiveView('vocab')}
-            style={{
-              margin: 0, width: '100%', border: 'none', borderRadius: '2px',
-              background: activeView === 'vocab' ? 'var(--gold)' : 'transparent',
-              color: activeView === 'vocab' ? 'black' : '#888',
-              fontWeight: 900, fontSize: '0.7rem', padding: '8px 4px', cursor: 'pointer',
-              letterSpacing: '0.05em'
+
+        <div className="dashboard__quick-actions">
+          <button 
+            onClick={() => setShowTrainingHub(true)} 
+            className="btn-toggle" 
+            style={{ 
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              background: 'rgba(255,255,255,0.03)',
+              border: '1px solid var(--border)',
+              borderRadius: '4px',
+              flex: 1
             }}
           >
-            VOCAB
+            🎮 TRAINING HUB
           </button>
+
           <button
-            onClick={() => setActiveView('roadmap')}
+            onClick={() => setShowFlashcards(true)}
+            className="btn-toggle"
             style={{
-              margin: 0, width: '100%', border: 'none', borderRadius: '2px',
-              background: activeView === 'roadmap' ? 'var(--gold)' : 'transparent',
-              color: activeView === 'roadmap' ? 'black' : '#888',
-              fontWeight: 900, fontSize: '0.7rem', padding: '8px 4px', cursor: 'pointer',
-              letterSpacing: '0.05em'
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              background: 'rgba(255,255,255,0.03)',
+              border: '1px solid var(--border)',
+              borderRadius: '4px',
+              flex: 1
             }}
           >
-            ROADMAP
+            🃏 FLASHCARDS
           </button>
-          <button
-            onClick={() => setActiveView('archive')}
-            style={{
-              margin: 0, width: '100%', border: 'none', borderRadius: '2px',
-              background: activeView === 'archive' ? 'var(--gold)' : 'transparent',
-              color: activeView === 'archive' ? 'black' : '#888',
-              fontWeight: 900, fontSize: '0.7rem', padding: '8px 4px', cursor: 'pointer',
-              letterSpacing: '0.05em'
-            }}
-          >
-            ARCHIVE
-          </button>
+
+          <button onClick={() => setShowProveIt(true)} className="dashboard__icon-btn" style={{ width: '42px', height: '42px', borderRadius: '4px' }} title="Prove It Drill">🎯</button>
+          <button onClick={() => onTogglePanel('instructions')} className="dashboard__icon-btn" style={{ ...getActiveStyle('instructions'), width: '42px', height: '42px', borderRadius: '4px' }}>?</button>
         </div>
 
-        {/* Row 3: Review Controls */}
-        <div style={{ display: 'flex', gap: '4px', marginBottom: '16px', width: '100%', boxSizing: 'border-box' }}>
-          <button
-            onClick={handleDailyReview}
-            className="btn-review"
-            style={{ flex: '0 0 auto', width: 'auto', maxWidth: '50%', marginBottom: 0, padding: '8px 10px', fontSize: '0.7rem', fontWeight: 900, whiteSpace: 'nowrap' }}
-          >
-            {activeView === 'vocab' ? '⚡ VOCAB PRACTICE' :
-             activeView === 'archive' ? (
-               reviewVibe === 'chill' ? '🔄 REFRESH' :
-               reviewVibe === 'deep' ? '🎭 SITUATIONAL' :
-               reviewVibe === 'intense' ? '🎤 LYRIC' :
-               '⚡ ARCHIVE'
-             ) : '🚀 ROADMAP'}
-          </button>
-          <div style={{ display: 'flex', flex: 1, background: 'var(--surface)', borderRadius: '4px', padding: '2px', border: '1px solid var(--border)', gap: '2px', minWidth: 0 }}>
+        {/* Unified Control Bar */}
+        <div className="dashboard__control-bar">
+          {/* Tab Switcher */}
+          <div className="dashboard__tabs" style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr 1fr',
+            gap: '4px',
+            width: '100%',
+            boxSizing: 'border-box'
+          }}>
             <button
-              onClick={() => setReviewVibe(reviewVibe === 'chill' ? null : 'chill')}
-              style={{ flex: 1, border: 'none', background: reviewVibe === 'chill' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'chill' ? 'black' : '#666', borderRadius: '2px', padding: '4px 2px', fontSize: '0.65rem', fontWeight: 900, cursor: 'pointer', minWidth: 0 }}
+              onClick={() => setActiveView('vocab')}
+              style={{
+                margin: 0, width: '100%', border: 'none', borderRadius: '2px',
+                background: activeView === 'vocab' ? 'var(--gold)' : 'transparent',
+                color: activeView === 'vocab' ? 'black' : '#888',
+                fontWeight: 900, fontSize: '0.7rem', padding: '8px 4px', cursor: 'pointer',
+                letterSpacing: '0.05em'
+              }}
             >
-              {activeView === 'vocab' ? 'CHILL' : activeView === 'archive' ? 'SAVES' : 'NEW'}
+              VOCAB
             </button>
             <button
-              onClick={() => setReviewVibe(reviewVibe === 'deep' ? null : 'deep')}
-              style={{ flex: 1, border: 'none', background: reviewVibe === 'deep' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'deep' ? 'black' : '#666', borderRadius: '2px', padding: '4px 2px', fontSize: '0.65rem', fontWeight: 900, cursor: 'pointer', minWidth: 0 }}
+              onClick={() => setActiveView('roadmap')}
+              style={{
+                margin: 0, width: '100%', border: 'none', borderRadius: '2px',
+                background: activeView === 'roadmap' ? 'var(--gold)' : 'transparent',
+                color: activeView === 'roadmap' ? 'black' : '#888',
+                fontWeight: 900, fontSize: '0.7rem', padding: '8px 4px', cursor: 'pointer',
+                letterSpacing: '0.05em'
+              }}
             >
-              {activeView === 'vocab' ? 'DEEP' : activeView === 'archive' ? 'EVERYDAY' : 'REVIEW'}
+              ROADMAP
             </button>
             <button
-              onClick={() => setReviewVibe(reviewVibe === 'intense' ? null : 'intense')}
-              style={{ flex: 1, border: 'none', background: reviewVibe === 'intense' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'intense' ? 'black' : '#666', borderRadius: '2px', padding: '4px 2px', fontSize: '0.65rem', fontWeight: 900, cursor: 'pointer', minWidth: 0 }}
+              onClick={() => setActiveView('archive')}
+              style={{
+                margin: 0, width: '100%', border: 'none', borderRadius: '2px',
+                background: activeView === 'archive' ? 'var(--gold)' : 'transparent',
+                color: activeView === 'archive' ? 'black' : '#888',
+                fontWeight: 900, fontSize: '0.7rem', padding: '8px 4px', cursor: 'pointer',
+                letterSpacing: '0.05em'
+              }}
             >
-              {activeView === 'vocab' ? 'INTENSE' : activeView === 'archive' ? 'DISCO' : 'QUIZ'}
+              ARCHIVE
             </button>
+          </div>
+
+          {/* Review Controls Group */}
+          <div className="dashboard__review-group" style={{ display: 'flex', gap: '4px', width: '100%' }}>
+            <button
+              onClick={handleDailyReview}
+              className="btn-review"
+              style={{ flex: '1', minWidth: 0, marginBottom: 0, padding: '8px 10px', fontSize: '0.7rem', fontWeight: 900, whiteSpace: 'nowrap' }}
+            >
+              {activeView === 'vocab' ? '⚡ PRACTICE' :
+               activeView === 'archive' ? '⚡ ARCHIVE' : '🚀 ROADMAP'}
+            </button>
+            <div style={{ display: 'flex', flex: 1.5, background: 'rgba(255,255,255,0.03)', borderRadius: '2px', padding: '2px', border: '1px solid rgba(255,255,255,0.05)', gap: '2px', minWidth: 0 }}>
+              <button
+                onClick={() => setReviewVibe(reviewVibe === 'chill' ? null : 'chill')}
+                style={{ flex: 1, border: 'none', background: reviewVibe === 'chill' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'chill' ? 'black' : '#666', borderRadius: '2px', padding: '4px 2px', fontSize: '0.65rem', fontWeight: 900, cursor: 'pointer', minWidth: 0 }}
+              >
+                {activeView === 'vocab' ? 'CHILL' : activeView === 'archive' ? 'SAVES' : 'NEW'}
+              </button>
+              <button
+                onClick={() => setReviewVibe(reviewVibe === 'deep' ? null : 'deep')}
+                style={{ flex: 1, border: 'none', background: reviewVibe === 'deep' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'deep' ? 'black' : '#666', borderRadius: '2px', padding: '4px 2px', fontSize: '0.65rem', fontWeight: 900, cursor: 'pointer', minWidth: 0 }}
+              >
+                {activeView === 'vocab' ? 'DEEP' : activeView === 'archive' ? 'EVERYDAY' : 'REVIEW'}
+              </button>
+              <button
+                onClick={() => setReviewVibe(reviewVibe === 'intense' ? null : 'intense')}
+                style={{ flex: 1, border: 'none', background: reviewVibe === 'intense' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'intense' ? 'black' : '#666', borderRadius: '2px', padding: '4px 2px', fontSize: '0.65rem', fontWeight: 900, cursor: 'pointer', minWidth: 0 }}
+              >
+                {activeView === 'vocab' ? 'INTENSE' : activeView === 'archive' ? 'DISCO' : 'QUIZ'}
+              </button>
+            </div>
           </div>
         </div>
 

@@ -26,9 +26,15 @@
   --amber: #f59e0b;
   --green: #10b981;
   --pink: #ec4899;
-  --header-height: 64px;
+  --header-height: 52px;
   --glass: blur(25px);
   --panel-width: 400px;
+}
+
+@media (max-width: 767px) {
+  :root {
+    --header-height: 48px;
+  }
 }
 
 html, body {
@@ -546,11 +552,11 @@ button:active { transform: scale(0.96); }
 /* Mobile Optimizations */
 @media (max-width: 768px) {
   .dashboard {
-    padding: 12px 12px 80px;
+    padding: 0 12px 80px;
   }
   
   .dashboard__header {
-    margin-bottom: 12px;
+    margin-bottom: 0;
   }
   
   .dashboard__title {
