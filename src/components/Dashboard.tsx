@@ -61,6 +61,9 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
       if (knowledgeCheckFrequency === 'never') return;
       if (knowledgeCheckFrequency === 'daily' && lastKnowledgeCheckDate === new Date().toDateString()) return;
       if (knowledgeCheckFrequency === 'session' && hasShownCheck) return;
+      
+      // Guard: Don't interrupt active activities or sessions
+      if (activeActivity || chatCount > 0) return;
 
       checkAssessments((word) => {
         setAssessmentWord(word);
@@ -69,7 +72,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
       });
     }, 60000); // Check every minute
     return () => clearInterval(interval);
-  }, [knowledgeCheckFrequency, lastKnowledgeCheckDate, hasShownCheck, checkAssessments, setLastKnowledgeCheckDate, calculateDecay]);
+  }, [knowledgeCheckFrequency, lastKnowledgeCheckDate, hasShownCheck, checkAssessments, setLastKnowledgeCheckDate, calculateDecay, activeActivity, chatCount]);
 
   useEffect(() => {
     setTranslation(null);
@@ -156,10 +159,10 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
       const activeNode = curriculums.flatMap(l => l.nodes).find(n => n.id === useMasteryStore.getState().currentPositionNodeId);
       const nodeTitle = activeNode?.title || 'Current Module';
 
-      if (reviewVibe === 'chill') { // NEW CONCEPT
-        onAskLina(`[SYSTEM: Roadmap Lesson - NEW CONCEPT. Focus strictly on current module items for "${nodeTitle}".]`);
-      } else if (reviewVibe === 'deep') { // REVIEW
-        onAskLina(`[SYSTEM: Roadmap Lesson - REVIEW. Mix items from "${nodeTitle}" with previously introduced words.]`);
+      if (reviewVibe === 'chill') { // REVIEW
+        onAskLina(`[SYSTEM: Roadmap Lesson - REVIEW. Mix items from "${nodeTitle}" with previously introduced words. Keep it easy and relaxed.]`);
+      } else if (reviewVibe === 'deep') { // NEW CONCEPT
+        onAskLina(`[SYSTEM: Roadmap Lesson - NEW CONCEPT. Focus strictly on current module items for "${nodeTitle}". Follow 3-phase structure.]`);
       } else if (reviewVibe === 'intense') { // QUIZ
         onAskLina(`[SYSTEM: Roadmap Lesson - QUIZ / LEVEL UP. Conduct a proficiency test on the current module "${nodeTitle}".]`);
       } else {

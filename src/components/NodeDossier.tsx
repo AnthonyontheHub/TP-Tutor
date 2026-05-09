@@ -29,7 +29,8 @@ export default function NodeDossier({ node, onBack, onAskLina, isSandboxMode }: 
        return node.status === 'mastered' ? 100 : 0;
     }
     const scores = nodeItems.map(word => word.baseScore);
-    return Math.round(scores.reduce((a, b) => a + b, 0) / scores.length / 10);
+    // baseScore max is 900 (mastered), so divide by (length * 9) for percentage
+    return Math.min(100, Math.round(scores.reduce((a, b) => a + b, 0) / (scores.length * 9)));
   };
 
   const mastery = calculateMastery();

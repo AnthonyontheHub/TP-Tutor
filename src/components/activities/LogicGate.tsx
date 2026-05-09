@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, ArrowRight, RotateCcw, CheckCircle2, XCircle, LogOut } from 'lucide-react';
+import { generateLogicStatements } from '../../services/geminiService';
 
 interface Statement {
   statement: string;
@@ -14,37 +15,34 @@ interface LogicGateProps {
   onComplete?: (results: { score: number; total: number }) => void;
 }
 
-const philosophyStatements = [
-  { statement: "Choosing a few high-quality tools is 'pona' compared to many cheap ones.", isPona: true, explanation: "Simplicity is about focus and depth, not clutter." },
-  { statement: "A complex solution is always better if it is more precise.", isPona: false, explanation: "In Toki Pona, clarity comes from simplicity, not complexity." },
-  { statement: "The best way to live is to have only what you truly use and love.", isPona: true, explanation: "This is the essence of nasin pona." },
-  { statement: "More words make a thought more accurate.", isPona: false, explanation: "Fewer words force you to find the core truth." },
-  { statement: "Simplicity is a path, not a destination.", isPona: true, explanation: "It is a way of walking through the world." },
-  { statement: "Ambiguity is an error that should always be removed.", isPona: false, explanation: "Toki Pona embraces intentional ambiguity as a tool for connection." },
-  { statement: "A small vocabulary frees the mind from over-analysis.", isPona: true, explanation: "When you have fewer words, you focus on the direct experience." }
-];
-
-export const LogicGate: React.FC<LogicGateProps> = ({ userProfile, onComplete }) => {
-  const [currentStatement, setCurrentStatement] = useState<Statement | null>(null);
+export const LogicGate: React.FC<LogicGateProps> = ({ userProfile, curriculumContext, onComplete }) => {
+  const [statements, setStatements] = useState<Statement[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [totalAttempted, setTotalAttempted] = useState(0);
   const [loading, setLoading] = useState(true);
   const [score, setScore] = useState(0);
   const [showFeedback, setShowFeedback] = useState(false);
   const [lastAnswerCorrect, setLastAnswerCorrect] = useState(false);
 
-  const getNextStatement = () => {
+  const loadStatements = async () => {
     setLoading(true);
-    setTimeout(() => {
-      const random = philosophyStatements[Math.floor(Math.random() * philosophyStatements.length)];
-      setCurrentStatement(random);
+    try {
+      const newStatements = await generateLogicStatements(userProfile, curriculumContext);
+      setStatements(newStatements);
+      setCurrentIndex(0);
       setLoading(false);
       setShowFeedback(false);
-    }, 600);
+    } catch (e) {
+      console.error("LogicGate Loading Error:", e);
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    getNextStatement();
+    loadStatements();
   }, [userProfile]);
+
+  const currentStatement = statements[currentIndex];
 
   const handleAnswer = (answer: boolean) => {
     if (!currentStatement) return;
@@ -53,6 +51,15 @@ export const LogicGate: React.FC<LogicGateProps> = ({ userProfile, onComplete })
     setTotalAttempted(prev => prev + 1);
     if (isCorrect) setScore((prev) => prev + 1);
     setShowFeedback(true);
+  };
+
+  const nextInsight = () => {
+    if (currentIndex < statements.length - 1) {
+      setCurrentIndex(prev => prev + 1);
+      setShowFeedback(false);
+    } else {
+      loadStatements();
+    }
   };
 
   if (loading && !currentStatement) return (
@@ -108,7 +115,7 @@ export const LogicGate: React.FC<LogicGateProps> = ({ userProfile, onComplete })
                 <p className="text-sm tracking-wide leading-relaxed text-white/80">{currentStatement?.explanation}</p>
               </div>
               <button 
-                onClick={getNextStatement}
+                onClick={nextInsight}
                 className="w-full py-5 bg-[#FFD700] text-black font-black uppercase tracking-[0.3em] rounded-2xl hover:scale-[1.02] transition-all"
               >
                 Next Insight

@@ -161,7 +161,6 @@ export default function MasteryGrid({
               ? result.replace(/```[a-z]*\n?/g, '').replace(/```/g, '').replace(/["']/g, '').trim()
               : null;
               
-            console.log('jan Lina Suggestion Result:', cleanResult);
             setSuggestion(cleanResult);
             setIsTranslating(false);
           }

@@ -114,3 +114,48 @@ export async function generateSortItems(userProfile: string | object, curriculum
     ];
   }
 }
+
+export async function generateLogicStatements(userProfile: any, curriculumContext?: string) {
+  const apiKey = resolveApiKey();
+  if (!apiKey) {
+    return [
+      { statement: "Choosing a few high-quality tools is 'pona' compared to many cheap ones.", isPona: true, explanation: "Simplicity is about focus and depth, not clutter." },
+      { statement: "A complex solution is always better if it is more precise.", isPona: false, explanation: "In Toki Pona, clarity comes from simplicity, not complexity." },
+      { statement: "The best way to live is to have only what you truly use and love.", isPona: true, explanation: "This is the essence of nasin pona." },
+      { statement: "More words make a thought more accurate.", isPona: false, explanation: "Fewer words force you to find the core truth." },
+      { statement: "Simplicity is a path, not a destination.", isPona: true, explanation: "It is a way of walking through the world." },
+      { statement: "Ambiguity is an error that should always be removed.", isPona: false, explanation: "Toki Pona embraces intentional ambiguity as a tool for connection." },
+      { statement: "A small vocabulary frees the mind from over-analysis.", isPona: true, explanation: "When you have fewer words, you focus on the direct experience." }
+    ];
+  }
+
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({
+    model: GEMINI_MODEL,
+    generationConfig: { responseMimeType: "application/json" },
+  });
+
+  const prompt = `Generate 5 "Philosophy Statements" about simplicity and Toki Pona values.
+  Each statement should be something a student can evaluate as 'pona' (true/aligned with simplicity) or 'ike' (false/aligned with complexity).
+  Make them relevant to this user profile context: ${JSON.stringify(userProfile)}.
+  Curriculum Context: ${curriculumContext || 'General philosophy and basic vocab'}
+  Return JSON array of objects: [{"statement": "...", "isPona": boolean, "explanation": "Brief explanation why"}]`;
+
+  try {
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+    return JSON.parse(text.replace(/```json|```/g, '').trim());
+  } catch (e) {
+    console.error("Gemini Logic Statements Error:", e);
+    return [
+      { statement: "Choosing a few high-quality tools is 'pona' compared to many cheap ones.", isPona: true, explanation: "Simplicity is about focus and depth, not clutter." },
+      { statement: "A complex solution is always better if it is more precise.", isPona: false, explanation: "In Toki Pona, clarity comes from simplicity, not complexity." },
+      { statement: "The best way to live is to have only what you truly use and love.", isPona: true, explanation: "This is the essence of nasin pona." },
+      { statement: "More words make a thought more accurate.", isPona: false, explanation: "Fewer words force you to find the core truth." },
+      { statement: "Simplicity is a path, not a destination.", isPona: true, explanation: "It is a way of walking through the world." },
+      { statement: "Ambiguity is an error that should always be removed.", isPona: false, explanation: "Toki Pona embraces intentional ambiguity as a tool for connection." },
+      { statement: "A small vocabulary frees the mind from over-analysis.", isPona: true, explanation: "When you have fewer words, you focus on the direct experience." }
+    ];
+  }
+}
+
