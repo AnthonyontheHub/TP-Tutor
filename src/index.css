@@ -59,7 +59,6 @@ select {
 .app-container {
   display: flex;
   height: 100dvh;
-  background: var(--bg);
   overflow-x: hidden;
 }
 
@@ -591,4 +590,17 @@ button:active { transform: scale(0.96); }
     padding: 12px 10px;
     font-size: 0.75rem;
   }
+}
+/* ─── Sitelen Pona Font ────────────────────────────────────────────────── */
+@font-face {
+  font-family: 'Toki Pona Font';
+  src: url('/toki-pona.woff2') format('woff2'); /* Assuming font is in public/ */
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+.sitelen-pona {
+  font-family: 'Toki Pona Font', 'Inter', system-ui, -apple-system, sans-serif;
+  font-feature-settings: 'liga' 1; /* Enable ligatures */
 }

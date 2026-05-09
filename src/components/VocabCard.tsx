@@ -47,6 +47,17 @@ export default function VocabCard({ word, onLongPress, onClick, isSandboxMode, i
   const hasMovedSignificant = useRef(false);
   const isLongPressActive = useRef(false);
 
+  // Helper function to abbreviate part of speech
+  const getPartOfSpeechAbbreviation = (partOfSpeech: string): string => {
+    if (!partOfSpeech) return '';
+    return partOfSpeech
+      .split(',')
+      .map(part => part.trim())
+      .filter(part => part.length > 0)
+      .map(part => part[0].toUpperCase())
+      .join(', ');
+  };
+
   const handleStatusClick = (e: React.MouseEvent | React.PointerEvent) => {
     e.stopPropagation();
     if (!isSandboxMode) return;
@@ -142,6 +153,25 @@ export default function VocabCard({ word, onLongPress, onClick, isSandboxMode, i
       onPointerCancel={handlePointerCancel}
       onClick={handleCardClick}
     >
+      {/* Background Glowing Glyph */}
+      <div
+        className="sitelen-pona"
+        style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%) scale(1.5)', // Adjust scale for desired size
+          zIndex: 0, // Behind the main text
+          opacity: 0.15,
+          lineHeight: 1,
+          pointerEvents: 'none', // Allow interaction with elements underneath
+          textShadow: `0 0 8px ${GLOW_COLOR[status]}, 0 0 12px ${GLOW_COLOR[status]}`, // Glow effect
+          color: GLOW_COLOR[status], // Base color for the glyph
+        }}
+      >
+        {word.word}
+      </div>
+
       <div 
         className="vocab-card__status"
         onClick={handleStatusClick}
@@ -154,12 +184,13 @@ export default function VocabCard({ word, onLongPress, onClick, isSandboxMode, i
         className="vocab-card__word" 
         style={{ 
           transition: 'all 0.3s ease', 
+          zIndex: 2 // Ensure main text is above the glyph
         }}
       >
         {word.type === 'grammar' ? word.sessionNotes : word.word}
       </div>
-      <div className="vocab-card__pos" style={{ opacity: isDimmed ? 0.7 : 1, transition: 'all 0.3s ease' }}>
-        {word.type === 'grammar' ? 'GRAMMAR' : word.partOfSpeech}
+      <div className="vocab-card__pos" style={{ opacity: isDimmed ? 0.7 : 1, transition: 'all 0.3s ease', zIndex: 2 }}>
+        {word.type === 'grammar' ? 'GRAMMAR' : getPartOfSpeechAbbreviation(word.partOfSpeech)}
       </div>
       {word.pinnedExample && (
         <div style={{
@@ -169,7 +200,8 @@ export default function VocabCard({ word, onLongPress, onClick, isSandboxMode, i
           marginTop: '4px',
           opacity: isDimmed ? 0.3 : 0.8,
           lineHeight: 1.2,
-          transition: 'all 0.3s ease'
+          transition: 'all 0.3s ease',
+          zIndex: 2 // Ensure example is above the glyph
         }}>
           "{word.pinnedExample}"
         </div>
