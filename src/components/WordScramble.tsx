@@ -27,7 +27,11 @@ export default function WordScramble({ nodeId, vocabList, onComplete }: { nodeId
       }
     }
 
-    if (!nodeId) return defaultWords;
+    if (!nodeId) {
+      const pool = vocabulary.filter(v => v.type === 'word' && v.meanings && v.meanings.trim() !== '');
+      const shuffled = [...pool].sort(() => Math.random() - 0.5).slice(0, 10);
+      return shuffled.map(v => ({ tokiPona: v.word, english: v.meanings.split(/[;,]/)[0].trim() }));
+    }
     const node = curriculums.flatMap(l => l.nodes).find(n => n.id === nodeId);
     if (!node) return defaultWords;
     
@@ -112,7 +116,11 @@ export default function WordScramble({ nodeId, vocabList, onComplete }: { nodeId
           <h1 className="text-4xl font-bold mb-4 tracking-tight">O kama sona!</h1>
           <p className="text-gray-400 mb-2 max-w-xs">You've mastered these words.</p>
           <div className="mb-8 p-3 bg-[#D4AF371a] border border-[#D4AF3733] rounded-lg">
-            <p className="text-[#D4AF37] text-xs font-mono uppercase tracking-widest font-bold">Node Activity Requirement Met! +30% Readiness</p>
+            {nodeId ? (
+              <p className="text-[#D4AF37] text-xs font-mono uppercase tracking-widest font-bold">Node Activity Requirement Met! +30% Readiness</p>
+            ) : (
+              <p className="text-[#D4AF37] text-xs font-mono uppercase tracking-widest font-bold">pona! Keep practicing!</p>
+            )}
           </div>
           <button onClick={resetGame} className="px-8 py-3 bg-[#D4AF37] text-black font-bold rounded-full transition-all hover:scale-105">Play Again</button>
         </motion.div>
