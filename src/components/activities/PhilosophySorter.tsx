@@ -18,6 +18,7 @@ interface PhilosophySorterProps {
 export const PhilosophySorter: React.FC<PhilosophySorterProps> = ({ userProfile, curriculumContext, vocabList, onSessionEnd }) => {
   const [items, setItems] = useState<SortItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [exitDir, setExitDir] = useState<'pona' | 'ike'>('pona');
   const [score, setScore] = useState(0);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -45,6 +46,7 @@ export const PhilosophySorter: React.FC<PhilosophySorterProps> = ({ userProfile,
 
   const handleSort = (category: 'pona' | 'ike') => {
     if (!items[currentIndex]) return;
+    setExitDir(category);
     if (items[currentIndex].category === category) {
       setScore(s => s + 1);
     }
@@ -71,7 +73,7 @@ export const PhilosophySorter: React.FC<PhilosophySorterProps> = ({ userProfile,
       </div>
 
       <div className="relative w-full h-64 flex items-center justify-center mb-12">
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="wait" custom={exitDir}>
           {items[currentIndex] && (
             <motion.div
               key={items[currentIndex].label}

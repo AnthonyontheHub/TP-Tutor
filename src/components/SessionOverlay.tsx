@@ -22,12 +22,12 @@ export const SessionOverlay: React.FC = () => {
     setShowConfirm(false);
   };
 
-  const handleComplete = (stats?: { score: number, total: number }) => {
-    if (activeActivity.nodeId && activeActivity.type) {
+  const handleComplete = React.useCallback((stats?: { score: number, total: number }) => {
+    if (activeActivity?.nodeId && activeActivity?.type) {
       recordActivityCompletion(activeActivity.nodeId, activeActivity.type, stats);
     }
     setActiveActivity(null);
-  };
+  }, [activeActivity, recordActivityCompletion, setActiveActivity]);
 
   const renderActivity = () => {
     const { type, nodeId } = activeActivity;

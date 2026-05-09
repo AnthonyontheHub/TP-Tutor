@@ -616,13 +616,11 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
       )}
 
       {showFlashcards && (
-        <div className="modal-backdrop" style={{ zIndex: 5000 }}>
-          <FlashcardMode
-            onClose={() => setShowFlashcards(false)}
-            onAskLina={onAskLina}
-            isSandboxMode={isSandboxMode}
-          />
-        </div>
+        <FlashcardMode
+          onClose={() => setShowFlashcards(false)}
+          onAskLina={onAskLina}
+          isSandboxMode={isSandboxMode}
+        />
       )}
     </div>
   );

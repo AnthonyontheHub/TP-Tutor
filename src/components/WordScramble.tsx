@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCcw, CheckCircle2, ChevronRight, Trophy } from 'lucide-react';
 import { useMasteryStore } from '../store/masteryStore';
@@ -51,6 +51,7 @@ export default function WordScramble({ nodeId, vocabList, onComplete }: { nodeId
   useEffect(() => {
     setCurrentIndex(0);
     setShowFinished(false);
+    completedRef.current = false;
   }, [words]);
 
   const [scrambled, setScrambled] = useState<ScrambledLetter[]>([]);
@@ -58,11 +59,13 @@ export default function WordScramble({ nodeId, vocabList, onComplete }: { nodeId
   const [isCorrect, setIsCorrect] = useState(false);
   const [showFinished, setShowFinished] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
+  const completedRef = useRef(false);
 
   const currentWord = words[currentIndex];
 
   useEffect(() => {
-    if (showFinished && nodeId && onComplete) {
+    if (showFinished && nodeId && onComplete && !completedRef.current) {
+      completedRef.current = true;
       onComplete({ score: words.length, total: words.length });
     }
   }, [showFinished, nodeId, onComplete, words.length]);
