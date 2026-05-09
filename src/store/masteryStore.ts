@@ -21,12 +21,15 @@ const KU_SULI_WORDS = new Set(['kokosila', 'lanpan', 'misikeke', 'epiku', 'jasim
 
 function normalizePartOfSpeech(pos: string): string {
   if (!pos) return pos;
-  if (pos === 'Adjective') return 'Modifier';
-  if (pos === 'Adverb') return 'Modifier';
-  if (pos === 'Number') return 'Modifier';
-  if (pos === 'Interrogative') return 'Particle';
-  if (pos === 'Ordinal-marker') return 'Particle';
-  return pos;
+  return pos.split(',').map(part => {
+    const p = part.trim();
+    if (p === 'Adjective') return 'Modifier';
+    if (p === 'Adverb') return 'Modifier';
+    if (p === 'Number') return 'Modifier';
+    if (p === 'Interrogative') return 'Particle';
+    if (p === 'Ordinal-marker') return 'Particle';
+    return p;
+  }).join(', ');
 }
 
 function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: MasteryStatus; type: 'word' | 'grammar'; sessionNotes: string; frequencyRank?: number; weight?: 'pillar' | 'working' | 'bonus' }): VocabWord {
@@ -1938,10 +1941,16 @@ export const useMasteryStore = create<MasteryStore>()(
 // ─────────────────────────────────────────────────────────────────────────────
     { 
       name: 'tp-tutor-mastery',
-      version: 2,
+      version: 3,
       migrate: (persistedState: any, version: number) => {
-        if (version < 2) {
+        if (version < 3) {
           if (persistedState && Array.isArray(persistedState.vocabulary)) {
+            // Apply normalization to all words
+            persistedState.vocabulary = persistedState.vocabulary.map((v: any) => ({
+              ...v,
+              partOfSpeech: normalizePartOfSpeech(v.partOfSpeech || '')
+            }));
+
             const persistedVocab = persistedState.vocabulary;
             const persistedMap = new Map(persistedVocab.map((v: any) => [v.word.toLowerCase(), v]));
 
@@ -1951,8 +1960,9 @@ export const useMasteryStore = create<MasteryStore>()(
               if (persistedWord) {
                 // Determine if we should patch partOfSpeech
                 let partOfSpeech = persistedWord.partOfSpeech;
+                // If the static word has multiple roles, and the persisted one doesn't match the normalized ground truth, 
+                // we might want to ensure it matches the static one if it's currently an outdated single role.
                 const oldPOS = ['Adjective', 'Adverb', 'Interrogative', 'Ordinal-marker', 'Number'];
-                const isSingleRole = !partOfSpeech.includes(',');
                 const isOutdated = oldPOS.includes(partOfSpeech);
 
                 if (isOutdated || !partOfSpeech) {
