@@ -177,11 +177,11 @@ export default function VocabCard({ word, onLongPress, onClick, isSandboxMode, i
         <span
           style={{
             position: 'absolute',
-            top: '5px',
-            left: '5px',
+            top: '25px', // Positioned below the status icon (which is at top: 8px)
+            right: '5px', // Positioned to the right
             fontSize: '0.6rem',
-            fontWeight: 'bold',
-            color: 'rgba(128, 0, 128, 0.6)', // Faint purple color
+            fontWeight: 'normal', // Changed from bold to normal for subtlety
+            color: 'rgba(128, 0, 128, 0.6)', // Faint purple color as requested
             backgroundColor: 'rgba(0,0,0,0.5)',
             padding: '2px 4px',
             borderRadius: '2px',
