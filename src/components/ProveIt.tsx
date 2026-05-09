@@ -15,12 +15,15 @@ export default function ProveIt({ onClose }: { onClose: () => void }) {
   }, []);
 
   const pickWord = () => {
-    const candidates = vocabulary.filter(w => w.status === 'introduced' || w.status === 'practicing');
+    const candidates = [...vocabulary]
+      .filter(v => v.type === 'word')
+      .sort((a, b) => a.baseScore - b.baseScore);
+
     if (candidates.length > 0) {
-      const idx = Math.floor(Math.random() * candidates.length);
+      // Pick from the 10 lowest mastery words for variety + bias
+      const limit = Math.min(candidates.length, 10);
+      const idx = Math.floor(Math.random() * limit);
       setCurrentWord(candidates[idx].word);
-    } else {
-      setCurrentWord(null);
     }
     setInput('');
     setShowSaved(false);
@@ -41,15 +44,6 @@ export default function ProveIt({ onClose }: { onClose: () => void }) {
       pickWord();
     }, 1500);
   };
-
-  if (!currentWord) {
-    return (
-      <div style={{ padding: '20px', background: 'var(--surface-opaque)', borderRadius: '8px', color: 'white', textAlign: 'center' }}>
-        <p>No words currently in "Introduced" or "Practicing" state. Learn some new words first!</p>
-        <button onClick={onClose} style={{ marginTop: '12px', background: 'var(--gold)', color: 'black', padding: '8px 16px', border: 'none', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer' }}>Close</button>
-      </div>
-    );
-  }
 
   return (
     <div style={{ padding: '24px', background: 'var(--surface-opaque)', borderRadius: '8px', color: 'white', maxWidth: '400px', margin: '0 auto', border: '1px solid var(--border)', position: 'relative' }}>
