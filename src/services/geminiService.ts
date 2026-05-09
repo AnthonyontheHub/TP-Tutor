@@ -1,16 +1,17 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { resolveApiKey } from './linaService';
 
 const GEMINI_MODEL = "gemini-2.5-flash";
 
-function resolveGamesApiKey(): string {
-  return localStorage.getItem('TP_GEMINI_KEY') 
-    || (import.meta.env.VITE_GEMINI_API_KEY as string | undefined) 
-    || '';
-}
-
 export async function generateChallenge(mode: 'selection' | 'input', userProfile?: any, curriculumContext?: string) {
-  const apiKey = resolveGamesApiKey();
-  if (!apiKey) throw new Error("API Key missing");
+  const apiKey = resolveApiKey();
+  if (!apiKey) {
+    return {
+      complexThought: "The light from the window is beautiful and makes me feel peaceful.",
+      options: ["suno li pona", "suno li suli", "suno li ike"],
+      correctEssence: "suno li pona"
+    };
+  }
 
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({
@@ -44,8 +45,8 @@ export async function generateChallenge(mode: 'selection' | 'input', userProfile
 }
 
 export async function evaluateInput(complexThought: string, correctEssence: string, userInput: string) {
-  const apiKey = resolveGamesApiKey();
-  if (!apiKey) return { score: 0, feedback: "API Key missing" };
+  const apiKey = resolveApiKey();
+  if (!apiKey) return { score: 50, feedback: "I couldn't quite analyze that, but keep trying!" };
 
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({
@@ -76,8 +77,16 @@ Return JSON: {"score": number (0-100), "feedback": "Brief encouragement/correcti
 }
 
 export async function generateSortItems(userProfile: string | object, curriculumContext?: string) {
-  const apiKey = resolveGamesApiKey();
-  if (!apiKey) throw new Error("API Key missing");
+  const apiKey = resolveApiKey();
+  if (!apiKey) {
+    return [
+      { label: "A complicated tax form", category: "ike" },
+      { label: "A hand-drawn map", category: "pona" },
+      { label: "Fresh water from a stream", category: "pona" },
+      { label: "A 500-page contract", category: "ike" },
+      { label: "A shared meal with a friend", category: "pona" }
+    ];
+  }
 
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({
