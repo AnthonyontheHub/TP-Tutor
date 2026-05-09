@@ -1,5 +1,5 @@
 /* src/components/VocabCard.tsx */
-import { useRef } from 'react';
+import { useRef, useCallback } from 'react';
 import type { VocabWord, MasteryStatus } from '../types/mastery';
 import { useMasteryStore } from '../store/masteryStore';
 import { soundService } from '../services/soundService';
