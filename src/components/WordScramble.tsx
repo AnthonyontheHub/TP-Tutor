@@ -57,6 +57,7 @@ export default function WordScramble({ nodeId, vocabList, onComplete }: { nodeId
   const [selected, setSelected] = useState<ScrambledLetter[]>([]);
   const [isCorrect, setIsCorrect] = useState(false);
   const [showFinished, setShowFinished] = useState(false);
+  const [isRevealed, setIsRevealed] = useState(false);
 
   const currentWord = words[currentIndex];
 
@@ -77,6 +78,7 @@ export default function WordScramble({ nodeId, vocabList, onComplete }: { nodeId
     setScrambled(shuffled);
     setSelected([]);
     setIsCorrect(false);
+    setIsRevealed(false);
   }, [currentIndex]);
 
   const handleTileClick = (letter: ScrambledLetter) => {
@@ -157,6 +159,28 @@ export default function WordScramble({ nodeId, vocabList, onComplete }: { nodeId
             ))}
           </AnimatePresence>
         </div>
+
+        {isRevealed && !isCorrect && (
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            className="flex flex-col items-center gap-4"
+          >
+            <div style={{ color: '#888', fontSize: '0.75rem', fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.2em' }}>
+              The word was:
+            </div>
+            <div style={{ color: '#D4AF37', fontSize: '2rem', fontWeight: 900, letterSpacing: '0.1em' }}>
+              {currentWord.tokiPona}
+            </div>
+            <button
+              onClick={nextWord}
+              className="group flex items-center gap-2 px-6 py-2 bg-white text-black font-bold rounded-full hover:bg-[#D4AF37] transition-colors"
+            >
+              Next Word <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </button>
+          </motion.div>
+        )}
+
         <div className="h-24 w-full flex items-center justify-center">
           <AnimatePresence>
             {isCorrect && (
@@ -168,8 +192,21 @@ export default function WordScramble({ nodeId, vocabList, onComplete }: { nodeId
           </AnimatePresence>
         </div>
       </main>
-      <footer className="w-full max-w-md py-8 flex justify-center">
-        <button onClick={() => { setScrambled([...scrambled, ...selected].sort(() => Math.random() - 0.5)); setSelected([]); setIsCorrect(false); }} disabled={isCorrect} className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-gray-500 hover:text-white disabled:opacity-0 transition-all"><RefreshCcw className="w-3 h-3" />Reset word</button>
+      <footer className="w-full max-w-md py-8 flex justify-center gap-8">
+        <button
+          onClick={() => { setScrambled([...scrambled, ...selected].sort(() => Math.random() - 0.5)); setSelected([]); setIsCorrect(false); }}
+          disabled={isCorrect || isRevealed}
+          className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-gray-500 hover:text-white disabled:opacity-0 transition-all"
+        >
+          <RefreshCcw className="w-3 h-3" />Reset word
+        </button>
+        <button
+          onClick={() => setIsRevealed(true)}
+          disabled={isCorrect || isRevealed}
+          className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-gray-500 hover:text-yellow-400 disabled:opacity-0 transition-all"
+        >
+          REVEAL
+        </button>
       </footer>
     </div>
   );
