@@ -1,0 +1,105 @@
+
+/home/anthonyguera/TP-Tutor/src/components/ChatSession.tsx
+   37:9   warning  The 'messages' logical expression could make the dependencies of useEffect Hook (at line 132) change on every render. To fix this, wrap the initialization of 'messages' in its own useMemo() Hook            react-hooks/exhaustive-deps
+   39:9   warning  The 'sessionDeltas' logical expression could make the dependencies of useEffect Hook (at line 128) change on every render. To fix this, wrap the initialization of 'sessionDeltas' in its own useMemo() Hook  react-hooks/exhaustive-deps
+   49:10  error    'userMsgCount' is assigned a value but never used. Allowed unused elements of array destructuring must match /^_/u                                                                                            @typescript-eslint/no-unused-vars
+   49:24  error    'setUserMsgCount' is assigned a value but never used. Allowed unused elements of array destructuring must match /^_/u                                                                                         @typescript-eslint/no-unused-vars
+   66:9   error    'lore' is assigned a value but never used. Allowed unused vars must match /^_/u                                                                                                                               @typescript-eslint/no-unused-vars
+  249:96  warning  Unexpected any. Specify a different type                                                                                                                                                                      @typescript-eslint/no-explicit-any
+  433:96  warning  Unexpected any. Specify a different type                                                                                                                                                                      @typescript-eslint/no-explicit-any
+  434:13  error    'latestChatContext' is assigned a value but never used. Allowed unused vars must match /^_/u                                                                                                                  @typescript-eslint/no-unused-vars
+  485:96  warning  Unexpected any. Specify a different type                                                                                                                                                                      @typescript-eslint/no-explicit-any
+
+/home/anthonyguera/TP-Tutor/src/components/Dashboard.tsx
+   29:300  error    'currentPositionNodeId' is assigned a value but never used. Allowed unused vars must match /^_/u                    @typescript-eslint/no-unused-vars
+   29:323  error    'recordActivityCompletion' is assigned a value but never used. Allowed unused vars must match /^_/u                 @typescript-eslint/no-unused-vars
+   29:349  error    'activeActivity' is assigned a value but never used. Allowed unused vars must match /^_/u                           @typescript-eslint/no-unused-vars
+   47:10   error    'savedConfirm' is assigned a value but never used. Allowed unused elements of array destructuring must match /^_/u  @typescript-eslint/no-unused-vars
+  325:154  warning  Unexpected any. Specify a different type                                                                            @typescript-eslint/no-explicit-any
+
+/home/anthonyguera/TP-Tutor/src/components/FlashcardMode.tsx
+  36:6   warning  React Hook useEffect has a missing dependency: 'vocabulary'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  86:68  warning  Unexpected any. Specify a different type                                                                       @typescript-eslint/no-explicit-any
+
+/home/anthonyguera/TP-Tutor/src/components/InstructionsPanel.tsx
+  186:77   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  187:109  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/anthonyguera/TP-Tutor/src/components/MasteryGrid.tsx
+   28:69  warning  Unexpected any. Specify a different type                                                       @typescript-eslint/no-explicit-any
+  135:59  error    'addWordToSelection' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/home/anthonyguera/TP-Tutor/src/components/PhraseGrid.tsx
+   31:9   warning  The 'safeSavedPhrases' logical expression could make the dependencies of useEffect Hook (at line 40) change on every render. To fix this, wrap the initialization of 'safeSavedPhrases' in its own useMemo() Hook  react-hooks/exhaustive-deps
+  262:63  warning  Unexpected any. Specify a different type                                                                                                                                                                           @typescript-eslint/no-explicit-any
+
+/home/anthonyguera/TP-Tutor/src/components/SessionRecap.tsx
+  187:163  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/anthonyguera/TP-Tutor/src/components/SettingsPanel.tsx
+  147:63  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/anthonyguera/TP-Tutor/src/components/TrainingHub.tsx
+  4:21  error  'Brain' is defined but never used. Allowed unused vars must match /^_/u   @typescript-eslint/no-unused-vars
+  4:28  error  'Zap' is defined but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+  4:33  error  'Layers' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/home/anthonyguera/TP-Tutor/src/components/UserProfilePanel.tsx
+  143:74   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  586:58   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  586:155  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  720:90   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/anthonyguera/TP-Tutor/src/components/VocabCard.tsx
+  114:9  error  'hasSavedInfo' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/home/anthonyguera/TP-Tutor/src/components/VocabGrid.tsx
+  18:59  error  'addWordToSelection' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+/home/anthonyguera/TP-Tutor/src/components/WordDetailDrawer.tsx
+  86:6  warning  React Hook useEffect has missing dependencies: 'triggerGeneration' and 'word'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/home/anthonyguera/TP-Tutor/src/components/WordScramble.tsx
+  76:6  warning  React Hook useEffect has a missing dependency: 'currentWord.tokiPona'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/home/anthonyguera/TP-Tutor/src/components/activities/Essentializer.tsx
+   3:10  error    'Sparkles' is defined but never used. Allowed unused vars must match /^_/u                                                                  @typescript-eslint/no-unused-vars
+   3:32  error    'CheckCircle2' is defined but never used. Allowed unused vars must match /^_/u                                                              @typescript-eslint/no-unused-vars
+   3:46  error    'XCircle' is defined but never used. Allowed unused vars must match /^_/u                                                                   @typescript-eslint/no-unused-vars
+   3:72  error    'Brain' is defined but never used. Allowed unused vars must match /^_/u                                                                     @typescript-eslint/no-unused-vars
+   3:79  error    'Send' is defined but never used. Allowed unused vars must match /^_/u                                                                      @typescript-eslint/no-unused-vars
+  30:6   warning  React Hook useCallback has missing dependencies: 'curriculumContext' and 'userProfile'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/home/anthonyguera/TP-Tutor/src/components/activities/LogicGate.tsx
+   3:10  error    'Sparkles' is defined but never used. Allowed unused vars must match /^_/u      @typescript-eslint/no-unused-vars
+   3:20  error    'ArrowRight' is defined but never used. Allowed unused vars must match /^_/u    @typescript-eslint/no-unused-vars
+   3:32  error    'RotateCcw' is defined but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+   3:43  error    'CheckCircle2' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+   3:57  error    'XCircle' is defined but never used. Allowed unused vars must match /^_/u       @typescript-eslint/no-unused-vars
+  12:16  warning  Unexpected any. Specify a different type                                        @typescript-eslint/no-explicit-any
+
+/home/anthonyguera/TP-Tutor/src/components/activities/PhilosophySorter.tsx
+  12:16  warning  Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  44:6   warning  React Hook useEffect has a missing dependency: 'loadItems'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/home/anthonyguera/TP-Tutor/src/services/geminiService.ts
+  6:84  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/anthonyguera/TP-Tutor/src/services/linaService.ts
+  129:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  130:13  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  264:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  377:53  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  569:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/anthonyguera/TP-Tutor/src/store/masteryStore.ts
+   544:26  warning  Unexpected any. Specify a different type                                                  @typescript-eslint/no-explicit-any
+   878:15  error    'shieldWasUsed' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  1588:34  warning  Unexpected any. Specify a different type                                                  @typescript-eslint/no-explicit-any
+  1588:40  warning  Unexpected any. Specify a different type                                                  @typescript-eslint/no-explicit-any
+
+/home/anthonyguera/TP-Tutor/src/types/mastery.ts
+  140:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 60 problems (25 errors, 35 warnings)
+
