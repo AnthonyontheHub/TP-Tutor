@@ -1920,9 +1920,9 @@ export const useMasteryStore = create<MasteryStore>()(
 // ─────────────────────────────────────────────────────────────────────────────
     { 
       name: 'tp-tutor-mastery',
-      version: 1,
+      version: 2,
       migrate: (persistedState: any, version: number) => {
-        if (version === 0) {
+        if (version < 2) {
           if (persistedState && Array.isArray(persistedState.vocabulary)) {
             const persistedVocab = persistedState.vocabulary;
             const persistedMap = new Map(persistedVocab.map((v: any) => [v.word.toLowerCase(), v]));

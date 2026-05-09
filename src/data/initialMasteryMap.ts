@@ -135,6 +135,14 @@ const initialVocabulary = [
   { word: "oke", partOfSpeech: "Modifier", frequencyRank: 204, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
   { word: "usawi", partOfSpeech: "Noun, Verb", frequencyRank: 205, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
   { word: "yupekosi", partOfSpeech: "Verb", frequencyRank: 206, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
+  { word: "epiku", partOfSpeech: "Modifier", frequencyRank: 207, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
+  { word: "jasima", partOfSpeech: "Noun, Verb", frequencyRank: 208, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
+  { word: "kijetesantakalu", partOfSpeech: "Noun", frequencyRank: 209, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
+  { word: "meso", partOfSpeech: "Modifier", frequencyRank: 210, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
+  { word: "oko", partOfSpeech: "Noun", frequencyRank: 211, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
+  { word: "soko", partOfSpeech: "Noun", frequencyRank: 212, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
+  { word: "kokosila", partOfSpeech: "Verb", frequencyRank: 213, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
+  { word: "misikeke", partOfSpeech: "Noun, Modifier", frequencyRank: 214, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
   
   // Grammar Tiles
   { word: "particle_li", partOfSpeech: "Particle", frequencyRank: 999, status: "not_started" as MasteryStatus, type: 'grammar' as const, weight: 'pillar', sessionNotes: "Subject Separator" },
