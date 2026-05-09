@@ -17,6 +17,8 @@ import { curriculumRoadmap } from '../data/curriculum';
 import { vocabContent } from '../data/vocabContent';
 import { TOKI_PONA_DICTIONARY, WORD_FREQUENCY } from '../data/tokiPonaDictionary';
 
+const KU_SULI_WORDS = new Set(['kokosila', 'lanpan', 'misikeke', 'epiku', 'jasima', 'kijetesantakalu', 'leko', 'linluwi', 'nja', 'oke', 'soko', 'tonsi', 'usawi', 'yupekosi', 'meso', 'namako', 'oko', 'kipisi']);
+
 function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: MasteryStatus; type: 'word' | 'grammar'; sessionNotes: string; frequencyRank?: number; weight?: 'pillar' | 'working' | 'bonus' }): VocabWord {
   const score = STATUS_MIDPOINT[v.status];
   const staticData = vocabContent[v.word] || {};
@@ -62,7 +64,7 @@ function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: Maste
     notes: '',
     customDefinition: '',
 
-    isKu: !!TOKI_PONA_DICTIONARY[v.word.toLowerCase()]
+    isKu: KU_SULI_WORDS.has(v.word.toLowerCase())
   };
 }
 
@@ -1778,7 +1780,7 @@ export const useMasteryStore = create<MasteryStore>()(
                 hardened: !!w.hardened,
                 isBleeding: !!w.isBleeding,
 
-                isKu: !!TOKI_PONA_DICTIONARY[w.word.toLowerCase()]
+                isKu: KU_SULI_WORDS.has(w.word.toLowerCase())
               };
             }
           );
