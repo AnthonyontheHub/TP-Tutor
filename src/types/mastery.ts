@@ -262,6 +262,8 @@ export interface VocabWord {
   scoreHistory: ScoreHistoryEntry[];
   hardened: boolean;
   isBleeding: boolean;
+  isKu?: boolean;
+  ku?: boolean;
 
   // Feature extensions
   productionStatus?: MasteryStatus;

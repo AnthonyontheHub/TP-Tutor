@@ -15,7 +15,9 @@ export type VocabContentEntry = Pick<VocabWord,
   'etymology' | 
   'mnemonic' | 
   'culturalNotes' | 
-  'avoidWhen'
+  'avoidWhen' |
+  'isKu' |
+  'ku'
 >;
 
 export const vocabContent: Record<string, VocabContentEntry> = {};

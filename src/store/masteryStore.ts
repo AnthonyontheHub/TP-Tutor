@@ -62,8 +62,7 @@ function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: Maste
     notes: '',
     customDefinition: '',
 
-    // Step 1: Add isKu property
-    isKu: !!(staticData.isKu || staticData.ku) // Check for isKu or ku property in staticData
+    isKu: !!TOKI_PONA_DICTIONARY[v.word.toLowerCase()]
   };
 }
 
@@ -1779,8 +1778,7 @@ export const useMasteryStore = create<MasteryStore>()(
                 hardened: !!w.hardened,
                 isBleeding: !!w.isBleeding,
 
-                // Step 1: Add isKu property
-                isKu: !!(staticData.isKu || staticData.ku) // Check for isKu or ku property in staticData
+                isKu: !!TOKI_PONA_DICTIONARY[w.word.toLowerCase()]
               };
             }
           );

@@ -160,32 +160,30 @@ export default function VocabCard({ word, onLongPress, onClick, isSandboxMode, i
           position: 'absolute',
           top: '50%',
           left: '50%',
-          transform: 'translate(-50%, -50%) scale(1.5)', // Adjust scale for desired size
-          zIndex: 0, // Behind the main text
+          transform: 'translate(-50%, -50%) scale(1.5)',
+          zIndex: 0,
           opacity: 0.15,
           lineHeight: 1,
-          pointerEvents: 'none', // Allow interaction with elements underneath
-          textShadow: `0 0 8px ${GLOW_COLOR[status]}, 0 0 12px ${GLOW_COLOR[status]}`, // Glow effect
-          color: GLOW_COLOR[status], // Base color for the glyph
+          pointerEvents: 'none',
+          textShadow: `0 0 8px ${GLOW_COLOR[status]}, 0 0 12px ${GLOW_COLOR[status]}`,
+          color: GLOW_COLOR[status],
         }}
       >
         {word.word}
       </div>
 
-      {/* 2. Add 'ku' Marker */}
+      {/* 'ku' Marker */}
       {word.isKu && (
         <span
           style={{
             position: 'absolute',
-            top: '25px', // Positioned below the status icon (which is at top: 8px)
-            right: '5px', // Positioned to the right
+            top: '28px',
+            right: '8px',
             fontSize: '0.6rem',
-            fontWeight: 'normal', // Changed from bold to normal for subtlety
-            color: 'rgba(128, 0, 128, 0.6)', // Faint purple color as requested
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            padding: '2px 4px',
-            borderRadius: '2px',
-            zIndex: 5, // Above glyph, below main text
+            fontWeight: 'bold',
+            color: 'rgba(168, 85, 247, 0.4)',
+            zIndex: 5,
+            pointerEvents: 'none'
           }}
         >
           ku

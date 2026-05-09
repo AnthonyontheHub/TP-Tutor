@@ -25,7 +25,7 @@ export default function MasteryGrid({
   onAskLina, isSandboxMode, activeFilter, sortMode, sortDirection,
   setSortMode, setSortDirection
 }: Props) {
-  const { vocabulary, selectedWords, toggleWordSelection, addWordToSelection, setSelectedWords, lessonFilter, isKu } = useMasteryStore(); // Added isKu from store
+  const { vocabulary, selectedWords, toggleWordSelection, addWordToSelection, setSelectedWords, lessonFilter } = useMasteryStore();
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [selectedPOS, setSelectedPOS] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
@@ -45,19 +45,19 @@ export default function MasteryGrid({
   // 3. Polish the POS Dropdown logic
   const availablePartsOfSpeech = useMemo(() => {
     const allPOS = vocabulary
-      .map(item => item.partOfSpeech)
-      // Filter out null/undefined, 'GRAMMAR' (case-insensitive)
-      .filter(pos => pos && pos.toLowerCase() !== 'grammar') 
-      .flatMap(pos => 
-        pos.toLowerCase() // Force all roles to lowercase first
+      .filter(item => item.type === 'word')
+      .flatMap(item => 
+        item.partOfSpeech
            .split(',')
            .map(p => p.trim())
-           .filter(p => p) // Remove empty strings
-           .map(p => p.charAt(0).toUpperCase() + p.slice(1)) // Capitalize first letter of each part
+           .filter(p => p !== '')
+           .map(p => p.toLowerCase())
       );
 
-    const uniquePOS = Array.from(new Set(allPOS)); // Use a Set for uniqueness
-    return uniquePOS.sort(); // Sort alphabetically
+    const uniquePOS = Array.from(new Set(allPOS));
+    return uniquePOS
+      .map(p => p.charAt(0).toUpperCase() + p.slice(1))
+      .sort();
   }, [vocabulary]);
 
   const handleCardClick = useCallback((word: VocabWord) => {
@@ -90,16 +90,13 @@ export default function MasteryGrid({
       .filter(item => {
         const passesLesson = !lessonFilter || lessonFilter.includes(item.id) || lessonFilter.includes(item.word);
         
-        // 3. Fix the Filter Logic (Inclusive filter check)
-        let matchesPOS = true; // Default to true if 'All' is selected
+        // inclusive filter check
+        let matchesPOS = true;
         if (selectedPOS !== 'All' && item.partOfSpeech) {
-          // Check if the word's part of speech string includes the selected POS (case-insensitive)
-          matchesPOS = item.partOfSpeech.toLowerCase().includes(selectedPOS.toLowerCase());
+          matchesPOS = item.partOfSpeech.toLowerCase().split(',').map(p => p.trim()).includes(selectedPOS.toLowerCase());
         } else if (selectedPOS !== 'All' && !item.partOfSpeech) {
-          // If POS is missing and 'All' is not selected, it doesn't match
           matchesPOS = false;
         }
-        // If selectedPOS is 'All', matchesPOS remains true.
 
         let matchesSearch = true;
         if (searchQuery.trim() !== '') {
@@ -107,17 +104,14 @@ export default function MasteryGrid({
           matchesSearch = 
             item.word.toLowerCase().includes(q) ||
             item.meanings.toLowerCase().includes(q) ||
-            (item.partOfSpeech && item.partOfSpeech.toLowerCase().includes(q)) || // Added check for item.partOfSpeech
+            (item.partOfSpeech && item.partOfSpeech.toLowerCase().includes(q)) ||
             (item.sessionNotes && item.sessionNotes.toLowerCase().includes(q));
         }
 
         return passesLesson && matchesPOS && matchesSearch;
       })
       .sort((a, b) => {
-        // 2. Add Sort & Marker - Lipu Ku Sort
-        if (sortMode === 'lipuKu') {
-          // Words where isKu is true should appear first.
-          // true (1) comes before false (0) in descending order (b - a).
+        if (sortMode === 'ku') {
           return (b.isKu ? 1 : 0) - (a.isKu ? 1 : 0);
         }
 
@@ -130,7 +124,6 @@ export default function MasteryGrid({
           return sortDirection === 'asc' ? diff : -diff;
         }
         if (sortMode === 'partOfSpeech') {
-          // Ensure partOfSpeech is treated consistently for sorting, e.g., handle null/undefined
           const posA = a.partOfSpeech || '';
           const posB = b.partOfSpeech || '';
           const diff = posA.localeCompare(posB);
@@ -144,7 +137,7 @@ export default function MasteryGrid({
         const valB = b.word.toLowerCase();
         return sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
       });
-  }, [vocabulary, lessonFilter, selectedPOS, searchQuery, sortMode, sortDirection, isKu]); // Added isKu dependency
+  }, [vocabulary, lessonFilter, selectedPOS, searchQuery, sortMode, sortDirection]);
 
   return (
     <div
@@ -184,7 +177,6 @@ export default function MasteryGrid({
           }
         `}</style>
         <div style={{ display: 'flex', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
-          {/* 2. Update the Dropdown */}
           <select
             value={selectedPOS}
             onChange={(e) => setSelectedPOS(e.target.value)}
@@ -216,8 +208,7 @@ export default function MasteryGrid({
             <option value="length">Word Length</option>
             <option value="partOfSpeech">Part of Speech</option>
             <option value="useCount">Most Used</option>
-            {/* 2. Add Lipu Ku Sort Option */}
-            <option value="lipuKu">Lipu Ku</option>
+            <option value="ku">Lipu Ku</option>
           </select>
           <button
             onClick={(e) => { e.stopPropagation(); setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc'); }}
