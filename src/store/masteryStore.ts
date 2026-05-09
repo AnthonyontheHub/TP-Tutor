@@ -1686,25 +1686,24 @@ export const useMasteryStore = create<MasteryStore>()(
           if (!snapshot.exists()) return;
           const data = snapshot.data();
 
-          // AUTO-MIGRATION: If Firestore data contains legacy partOfSpeech strings,
-          // normalize them and write back to Firestore immediately.
-          if (Array.isArray(data.vocabulary)) {
-            const legacyStrings = ['Adjective', 'Adverb', 'Interrogative', 'Ordinal-marker', 'Number'];
-            const hasLegacy = data.vocabulary.some(w => 
-              typeof w.partOfSpeech === 'string' && 
-              legacyStrings.some(ls => w.partOfSpeech.includes(ls))
-            );
-
-            if (hasLegacy) {
-              const cleanedVocab = data.vocabulary.map(w => ({
-                ...w,
-                partOfSpeech: normalizePartOfSpeech(w.partOfSpeech || '')
-              }));
-              void setDoc(userDocRef, { vocabulary: cleanedVocab }, { merge: true });
+          // 1. AUTO-MIGRATION: Normalize Firestore data on load
+          let needsUpdate = false;
+          const cloudVocab = Array.isArray(data.vocabulary) ? data.vocabulary : [];
+          
+          const normalizedCloudVocab = cloudVocab.map(w => {
+            const currentPOS = w.partOfSpeech || '';
+            const normalizedPOS = normalizePartOfSpeech(currentPOS);
+            if (currentPOS !== normalizedPOS) {
+              needsUpdate = true;
             }
+            return { ...w, partOfSpeech: normalizedPOS };
+          });
+
+          if (needsUpdate && uid !== 'guest_user') {
+            void setDoc(userDocRef, { vocabulary: normalizedCloudVocab }, { merge: true });
           }
 
-          // Detect contaminated cloud data: a different name + all vocab mastered
+          // 2. Detect contaminated cloud data: a different name + all vocab mastered
           // indicates test/debug data was accidentally synced to this account
           const cloudName = data.studentName as string | undefined;
           const allVocabMastered = Array.isArray(data.vocabulary) &&
@@ -1735,7 +1734,8 @@ export const useMasteryStore = create<MasteryStore>()(
             return;
           }
 
-          const vocabulary = (data.vocabulary || mappedVocabulary).map(
+          const sourceVocab = Array.isArray(data.vocabulary) ? normalizedCloudVocab : mappedVocabulary;
+          const vocabulary = sourceVocab.map(
             (w: { word?: string; useCount?: number; frequencyRank?: number; type?: string; status?: MasteryStatus; [key: string]: unknown }) => {
               const base = mappedVocabulary.find(iv => iv.word === w.word);
               const staticData = vocabContent[w.word || ''] || {};
