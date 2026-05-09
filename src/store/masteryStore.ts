@@ -19,6 +19,16 @@ import { TOKI_PONA_DICTIONARY, WORD_FREQUENCY } from '../data/tokiPonaDictionary
 
 const KU_SULI_WORDS = new Set(['kokosila', 'lanpan', 'misikeke', 'epiku', 'jasima', 'kijetesantakalu', 'leko', 'linluwi', 'nja', 'oke', 'soko', 'tonsi', 'usawi', 'yupekosi', 'meso', 'namako', 'oko', 'kipisi']);
 
+function normalizePartOfSpeech(pos: string): string {
+  if (!pos) return pos;
+  return pos
+    .replace(/\bAdjective\b/g, 'Modifier')
+    .replace(/\bAdverb\b/g, 'Modifier')
+    .replace(/\bNumber\b/g, 'Modifier')
+    .replace(/\bInterrogative\b/g, 'Particle')
+    .replace(/\bOrdinal-marker\b/g, 'Particle');
+}
+
 function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: MasteryStatus; type: 'word' | 'grammar'; sessionNotes: string; frequencyRank?: number; weight?: 'pillar' | 'working' | 'bonus' }): VocabWord {
   const score = STATUS_MIDPOINT[v.status];
   const staticData = vocabContent[v.word] || {};
@@ -26,7 +36,7 @@ function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: Maste
   return {
     id: v.word,
     word: v.word,
-    partOfSpeech: v.partOfSpeech || '',
+    partOfSpeech: normalizePartOfSpeech(v.partOfSpeech || ''),
     meanings: TOKI_PONA_DICTIONARY[v.word.toLowerCase()] || '',
     type: v.type,
     baseScore: score,
@@ -1751,7 +1761,7 @@ export const useMasteryStore = create<MasteryStore>()(
                 weight,
                 meanings,
                 sessionNotes,
-                partOfSpeech: w.partOfSpeech || (base?.partOfSpeech ?? ''),
+                partOfSpeech: normalizePartOfSpeech(w.partOfSpeech || (base?.partOfSpeech ?? '')),
                 partOfSpeechScores: w.partOfSpeechScores || { noun: 0, verb: 0, modifier: 0 },
                 lastReviewed: w.lastReviewed || new Date().toISOString(),
                 scoreHistory: w.scoreHistory || [],
@@ -1908,6 +1918,14 @@ export const useMasteryStore = create<MasteryStore>()(
       },
       onRehydrateStorage: () => (state) => {
         if (state) {
+          // Normalize vocabulary partOfSpeech
+          if (Array.isArray(state.vocabulary)) {
+            state.vocabulary = state.vocabulary.map(v => ({
+              ...v,
+              partOfSpeech: normalizePartOfSpeech(v.partOfSpeech)
+            }));
+          }
+
           // Ensure critical array fields are always arrays and not empty if defaults exist
           if (!Array.isArray(state.commonPhrases) || state.commonPhrases.length === 0) {
             state.commonPhrases = defaultCommonPhrases;
