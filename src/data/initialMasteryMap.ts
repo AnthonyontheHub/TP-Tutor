@@ -128,6 +128,13 @@ const initialVocabulary = [
   { word: "wawa", partOfSpeech: "Modifier", frequencyRank: 53, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
   { word: "weka", partOfSpeech: "Modifier", frequencyRank: 129, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
   { word: "wile", partOfSpeech: "Verb", frequencyRank: 33, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
+  { word: "lanpan", partOfSpeech: "Verb", frequencyRank: 200, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
+  { word: "leko", partOfSpeech: "Noun", frequencyRank: 201, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
+  { word: "linluwi", partOfSpeech: "Noun", frequencyRank: 202, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
+  { word: "nja", partOfSpeech: "Particle", frequencyRank: 203, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
+  { word: "oke", partOfSpeech: "Modifier", frequencyRank: 204, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
+  { word: "usawi", partOfSpeech: "Noun, Verb", frequencyRank: 205, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
+  { word: "yupekosi", partOfSpeech: "Verb", frequencyRank: 206, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
   
   // Grammar Tiles
   { word: "particle_li", partOfSpeech: "Particle", frequencyRank: 999, status: "not_started" as MasteryStatus, type: 'grammar' as const, weight: 'pillar', sessionNotes: "Subject Separator" },

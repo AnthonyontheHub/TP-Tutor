@@ -98,23 +98,17 @@ export default function MasteryGrid({
           matchesPOS = false;
         }
 
-        let matchesSearch = true;
-        if (searchQuery.trim() !== '') {
-          const q = searchQuery.toLowerCase().trim();
-          matchesSearch = 
-            item.word.toLowerCase().includes(q) ||
-            item.meanings.toLowerCase().includes(q) ||
-            (item.partOfSpeech && item.partOfSpeech.toLowerCase().includes(q)) ||
-            (item.sessionNotes && item.sessionNotes.toLowerCase().includes(q));
-        }
+        const matchesSearch = searchQuery.trim() === '' || 
+          item.word.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
+          item.meanings.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
+          (item.partOfSpeech && item.partOfSpeech.toLowerCase().includes(searchQuery.toLowerCase().trim())) ||
+          (item.sessionNotes && item.sessionNotes.toLowerCase().includes(searchQuery.toLowerCase().trim()));
 
-        return passesLesson && matchesPOS && matchesSearch;
+        const matchesKu = sortMode !== 'ku' || item.isKu;
+
+        return passesLesson && matchesPOS && matchesSearch && matchesKu;
       })
       .sort((a, b) => {
-        if (sortMode === 'ku') {
-          return (b.isKu ? 1 : 0) - (a.isKu ? 1 : 0);
-        }
-
         if (sortMode === 'status') {
           const diff = STATUS_RANK[a.status] - STATUS_RANK[b.status];
           return sortDirection === 'asc' ? diff : -diff;
