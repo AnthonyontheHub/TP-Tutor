@@ -181,7 +181,7 @@ export default function VocabCard({ word, onLongPress, onClick, isSandboxMode, i
             left: '5px',
             fontSize: '0.6rem',
             fontWeight: 'bold',
-            color: 'rgba(255, 191, 0, 0.6)', // Subtle gold-like color
+            color: 'rgba(128, 0, 128, 0.6)', // Faint purple color
             backgroundColor: 'rgba(0,0,0,0.5)',
             padding: '2px 4px',
             borderRadius: '2px',
