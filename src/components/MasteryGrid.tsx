@@ -31,6 +31,29 @@ export default function MasteryGrid({
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'card' | 'table'>('card');
 
+  // Helper function to parse and abbreviate part of speech
+  const getPartOfSpeechAbbreviation = useCallback((partOfSpeech: string): string => {
+    if (!partOfSpeech) return '';
+    return partOfSpeech
+      .split(',')
+      .map(part => part.trim())
+      .filter(part => part.length > 0)
+      .map(part => part[0].toUpperCase())
+      .join(', ');
+  }, []);
+
+  // 1. Create a Dynamic POS List
+  const availablePartsOfSpeech = useMemo(() => {
+    const allPOS = vocabulary
+      .map(item => item.partOfSpeech)
+      .filter(pos => pos && pos !== 'GRAMMAR') // Ensure POS exists and is not 'GRAMMAR'
+      .flatMap(pos => pos.split(',').map(p => p.trim())) // Split by comma and trim whitespace
+      .filter(pos => pos); // Remove any empty strings after trimming
+
+    const uniquePOS = Array.from(new Set(allPOS));
+    return uniquePOS.sort();
+  }, [vocabulary]);
+
   const handleCardClick = useCallback((word: VocabWord) => {
     if (selectedWords.length > 0) {
       toggleWordSelection(word.word);
@@ -60,15 +83,25 @@ export default function MasteryGrid({
     return vocabulary
       .filter(item => {
         const passesLesson = !lessonFilter || lessonFilter.includes(item.id) || lessonFilter.includes(item.word);
-        const matchesPOS = selectedPOS === 'All' || item.partOfSpeech === selectedPOS;
         
+        // 3. Fix the Filter Logic
+        let matchesPOS = true; // Default to true if 'All' is selected
+        if (selectedPOS !== 'All' && item.partOfSpeech) {
+          // Check if the word's part of speech string includes the selected POS (case-insensitive)
+          matchesPOS = item.partOfSpeech.toLowerCase().includes(selectedPOS.toLowerCase());
+        } else if (selectedPOS !== 'All' && !item.partOfSpeech) {
+          // If POS is missing and 'All' is not selected, it doesn't match
+          matchesPOS = false;
+        }
+        // If selectedPOS is 'All', matchesPOS remains true.
+
         let matchesSearch = true;
         if (searchQuery.trim() !== '') {
           const q = searchQuery.toLowerCase().trim();
           matchesSearch = 
             item.word.toLowerCase().includes(q) ||
             item.meanings.toLowerCase().includes(q) ||
-            item.partOfSpeech.toLowerCase().includes(q) ||
+            (item.partOfSpeech && item.partOfSpeech.toLowerCase().includes(q)) || // Added check for item.partOfSpeech
             (item.sessionNotes && item.sessionNotes.toLowerCase().includes(q));
         }
 
@@ -84,7 +117,10 @@ export default function MasteryGrid({
           return sortDirection === 'asc' ? diff : -diff;
         }
         if (sortMode === 'partOfSpeech') {
-          const diff = a.partOfSpeech.localeCompare(b.partOfSpeech);
+          // Ensure partOfSpeech is treated consistently for sorting, e.g., handle null/undefined
+          const posA = a.partOfSpeech || '';
+          const posB = b.partOfSpeech || '';
+          const diff = posA.localeCompare(posB);
           return sortDirection === 'asc' ? diff : -diff;
         }
         if (sortMode === 'useCount') {
@@ -135,19 +171,16 @@ export default function MasteryGrid({
           }
         `}</style>
         <div style={{ display: 'flex', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
+          {/* 2. Update the Dropdown */}
           <select
             value={selectedPOS}
             onChange={(e) => setSelectedPOS(e.target.value)}
             className="toolbar-input"
           >
             <option value="All">All Parts of Speech</option>
-            <option value="Noun">Nouns</option>
-            <option value="Verb">Verbs</option>
-            <option value="Adjective">Adjectives</option>
-            <option value="Particle">Particles</option>
-            <option value="Preposition">Prepositions</option>
-            <option value="Pronoun">Pronouns</option>
-            <option value="Number">Numbers</option>
+            {availablePartsOfSpeech.map(pos => (
+              <option key={pos} value={pos}>{pos}</option>
+            ))}
           </select>
           <input
             type="text"
