@@ -17,6 +17,9 @@ interface Props {
   sortDirection: 'asc' | 'desc';
   setSortMode: (mode: string) => void;
   setSortDirection: (dir: 'asc' | 'desc') => void;
+  onSavePhrase?: (tp: string, en: string) => void;
+  posFilter?: string;
+  setPosFilter?: (pos: string) => void;
 }
 
 const STATUS_RANK: Record<MasteryStatus, number> = {
@@ -25,7 +28,7 @@ const STATUS_RANK: Record<MasteryStatus, number> = {
 
 export default function MasteryGrid({
   onAskLina, isSandboxMode, activeFilter, sortMode, sortDirection,
-  setSortMode, setSortDirection
+  setSortMode, setSortDirection, onSavePhrase, posFilter, setPosFilter
 }: Props) {
   const { vocabulary, selectedWords, toggleWordSelection, addWordToSelection, setSelectedWords, lessonFilter, savePhrase } = useMasteryStore();
   const [drawerId, setDrawerId] = useState<string | null>(null);
@@ -371,7 +374,7 @@ export default function MasteryGrid({
                 ))}
               </div>
               <button
-                onClick={() => savePhrase({ id: suggestion, tp: suggestion, en: searchQuery, notes: 'AI Suggestion' })}
+                onClick={() => onSavePhrase ? onSavePhrase(suggestion, searchQuery) : savePhrase({ id: suggestion, tp: suggestion, en: searchQuery, notes: 'AI Suggestion' })}
                 className="btn-review"
                 style={{ width: 'auto', padding: '8px 16px', fontSize: '0.7rem', marginBottom: 0 }}
               >

@@ -46,7 +46,14 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   const [saveNoteInput, setSaveNoteInput] = useState('');
   const [savedConfirm, setSavedConfirm] = useState(false);
   const [showProveIt, setShowProveIt] = useState(false);
+  const [externalPhrase, setExternalPhrase] = useState<{ tp: string; en: string } | null>(null);
   const confirmTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleOpenExternalPhrase = (tp: string, en: string) => {
+    setExternalPhrase({ tp, en });
+    setShowSaveNote(true);
+    setSaveNoteInput('');
+  };
 
   useEffect(() => {
     calculateDecay();
@@ -162,16 +169,19 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   };
 
   const handleSaveSentence = () => {
-    const sentence = selectedWords.join(' ');
-    savePhrase({ id: sentence, tp: sentence, en: translation ?? '', notes: saveNoteInput });
+    const tp = externalPhrase ? externalPhrase.tp : selectedWords.join(' ');
+    const en = externalPhrase ? externalPhrase.en : (translation ?? '');
+    savePhrase({ id: tp, tp, en, notes: saveNoteInput });
+    setExternalPhrase(null);
     if (confirmTimer.current) clearTimeout(confirmTimer.current);
     setSavedConfirm(true);
     setShowSaveNote(false);
+    setActiveView('archive');
     setSaveNoteInput('');
     confirmTimer.current = setTimeout(() => {
       setSavedConfirm(false);
       confirmTimer.current = null;
-      setSelectedWords([]);
+      if (!externalPhrase) setSelectedWords([]);
     }, 800);
   };
 
@@ -482,6 +492,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
                   setSortMode={setSortMode}
                   setSortDirection={setSortDirection}
                   setPosFilter={setPosFilter}
+                  onSavePhrase={handleOpenExternalPhrase}
                 />
               )}
               {activeView === 'roadmap' && (
@@ -534,9 +545,9 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
               >
                 <h3 style={{ color: 'var(--gold)', marginBottom: '15px' }}>SAVE PHRASE</h3>
                 <div style={{ marginBottom: '10px', fontSize: '0.9rem', color: '#ccc' }}>
-                   <strong>{selectedWords.join(' ')}</strong>
+                   <strong>{externalPhrase ? externalPhrase.tp : selectedWords.join(' ')}</strong>
                    <br/>
-                   <span style={{ fontSize: '0.75rem', opacity: 0.7 }}>{translation}</span>
+                   <span style={{ fontSize: '0.75rem', opacity: 0.7 }}>{externalPhrase ? externalPhrase.en : translation}</span>
                 </div>
                 <textarea 
                   value={saveNoteInput} 
@@ -547,10 +558,10 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
                 />
                 <div style={{ display: 'flex', gap: '8px' }}>
                    <button onClick={handleSaveSentence} className="btn-review" style={{ flex: 1, margin: 0 }}>SAVE</button>
-                   <button onClick={() => { setShowSaveNote(false); setSaveNoteInput(''); }} className="btn-toggle" style={{ flex: 1 }}>CANCEL</button>
+                   <button onClick={() => { setShowSaveNote(false); setSaveNoteInput(''); setExternalPhrase(null); }} className="btn-toggle" style={{ flex: 1 }}>CANCEL</button>
                 </div>
                 <div style={{ marginTop: '10px', display: 'flex', gap: '8px' }}>
-                   <button onClick={() => { setSelectedWords([]); setShowSaveNote(false); }} className="btn-toggle" style={{ flex: 1, color: '#ef4444' }}>DELETE</button>
+                   <button onClick={() => { setSelectedWords([]); setShowSaveNote(false); setExternalPhrase(null); }} className="btn-toggle" style={{ flex: 1, color: '#ef4444' }}>DELETE</button>
                    <button onClick={() => setShowSaveNote(false)} className="btn-toggle" style={{ flex: 1 }}>EDIT</button>
                 </div>
               </motion.div>

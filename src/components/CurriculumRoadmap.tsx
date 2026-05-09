@@ -3,7 +3,6 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import NodeDossier from './NodeDossier';
-import ChallengeWidget from './ChallengeWidget';
 import type { CurriculumNode, SessionLogEntry } from '../types/mastery';
 import { STATUS_META } from '../types/mastery';
 
@@ -16,9 +15,20 @@ export default function CurriculumRoadmap({ onAskLina, isSandboxMode }: Props) {
   const { curriculums, currentPositionNodeId, sessionLog, vocabulary } = useMasteryStore();
   const [selectedNode, setSelectedNode] = useState<CurriculumNode | null>(null);
   const [hoveredSession, setHoveredSession] = useState<SessionLogEntry | null>(null);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [tappedSession, setTappedSession] = useState<SessionLogEntry | null>(null);
 
   const currentPositionRef = useRef<HTMLDivElement>(null);
+
+  const getNodeIcon = (node: CurriculumNode): string => {
+    if (node.type === 'Checkpoint') return '🏁';
+    if (node.type === 'Drill') return '⚡';
+    if (node.type === 'Concept') return '💡';
+    if (node.type === 'Vocabulary') return '📖';
+    if (node.type === 'Grammar') return '🔤';
+    if (node.type === 'Culture') return '🌍';
+    if (node.type === 'Review') return '🔄';
+    return '🧠';
+  };
 
   // Global Progress Calculation
   const globalMastery = useMemo(() => {
@@ -39,7 +49,7 @@ export default function CurriculumRoadmap({ onAskLina, isSandboxMode }: Props) {
     if (currentPositionRef.current) {
       currentPositionRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
-  }, []);
+  }, [currentPositionNodeId]);
 
   // Helper to calculate mastery for a node
   const calculateNodeMastery = (node: CurriculumNode) => {
@@ -134,17 +144,49 @@ export default function CurriculumRoadmap({ onAskLina, isSandboxMode }: Props) {
     return { past: past.reverse(), future: futureNodes, generalSessionsExist: generalSessions.length > 0 };
   }, [allNodes, sessionLog, currentPositionNodeId]);
 
+  const futureWithHeaders = useMemo(() => {
+    const result: ({ type: 'header'; label: string } | { type: 'node'; data: CurriculumNode })[] = [];
+    let lastLevelId: string | null = null;
+
+    unifiedPath.future.forEach(item => {
+      const levelForNode = curriculums.find(l => l.nodes.some(n => n.id === item.data.id));
+      if (levelForNode && levelForNode.id !== lastLevelId) {
+        result.push({ type: 'header', label: levelForNode.title || `Level ${levelForNode.id}` });
+        lastLevelId = levelForNode.id;
+      }
+      result.push(item);
+    });
+
+    return result;
+  }, [unifiedPath.future, curriculums]);
+
+  const nextLockedNode = useMemo(() => {
+    return unifiedPath.future.find(item => item.data.status === 'locked' && item.data.id !== currentPositionNodeId)?.data || null;
+  }, [unifiedPath.future, currentPositionNodeId]);
+
+  const nextLockedNodeItems = useMemo(() => {
+    if (!nextLockedNode) return [];
+    const allIds = [...(nextLockedNode.requiredVocabIds || []), ...(nextLockedNode.requiredGrammarIds || [])];
+    return vocabulary.filter(v => allIds.includes(v.id) || allIds.includes(v.word))
+      .filter(v => v.status !== 'mastered' && v.status !== 'confident')
+      .slice(0, 3);
+  }, [nextLockedNode, vocabulary]);
+
   return (
-    <div className="roadmap-container" style={{ 
-      padding: '40px 0', 
-      paddingBottom: '200px', 
-      position: 'relative',
-      maxWidth: '600px',
-      margin: '0 auto',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center'
-    }}>
+    <div 
+      className="roadmap-container" 
+      onClick={() => setTappedSession(null)}
+      style={{ 
+        padding: '40px 0', 
+        paddingBottom: '200px', 
+        position: 'relative',
+        maxWidth: '600px',
+        margin: '0 auto',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center'
+      }}
+    >
       <AnimatePresence>
         {selectedNode && (
           <NodeDossier 
@@ -196,9 +238,6 @@ export default function CurriculumRoadmap({ onAskLina, isSandboxMode }: Props) {
 
         {/* PAST SECTION */}
         <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '48px' }}>
-          <div style={{ marginBottom: '-20px', width: '100%', padding: '0 40px' }}>
-            <ChallengeWidget />
-          </div>
           
           {unifiedPath.generalSessionsExist && (
             <div style={{ color: '#666', fontSize: '0.6rem', fontWeight: 900, letterSpacing: '0.1em', marginTop: '20px' }}>GENERAL SESSIONS</div>
@@ -212,7 +251,10 @@ export default function CurriculumRoadmap({ onAskLina, isSandboxMode }: Props) {
               return (
                 <div 
                   key={session.id}
-                  onMouseMove={(e) => setMousePos({ x: e.clientX, y: e.clientY })}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setTappedSession(prev => prev === session ? null : session);
+                  }}
                   onMouseEnter={() => setHoveredSession(session)}
                   onMouseLeave={() => setHoveredSession(null)}
                   style={{ position: 'relative', zIndex: 1, left: xOffset }}
@@ -235,12 +277,13 @@ export default function CurriculumRoadmap({ onAskLina, isSandboxMode }: Props) {
                     {session.grade || '·'}
                   </div>
 
-                  {hoveredSession === session && (
+                  {(hoveredSession === session || tappedSession === session) && (
                     <div style={{
-                      position: 'fixed',
-                      top: mousePos.y - 120,
-                      left: mousePos.x + 20,
-                      background: 'rgba(5,5,5,0.95)',
+                      position: 'absolute',
+                      bottom: '60px',
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      background: 'rgba(5,5,5,0.97)',
                       border: '1px solid var(--gold)',
                       padding: '12px',
                       borderRadius: '4px',
@@ -272,27 +315,30 @@ export default function CurriculumRoadmap({ onAskLina, isSandboxMode }: Props) {
             return (
               <div key={node.id} style={{ position: 'relative', zIndex: 1, left: xOffset, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => handleNodeClick(node)}
                   style={{
-                    width: '64px',
-                    height: '64px',
+                    width: '52px',
+                    height: '52px',
                     borderRadius: '50%',
-                    background: 'var(--gold)',
-                    border: '2px solid var(--gold)',
+                    background: 'rgba(34, 197, 94, 0.15)',
+                    border: '2px solid #22c55e',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     cursor: 'pointer',
-                    position: 'relative'
+                    position: 'relative',
+                    boxShadow: '0 0 12px rgba(34, 197, 94, 0.2)'
                   }}
                 >
-                  <span style={{ fontSize: '1.5rem' }}>
-                    {node.type === 'Checkpoint' ? '🏁' : (node.type === 'Drill' ? '⚡' : '🧠')}
+                  <span style={{ fontSize: '1.2rem', opacity: 0.9 }}>
+                    {getNodeIcon(node)}
                   </span>
                 </motion.button>
-                <div style={{ marginTop: '10px', fontSize: '0.6rem', fontWeight: 900, color: '#888', textAlign: 'center' }}>{node.title.toUpperCase()}</div>
+                <div style={{ marginTop: '8px', fontSize: '0.55rem', fontWeight: 900, color: '#22c55e', textAlign: 'center', opacity: 0.7 }}>
+                  {node.title.toUpperCase()}
+                </div>
               </div>
             );
           })}
@@ -300,99 +346,168 @@ export default function CurriculumRoadmap({ onAskLina, isSandboxMode }: Props) {
 
         {/* FUTURE SECTION */}
         <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '48px' }}>
-          {unifiedPath.future.map((item, index) => {
-            const node = item.data;
-            const isCurrent = node.id === currentPositionNodeId;
-            const isLocked = node.status === 'locked' && !isCurrent;
-            const isMastered = node.status === 'mastered';
-            const mastery = calculateNodeMastery(node);
-            const masteryColor = mastery >= 100 ? 'var(--gold)' : (mastery > 50 ? '#3b82f6' : '#a855f7');
-            const xOffset = getWindingOffset(index + unifiedPath.past.length);
-
-            return (
-              <div 
-                key={node.id} 
-                ref={isCurrent ? currentPositionRef : null}
-                style={{ 
-                  position: 'relative', 
-                  zIndex: 1, 
-                  left: xOffset,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center'
-                }}
-              >
-                {isCurrent && (
-                   <motion.div 
-                    animate={{ opacity: [1, 0.5, 1] }}
-                    transition={{ repeat: Infinity, duration: 1.2 }}
-                    style={{ position: 'absolute', top: -25, color: 'var(--gold)', fontSize: '0.6rem', fontWeight: 900, letterSpacing: '0.1em' }}
-                   >
-                     YOU ARE HERE
-                   </motion.div>
-                )}
-
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => handleNodeClick(node)}
-                  style={{
-                    width: isCurrent ? '80px' : '64px',
-                    height: isCurrent ? '80px' : '64px',
-                    borderRadius: '50%',
-                    background: isLocked ? '#222' : (isMastered ? 'var(--gold)' : '#333'),
-                    border: isCurrent ? '4px solid white' : `2px solid ${isLocked ? '#333' : 'var(--gold)'}`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    boxShadow: isCurrent ? '0 0 20px var(--gold)' : 'none',
-                    position: 'relative'
-                  }}
-                >
-                  {isLocked ? (
-                    <span style={{ fontSize: '1.2rem', opacity: 0.3 }}>🔒</span>
-                  ) : (
-                    <span style={{ fontSize: '1.5rem', filter: isMastered ? 'none' : 'grayscale(1)' }}>
-                      {node.type === 'Checkpoint' ? '🏁' : (node.type === 'Drill' ? '⚡' : '🧠')}
-                    </span>
-                  )}
-
-                  {!isLocked && (
-                    <svg style={{ position: 'absolute', inset: -6, width: 'calc(100% + 12px)', height: 'calc(100% + 12px)', transform: 'rotate(-90deg)' }}>
-                      <circle 
-                        cx="50%" cy="50%" r="48%" 
-                        fill="none" 
-                        stroke={masteryColor} 
-                        strokeWidth="3" 
-                        strokeDasharray="100 100" 
-                        strokeDashoffset={100 - mastery}
-                        strokeLinecap="round"
-                        style={{ transition: 'stroke-dashoffset 1s ease-out' }}
-                      />
-                    </svg>
-                  )}
-                </motion.button>
-
-                <div style={{ 
-                  marginTop: '12px', 
-                  textAlign: 'center', 
-                  width: '120px',
-                  opacity: isLocked ? 0.4 : 1
-                }}>
-                  <div style={{ 
-                    fontSize: '0.65rem', 
-                    fontWeight: 900, 
-                    color: isCurrent ? 'white' : '#888',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em'
+          {(() => {
+            let nodeIndex = 0;
+            return futureWithHeaders.map((item) => {
+              if (item.type === 'header') {
+                return (
+                  <div key={`header-${item.label}`} style={{
+                    width: '100%',
+                    textAlign: 'center',
+                    padding: '8px 20px',
+                    position: 'relative',
+                    zIndex: 2
                   }}>
-                    {node.title}
+                    <div style={{
+                      display: 'inline-block',
+                      background: 'rgba(255,191,0,0.08)',
+                      border: '1px solid rgba(255,191,0,0.3)',
+                      borderRadius: '20px',
+                      padding: '4px 16px',
+                      fontSize: '0.6rem',
+                      fontWeight: 900,
+                      color: 'var(--gold)',
+                      letterSpacing: '0.15em'
+                    }}>
+                      {item.label.toUpperCase()}
+                    </div>
                   </div>
+                );
+              }
+
+              const node = item.data;
+              const isCurrent = node.id === currentPositionNodeId;
+              const isLocked = node.status === 'locked' && !isCurrent;
+              const isMastered = node.status === 'mastered';
+              const mastery = calculateNodeMastery(node);
+              const masteryColor = 
+                mastery >= 100 ? 'var(--gold)' :
+                mastery >= 75  ? '#f59e0b' :
+                mastery >= 50  ? '#3b82f6' :
+                mastery >= 25  ? '#a855f7' :
+                '#4b5563';
+              const xOffset = getWindingOffset(nodeIndex + unifiedPath.past.length);
+              nodeIndex++;
+
+              return (
+                <div key={node.id} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '48px' }}>
+                  <div 
+                    ref={isCurrent ? currentPositionRef : null}
+                    style={{ 
+                      position: 'relative', 
+                      zIndex: 1, 
+                      left: xOffset,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center'
+                    }}
+                  >
+                    {isCurrent && (
+                       <motion.div 
+                        animate={{ opacity: [1, 0.5, 1] }}
+                        transition={{ repeat: Infinity, duration: 1.2 }}
+                        style={{ position: 'absolute', top: -25, color: 'var(--gold)', fontSize: '0.6rem', fontWeight: 900, letterSpacing: '0.1em' }}
+                       >
+                         YOU ARE HERE
+                       </motion.div>
+                    )}
+
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => handleNodeClick(node)}
+                      style={{
+                        width: isCurrent ? '80px' : '64px',
+                        height: isCurrent ? '80px' : '64px',
+                        borderRadius: '50%',
+                        background: isLocked ? '#222' : (isMastered ? 'var(--gold)' : '#333'),
+                        border: isCurrent ? '4px solid white' : `2px solid ${isLocked ? '#333' : 'var(--gold)'}`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        boxShadow: isCurrent ? '0 0 20px var(--gold)' : 'none',
+                        position: 'relative'
+                      }}
+                    >
+                      {isLocked ? (
+                        <span style={{ fontSize: '1.2rem', opacity: 0.3 }}>🔒</span>
+                      ) : (
+                        <span style={{ fontSize: '1.5rem', filter: isMastered ? 'none' : 'grayscale(1)' }}>
+                          {getNodeIcon(node)}
+                        </span>
+                      )}
+
+                      {!isLocked && (
+                        <svg style={{ position: 'absolute', inset: -6, width: 'calc(100% + 12px)', height: 'calc(100% + 12px)', transform: 'rotate(-90deg)' }}>
+                          <circle 
+                            cx="50%" cy="50%" r="48%" 
+                            fill="none" 
+                            stroke={masteryColor} 
+                            strokeWidth="3" 
+                            strokeDasharray="100 100" 
+                            strokeDashoffset={100 - mastery}
+                            strokeLinecap="round"
+                            style={{ transition: 'stroke-dashoffset 1s ease-out' }}
+                          />
+                        </svg>
+                      )}
+                    </motion.button>
+
+                    <div style={{ 
+                      marginTop: '12px', 
+                      textAlign: 'center', 
+                      width: '120px',
+                      opacity: isLocked ? 0.4 : 1
+                    }}>
+                      <div style={{ 
+                        fontSize: '0.65rem', 
+                        fontWeight: 900, 
+                        color: isCurrent ? 'white' : '#888',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em'
+                      }}>
+                        {node.title}
+                      </div>
+                      {!isLocked && (
+                        <div style={{
+                          fontSize: '0.55rem',
+                          fontWeight: 900,
+                          color: masteryColor,
+                          letterSpacing: '0.08em',
+                          marginTop: '2px'
+                        }}>
+                          {mastery}%
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {isCurrent && nextLockedNode && (
+                    <div style={{
+                      width: '85%',
+                      background: 'rgba(168,85,247,0.06)',
+                      border: '1px solid rgba(168,85,247,0.3)',
+                      borderRadius: '8px',
+                      padding: '12px 16px',
+                      textAlign: 'center',
+                      zIndex: 2,
+                      position: 'relative'
+                    }}>
+                      <div style={{ fontSize: '0.55rem', color: '#a855f7', fontWeight: 900, letterSpacing: '0.1em', marginBottom: '6px' }}>
+                        NEXT UNLOCK: {nextLockedNode.title.toUpperCase()}
+                      </div>
+                      {nextLockedNodeItems.length > 0 && (
+                        <div style={{ fontSize: '0.6rem', color: '#888', fontWeight: 700 }}>
+                          Focus on: {nextLockedNodeItems.map(w => w.word).join(' · ')}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
-              </div>
-            );
-          })}
+              );
+            });
+          })()}
         </div>
 
       </div>
