@@ -19,6 +19,10 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useChatStore } from './store/chatStore';
 import { detectSessionTitle } from './services/linaService';
 
+// Type for __BUILD_TIME__ to satisfy TypeScript if it's not globally declared elsewhere.
+// In Vite, it's typically injected globally.
+declare const __BUILD_TIME__: string;
+
 export type AppPanel = 'profile' | 'settings' | 'instructions' | 'achievements' | 'logbook';
 
 export default function App() {
@@ -199,7 +203,7 @@ export default function App() {
         {activePanels.map(panel => (
           <ModalWrapper key={panel} onClose={() => togglePanel(panel)}>
              {panel === 'profile' && <UserProfilePanel onClose={() => togglePanel('profile')} />}
-             {panel === 'settings' && <SettingsPanel isOpen={true} onClose={() => togglePanel('settings')} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} onOpenLogbook={() => togglePanel('logbook')} onOpenMasteryCourt={() => { togglePanel('settings'); handleAskLina('[SYSTEM: The student has opened Mastery Court. You know why they\'re here. Greet them briefly, acknowledge your role, and ask what they\'d like to petition.]'); }} onOpenStoicArchive={() => { togglePanel('settings'); setShowStoicHistory(true); }} />}
+             {panel === 'settings' && <SettingsPanel isOpen={true} onClose={() => togglePanel('settings')} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} onOpenLogbook={() => togglePanel('logbook')} onOpenMasteryCourt={() => { togglePanel('settings'); handleAskLina('[SYSTEM: The student has opened Mastery Court. You know why they're here. Greet them briefly, acknowledge your role, and ask what they'd like to petition.]'); }} onOpenStoicArchive={() => { togglePanel('settings'); setShowStoicHistory(true); }} />}
              {panel === 'achievements' && <AchievementsPanel onClose={() => togglePanel('achievements')} />}
              {panel === 'instructions' && <InstructionsPanel isOpen={true} onClose={() => togglePanel('instructions')} />}
              {panel === 'logbook' && <LogbookPanel onClose={() => togglePanel('logbook')} />}
@@ -282,6 +286,27 @@ export default function App() {
       </div>
 
       {!hasCompletedSetup && <SetupScreen />}
+
+      {/* Build Time Badge */}
+      <div
+        style={{
+          position: 'fixed',
+          bottom: '10px',
+          right: '10px',
+          backgroundColor: 'rgba(0, 0, 0, 0.6)', // Semi-transparent black background
+          color: 'white',
+          padding: '5px 10px',
+          borderRadius: '5px',
+          fontSize: '0.7rem',
+          fontWeight: 'bold',
+          zIndex: 99999, // High z-index to ensure it's on top
+          opacity: 0.8, // Slightly transparent
+          backdropFilter: 'blur(5px)' // Optional: adds a blur effect for unobtrusiveness
+        }}
+      >
+        Compiled: {new Date(__BUILD_TIME__).toLocaleString()}
+      </div>
+      {/* End Build Time Badge */}
     </div>
   );
 }
