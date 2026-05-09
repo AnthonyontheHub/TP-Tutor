@@ -1686,6 +1686,24 @@ export const useMasteryStore = create<MasteryStore>()(
           if (!snapshot.exists()) return;
           const data = snapshot.data();
 
+          // AUTO-MIGRATION: If Firestore data contains legacy partOfSpeech strings,
+          // normalize them and write back to Firestore immediately.
+          if (Array.isArray(data.vocabulary)) {
+            const legacyStrings = ['Adjective', 'Adverb', 'Interrogative', 'Ordinal-marker', 'Number'];
+            const hasLegacy = data.vocabulary.some(w => 
+              typeof w.partOfSpeech === 'string' && 
+              legacyStrings.some(ls => w.partOfSpeech.includes(ls))
+            );
+
+            if (hasLegacy) {
+              const cleanedVocab = data.vocabulary.map(w => ({
+                ...w,
+                partOfSpeech: normalizePartOfSpeech(w.partOfSpeech || '')
+              }));
+              void setDoc(userDocRef, { vocabulary: cleanedVocab }, { merge: true });
+            }
+          }
+
           // Detect contaminated cloud data: a different name + all vocab mastered
           // indicates test/debug data was accidentally synced to this account
           const cloudName = data.studentName as string | undefined;
