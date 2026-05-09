@@ -1911,6 +1911,7 @@ export const useMasteryStore = create<MasteryStore>()(
     }),
     { 
       name: 'tp-tutor-mastery',
+      version: 1,
       partialize: (state) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { userId, cloudSynced, ...rest } = state;
