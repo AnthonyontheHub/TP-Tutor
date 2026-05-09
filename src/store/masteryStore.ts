@@ -612,13 +612,14 @@ export const useMasteryStore = create<MasteryStore>()(
             const totalDrop = Math.abs(recentDrops.reduce((acc, h) => acc + h.change, 0));
             const isBleeding = totalDrop > 50;
 
-            // Distribute XP delta equally across the word's actual roles
-            const roles = (w.partOfSpeech || '').split(',').map(p => p.trim().toLowerCase()).filter(Boolean);
-            const roleKeys = roles.map(r => r === 'modifier' ? 'mod' : r);
+            // Distribute points equally across the word's actual roles
+            const roleParts = (w.partOfSpeech || '').split(',').map((p: string) => p.trim().toLowerCase()).filter(Boolean);
+            const roleKeys = roleParts.map((r: string) => r === 'modifier' ? 'mod' : r);
             const pointsPerRole = roleKeys.length > 0 ? Math.floor(points / roleKeys.length) : 0;
-            const newRoleMatrix = { ...((w as any).roleMatrix || {}) };
-            roleKeys.forEach(key => {
-              newRoleMatrix[key] = clamp((newRoleMatrix[key] || 0) + pointsPerRole, 0, Math.floor(1000 / roleKeys.length));
+            const maxPerRole = roleKeys.length > 0 ? Math.floor(1000 / roleKeys.length) : 1000;
+            const newRoleMatrix = { ...(w.roleMatrix || {}) };
+            roleKeys.forEach((key: string) => {
+              newRoleMatrix[key] = clamp((newRoleMatrix[key] || 0) + pointsPerRole, 0, maxPerRole);
             });
 
             return {
