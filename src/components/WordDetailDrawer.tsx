@@ -8,6 +8,7 @@ import { fetchDeepDiveExamples, fetchExamplesForWord, fetchNeighborConnections, 
 import { WORD_RELATIONSHIPS } from '../data/wordRelationships';
 import { soundService } from '../services/soundService';
 import { initialMasteryMap } from '../data/initialMasteryMap';
+import aiVocabCache from '../data/aiVocabCache.json';
 
 const NEXT_STATUS: Partial<Record<MasteryStatus, MasteryStatus>> = {
   not_started: 'introduced',
@@ -103,20 +104,34 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
       setGrammarExamples(null);
       setNeighborConnections(null);
 
-      const hasDeepDive = !!(word.aiExamples && word.aiExplanation);
-      const hasGrammar = !!(word.grammarExamples || initialData?.grammarExamples);
-      const hasNeighbors = !!(word.neighborConnections || initialData?.neighborConnections);
+      const cachedData = (aiVocabCache as Record<string, any>)[word.word];
+
+      const hasDeepDive = !!(word.aiExamples && word.aiExplanation) || !!cachedData?.aiExamples;
+      const hasGrammar = !!(word.grammarExamples || initialData?.grammarExamples) || !!cachedData?.grammarExamples;
+      const hasNeighbors = !!(word.neighborConnections || initialData?.neighborConnections) || !!cachedData?.neighborConnections;
 
       if (hasDeepDive) {
-        setDeepDive({ ...word.aiExamples, explanation: word.aiExplanation });
+        if (word.aiExamples && word.aiExplanation) {
+          setDeepDive({ ...word.aiExamples, explanation: word.aiExplanation });
+        } else if (cachedData?.aiExamples) {
+          setDeepDive({ ...cachedData.aiExamples, explanation: cachedData.aiExplanation });
+        }
       }
 
       if (hasGrammar) {
-        setGrammarExamples({ ...(word.grammarExamples || {}), ...(initialData?.grammarExamples || {}) });
+        setGrammarExamples({ 
+          ...(word.grammarExamples || {}), 
+          ...(initialData?.grammarExamples || {}),
+          ...(cachedData?.grammarExamples || {})
+        });
       }
 
       if (hasNeighbors) {
-        setNeighborConnections({ ...(word.neighborConnections || {}), ...(initialData?.neighborConnections || {}) });
+        setNeighborConnections({ 
+          ...(word.neighborConnections || {}), 
+          ...(initialData?.neighborConnections || {}),
+          ...(cachedData?.neighborConnections || {})
+        });
       }
 
       if (!hasDeepDive || !hasGrammar || !hasNeighbors) {
@@ -130,13 +145,13 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
           } else {
             if (!hasGrammar) {
               fetchExamplesForWord(key, word.word, partsOfSpeech, userContext).then(res => {
-                setGrammarExamples(res);
+                setGrammarExamples(prev => ({ ...prev, ...res }));
                 updateVocabAIContent(word.id, { grammarExamples: res });
               });
             }
             if (!hasNeighbors) {
               fetchNeighborConnections(key, word.word, filteredNeighbors, userContext).then(res => {
-                setNeighborConnections(res);
+                setNeighborConnections(prev => ({ ...prev, ...res }));
                 updateVocabAIContent(word.id, { neighborConnections: res });
               });
             }
@@ -153,7 +168,7 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
         }
       }
     }
-  }, [isOpen, word, triggerGeneration, isSandboxMode, profile, updateVocabAIContent, filteredNeighbors]);
+  }, [isOpen, word, triggerGeneration, isSandboxMode, profile, updateVocabAIContent, filteredNeighbors, initialData]);
 
   return (
     <AnimatePresence>
@@ -204,32 +219,54 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
               </div>
 
               <div style={{ display: 'grid', gap: '12px' }}>
-                {(['noun', 'verb', 'mod'] as const).map(role => {
-                  const score = word.roleMatrix?.[role] || 0;
-                  const lowest = Math.min(word.roleMatrix?.noun ?? 0, word.roleMatrix?.verb ?? 0, word.roleMatrix?.mod ?? 0);                  const isLocked = score >= lowest + 100 && score < 334;
-                  const progress = (score / 334) * 100;
-                  const color = role === 'noun' ? 'var(--blue)' : role === 'verb' ? 'var(--pink)' : 'var(--amber)';
+                {(() => {
+                  const roles = (word.partOfSpeech || '').split(',').map(p => p.trim()).filter(Boolean);
+                  const pointsPerRole = roles.length > 0 ? Math.floor(1000 / roles.length) : 0;
+                  
+                  const roleMatrix = (word as any).roleMatrix || {};
+                  const roleKeys = roles.map(r => {
+                    const lower = r.toLowerCase();
+                    if (lower === 'noun') return 'noun';
+                    if (lower === 'verb') return 'verb';
+                    if (lower === 'modifier' || lower === 'mod') return 'mod';
+                    return lower;
+                  });
 
-                  return (
-                    <div key={role}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.55rem', textTransform: 'uppercase', marginBottom: '4px', fontWeight: 900, letterSpacing: '0.1em' }}>
-                        <span style={{ color: isLocked ? '#666' : 'white' }}>{role === 'mod' ? 'modifier' : role} {isLocked && '🔒'}</span>
-                        <span style={{ color }}>{score} / 334</span>
+                  const scores = roleKeys.map(key => roleMatrix[key] || 0);
+                  const lowestScore = scores.length > 0 ? Math.min(...scores) : 0;
+
+                  return roles.map((role, idx) => {
+                    const key = roleKeys[idx];
+                    const score = scores[idx];
+                    const isLocked = score > lowestScore + 100;
+                    const progress = pointsPerRole > 0 ? (score / pointsPerRole) * 100 : 0;
+                    
+                    let color = 'var(--cyan)';
+                    if (key === 'noun') color = 'var(--blue)';
+                    else if (key === 'verb') color = 'var(--pink)';
+                    else if (key === 'mod') color = 'var(--amber)';
+
+                    return (
+                      <div key={role}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.55rem', textTransform: 'uppercase', marginBottom: '4px', fontWeight: 900, letterSpacing: '0.1em' }}>
+                          <span style={{ color: isLocked ? '#666' : 'white' }}>{role} {isLocked && '🔒'}</span>
+                          <span style={{ color }}>{score} / {pointsPerRole}</span>
+                        </div>
+                        <div className="progress-bar-track" style={{ height: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '100px', overflow: 'hidden' }}>
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${progress}%` }}
+                            style={{
+                              height: '100%',
+                              background: isLocked ? '#666' : color,
+                              boxShadow: isLocked ? 'none' : `0 0 10px ${color}44`
+                            }}
+                          />
+                        </div>
                       </div>
-                      <div className="progress-bar-track" style={{ height: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '100px', overflow: 'hidden' }}>
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${progress}%` }}
-                          style={{
-                            height: '100%',
-                            background: color,
-                            boxShadow: `0 0 10px ${color}44`
-                          }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
+                    );
+                  });
+                })()}
               </div>
 
               {word.status !== 'mastered' && (

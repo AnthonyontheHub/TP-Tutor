@@ -1905,7 +1905,6 @@
     },
     "neighborConnections": {
       "ala (Opposite-ish)": "ala (none/zero) is an opposite-ish of wan (one) as it represents the absence of quantity, while wan represents a single unit.",
-      "ale (Opposite-ish)": "ale (all) is an opposite-ish of wan (one) because ale encompasses everything, contrasting with wan which specifies a single item.",
       "ale (Opposite-ish)": "Similar to ale, ale (all) is an opposite-ish of wan (one) by representing the complete set as opposed to a solitary element.",
       "mute (Antonym)": "mute (many) is an antonym to wan (one) as it expresses multiplicity, directly contrasting with singularity.",
       "tu (Neighbor)": "tu (two) is a numerical neighbor to wan (one) as it is the very next number in the Toki Pona counting system."
@@ -2188,6 +2187,28 @@
       "jan (Category)": "Category: 'tonsi' describes a specific category of 'jan' (person), referring to individuals with non-binary or ambiguous gender identities.",
       "meli (Counterpart)": "Counterpart: 'tonsi' serves as a gender counterpart to 'meli,' representing individuals whose gender identity is not exclusively female.",
       "mije (Counterpart)": "Counterpart: 'tonsi' also serves as a gender counterpart to 'mije,' representing individuals whose gender identity is not exclusively male."
+    }
+  },
+  "ali": {
+    "aiExamples": {
+      "simple": "ali li pona. (Everything is good.)",
+      "intermediate": "ali suli li lon ma ni. (All important things are in this land.)",
+      "advanced": "mi kama sona e ali pi ma ante la, mi pilin wawa. (When I learned all things of other lands, I felt strong.)"
+    },
+    "aiExplanation": "The word \"ali\" signifies totality, meaning \"all,\" \"every,\" or \"complete.\" It most commonly acts as a post-modifier for a noun, such as in \"jan ali\" (all people) or \"ma ali\" (every land). When used as a noun itself, \"ali\" refers to \"everything\" or \"the whole.\"",
+    "grammarExamples": {
+      "Modifier": "jan ali li pona. (All people are good.)"
+    }
+  },
+  "sewi": {
+    "aiExamples": {
+      "simple": "suno li sewi. (The sun is high.)",
+      "intermediate": "kon sewi li kama. (A high spirit comes / A divine spirit comes.)",
+      "advanced": "mi lukin e soweli sewi la, mi pilin pona. (When I see a divine animal, I feel good.)"
+    },
+    "aiExplanation": "Sewi primarily denotes height or elevation, meaning \"high,\" \"up,\" or \"above.\" However, its usage extends beyond the physical to encompass abstract concepts like divinity, sacredness, importance, or nobility. Consequently, it can describe anything from a high mountain (\"nasin sewi\") to a spiritual essence (\"kon sewi\") or a revered person (\"jan sewi\"), highlighting its semantic depth.",
+    "grammarExamples": {
+      "Preposition": "mi sewi ona. (I am above them.)"
     }
   }
 }

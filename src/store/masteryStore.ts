@@ -16,6 +16,7 @@ import { initialMasteryMap } from '../data/initialMasteryMap';
 import { curriculumRoadmap } from '../data/curriculum';
 import { vocabContent } from '../data/vocabContent';
 import { TOKI_PONA_DICTIONARY, WORD_FREQUENCY } from '../data/tokiPonaDictionary';
+import aiVocabCache from '../data/aiVocabCache.json';
 
 const KU_SULI_WORDS = new Set(['kokosila', 'lanpan', 'misikeke', 'epiku', 'jasima', 'kijetesantakalu', 'leko', 'linluwi', 'nja', 'oke', 'soko', 'tonsi', 'usawi', 'yupekosi', 'meso', 'namako', 'oko', 'kipisi']);
 
@@ -41,10 +42,29 @@ function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: Maste
   const score = STATUS_MIDPOINT[v.status];
   const staticData = vocabContent[v.word] || {};
 
+  // HARDCODED RULE: partOfSpeech is ALWAYS derived from aiVocabCache.grammarExamples.
+  // NEVER trust the partOfSpeech value stored in Firestore or localStorage.
+  // If aiVocabCache has no grammarExamples for this word, fall back to initialMasteryMap.
+  // Do NOT remove this logic or store partOfSpeech as a source of truth anywhere.
+  const derivedPartOfSpeech = (() => {
+    const cache = (aiVocabCache as Record<string, { grammarExamples?: Record<string, string> }>)[v.word];
+    if (cache?.grammarExamples) {
+      return normalizePartOfSpeech(Object.keys(cache.grammarExamples).join(', '));
+    }
+    return normalizePartOfSpeech(v.partOfSpeech || '');
+  })();
+
+  // Build initial roleMatrix from partOfSpeech
+  const roles = derivedPartOfSpeech.split(',').map(p => p.trim().toLowerCase()).filter(Boolean);
+  const roleKeys = roles.map(r => r === 'modifier' ? 'mod' : r);
+  const scorePerRole = roleKeys.length > 0 ? Math.floor(score / roleKeys.length) : 0;
+  const roleMatrix: Record<string, number> = {};
+  roleKeys.forEach(k => { roleMatrix[k] = scorePerRole; });
+
   return {
     id: v.word,
     word: v.word,
-    partOfSpeech: normalizePartOfSpeech(v.partOfSpeech || ''),
+    partOfSpeech: derivedPartOfSpeech,
     meanings: TOKI_PONA_DICTIONARY[v.word.toLowerCase()] || '',
     type: v.type,
     baseScore: score,
@@ -56,6 +76,7 @@ function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: Maste
     isMasteryCandidate: false,
     sessionNotes: v.sessionNotes,
     partOfSpeechScores: { noun: 0, verb: 0, modifier: 0 },
+    roleMatrix: roleMatrix as any,
     lastReviewed: new Date().toISOString(),
     scoreHistory: [],
     hardened: false,
@@ -591,6 +612,15 @@ export const useMasteryStore = create<MasteryStore>()(
             const totalDrop = Math.abs(recentDrops.reduce((acc, h) => acc + h.change, 0));
             const isBleeding = totalDrop > 50;
 
+            // Distribute XP delta equally across the word's actual roles
+            const roles = (w.partOfSpeech || '').split(',').map(p => p.trim().toLowerCase()).filter(Boolean);
+            const roleKeys = roles.map(r => r === 'modifier' ? 'mod' : r);
+            const pointsPerRole = roleKeys.length > 0 ? Math.floor(points / roleKeys.length) : 0;
+            const newRoleMatrix = { ...((w as any).roleMatrix || {}) };
+            roleKeys.forEach(key => {
+              newRoleMatrix[key] = clamp((newRoleMatrix[key] || 0) + pointsPerRole, 0, Math.floor(1000 / roleKeys.length));
+            });
+
             return {
               ...w,
               baseScore: newScore,
@@ -599,7 +629,8 @@ export const useMasteryStore = create<MasteryStore>()(
               lastReviewed: now,
               scoreHistory: [historyEntry, ...(w.scoreHistory || [])].slice(0, 5),
               useCount: w.useCount + 1,
-              isBleeding
+              isBleeding,
+              roleMatrix: newRoleMatrix
             };
           });
 
@@ -701,6 +732,16 @@ export const useMasteryStore = create<MasteryStore>()(
             totalXPChange += effectiveDelta;
 
             const newScore = clamp((w.baseScore ?? 0) + effectiveDelta, 0, 1000);
+
+            // Distribute XP delta equally across the word's actual roles
+            const roles = (w.partOfSpeech || '').split(',').map(p => p.trim().toLowerCase()).filter(Boolean);
+            const roleKeys = roles.map(r => r === 'modifier' ? 'mod' : r);
+            const pointsPerRole = roleKeys.length > 0 ? Math.floor(effectiveDelta / roleKeys.length) : 0;
+            const newRoleMatrix = { ...((w as any).roleMatrix || {}) };
+            roleKeys.forEach(key => {
+              newRoleMatrix[key] = clamp((newRoleMatrix[key] || 0) + pointsPerRole, 0, Math.floor(1000 / roleKeys.length));
+            });
+
             const historyReason = (pendingComebackBonus && idx === 0) ? 'manual_delta + comeback_bonus' : 'manual_delta';
             
             const newStatus = scoreToStatus(newScore);
@@ -717,6 +758,7 @@ export const useMasteryStore = create<MasteryStore>()(
               confidenceScore: newScore,
               status: newStatus,
               useCount: (w.useCount ?? 0) + 1,
+              roleMatrix: newRoleMatrix,
               lastReviewed: now,
               scoreHistory: [{ date: now, change: effectiveDelta, reason: historyReason }, ...(w.scoreHistory || [])].slice(0, 5)
             };
@@ -1601,8 +1643,13 @@ export const useMasteryStore = create<MasteryStore>()(
 
         try {
           // Strip static content before sending to Firestore
+          // HARDCODED RULE: partOfSpeech is NEVER stored in Firestore.
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const partialVocab = vocabulary.map(({ phonetic, syllables, anchor, semanticCluster, connotation, roles, examples, collocations, relatedWordIds, boundaryNotes, etymology, mnemonic, culturalNotes, avoidWhen, ...dynamicData }) => dynamicData);
+          const partialVocab = vocabulary.map(({ 
+            phonetic, syllables, anchor, semanticCluster, connotation, roles, 
+            examples, collocations, relatedWordIds, boundaryNotes, etymology, 
+            mnemonic, culturalNotes, avoidWhen, partOfSpeech, ...dynamicData 
+          }) => dynamicData);
 
           // Deep sanitize object to convert undefined -> null for Firestore reliability
           const sanitize = (obj: any): any => {
@@ -1720,7 +1767,9 @@ export const useMasteryStore = create<MasteryStore>()(
           }
 
           if (needsUpdate && uid !== 'guest_user') {
-            void setDoc(userDocRef, { vocabulary: normalizedCloudVocab }, { merge: true });
+            // Strip partOfSpeech before writing back to Firestore to prevent corruption
+            const strippedVocab = normalizedCloudVocab.map(({ partOfSpeech, ...rest }) => rest);
+            void setDoc(userDocRef, { vocabulary: strippedVocab }, { merge: true });
           }
 
           const sourceVocab = Array.isArray(data.vocabulary) ? normalizedCloudVocab : mappedVocabulary;
@@ -1756,9 +1805,18 @@ export const useMasteryStore = create<MasteryStore>()(
                 } else {
                   baseScore = STATUS_MIDPOINT[w.status as MasteryStatus || 'not_started'];
                 }
-              }
+                }
 
-              return { 
+                // HARDCODED RULE: partOfSpeech is ALWAYS derived from aiVocabCache.grammarExamples.
+                // NEVER trust the partOfSpeech value stored in Firestore or localStorage.
+                // If aiVocabCache has no grammarExamples for this word, fall back to initialMasteryMap.
+                // Do NOT remove this logic or store partOfSpeech as a source of truth anywhere.
+                const cache = (aiVocabCache as Record<string, { grammarExamples?: Record<string, string> }>)[w.word || ''];
+                const derivedPOS = cache?.grammarExamples 
+                ? normalizePartOfSpeech(Object.keys(cache.grammarExamples).join(', '))
+                : normalizePartOfSpeech(w.partOfSpeech || (base?.partOfSpeech ?? ''));
+
+                return { 
                 ...w, 
                 baseScore,
                 confidenceScore: baseScore, // sync legacy
@@ -1768,7 +1826,7 @@ export const useMasteryStore = create<MasteryStore>()(
                 weight,
                 meanings,
                 sessionNotes,
-                partOfSpeech: normalizePartOfSpeech(w.partOfSpeech || (base?.partOfSpeech ?? '')),
+                partOfSpeech: derivedPOS,
                 partOfSpeechScores: w.partOfSpeechScores || { noun: 0, verb: 0, modifier: 0 },
                 lastReviewed: w.lastReviewed || new Date().toISOString(),
                 scoreHistory: w.scoreHistory || [],

@@ -21,6 +21,16 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
   const [localSandbox, setLocalSandbox] = useState(isSandboxMode);
   const [localApiKey, setLocalApiKey] = useState(localStorage.getItem('TP_GEMINI_KEY') || '');
   const [localFreq, setLocalFreq] = useState(knowledgeCheckFrequency);
+  const [pendingAction, setPendingAction] = useState<string | null>(null);
+  const [confirmInput, setConfirmInput] = useState('');
+
+  const DANGER_CONFIG: Record<string, { label: string; confirmWord: string; warning: string }> = {
+    randomize:    { label: 'RANDOMIZE NEURAL SYNC',      confirmWord: 'randomize', warning: 'This will randomize all vocabulary mastery statuses.' },
+    masterAll:    { label: 'FORCE TOTAL MASTERY',         confirmWord: 'master',    warning: 'This will mark all vocabulary as mastered.' },
+    clearPhrases: { label: 'CLEAR ALL SAVED PHRASES',     confirmWord: 'clear',     warning: 'This will permanently delete all your saved phrases.' },
+    resetLearning:{ label: 'RESET LEARNING PROGRESS',     confirmWord: 'reset',     warning: 'Your profile is kept, but all vocab progress and streaks are wiped.' },
+    wipeAll:      { label: 'WIPE EVERYTHING',             confirmWord: 'wipe',      warning: 'Wipes ALL local and cloud data. You will be signed out.' },
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -41,38 +51,22 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
     onClose();
   };
 
-  const handleResetLearning = async () => {
-    if(confirm("Reset learning progress? Your profile will be kept, but vocabulary and streaks will be reset to zero.")) {
+  const handleConfirm = async () => {
+    if (pendingAction === 'randomize') { randomizeVocab(); }
+    else if (pendingAction === 'masterAll') { masterAllVocab(); }
+    else if (pendingAction === 'clearPhrases') { clearAllSavedPhrases(); }
+    else if (pendingAction === 'resetLearning') {
       await resetLearningProgress();
       setIsSandboxMode(false);
       onClose();
     }
-  };
-
-  const handleReset = async () => {
-    if(confirm("Wipe all local and cloud data? This will also sign you out.")) {
+    else if (pendingAction === 'wipeAll') {
       await resetAsNewUser();
       setIsSandboxMode(false);
       await logout();
     }
-  };
-
-  const handleRandomize = async () => {
-    if(confirm("Randomize all vocabulary mastery statuses?")) {
-      randomizeVocab();
-    }
-  };
-
-  const handleMasterAll = async () => {
-    if(confirm("Master all vocabulary?")) {
-      masterAllVocab();
-    }
-  };
-
-  const handleClearPhrases = async () => {
-    if(confirm("Clear all saved phrases?")) {
-      clearAllSavedPhrases();
-    }
+    setPendingAction(null);
+    setConfirmInput('');
   };
 
   return (
@@ -170,17 +164,43 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
       <section style={{ marginBottom: '40px' }}>
         <h2 style={{ fontSize: '0.8rem', fontWeight: 900, opacity: 0.5, marginBottom: '20px', color: '#ef4444' }}>DANGER ZONE</h2>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px' }}>
-          <button onClick={handleRandomize} className="btn-settings" style={{ background: '#1a1a1a', border: '1px solid #d4af37', color: '#d4af37' }}>RANDOMIZE NEURAL SYNC</button>
-          <button onClick={handleMasterAll} className="btn-settings" style={{ background: '#1a1a1a', border: '1px solid #d4af37', color: '#d4af37' }}>FORCE TOTAL MASTERY</button>
-          <button onClick={handleClearPhrases} className="btn-settings" style={{ background: '#1a1a1a', border: '1px solid #d4af37', color: '#d4af37' }}>CLEAR ALL SAVED PHRASES</button>
-          <button onClick={handleResetLearning} className="btn-settings" style={{ background: '#1a1a1a', border: '1px solid #d4af37', color: '#d4af37' }}>RESET LEARNING PROGRESS</button>
-          <button 
-            onClick={handleReset} 
-            className="btn-settings" 
-            style={{ background: '#1a1a1a', border: '1px solid #d4af37', color: '#d4af37' }}
-          >
-            WIPE EVERYTHING
-          </button>
+          {(['randomize', 'masterAll', 'clearPhrases', 'resetLearning', 'wipeAll'] as const).map(actionKey => (
+            <div key={actionKey}>
+              {pendingAction === actionKey ? (
+                <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.4)', borderRadius: '4px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{ fontSize: '0.7rem', color: '#ef4444', fontWeight: 800 }}>{DANGER_CONFIG[actionKey].warning}</div>
+                  <div style={{ fontSize: '0.65rem', color: '#888' }}>Type <strong style={{ color: 'white' }}>{DANGER_CONFIG[actionKey].confirmWord}</strong> to confirm</div>
+                  <input
+                    type="text"
+                    value={confirmInput}
+                    onChange={e => setConfirmInput(e.target.value)}
+                    placeholder={DANGER_CONFIG[actionKey].confirmWord}
+                    autoFocus
+                    style={{ background: '#111', border: '1px solid #333', color: 'white', borderRadius: '4px', padding: '6px 10px', fontSize: '0.8rem', fontFamily: 'var(--font)' }}
+                  />
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      onClick={handleConfirm}
+                      disabled={confirmInput !== DANGER_CONFIG[actionKey].confirmWord}
+                      style={{ flex: 1, padding: '8px', background: confirmInput === DANGER_CONFIG[actionKey].confirmWord ? '#ef4444' : '#333', color: 'white', border: 'none', borderRadius: '4px', fontWeight: 900, fontSize: '0.75rem', cursor: confirmInput === DANGER_CONFIG[actionKey].confirmWord ? 'pointer' : 'not-allowed', letterSpacing: '0.05em' }}
+                    >
+                      CONFIRM
+                    </button>
+                    <button
+                      onClick={() => { setPendingAction(null); setConfirmInput(''); }}
+                      style={{ padding: '8px 14px', background: 'transparent', color: '#888', border: '1px solid #333', borderRadius: '4px', fontWeight: 700, fontSize: '0.75rem', cursor: 'pointer' }}
+                    >
+                      CANCEL
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button onClick={() => { setPendingAction(actionKey); setConfirmInput(''); }} className="btn-settings" style={{ width: '100%', background: '#1a1a1a', border: '1px solid #d4af37', color: '#d4af37' }}>
+                  {DANGER_CONFIG[actionKey].label}
+                </button>
+              )}
+            </div>
+          ))}
         </div>
       </section>
 

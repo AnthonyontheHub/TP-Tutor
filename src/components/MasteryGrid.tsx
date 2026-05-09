@@ -221,41 +221,67 @@ export default function MasteryGrid({
           font-size: 0.8rem;
           box-sizing: border-box;
         }
+
+        /* ── Mobile: two clean rows ── */
         .grid-toolbar-inner {
           display: flex;
           flex-direction: column;
           gap: 8px;
         }
-        .toolbar-group {
+        .toolbar-row {
           display: flex;
           gap: 8px;
           width: 100%;
+          align-items: center;
         }
-        .toolbar-group--left > * {
+        /* Row 1: POS dropdown + Search bar share the full width */
+        .toolbar-row--filters .toolbar-pos-select {
+          flex: 0 0 auto;
+          width: 130px;
+        }
+        .toolbar-row--filters .toolbar-search {
           flex: 1;
           min-width: 0;
         }
-        .toolbar-group--right .sort-select {
+        /* Row 2: Sort dropdown expands, arrow + view toggle are fixed-width icon buttons */
+        .toolbar-row--sort .toolbar-sort-select {
           flex: 1;
           min-width: 0;
         }
+        .toolbar-icon-btn {
+          flex: 0 0 36px;
+          width: 36px;
+          padding: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1rem;
+        }
+
+        /* ── Desktop: single row ── */
         @media (min-width: 768px) {
           .grid-toolbar-inner {
             flex-direction: row;
+            align-items: center;
           }
-          .toolbar-group {
+          .toolbar-row {
             width: auto;
             flex: 1;
+          }
+          .toolbar-row--filters .toolbar-pos-select {
+            width: 160px;
           }
         }
       `}</style>
       <div className="grid-toolbar" style={{ flexShrink: 0 }}>
         <div className="grid-toolbar-inner">
-          <div className="toolbar-group toolbar-group--left">
+
+          {/* Row 1: POS filter + Search */}
+          <div className="toolbar-row toolbar-row--filters">
             <select
               value={selectedPOS}
               onChange={(e) => setSelectedPOS(e.target.value)}
-              className="toolbar-input"
+              className="toolbar-input toolbar-pos-select"
             >
               <option value="All">All Parts of Speech</option>
               {availablePartsOfSpeech.map(pos => (
@@ -267,14 +293,16 @@ export default function MasteryGrid({
               placeholder="Search vocab..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="toolbar-input"
+              className="toolbar-input toolbar-search"
             />
           </div>
-          <div className="toolbar-group toolbar-group--right">
+
+          {/* Row 2: Sort + Direction + View toggle */}
+          <div className="toolbar-row toolbar-row--sort">
             <select
               value={sortMode}
               onChange={(e) => setSortMode(e.target.value)}
-              className="toolbar-input sort-select"
+              className="toolbar-input toolbar-sort-select"
             >
               <option value="alphabetical">A → Z</option>
               <option value="status">Mastery Level</option>
@@ -285,20 +313,19 @@ export default function MasteryGrid({
             </select>
             <button
               onClick={(e) => { e.stopPropagation(); setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc'); }}
-              className="toolbar-input btn-toggle"
-              style={{ width: '36px', padding: '0', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              className="toolbar-input btn-toggle toolbar-icon-btn"
             >
               {sortDirection === 'asc' ? '↑' : '↓'}
             </button>
             <button
               onClick={() => setViewMode(prev => prev === 'card' ? 'table' : 'card')}
-              className="toolbar-input btn-toggle"
-              style={{ width: '36px', padding: '0', flexShrink: 0, fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              className="toolbar-input btn-toggle toolbar-icon-btn"
               title={viewMode === 'card' ? 'Switch to Table View' : 'Switch to Card View'}
             >
               {viewMode === 'card' ? '📋' : '🎴'}
             </button>
           </div>
+
         </div>
       </div>
 
