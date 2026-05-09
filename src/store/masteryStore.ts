@@ -22,12 +22,17 @@ const KU_SULI_WORDS = new Set(['kokosila', 'lanpan', 'misikeke', 'epiku', 'jasim
 function normalizePartOfSpeech(pos: string): string {
   if (!pos) return pos;
   return pos.split(',').map(part => {
-    const p = part.trim();
-    if (p === 'Adjective') return 'Modifier';
-    if (p === 'Adverb') return 'Modifier';
-    if (p === 'Number') return 'Modifier';
-    if (p === 'Interrogative') return 'Particle';
-    if (p === 'Ordinal-marker') return 'Particle';
+    let p = part.trim();
+    const lower = p.toLowerCase();
+    
+    if (lower === 'adjective' || lower === 'adverb' || lower === 'number') {
+      p = 'Modifier';
+    } else if (lower === 'interrogative' || lower === 'ordinal-marker') {
+      p = 'Particle';
+    } else {
+      // Capitalize first letter of any other role (e.g. noun -> Noun)
+      p = p.charAt(0).toUpperCase() + p.slice(1).toLowerCase();
+    }
     return p;
   }).join(', ');
 }
