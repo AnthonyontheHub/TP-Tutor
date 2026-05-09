@@ -209,7 +209,7 @@ export default function FlashcardMode({ onClose, onAskLina, isSandboxMode }: Pro
                   className="btn-review"
                   style={{ width: '100%', margin: 0 }}
                 >
-                  NEXT CARD (+2 XP)
+                  ✓ GOT IT
                 </button>
                 <button 
                   type="button" 
@@ -227,7 +227,7 @@ export default function FlashcardMode({ onClose, onAskLina, isSandboxMode }: Pro
                     fontSize: '0.8rem'
                   }}
                 >
-                  NEXT CARD
+                  → SKIP
                 </button>
                 <button 
                   type="button" 
@@ -245,7 +245,7 @@ export default function FlashcardMode({ onClose, onAskLina, isSandboxMode }: Pro
                     fontSize: '0.8rem'
                   }}
                 >
-                  NEXT CARD (-5 XP)
+                  ✗ WRONG
                 </button>
               </div>
             </motion.div>
