@@ -1694,11 +1694,17 @@ export const useMasteryStore = create<MasteryStore>()(
           if (!snapshot.exists()) return;
           const data = snapshot.data();
 
-          // 1. AUTO-MIGRATION: Normalize Firestore data on load
+          // 1. AUTO-MIGRATION: Normalize Firestore data on load and add missing words
           let needsUpdate = false;
           const cloudVocab = Array.isArray(data.vocabulary) ? data.vocabulary : [];
           
-          const normalizedCloudVocab = cloudVocab.map(w => {
+          // Identify missing words from code's ground truth
+          const cloudWordIds = new Set(cloudVocab.map(w => w.word?.toLowerCase()));
+          const missingFromCloud = initialMasteryMap.initialVocabulary.filter(
+            iv => !cloudWordIds.has(iv.word.toLowerCase())
+          );
+
+          let normalizedCloudVocab = cloudVocab.map(w => {
             const currentPOS = w.partOfSpeech || '';
             const normalizedPOS = normalizePartOfSpeech(currentPOS);
             if (currentPOS !== normalizedPOS) {
@@ -1706,6 +1712,13 @@ export const useMasteryStore = create<MasteryStore>()(
             }
             return { ...w, partOfSpeech: normalizedPOS };
           });
+
+          if (missingFromCloud.length > 0) {
+            needsUpdate = true;
+            // Add missing words fresh using the standard hydration logic
+            const newEntries = missingFromCloud.map(toFullVocabWord);
+            normalizedCloudVocab = [...normalizedCloudVocab, ...newEntries];
+          }
 
           if (needsUpdate && uid !== 'guest_user') {
             void setDoc(userDocRef, { vocabulary: normalizedCloudVocab }, { merge: true });
