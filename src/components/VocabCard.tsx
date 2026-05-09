@@ -163,6 +163,7 @@ export default function VocabCard({ word, onLongPress, onClick, isSandboxMode, i
           transform: 'translate(-50%, -50%) scale(1.5)',
           zIndex: 0,
           opacity: 0.15,
+          fontSize: '2rem',
           lineHeight: 1,
           pointerEvents: 'none',
           textShadow: `0 0 8px ${GLOW_COLOR[status]}, 0 0 12px ${GLOW_COLOR[status]}`,

@@ -1931,12 +1931,22 @@ export const useMasteryStore = create<MasteryStore>()(
             persistedState.vocabulary = mappedVocabulary.map(staticWord => {
               const persistedWord = persistedMap.get(staticWord.id.toLowerCase());
               if (persistedWord) {
+                // Determine if we should patch partOfSpeech
+                let partOfSpeech = persistedWord.partOfSpeech;
+                const oldPOS = ['Adjective', 'Adverb', 'Interrogative', 'Ordinal-marker', 'Number'];
+                const isSingleRole = !partOfSpeech.includes(',');
+                const isOutdated = oldPOS.includes(partOfSpeech);
+
+                if (isOutdated || !partOfSpeech) {
+                  partOfSpeech = staticWord.partOfSpeech;
+                }
+
                 // Merge: preserve user progress, but update static linguistics
                 return {
                   ...staticWord, 
                   ...persistedWord,
                   // Re-force fields that must match current code normalization
-                  partOfSpeech: staticWord.partOfSpeech,
+                  partOfSpeech,
                   meanings: staticWord.meanings,
                   isKu: staticWord.isKu
                 };
