@@ -1909,9 +1909,44 @@ export const useMasteryStore = create<MasteryStore>()(
         });
       },
     }),
+// ─── MIGRATION SYSTEM ────────────────────────────────────────────────────────
+// IMPORTANT: Any time you change src/data/initialMasteryMap.ts (adding words,
+// changing partOfSpeech values, etc.), you MUST:
+// 1. Bump the `version` number in the persist config below by 1.
+// 2. Add a new migration case handling the old version → new version, applying
+//    your changes to any persisted vocabulary so existing users get the update
+//    without losing their progress.
+// Failing to do this means existing users will never see your changes.
+// ─────────────────────────────────────────────────────────────────────────────
     { 
       name: 'tp-tutor-mastery',
       version: 1,
+      migrate: (persistedState: any, version: number) => {
+        if (version === 0) {
+          if (persistedState && Array.isArray(persistedState.vocabulary)) {
+            const persistedVocab = persistedState.vocabulary;
+            const persistedMap = new Map(persistedVocab.map((v: any) => [v.word.toLowerCase(), v]));
+
+            // mappedVocabulary is our ground truth from code (already POS-normalized)
+            persistedState.vocabulary = mappedVocabulary.map(staticWord => {
+              const persistedWord = persistedMap.get(staticWord.id.toLowerCase());
+              if (persistedWord) {
+                // Merge: preserve user progress, but update static linguistics
+                return {
+                  ...staticWord, 
+                  ...persistedWord,
+                  // Re-force fields that must match current code normalization
+                  partOfSpeech: staticWord.partOfSpeech,
+                  meanings: staticWord.meanings,
+                  isKu: staticWord.isKu
+                };
+              }
+              return staticWord; // This word was missing from user's state, add it fresh
+            });
+          }
+        }
+        return persistedState as MasteryStore;
+      },
       partialize: (state) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { userId, cloudSynced, ...rest } = state;
