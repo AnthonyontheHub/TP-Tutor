@@ -1,5 +1,5 @@
 /* src/components/MasteryGrid.tsx */
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import VocabCard from './VocabCard';
 import WordDetailDrawer from './WordDetailDrawer';
@@ -7,6 +7,7 @@ import ChallengeWidget from './ChallengeWidget';
 import type { MasteryStatus, VocabWord } from '../types/mastery';
 import { STATUS_META } from '../types/mastery';
 import { WORD_RELATIONSHIPS } from '../data/wordRelationships';
+import { fetchEnglishToTokiPona, resolveApiKey } from '../services/linaService';
 
 interface Props {
   onAskLina: (p: string) => void;
@@ -26,11 +27,13 @@ export default function MasteryGrid({
   onAskLina, isSandboxMode, activeFilter, sortMode, sortDirection,
   setSortMode, setSortDirection
 }: Props) {
-  const { vocabulary, selectedWords, toggleWordSelection, addWordToSelection, setSelectedWords, lessonFilter } = useMasteryStore();
+  const { vocabulary, selectedWords, toggleWordSelection, addWordToSelection, setSelectedWords, lessonFilter, savePhrase } = useMasteryStore();
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [selectedPOS, setSelectedPOS] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'card' | 'table'>('card');
+  const [suggestion, setSuggestion] = useState<string | null>(null);
+  const [isTranslating, setIsTranslating] = useState(false);
 
   // Helper function to parse and abbreviate part of speech
   const getPartOfSpeechAbbreviation = useCallback((partOfSpeech: string): string => {
@@ -133,6 +136,47 @@ export default function MasteryGrid({
         return sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
       });
   }, [vocabulary, lessonFilter, selectedPOS, searchQuery, sortMode, sortDirection]);
+
+  useEffect(() => {
+    let active = true;
+    const query = searchQuery.trim();
+
+    if (displayed.length === 0 && query.length > 0 && !isSandboxMode) {
+      const apiKey = resolveApiKey();
+      if (!apiKey) {
+        setSuggestion(null);
+        return;
+      }
+
+      setIsTranslating(true);
+      const timer = setTimeout(async () => {
+        try {
+          const result = await fetchEnglishToTokiPona(apiKey, query);
+          if (active) {
+            // Sanitize: Remove markdown code blocks, quotes, and newlines
+            const cleanResult = result 
+              ? result.replace(/```[a-z]*\n?/g, '').replace(/```/g, '').replace(/["']/g, '').trim()
+              : null;
+              
+            console.log('jan Lina Suggestion Result:', cleanResult);
+            setSuggestion(cleanResult);
+            setIsTranslating(false);
+          }
+        } catch (err) {
+          console.error('jan Lina Translation Error:', err);
+          if (active) setIsTranslating(false);
+        }
+      }, 1200);
+
+      return () => {
+        active = false;
+        clearTimeout(timer);
+      };
+    } else {
+      setSuggestion(null);
+      setIsTranslating(false);
+    }
+  }, [displayed.length, searchQuery, isSandboxMode]);
 
   return (
     <div
@@ -261,6 +305,59 @@ export default function MasteryGrid({
       <div style={{ marginTop: '12px', marginBottom: '12px' }}>
         <ChallengeWidget />
       </div>
+
+      {displayed.length === 0 && searchQuery.trim() !== '' && (suggestion || isTranslating) && (
+        <div className="suggestion-panel" style={{
+          background: 'rgba(251, 191, 36, 0.05)',
+          border: '1px solid var(--gold)',
+          borderRadius: '8px',
+          padding: '16px',
+          marginBottom: '20px'
+        }}>
+          <div style={{ fontSize: '0.7rem', color: 'var(--gold)', fontWeight: 800, marginBottom: '8px', opacity: 0.8 }}>
+            {isTranslating ? 'jan LINA IS THINKING...' : 'NO LOCAL RESULTS. jan LINA SUGGESTS:'}
+          </div>
+          {suggestion ? (
+            <>
+              <div style={{ fontSize: '1.2rem', fontWeight: 900, marginBottom: '12px', color: 'white' }}>
+                "{searchQuery}" → 
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '16px' }}>
+                {suggestion.split(/\s+/).map((word, i) => (
+                  <button
+                    key={i}
+                    onClick={() => addWordToSelection(word.replace(/[.!?,]/g, '').toLowerCase())}
+                    className="chip-btn"
+                    style={{
+                      background: 'rgba(255, 191, 0, 0.1)',
+                      border: '1px solid var(--gold)',
+                      color: 'var(--gold)',
+                      borderRadius: '16px',
+                      padding: '4px 12px',
+                      fontSize: '0.9rem',
+                      fontWeight: 800,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {word}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => savePhrase({ id: suggestion, tp: suggestion, en: searchQuery, notes: 'AI Suggestion' })}
+                className="btn-review"
+                style={{ width: 'auto', padding: '8px 16px', fontSize: '0.7rem', marginBottom: 0 }}
+              >
+                SAVE PHRASE
+              </button>
+            </>
+          ) : !isTranslating && (
+            <div style={{ color: '#666', fontSize: '0.85rem' }}>
+              jan Lina couldn't find a translation for this yet.
+            </div>
+          )}
+        </div>
+      )}
 
       {viewMode === 'card' ? (
         <div className="mastery-vocab-grid">

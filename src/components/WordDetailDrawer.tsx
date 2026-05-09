@@ -206,8 +206,7 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
               <div style={{ display: 'grid', gap: '12px' }}>
                 {(['noun', 'verb', 'mod'] as const).map(role => {
                   const score = word.roleMatrix?.[role] || 0;
-                  const lowest = Math.min(word.roleMatrix.noun, word.roleMatrix.verb, word.roleMatrix.mod);
-                  const isLocked = score >= lowest + 100 && score < 334;
+                  const lowest = Math.min(word.roleMatrix?.noun ?? 0, word.roleMatrix?.verb ?? 0, word.roleMatrix?.mod ?? 0);                  const isLocked = score >= lowest + 100 && score < 334;
                   const progress = (score / 334) * 100;
                   const color = role === 'noun' ? 'var(--blue)' : role === 'verb' ? 'var(--pink)' : 'var(--amber)';
 

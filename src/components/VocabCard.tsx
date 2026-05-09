@@ -133,7 +133,7 @@ export default function VocabCard({ word, onLongPress, onClick, isSandboxMode, i
     <div
       className={`vocab-card vocab-card--${status} ${isSelected ? 'is-selected' : ''} ${isRelated ? 'is-related' : ''}`}
       style={{ 
-        touchAction: 'none', 
+        touchAction: 'pan-y', 
         borderLeftColor: isDimmed ? 'transparent' : RING_COLOR[status],
         background: isDimmed ? 'rgba(0,0,0,0.5)' : (isSelected ? 'rgba(255,255,255,0.08)' : undefined),
         borderColor: isSelected ? 'var(--gold)' : (isDimmed ? '#222' : undefined),

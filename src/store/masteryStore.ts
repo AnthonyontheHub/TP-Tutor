@@ -1702,13 +1702,14 @@ export const useMasteryStore = create<MasteryStore>()(
             iv => !cloudWordIds.has(iv.word.toLowerCase())
           );
 
+          const OLD_POS = ['Adjective', 'Adverb', 'Number', 'Interrogative', 'Ordinal-marker'];
           let normalizedCloudVocab = cloudVocab.map(w => {
             const currentPOS = w.partOfSpeech || '';
-            const normalizedPOS = normalizePartOfSpeech(currentPOS);
-            if (currentPOS !== normalizedPOS) {
+            if (OLD_POS.includes(currentPOS)) {
               needsUpdate = true;
+              return { ...w, partOfSpeech: normalizePartOfSpeech(currentPOS) };
             }
-            return { ...w, partOfSpeech: normalizedPOS };
+            return { ...w };
           });
 
           if (missingFromCloud.length > 0) {
@@ -1720,37 +1721,6 @@ export const useMasteryStore = create<MasteryStore>()(
 
           if (needsUpdate && uid !== 'guest_user') {
             void setDoc(userDocRef, { vocabulary: normalizedCloudVocab }, { merge: true });
-          }
-
-          // 2. Detect contaminated cloud data: a different name + all vocab mastered
-          // indicates test/debug data was accidentally synced to this account
-          const cloudName = data.studentName as string | undefined;
-          const allVocabMastered = Array.isArray(data.vocabulary) &&
-            data.vocabulary.length > 0 &&
-            (data.vocabulary as Array<{ status: MasteryStatus }>).every((w) => w.status === 'mastered');
-          const nameMismatch = initialName && cloudName &&
-            cloudName.toLowerCase() !== initialName.toLowerCase();
-
-          if (nameMismatch && allVocabMastered) {
-            set({
-              studentName: initialName,
-              profile: { ...defaultProfile, firstName: initialName },
-              profileImage: initialProfileImage || '',
-              savedPhrases: [],
-              currentStreak: 0,
-              lastActiveDate: '',
-              vocabulary: mappedVocabulary,
-              curriculums: curriculumRoadmap,
-              currentPositionNodeId: 'phi_sim',
-          activeCurriculumId: null,
-          activeModuleId: null,
-              hasCompletedSetup: false,
-              songs: defaultSongs,
-              commonPhrases: defaultCommonPhrases,
-              cloudSynced: true,
-            });
-            void get().syncToCloud(uid);
-            return;
           }
 
           const sourceVocab = Array.isArray(data.vocabulary) ? normalizedCloudVocab : mappedVocabulary;
