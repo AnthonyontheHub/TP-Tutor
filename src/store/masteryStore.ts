@@ -1986,7 +1986,7 @@ export const useMasteryStore = create<MasteryStore>()(
 // ─────────────────────────────────────────────────────────────────────────────
     { 
       name: 'tp-tutor-mastery',
-      version: 3,
+      version: 4,
       migrate: (persistedState: any, version: number) => {
         if (version < 3) {
           if (persistedState && Array.isArray(persistedState.vocabulary)) {
@@ -2026,6 +2026,15 @@ export const useMasteryStore = create<MasteryStore>()(
               }
               return staticWord; // This word was missing from user's state, add it fresh
             });
+          }
+        }
+
+        if (version < 4) {
+          if (persistedState && Array.isArray(persistedState.vocabulary)) {
+            const REMOVED_IDS = new Set(['ali', 'particle_li', 'particle_e', 'particle_pi', 'particle_la']);
+            persistedState.vocabulary = persistedState.vocabulary.filter(
+              (v: any) => !REMOVED_IDS.has(v.word) && !REMOVED_IDS.has(v.id)
+            );
           }
         }
         return persistedState as MasteryStore;

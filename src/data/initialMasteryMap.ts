@@ -8,7 +8,6 @@ const initialVocabulary = [
   { word: "ala", partOfSpeech: "Modifier", frequencyRank: 12, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'pillar', sessionNotes: "" },
   { word: "alasa", partOfSpeech: "Verb", frequencyRank: 90, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
   { word: "ale", partOfSpeech: "Modifier", frequencyRank: 101, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
-  { word: "ali", partOfSpeech: "Modifier", frequencyRank: 102, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
   { word: "anpa", partOfSpeech: "Noun", frequencyRank: 45, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
   { word: "ante", partOfSpeech: "Modifier", frequencyRank: 39, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
   { word: "anu", partOfSpeech: "Particle", frequencyRank: 17, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
@@ -142,13 +141,7 @@ const initialVocabulary = [
   { word: "oko", partOfSpeech: "Noun", frequencyRank: 211, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
   { word: "soko", partOfSpeech: "Noun", frequencyRank: 212, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
   { word: "kokosila", partOfSpeech: "Verb", frequencyRank: 213, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
-  { word: "misikeke", partOfSpeech: "Noun, Modifier", frequencyRank: 214, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" },
-  
-  // Grammar Tiles
-  { word: "particle_li", partOfSpeech: "Particle", frequencyRank: 999, status: "not_started" as MasteryStatus, type: 'grammar' as const, weight: 'pillar', sessionNotes: "Subject Separator" },
-  { word: "particle_e", partOfSpeech: "Particle", frequencyRank: 999, status: "not_started" as MasteryStatus, type: 'grammar' as const, weight: 'pillar', sessionNotes: "Object Marker" },
-  { word: "particle_pi", partOfSpeech: "Particle", frequencyRank: 999, status: "not_started" as MasteryStatus, type: 'grammar' as const, weight: 'pillar', sessionNotes: "Grouping Particle" },
-  { word: "particle_la", partOfSpeech: "Particle", frequencyRank: 999, status: "not_started" as MasteryStatus, type: 'grammar' as const, weight: 'pillar', sessionNotes: "Context Particle" }
+  { word: "misikeke", partOfSpeech: "Noun, Modifier", frequencyRank: 214, status: "not_started" as MasteryStatus, type: 'word' as const, weight: 'working', sessionNotes: "" }
 ];
 
 export const initialMasteryMap = {
