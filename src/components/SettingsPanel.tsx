@@ -58,23 +58,20 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
   };
 
   const handleRandomize = async () => {
-    if(confirm("Randomize all vocabulary mastery? This will also sign you out.")) {
+    if(confirm("Randomize all vocabulary mastery statuses?")) {
       randomizeVocab();
-      await logout();
     }
   };
 
   const handleMasterAll = async () => {
-    if(confirm("Master all vocabulary? This will also sign you out.")) {
+    if(confirm("Master all vocabulary?")) {
       masterAllVocab();
-      await logout();
     }
   };
 
   const handleClearPhrases = async () => {
-    if(confirm("Clear all saved phrases? This will also sign you out.")) {
+    if(confirm("Clear all saved phrases?")) {
       clearAllSavedPhrases();
-      await logout();
     }
   };
 

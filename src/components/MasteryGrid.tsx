@@ -169,56 +169,84 @@ export default function MasteryGrid({
             font-size: 0.8rem;
             box-sizing: border-box;
           }
+          .grid-toolbar-inner {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 8px;
+          }
+          .toolbar-group {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+          }
+          .toolbar-group--left > * {
+            flex: 1;
+            min-width: 0;
+          }
+          .toolbar-group--right .sort-select {
+            flex: 1;
+            min-width: 0;
+          }
+          @media (min-width: 768px) {
+            .grid-toolbar-inner {
+              flex-direction: row;
+            }
+            .toolbar-group {
+              width: auto;
+              flex: 1;
+            }
+          }
         `}</style>
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
-          <select
-            value={selectedPOS}
-            onChange={(e) => setSelectedPOS(e.target.value)}
-            className="toolbar-input"
-          >
-            <option value="All">All Parts of Speech</option>
-            {availablePartsOfSpeech.map(pos => (
-              <option key={pos} value={pos}>{pos}</option>
-            ))}
-          </select>
-          <input
-            type="text"
-            placeholder="Search vocab..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="toolbar-input"
-            style={{ flex: 1, minWidth: '140px' }}
-          />
-        </div>
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '8px', alignItems: 'center' }}>
-          <select
-            value={sortMode}
-            onChange={(e) => setSortMode(e.target.value)}
-            className="toolbar-input sort-select"
-            style={{ flex: 1 }}
-          >
-            <option value="alphabetical">A → Z</option>
-            <option value="status">Mastery Level</option>
-            <option value="length">Word Length</option>
-            <option value="partOfSpeech">Part of Speech</option>
-            <option value="useCount">Most Used</option>
-            <option value="ku">Lipu Ku</option>
-          </select>
-          <button
-            onClick={(e) => { e.stopPropagation(); setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc'); }}
-            className="toolbar-input btn-toggle"
-            style={{ width: '36px', padding: '0', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-          >
-            {sortDirection === 'asc' ? '↑' : '↓'}
-          </button>
-          <button
-            onClick={() => setViewMode(prev => prev === 'card' ? 'table' : 'card')}
-            className="toolbar-input btn-toggle"
-            style={{ width: '36px', padding: '0', flexShrink: 0, fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            title={viewMode === 'card' ? 'Switch to Table View' : 'Switch to Card View'}
-          >
-            {viewMode === 'card' ? '📋' : '🎴'}
-          </button>
+        <div className="grid-toolbar-inner">
+          <div className="toolbar-group toolbar-group--left">
+            <select
+              value={selectedPOS}
+              onChange={(e) => setSelectedPOS(e.target.value)}
+              className="toolbar-input"
+            >
+              <option value="All">All Parts of Speech</option>
+              {availablePartsOfSpeech.map(pos => (
+                <option key={pos} value={pos}>{pos}</option>
+              ))}
+            </select>
+            <input
+              type="text"
+              placeholder="Search vocab..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="toolbar-input"
+            />
+          </div>
+          <div className="toolbar-group toolbar-group--right">
+            <select
+              value={sortMode}
+              onChange={(e) => setSortMode(e.target.value)}
+              className="toolbar-input sort-select"
+            >
+              <option value="alphabetical">A → Z</option>
+              <option value="status">Mastery Level</option>
+              <option value="length">Word Length</option>
+              <option value="partOfSpeech">Part of Speech</option>
+              <option value="useCount">Most Used</option>
+              <option value="ku">Lipu Ku</option>
+            </select>
+            <button
+              onClick={(e) => { e.stopPropagation(); setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc'); }}
+              className="toolbar-input btn-toggle"
+              style={{ width: '36px', padding: '0', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
+              {sortDirection === 'asc' ? '↑' : '↓'}
+            </button>
+            <button
+              onClick={() => setViewMode(prev => prev === 'card' ? 'table' : 'card')}
+              className="toolbar-input btn-toggle"
+              style={{ width: '36px', padding: '0', flexShrink: 0, fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              title={viewMode === 'card' ? 'Switch to Table View' : 'Switch to Card View'}
+            >
+              {viewMode === 'card' ? '📋' : '🎴'}
+            </button>
+          </div>
         </div>
       </div>
 

@@ -1461,7 +1461,6 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       randomizeVocab: () => {
-        if (localStorage.getItem('tp_sandbox_mode') !== 'true') return;
         set((state) => ({
           vocabulary: state.vocabulary.map(w => {
             const score = Math.floor(Math.random() * 1001);
@@ -1473,7 +1472,6 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       masterAllVocab: () => {
-        if (localStorage.getItem('tp_sandbox_mode') !== 'true') return;
         set((state) => ({
           vocabulary: state.vocabulary.map(w => ({ ...w, baseScore: 975, confidenceScore: 975, status: 'mastered' as MasteryStatus })),
           curriculums: state.curriculums.map(level => ({
