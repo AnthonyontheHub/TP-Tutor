@@ -25,7 +25,7 @@ export default function MasteryGrid({
   onAskLina, isSandboxMode, activeFilter, sortMode, sortDirection,
   setSortMode, setSortDirection
 }: Props) {
-  const { vocabulary, selectedWords, toggleWordSelection, addWordToSelection, setSelectedWords, lessonFilter } = useMasteryStore();
+  const { vocabulary, selectedWords, toggleWordSelection, addWordToSelection, setSelectedWords, lessonFilter, isKu } = useMasteryStore(); // Added isKu from store
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [selectedPOS, setSelectedPOS] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
@@ -42,16 +42,22 @@ export default function MasteryGrid({
       .join(', ');
   }, []);
 
-  // 1. Create a Dynamic POS List
+  // 3. Polish the POS Dropdown logic
   const availablePartsOfSpeech = useMemo(() => {
     const allPOS = vocabulary
       .map(item => item.partOfSpeech)
-      .filter(pos => pos && pos !== 'GRAMMAR') // Ensure POS exists and is not 'GRAMMAR'
-      .flatMap(pos => pos.split(',').map(p => p.trim())) // Split by comma and trim whitespace
-      .filter(pos => pos); // Remove any empty strings after trimming
+      // Filter out null/undefined, 'GRAMMAR' (case-insensitive)
+      .filter(pos => pos && pos.toLowerCase() !== 'grammar') 
+      .flatMap(pos => 
+        pos.toLowerCase() // Force all roles to lowercase first
+           .split(',')
+           .map(p => p.trim())
+           .filter(p => p) // Remove empty strings
+           .map(p => p.charAt(0).toUpperCase() + p.slice(1)) // Capitalize first letter of each part
+      );
 
-    const uniquePOS = Array.from(new Set(allPOS));
-    return uniquePOS.sort();
+    const uniquePOS = Array.from(new Set(allPOS)); // Use a Set for uniqueness
+    return uniquePOS.sort(); // Sort alphabetically
   }, [vocabulary]);
 
   const handleCardClick = useCallback((word: VocabWord) => {
@@ -84,7 +90,7 @@ export default function MasteryGrid({
       .filter(item => {
         const passesLesson = !lessonFilter || lessonFilter.includes(item.id) || lessonFilter.includes(item.word);
         
-        // 3. Fix the Filter Logic
+        // 3. Fix the Filter Logic (Inclusive filter check)
         let matchesPOS = true; // Default to true if 'All' is selected
         if (selectedPOS !== 'All' && item.partOfSpeech) {
           // Check if the word's part of speech string includes the selected POS (case-insensitive)
@@ -108,6 +114,13 @@ export default function MasteryGrid({
         return passesLesson && matchesPOS && matchesSearch;
       })
       .sort((a, b) => {
+        // 2. Add Sort & Marker - Lipu Ku Sort
+        if (sortMode === 'lipuKu') {
+          // Words where isKu is true should appear first.
+          // true (1) comes before false (0) in descending order (b - a).
+          return (b.isKu ? 1 : 0) - (a.isKu ? 1 : 0);
+        }
+
         if (sortMode === 'status') {
           const diff = STATUS_RANK[a.status] - STATUS_RANK[b.status];
           return sortDirection === 'asc' ? diff : -diff;
@@ -131,7 +144,7 @@ export default function MasteryGrid({
         const valB = b.word.toLowerCase();
         return sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
       });
-  }, [vocabulary, lessonFilter, selectedPOS, searchQuery, sortMode, sortDirection]);
+  }, [vocabulary, lessonFilter, selectedPOS, searchQuery, sortMode, sortDirection, isKu]); // Added isKu dependency
 
   return (
     <div
@@ -203,6 +216,8 @@ export default function MasteryGrid({
             <option value="length">Word Length</option>
             <option value="partOfSpeech">Part of Speech</option>
             <option value="useCount">Most Used</option>
+            {/* 2. Add Lipu Ku Sort Option */}
+            <option value="lipuKu">Lipu Ku</option>
           </select>
           <button
             onClick={(e) => { e.stopPropagation(); setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc'); }}

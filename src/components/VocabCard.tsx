@@ -48,7 +48,7 @@ export default function VocabCard({ word, onLongPress, onClick, isSandboxMode, i
   const isLongPressActive = useRef(false);
 
   // Helper function to abbreviate part of speech
-  const getPartOfSpeechAbbreviation = (partOfSpeech: string): string => {
+  const getPartOfSpeechAbbreviation = useCallback((partOfSpeech: string): string => {
     if (!partOfSpeech) return '';
     return partOfSpeech
       .split(',')
@@ -56,7 +56,7 @@ export default function VocabCard({ word, onLongPress, onClick, isSandboxMode, i
       .filter(part => part.length > 0)
       .map(part => part[0].toUpperCase())
       .join(', ');
-  };
+  }, []);
 
   const handleStatusClick = (e: React.MouseEvent | React.PointerEvent) => {
     e.stopPropagation();
@@ -171,6 +171,26 @@ export default function VocabCard({ word, onLongPress, onClick, isSandboxMode, i
       >
         {word.word}
       </div>
+
+      {/* 2. Add 'ku' Marker */}
+      {word.isKu && (
+        <span
+          style={{
+            position: 'absolute',
+            top: '5px',
+            left: '5px',
+            fontSize: '0.6rem',
+            fontWeight: 'bold',
+            color: 'rgba(255, 191, 0, 0.6)', // Subtle gold-like color
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            padding: '2px 4px',
+            borderRadius: '2px',
+            zIndex: 5, // Above glyph, below main text
+          }}
+        >
+          ku
+        </span>
+      )}
 
       <div 
         className="vocab-card__status"

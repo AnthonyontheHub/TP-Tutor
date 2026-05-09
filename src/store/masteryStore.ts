@@ -60,7 +60,10 @@ function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: Maste
     rolesMastered: {},
     userNotes: '',
     notes: '',
-    customDefinition: ''
+    customDefinition: '',
+
+    // Step 1: Add isKu property
+    isKu: !!(staticData.isKu || staticData.ku) // Check for isKu or ku property in staticData
   };
 }
 
@@ -1774,7 +1777,10 @@ export const useMasteryStore = create<MasteryStore>()(
                 avoidWhen: staticData.avoidWhen || '',
                 rolesMastered: w.rolesMastered || {},
                 hardened: !!w.hardened,
-                isBleeding: !!w.isBleeding
+                isBleeding: !!w.isBleeding,
+
+                // Step 1: Add isKu property
+                isKu: !!(staticData.isKu || staticData.ku) // Check for isKu or ku property in staticData
               };
             }
           );
