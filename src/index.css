@@ -367,6 +367,7 @@ select {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   gap: 10px;
+  width: 100%;
 }
 
 /* ─── Vocab Cards ───────────────────────────────────────────────────────── */
@@ -593,14 +594,14 @@ button:active { transform: scale(0.96); }
 }
 /* ─── Sitelen Pona Font ────────────────────────────────────────────────── */
 @font-face {
-  font-family: 'Toki Pona Font';
-  src: url('/toki-pona.woff2') format('woff2'); /* Assuming font is in public/ */
+  font-family: 'SitelenPona';
+  src: url('/linja-pona.otf') format('otf'); /* Assuming font is in public/ */
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 .sitelen-pona {
-  font-family: 'Toki Pona Font', 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'SitelenPona', 'Inter', system-ui, -apple-system, sans-serif !important;
   font-feature-settings: 'liga' 1; /* Enable ligatures */
 }
