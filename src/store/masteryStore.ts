@@ -18,6 +18,7 @@ import { vocabContent } from '../data/vocabContent';
 import { TOKI_PONA_DICTIONARY, WORD_FREQUENCY } from '../data/tokiPonaDictionary';
 import aiVocabCache from '../data/aiVocabCache.json';
 import { initialPhrasebook } from '../data/phrasebook';
+import { useActivityStore } from './activityStore';
 
 const KU_SULI_WORDS = new Set(['kokosila', 'lanpan', 'misikeke', 'epiku', 'jasima', 'kijetesantakalu', 'leko', 'linluwi', 'nja', 'oke', 'soko', 'tonsi', 'usawi', 'yupekosi', 'meso', 'namako', 'oko', 'kipisi']);
 
@@ -614,6 +615,9 @@ export const useMasteryStore = create<MasteryStore>()(
 
       applyScoreUpdate: (nodeId, points, context, targetRole) => {
         const now = new Date().toISOString();
+        if (Math.abs(points) >= 20) {
+          useActivityStore.getState().logEvent('XP_SHIFT', `[[${nodeId}]] resonance shifted by ${points > 0 ? '+' : ''}${Math.round(points)}`);
+        }
         set((state) => {
           const vocab = state.vocabulary.map((w) => {
             if (w.id !== nodeId && w.word.toLowerCase() !== nodeId.toLowerCase()) return w;
@@ -761,6 +765,9 @@ export const useMasteryStore = create<MasteryStore>()(
             }
 
             totalXPChange += effectiveDelta;
+            if (Math.abs(effectiveDelta) >= 20) {
+              useActivityStore.getState().logEvent('XP_SHIFT', `[[${w.word}]] resonance shifted by ${effectiveDelta > 0 ? '+' : ''}${Math.round(effectiveDelta)}`);
+            }
 
             const maxScore = (w.status === 'mastered' || effectiveDelta < 0) ? 1000 : 850;
             const newScore = clamp((w.baseScore ?? 0) + effectiveDelta, 0, maxScore);
@@ -888,6 +895,9 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       savePhrase: (phrase) => {
+        const tp = typeof phrase === 'string' ? phrase : phrase.tp;
+        const en = typeof phrase === 'string' ? 'Saved Phrase *' : phrase.en;
+        useActivityStore.getState().logEvent('PHRASE_SAVED', `New phrase transcribed: [[${tp}]] - ${en}`);
         set((state) => {
           const key = typeof phrase === 'string' ? phrase : phrase.tp;
           const already = state.savedPhrases.some(p =>

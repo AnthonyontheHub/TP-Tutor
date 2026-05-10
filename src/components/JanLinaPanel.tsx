@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
 import { useStoicStore } from '../store/stoicStore';
+import { useActivityStore, ActivityEntry } from '../store/activityStore';
 
 interface Props {
   onClose: () => void;
@@ -19,6 +20,57 @@ const JanLinaPanel: React.FC<Props> = ({
   onOpenMasteryCourt 
 }) => {
   const { knowledgeCheckFrequency, setKnowledgeCheckFrequency } = useMasteryStore();
+
+  const handleExportLedger = () => {
+    const { history } = useActivityStore.getState();
+    if (history.length === 0) {
+      alert("Ledger is empty. Engage in more activities first.");
+      return;
+    }
+
+    let md = "# TP-Tutor Master Ledger\n\n";
+    
+    // Sort history by timestamp ascending for chronological reading
+    const sorted = [...history].sort((a, b) => a.timestamp - b.timestamp);
+
+    const grouped: Record<string, Record<string, ActivityEntry[]>> = {};
+
+    sorted.forEach(entry => {
+      const d = new Date(entry.timestamp);
+      const monthYear = d.toLocaleString('default', { month: 'long', year: 'numeric' });
+      const dateStr = d.toLocaleDateString();
+
+      if (!grouped[monthYear]) grouped[monthYear] = {};
+      if (!grouped[monthYear][dateStr]) grouped[monthYear][dateStr] = [];
+      grouped[monthYear][dateStr].push(entry);
+    });
+
+    Object.keys(grouped).forEach(monthYear => {
+      md += `## ${monthYear}\n\n`;
+      Object.keys(grouped[monthYear]).forEach(dateStr => {
+        md += `### ${dateStr}\n\n`;
+        grouped[monthYear][dateStr].forEach(entry => {
+          const time = new Date(entry.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          if (entry.type === 'STOIC_RITUAL') {
+            md += `> **[${time}] STOIC RITUAL**\n> ${entry.content}\n\n`;
+          } else {
+            md += `- **[${time}]** ${entry.content}\n`;
+          }
+        });
+        md += "\n";
+      });
+    });
+
+    const blob = new Blob([md], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `TP-Tutor-Master-Ledger.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <motion.div 
@@ -88,6 +140,13 @@ const JanLinaPanel: React.FC<Props> = ({
               style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', color: 'white', margin: 0 }}
             >
               🕒 SESSION HISTORY
+            </button>
+            <button 
+              onClick={handleExportLedger} 
+              className="btn-review" 
+              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', color: 'var(--gold)', margin: '8px 0 0 0', fontWeight: 900 }}
+            >
+              📜 EXPORT MASTER LEDGER (.md)
             </button>
           </div>
         </section>

@@ -5,6 +5,7 @@ import { db } from '../services/firebase';
 import { doc, setDoc, getDoc, collection, query, orderBy, getDocs, limit } from 'firebase/firestore';
 import { resolveApiKey, fetchStoicAnalysis, generateStoicQuote } from '../services/linaService';
 import { useMasteryStore } from './masteryStore';
+import { useActivityStore } from './activityStore';
 
 export interface StoicQuote {
   id: string; // YYYY-MM-DD
@@ -97,6 +98,9 @@ export const useStoicStore = create<StoicStore>()(
 
             const analysis = await fetchStoicAnalysis(apiKey, english);
             if (!analysis) return;
+
+            // Log to Master Ledger
+            useActivityStore.getState().logEvent('STOIC_RITUAL', `Deep Study: [[${analysis.tokiPona}]]. Intent: ${analysis.philosopherIntent}. Protocol: ${analysis.lifeApplication}`);
 
             const newQuote: StoicQuote = {
               id: today,
