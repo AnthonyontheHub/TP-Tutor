@@ -19,7 +19,7 @@ const GRADE_COLORS: Record<string, { color: string, glow: string }> = {
 };
 
 export default function CompositionMode({ onClose, isSandboxMode }: Props) {
-  const { vocabulary, profile, updateSessionNotes } = useMasteryStore();
+  const { vocabulary, profile, updateSessionNotes, saveComposition } = useMasteryStore();
   const [text, setText] = useState('');
   const [result, setResult] = useState<CompositionResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -285,13 +285,22 @@ export default function CompositionMode({ onClose, isSandboxMode }: Props) {
                 </section>
               )}
 
-              <div className="pt-4 flex justify-end">
+              <div className="pt-4 flex justify-end gap-3">
                 <button
                   onClick={handleSaveToLogbook}
                   disabled={!result.corrections || result.corrections.length === 0}
                   className={`px-6 py-3 rounded text-sm font-bold tracking-widest transition-colors ${result.corrections && result.corrections.length > 0 ? 'bg-white/10 text-white hover:bg-white/20' : 'bg-white/5 text-white/30 cursor-not-allowed'}`}
                 >
                   SAVE CORRECTIONS TO LOGBOOK
+                </button>
+                <button
+                  onClick={() => {
+                    saveComposition(text, result.literalTranslation || undefined);
+                    alert('Composition archived to your Markdown Sync.');
+                  }}
+                  className="px-6 py-3 rounded text-sm font-bold tracking-widest transition-colors bg-[#D4AF37] text-black hover:bg-[#FBE106] shadow-[0_0_15px_rgba(212,175,55,0.4)]"
+                >
+                  SAVE WRITING
                 </button>
               </div>
 

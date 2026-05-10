@@ -1,6 +1,8 @@
-/* src/components/Dashboard.tsx */
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
+import { fetchCompositionGrade, resolveApiKey, stringifyUserContext, detectSessionTitle, fetchQuickTranslation, buildOfflineTranslation } from '../services/linaService';
+import { exportToMarkdown, importFromMarkdown } from '../utils/markdownSync';
 import ProgressSummary from './ProgressSummary';
 import MasteryGrid from './MasteryGrid';
 import PhraseGrid from './PhraseGrid';
@@ -8,22 +10,19 @@ import CurriculumRoadmap from './CurriculumRoadmap';
 import SentenceBuilder from './SentenceBuilder';
 import ProveIt from './ProveIt';
 import ChallengeWidget from './ChallengeWidget';
-import OperationalIntelligenceWidget from './OperationalIntelligenceWidget';
-import { SessionOverlay } from './SessionOverlay';
 import TrainingHub from './TrainingHub';
 import FlashcardMode from './FlashcardMode';
 import DualDrillMode from './DualDrillMode';
 import ConfusionDrill from './ConfusionDrill';
 import CompositionMode from './CompositionMode';
-import SRSWidget from './SRSWidget';
-import InfoTooltip from './InfoTooltip';
 import AnalyticsPanel from './AnalyticsPanel';
-import { fetchQuickTranslation, resolveApiKey, buildOfflineTranslation } from '../services/linaService';
-import type { MasteryStatus, VocabWord } from '../types/mastery';
+import BossFightMode from './BossFightMode';
+import OperationalIntelligenceWidget from './OperationalIntelligenceWidget';
+import InfoTooltip from './InfoTooltip';
+import SRSWidget from './SRSWidget';
+import { SessionOverlay } from './SessionOverlay';
+import type { VocabWord, MasteryStatus, SavedPhrase, DashboardView } from '../types/mastery';
 import type { AppPanel } from '../App';
-import { motion, AnimatePresence } from 'framer-motion';
-
-export type DashboardView = 'vocab' | 'roadmap' | 'archive';
 
 export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSandboxMode, chatCount }: {
   onTogglePanel: (p: AppPanel) => void;
@@ -44,6 +43,9 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   const [showLoreModal, setShowLoreModal] = useState(false);
   const [loreInput, setLoreInput] = useState('');
   const [showLoreToast, setShowLoreToast] = useState(false);
+  const [showSyncRestore, setShowSyncRestore] = useState(false);
+  const [showBossFight, setShowBossFight] = useState(false);
+  const [bossFightWords, setBossFightWords] = useState<string[]>([]);
   const [showDrillsMenu, setShowDrillsMenu] = useState(false);
   const drillsMenuRef = useRef<HTMLDivElement>(null);
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
@@ -286,6 +288,22 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
             gap: 8px;
           }
         }
+
+        @keyframes gradient-shift {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+
+        .pulse {
+          animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+          0% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.05); opacity: 0.8; }
+          100% { transform: scale(1); opacity: 1; }
+        }
       `}</style>
 
       <header className="dashboard__header">
@@ -349,11 +367,67 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
             onOpenAchievements={() => onTogglePanel('achievements')}
           />
           
+          <button 
+            onClick={() => {
+              exportToMarkdown(useMasteryStore.getState());
+              setShowSyncRestore(true);
+            }} 
+            className="dashboard__icon-btn" 
+            style={{ width: '32px', height: '32px', fontSize: '0.9rem', marginRight: '4px' }}
+            title="Backup Data"
+          >
+            💾
+          </button>
+          
           <button onClick={() => onTogglePanel('settings')} className="dashboard__icon-btn" style={{ ...getActiveStyle('settings'), width: '32px', height: '32px', fontSize: '0.9rem' }}>⚙️</button>
         </div>
       </header>
 
       <main className="dashboard__main" style={{ paddingBottom: '12rem' }}>
+        {(() => {
+          const bossCandidates = vocabulary.filter(v => v.baseScore >= 850 && v.status !== 'mastered');
+          if (bossCandidates.length === 0) return null;
+          
+          return (
+            <motion.button
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              whileHover={{ scale: 1.02 }}
+              onClick={() => {
+                const count = Math.min(bossCandidates.length, Math.floor(Math.random() * 3) + 3); // 3-5
+                const selected = [...bossCandidates].sort(() => 0.5 - Math.random()).slice(0, count).map(v => v.word);
+                setBossFightWords(selected);
+                setShowBossFight(true);
+              }}
+              style={{
+                width: '100%',
+                background: 'linear-gradient(45deg, #D4AF37, #FBE106, #D4AF37)',
+                backgroundSize: '200% 200%',
+                animation: 'gradient-shift 3s ease infinite',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '16px',
+                marginBottom: '16px',
+                color: 'black',
+                fontWeight: 900,
+                letterSpacing: '0.2em',
+                fontSize: '1rem',
+                cursor: 'pointer',
+                boxShadow: '0 0 20px rgba(212,175,55,0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '12px',
+                textTransform: 'uppercase'
+              }}
+            >
+              <span style={{ fontSize: '1.4rem' }}>⚔️</span>
+              BOSS FIGHT AVAILABLE
+              <span style={{ fontSize: '1.4rem' }}>⚔️</span>
+            </motion.button>
+          );
+        })()}
+
         {(() => {
           const score = calculateReadinessScore();
           const isLow = score < 50;
@@ -440,6 +514,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
           >
             📝 LOG EVENT
           </button>
+
 
           <div style={{ position: 'relative', flex: 1 }} ref={drillsMenuRef}>
             <button
@@ -844,6 +919,58 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
             )}
           </AnimatePresence>
 
+          {showSyncRestore && (
+            <div className="modal-backdrop" style={{ zIndex: 9000 }}>
+              <motion.div 
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                className="glass-panel"
+                style={{ width: '90%', maxWidth: '400px', border: '1px solid var(--gold)', textAlign: 'center' }}
+                onClick={e => e.stopPropagation()}
+              >
+                <div className="sync-modal__body" style={{ padding: '24px', textAlign: 'center' }}>
+                  <div style={{ fontSize: '3rem', marginBottom: '16px' }}>💾</div>
+                  <h3 style={{ margin: '0 0 8px 0', color: 'var(--gold)', letterSpacing: '0.1em' }}>BACKUP GENERATED</h3>
+                  <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: '1.5' }}>
+                    Your neural state has been serialized to a Markdown file. 
+                    Keep this file safe as your primary **Data Backup**.
+                  </p>
+                  
+                  <div style={{ marginTop: '24px', padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                    <p style={{ margin: '0 0 12px 0', fontSize: '0.8rem', color: 'white', fontWeight: 700 }}>
+                      RESTORE FROM BACKUP
+                    </p>
+                    <input 
+                      type="file" 
+                      accept=".md"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = async (event) => {
+                            try {
+                              const content = event.target?.result as string;
+                              const data = importFromMarkdown(content);
+                              hydrateStoreFromExternalData(data);
+                              alert('Neural pathways successfully restored.');
+                              setShowSyncRestore(false);
+                            } catch (err: any) {
+                              alert(`Failed to restore: ${err.message}`);
+                            }
+                          };
+                          reader.readAsText(file);
+                        }
+                      }}
+                      style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}
+                    />
+                  </div>
+                </div>
+                <button onClick={() => setShowSyncRestore(false)} className="btn-toggle" style={{ width: '100%' }}>CLOSE</button>
+              </motion.div>
+            </div>
+          )}
+
         </AnimatePresence>
       </main>
 
@@ -885,6 +1012,14 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
         isOpen={showAnalytics}
         onClose={() => setShowAnalytics(false)}
       />
+
+      {showBossFight && (
+        <BossFightMode 
+          onClose={() => setShowBossFight(false)}
+          bossWords={bossFightWords}
+          isSandboxMode={isSandboxMode}
+        />
+      )}
     </div>
   );
 }

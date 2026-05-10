@@ -257,6 +257,9 @@ interface MasteryActions {
   processFlashcardResult: (wordId: string, isCorrect: boolean) => void;
   addLoreEntry: (text: string) => void;
   calculateReadinessScore: () => number;
+  saveComposition: (text: string, translation?: string) => void;
+  hydrateStoreFromExternalData: (data: any) => void;
+  completeBossFight: (wordIds: string[]) => void;
 }
 
 interface MasteryState {
@@ -282,6 +285,7 @@ interface MasteryState {
   cloudSynced: boolean;
   songs: { id: string; title: string; tracks: { title: string; blocks: { title: string; tp: string; en: string }[] }[] }[];
   commonPhrases: CommonPhrase[];
+  compositionLog: { date: string, text: string, translation?: string }[];
   // Dashboard settings
   widgetDensity: 'Compact' | 'Expanded';
   fogOfWar: 'Strict' | 'Visible';
@@ -387,8 +391,8 @@ export const useMasteryStore = create<MasteryStore>()(
       lastActiveDate: '',
       hasCompletedSetup: false,
       currentPositionNodeId: 'phi_sim',
-          activeCurriculumId: null,
-          activeModuleId: null,
+      activeCurriculumId: null,
+      activeModuleId: null,
       selectedWords: [],
       lessonFilter: null,
       activeActivity: null,
@@ -609,7 +613,8 @@ export const useMasteryStore = create<MasteryStore>()(
         set((state) => {
           const vocab = state.vocabulary.map((w) => {
             if (w.id !== nodeId && w.word.toLowerCase() !== nodeId.toLowerCase()) return w;
-            const newScore = clamp(w.baseScore + points, 0, 1000);
+            const maxScore = (w.status === 'mastered' || points < 0) ? 1000 : 850;
+            const newScore = clamp(w.baseScore + points, 0, maxScore);
             const historyEntry = { date: now, change: points, reason: context };
             
             const recentDrops = [historyEntry, ...(w.scoreHistory || [])]
@@ -621,7 +626,7 @@ export const useMasteryStore = create<MasteryStore>()(
             const roleParts = (w.partOfSpeech || '').split(',').map((p: string) => p.trim().toLowerCase()).filter(Boolean);
             const roleKeys = roleParts.map((r: string) => r === 'modifier' ? 'mod' : r);
             const pointsPerRole = roleKeys.length > 0 ? Math.floor(points / roleKeys.length) : 0;
-            const maxPerRole = roleKeys.length > 0 ? Math.floor(1000 / roleKeys.length) : 1000;
+            const maxPerRole = roleKeys.length > 0 ? Math.floor(maxScore / roleKeys.length) : maxScore;
             const newRoleMatrix = { ...(w.roleMatrix || {}) };
             roleKeys.forEach((key: string) => {
               newRoleMatrix[key] = clamp((newRoleMatrix[key] || 0) + pointsPerRole, 0, maxPerRole);
@@ -663,7 +668,8 @@ export const useMasteryStore = create<MasteryStore>()(
           vocabulary: state.vocabulary.map((w) => {
             if (w.hardened) return w;
             const last = new Date(w.lastReviewed || 0).getTime();
-            if (now.getTime() - last > FORTY_EIGHT_HOURS) {
+            const interval = w.status === 'mastered' ? FORTY_EIGHT_HOURS * 3 : FORTY_EIGHT_HOURS;
+            if (now.getTime() - last > interval) {
               const decayAmount = -15; 
               const newScore = clamp(w.baseScore - 15, 0, 1000);
               if (newScore === w.baseScore) return w;
@@ -737,7 +743,8 @@ export const useMasteryStore = create<MasteryStore>()(
 
             totalXPChange += effectiveDelta;
 
-            const newScore = clamp((w.baseScore ?? 0) + effectiveDelta, 0, 1000);
+            const maxScore = (w.status === 'mastered' || effectiveDelta < 0) ? 1000 : 850;
+            const newScore = clamp((w.baseScore ?? 0) + effectiveDelta, 0, maxScore);
 
             // Distribute XP delta equally across the word's actual roles
             const roles = (w.partOfSpeech || '').split(',').map(p => p.trim().toLowerCase()).filter(Boolean);
@@ -745,7 +752,7 @@ export const useMasteryStore = create<MasteryStore>()(
             const pointsPerRole = roleKeys.length > 0 ? Math.floor(effectiveDelta / roleKeys.length) : 0;
             const newRoleMatrix = { ...((w as any).roleMatrix || {}) };
             roleKeys.forEach(key => {
-              newRoleMatrix[key] = clamp((newRoleMatrix[key] || 0) + pointsPerRole, 0, Math.floor(1000 / roleKeys.length));
+              newRoleMatrix[key] = clamp((newRoleMatrix[key] || 0) + pointsPerRole, 0, Math.floor(maxScore / roleKeys.length));
             });
 
             const historyReason = (pendingComebackBonus && idx === 0) ? 'manual_delta + comeback_bonus' : 'manual_delta';
@@ -1458,6 +1465,36 @@ export const useMasteryStore = create<MasteryStore>()(
         return Math.round(score);
       },
 
+      saveComposition: (text, translation) => {
+        set(state => ({
+          compositionLog: [...(state.compositionLog || []), { date: new Date().toISOString(), text, translation }]
+        }));
+        get().syncToCloud();
+      },
+
+      hydrateStoreFromExternalData: (data: any) => {
+        // Validate basic structure
+        if (!data || typeof data !== 'object') {
+          throw new Error('Invalid data format');
+        }
+        
+        // Merge state carefully
+        set(state => ({
+          ...state,
+          vocabulary: data.vocabulary || state.vocabulary,
+          sessionLog: data.sessionLog || state.sessionLog,
+          profile: data.profile || state.profile,
+          savedPhrases: data.savedPhrases || state.savedPhrases,
+          compositionLog: data.compositionLog || state.compositionLog || [],
+          commonPhrases: data.commonPhrases || state.commonPhrases,
+          curriculums: data.curriculums || state.curriculums,
+          songs: data.songs || state.songs,
+        }));
+        
+        // Push full state to cloud
+        get().syncToCloud();
+      },
+
       processFlashcardResult: (wordId, isCorrect) => {
         const now = new Date();
         set((state) => {
@@ -1485,7 +1522,8 @@ export const useMasteryStore = create<MasteryStore>()(
               }
 
               pointsChange = pointsGained;
-              newBaseScore = Math.min(newBaseScore + pointsGained, 1000);
+              const maxScore = (w.status === 'mastered') ? 1000 : 850;
+              newBaseScore = Math.min(newBaseScore + pointsGained, maxScore);
             } else {
               newConsecutive = 0;
               let pointsLost = Math.floor(newBaseScore * 0.10);
@@ -2183,6 +2221,27 @@ export const useMasteryStore = create<MasteryStore>()(
           set(update);
           get().refreshCurriculumStatus();
         });
+      },
+
+      completeBossFight: (wordIds) => {
+        const now = new Date().toISOString();
+        set((state) => ({
+          vocabulary: state.vocabulary.map(w => {
+            if (wordIds.includes(w.id) || wordIds.includes(w.word)) {
+              return {
+                ...w,
+                baseScore: 1000,
+                status: 'mastered',
+                lastReviewed: now,
+                lastReviewedAt: now,
+                scoreHistory: [{ date: now, change: 150, reason: 'boss_fight_victory' }, ...(w.scoreHistory || [])].slice(0, 5)
+              };
+            }
+            return w;
+          })
+        }));
+        get().refreshCurriculumStatus();
+        void get().syncToCloud();
       },
     }),
 // ─── MIGRATION SYSTEM ────────────────────────────────────────────────────────

@@ -71,7 +71,7 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
     setConfirmInput('');
   };
 
-  const handleExportToObsidian = () => {
+  const handleExportDataSummary = () => {
     const summary = getStatusSummary();
     const dateStr = new Date().toISOString().split('T')[0];
     const name = profile?.tpName || profile?.firstName || studentName || 'Student';
@@ -113,7 +113,7 @@ ${confidentWords}
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `TP-Tutor-Export-${dateStr}.md`;
+    link.download = `TP-Tutor-Summary-${dateStr}.md`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -162,11 +162,11 @@ ${confidentWords}
             </button>
           )}
           <button
-            onClick={handleExportToObsidian}
+            onClick={handleExportDataSummary}
             className="btn-review"
-            style={{ width: '100%', background: 'rgba(168,85,247,0.1)', border: '1px solid #a855f7', color: '#a855f7' }}
+            style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', color: 'white' }}
           >
-            🗄️ EXPORT TO OBSIDIAN (.md)
+            🗄️ EXPORT DATA SUMMARY (.md)
           </button>
         </div>
       </section>
