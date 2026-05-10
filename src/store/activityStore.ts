@@ -70,7 +70,6 @@ export const useActivityStore = create<ActivityStore>()(
 
       generateMarkdownExport: (snapshot) => {
         const { history } = get();
-        if (history.length === 0) return "";
 
         let md = "# TP-Tutor Master Ledger\n\n";
 

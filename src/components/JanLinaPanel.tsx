@@ -44,19 +44,16 @@ const JanLinaPanel: React.FC<Props> = ({
     };
 
     const md = useActivityStore.getState().generateMarkdownExport(snapshot);
-    if (!md) {
-      alert("Ledger is empty. Engage in more activities first.");
-      return;
-    }
 
     const nowStr = new Date().toISOString();
+    const dateStamp = nowStr.split('T')[0];
     setLastExportDate(nowStr);
 
     const blob = new Blob([md], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `TP-Tutor-Master-Ledger.md`;
+    a.download = `TP-Tutor-Master-Ledger-${dateStamp}.md`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -267,11 +264,9 @@ const JanLinaPanel: React.FC<Props> = ({
               >
                 📜 EXPORT MASTER LEDGER (.md)
               </button>
-              {lastExportDate && (
-                <p style={{ fontSize: '0.6rem', color: '#444', textAlign: 'center', marginTop: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  Last Exported: {new Date(lastExportDate).toLocaleString()}
-                </p>
-              )}
+              <p style={{ fontSize: '0.6rem', color: '#444', textAlign: 'center', marginTop: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Last Exported: {lastExportDate ? new Date(lastExportDate).toLocaleString() : "INITIAL SYNC PENDING"}
+              </p>
             </section>
           </>
         )}
