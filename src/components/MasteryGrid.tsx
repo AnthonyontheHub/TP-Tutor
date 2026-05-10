@@ -85,12 +85,6 @@ export default function MasteryGrid({
     }
   }, []);
 
-  const handleLongPressAction = useCallback((e: React.MouseEvent | React.TouchEvent, word: VocabWord) => {
-    e.preventDefault();
-    e.stopPropagation();
-    toggleWordSelection(word.word);
-  }, [toggleWordSelection]);
-
   // Cycle: ledger -> grid -> crystal -> datapad -> ledger
   const cycleDensity = () => {
     setGridDensity(prev => {
@@ -498,7 +492,7 @@ export default function MasteryGrid({
                 key={word.id} 
                 className={`vocab-ledger-row vocab-ledger-row--${word.status} ${isSelected ? 'is-selected' : ''}`}
                 onClick={() => handleWordTap(word)}
-                onContextMenu={(e) => handleLongPressAction(e, word)}
+                onContextMenu={(e) => e.preventDefault()} onTouchMove={handleTouchEnd}
                 onTouchStart={() => handleTouchStart(word)}
                 onTouchEnd={handleTouchEnd}
                 onMouseDown={() => handleMouseDown(word)}
@@ -523,7 +517,7 @@ export default function MasteryGrid({
                 key={word.id}
                 className={`vocab-card vocab-card--${word.status} ${isSelected ? 'is-selected' : ''}`}
                 onClick={() => handleWordTap(word)}
-                onContextMenu={(e) => handleLongPressAction(e, word)}
+                onContextMenu={(e) => e.preventDefault()} onTouchMove={handleTouchEnd}
                 onTouchStart={() => handleTouchStart(word)}
                 onTouchEnd={handleTouchEnd}
                 onMouseDown={() => handleMouseDown(word)}
@@ -547,7 +541,7 @@ export default function MasteryGrid({
                 key={word.id} 
                 className={`vocab-crystal-card vocab-crystal-card--${word.status} ${isSelected ? 'is-selected' : ''}`}
                 onClick={() => handleWordTap(word)}
-                onContextMenu={(e) => handleLongPressAction(e, word)}
+                onContextMenu={(e) => e.preventDefault()} onTouchMove={handleTouchEnd}
                 onTouchStart={() => handleTouchStart(word)}
                 onTouchEnd={handleTouchEnd}
                 onMouseDown={() => handleMouseDown(word)}
@@ -572,7 +566,7 @@ export default function MasteryGrid({
                 key={word.id} 
                 className={`vocab-datapad-block vocab-datapad-block--${word.status} ${isSelected ? 'is-selected' : ''}`}
                 onClick={() => handleWordTap(word)}
-                onContextMenu={(e) => handleLongPressAction(e, word)}
+                onContextMenu={(e) => e.preventDefault()} onTouchMove={handleTouchEnd}
                 onTouchStart={() => handleTouchStart(word)}
                 onTouchEnd={handleTouchEnd}
                 onMouseDown={() => handleMouseDown(word)}
