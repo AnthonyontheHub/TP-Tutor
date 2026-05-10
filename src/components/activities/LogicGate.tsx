@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, ArrowRight, RotateCcw, CheckCircle2, XCircle, LogOut, HelpCircle } from 'lucide-react';
-import { logicGateData } from '../../data/drills';
-  statement: string;
-  isPona: boolean;
-  explanation: string;
-}
+import { logicGateData, LogicGateDrill } from '../../data/drills';
 
 interface LogicGateProps {
   onComplete?: (results: { score: number; total: number }) => void;
