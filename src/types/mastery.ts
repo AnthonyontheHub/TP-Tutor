@@ -265,6 +265,10 @@ export interface VocabWord {
   isKu?: boolean;
   ku?: boolean;
 
+  // Time-Weighted SRS
+  lastReviewedAt?: string;
+  consecutiveCorrect?: number;
+
   // Feature extensions
   productionStatus?: MasteryStatus;
   recognitionStatus?: MasteryStatus;

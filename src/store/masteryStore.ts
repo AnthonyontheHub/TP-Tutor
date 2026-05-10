@@ -254,6 +254,7 @@ interface MasteryActions {
   clearRankAcknowledgement: () => void;
   getDueWords: () => VocabWord[];
   getDueCount: () => number;
+  processFlashcardResult: (wordId: string, isCorrect: boolean) => void;
 }
 
 interface MasteryState {
@@ -1431,6 +1432,66 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       getDueCount: () => get().getDueWords().length,
+
+      processFlashcardResult: (wordId, isCorrect) => {
+        const now = new Date();
+        set((state) => {
+          const vocabulary = state.vocabulary.map((w) => {
+            if (w.id !== wordId && w.word !== wordId) return w;
+
+            const lastReviewedDate = w.lastReviewedAt ? new Date(w.lastReviewedAt) : null;
+            const hoursSince = lastReviewedDate ? (now.getTime() - lastReviewedDate.getTime()) / (1000 * 60 * 60) : 24;
+
+            let newBaseScore = w.baseScore || 0;
+            let newConsecutive = w.consecutiveCorrect || 0;
+            let pointsChange = 0;
+
+            if (isCorrect) {
+              newConsecutive += 1;
+              let pointsGained = 15;
+              
+              // Anti-Cramming
+              if (hoursSince < 4) {
+                pointsGained = 2;
+              } 
+              // SRS Bonus
+              else if (hoursSince > 48) {
+                pointsGained = Math.floor(pointsGained * 1.5);
+              }
+
+              pointsChange = pointsGained;
+              newBaseScore = Math.min(newBaseScore + pointsGained, 1000);
+            } else {
+              newConsecutive = 0;
+              let pointsLost = Math.floor(newBaseScore * 0.10);
+              if (pointsLost < 10) pointsLost = 10;
+              if (pointsLost > 100) pointsLost = 100;
+
+              pointsChange = -pointsLost;
+              newBaseScore = Math.max(newBaseScore - pointsLost, 0);
+            }
+
+            const newStatus = scoreToStatus(newBaseScore);
+            
+            const historyEntry = { date: now.toISOString(), change: pointsChange, reason: isCorrect ? 'flashcard_correct' : 'flashcard_incorrect' };
+
+            return {
+              ...w,
+              baseScore: newBaseScore,
+              confidenceScore: newBaseScore,
+              status: newStatus,
+              consecutiveCorrect: newConsecutive,
+              lastReviewedAt: now.toISOString(),
+              scoreHistory: [historyEntry, ...(w.scoreHistory || [])].slice(0, 5)
+            };
+          });
+
+          return { vocabulary };
+        });
+
+        get().refreshCurriculumStatus();
+        void get().syncToCloud();
+      },
 
       setStudentName: (name) => { set({ studentName: name }); get().updateProfile({ firstName: name }); },
       updateProfile: (profileUpdate) => { 

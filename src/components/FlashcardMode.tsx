@@ -13,7 +13,7 @@ interface Props {
 }
 
 export default function FlashcardMode({ onClose, onAskLina, isSandboxMode }: Props) {
-  const { vocabulary, applyScoreUpdate } = useMasteryStore();
+  const { vocabulary, processFlashcardResult } = useMasteryStore();
   
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -26,7 +26,24 @@ export default function FlashcardMode({ onClose, onAskLina, isSandboxMode }: Pro
     let pool = [...vocabulary].filter(v => v.baseScore < 800);
     if (pool.length === 0) pool = [...vocabulary];
 
-    pool.sort((a, b) => a.baseScore - b.baseScore);
+    const now = new Date();
+
+    pool.sort((a, b) => {
+      const aLastReviewed = a.lastReviewedAt ? new Date(a.lastReviewedAt) : new Date(0);
+      const bLastReviewed = b.lastReviewedAt ? new Date(b.lastReviewedAt) : new Date(0);
+
+      const aHours = (now.getTime() - aLastReviewed.getTime()) / (1000 * 60 * 60);
+      const bHours = (now.getTime() - bLastReviewed.getTime()) / (1000 * 60 * 60);
+
+      const aIsOld = aHours > 24;
+      const bIsOld = bHours > 24;
+
+      if (aIsOld && !bIsOld) return -1;
+      if (!aIsOld && bIsOld) return 1;
+
+      return (a.baseScore || 0) - (b.baseScore || 0);
+    });
+
     const subset = pool.slice(0, 50);
 
     for (let i = subset.length - 1; i > 0; i--) {
@@ -38,8 +55,7 @@ export default function FlashcardMode({ onClose, onAskLina, isSandboxMode }: Pro
 
   const handleNext = () => {
     const currentWord = displayCards[currentIndex];
-    // Add 2 points to the word
-    applyScoreUpdate(currentWord.id, 2, 'flashcard_mode');
+    processFlashcardResult(currentWord.id, true);
     
     setCardsStudied(prev => prev + 1);
     setIsFlipped(false);
@@ -58,8 +74,7 @@ export default function FlashcardMode({ onClose, onAskLina, isSandboxMode }: Pro
 
   const handleWrong = () => {
     const currentWord = displayCards[currentIndex];
-    // Subtract 5 points from the word
-    applyScoreUpdate(currentWord.id, -5, 'flashcard_mode');
+    processFlashcardResult(currentWord.id, false);
     
     setCardsStudied(prev => prev + 1);
     setIsFlipped(false);
