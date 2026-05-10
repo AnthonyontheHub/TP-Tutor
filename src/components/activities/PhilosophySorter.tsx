@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LogOut, HelpCircle } from 'lucide-react';
 import { sorterData } from '../../data/drills';
+import { useMasteryStore } from '../../store/masteryStore';
 
 interface PhilosophySorterProps {
   onSessionEnd: (results: { score: number; total: number }) => void;
@@ -9,7 +10,17 @@ interface PhilosophySorterProps {
 }
 
 export const PhilosophySorter: React.FC<PhilosophySorterProps> = ({ onSessionEnd, onAskLina }) => {
-  const [drill] = useState(() => sorterData[Math.floor(Math.random() * sorterData.length)]);
+  const vocabulary = useMasteryStore(state => state.vocabulary);
+  const [drill] = useState(() => {
+    const filtered = sorterData.filter(d => {
+      return d.requiredVocab.every(reqWord => {
+        const v = vocabulary.find(vw => vw.word.toLowerCase() === reqWord.toLowerCase());
+        return v && v.status !== 'not_started';
+      });
+    });
+    const sourceData = filtered.length > 0 ? filtered : sorterData;
+    return sourceData[Math.floor(Math.random() * sourceData.length)];
+  });
   const [items] = useState(() => [...drill.items].sort(() => Math.random() - 0.5));
   const [currentIndex, setCurrentIndex] = useState(0);
   const [exitDir, setExitDir] = useState<'A' | 'B'>('A');

@@ -1,0 +1,5288 @@
+{
+  "essentializerData": [
+    {
+      "id": "ess_1",
+      "requiredVocab": [
+        "mi",
+        "jan",
+        "Ansoni"
+      ],
+      "englishPrompt": "You introduce yourself in Toki Pona. You go by jan Ansoni. How do you say 'I am Anthony'?",
+      "options": [
+        "mi jan Ansoni.",
+        "sina jan Ansoni.",
+        "ona jan Ansoni."
+      ],
+      "correctOption": "mi jan Ansoni."
+    },
+    {
+      "id": "ess_2",
+      "requiredVocab": [
+        "soweli",
+        "Sili",
+        "mi"
+      ],
+      "englishPrompt": "Sirius the cat curls up on the couch. How do you say 'Sirius is my cat' (using soweli for small mammal)?",
+      "options": [
+        "soweli Sili li soweli mi.",
+        "soweli Sili li jan mi.",
+        "soweli mi li Sili."
+      ],
+      "correctOption": "soweli Sili li soweli mi."
+    },
+    {
+      "id": "ess_3",
+      "requiredVocab": [
+        "mi",
+        "moku",
+        "telo",
+        "pimeja"
+      ],
+      "englishPrompt": "It's 7:15 AM. Black coffee before anything else. How do you say 'I drink black liquid (coffee)'?",
+      "options": [
+        "mi moku e telo pimeja.",
+        "mi pali e telo pimeja.",
+        "mi lukin e telo pimeja."
+      ],
+      "correctOption": "mi moku e telo pimeja."
+    },
+    {
+      "id": "ess_4",
+      "requiredVocab": [
+        "mi",
+        "lape"
+      ],
+      "englishPrompt": "Bedtime is approaching midnight. How do you say 'I sleep'?",
+      "options": [
+        "mi lape.",
+        "mi moku.",
+        "mi pali."
+      ],
+      "correctOption": "mi lape."
+    },
+    {
+      "id": "ess_5",
+      "requiredVocab": [
+        "mi",
+        "pali"
+      ],
+      "englishPrompt": "Your shift at Target Franklin starts. How do you say 'I work'?",
+      "options": [
+        "mi pali.",
+        "mi musi.",
+        "mi lape."
+      ],
+      "correctOption": "mi pali."
+    },
+    {
+      "id": "ess_6",
+      "requiredVocab": [
+        "mi",
+        "lukin",
+        "lipu"
+      ],
+      "englishPrompt": "You pull up The Expanse on your Kindle. How do you say 'I read a book'?",
+      "options": [
+        "mi lukin e lipu.",
+        "mi pali e lipu.",
+        "mi moku e lipu."
+      ],
+      "correctOption": "mi lukin e lipu."
+    },
+    {
+      "id": "ess_7",
+      "requiredVocab": [
+        "soweli",
+        "Sili",
+        "moku"
+      ],
+      "englishPrompt": "Sirius is at his food bowl. How do you say 'Sirius eats'?",
+      "options": [
+        "soweli Sili li moku.",
+        "soweli Sili li lape.",
+        "soweli Sili li tawa."
+      ],
+      "correctOption": "soweli Sili li moku."
+    },
+    {
+      "id": "ess_8",
+      "requiredVocab": [
+        "mi",
+        "wile",
+        "telo"
+      ],
+      "englishPrompt": "You're parched after a heavy bag session. How do you say 'I want water'?",
+      "options": [
+        "mi wile e telo.",
+        "mi wile e moku.",
+        "mi wile e kasi."
+      ],
+      "correctOption": "mi wile e telo."
+    },
+    {
+      "id": "ess_9",
+      "requiredVocab": [
+        "tomo",
+        "mi",
+        "lili"
+      ],
+      "englishPrompt": "Your apartment is 678 sq ft. How do you say 'My home is small'?",
+      "options": [
+        "tomo mi li lili.",
+        "tomo mi li suli.",
+        "tomo mi li pona."
+      ],
+      "correctOption": "tomo mi li lili."
+    },
+    {
+      "id": "ess_10",
+      "requiredVocab": [
+        "mi",
+        "wawa"
+      ],
+      "englishPrompt": "Lean, athletic, ~12% body fat. How do you say 'I am strong'?",
+      "options": [
+        "mi wawa.",
+        "mi suli.",
+        "mi lili."
+      ],
+      "correctOption": "mi wawa."
+    },
+    {
+      "id": "ess_11",
+      "requiredVocab": [
+        "soweli",
+        "Sili",
+        "lape"
+      ],
+      "englishPrompt": "Sirius is curled up sleeping. How do you say 'Sirius sleeps'?",
+      "options": [
+        "soweli Sili li lape.",
+        "soweli Sili li moku.",
+        "soweli Sili li pali."
+      ],
+      "correctOption": "soweli Sili li lape."
+    },
+    {
+      "id": "ess_12",
+      "requiredVocab": [
+        "mi",
+        "tawa",
+        "tomo"
+      ],
+      "englishPrompt": "Shift's done; you're heading back to the apartment. How do you say 'I go home'?",
+      "options": [
+        "mi tawa tomo.",
+        "mi awen tomo.",
+        "mi pali tomo."
+      ],
+      "correctOption": "mi tawa tomo."
+    },
+    {
+      "id": "ess_13",
+      "requiredVocab": [
+        "mi",
+        "pona"
+      ],
+      "englishPrompt": "You're a coworker asks how you are; you're fine. How do you say 'I am good'?",
+      "options": [
+        "mi pona.",
+        "mi ike.",
+        "mi nasa."
+      ],
+      "correctOption": "mi pona."
+    },
+    {
+      "id": "ess_14",
+      "requiredVocab": [
+        "mi",
+        "moku"
+      ],
+      "englishPrompt": "Lunch break. How do you say 'I eat'?",
+      "options": [
+        "mi moku.",
+        "mi telo.",
+        "mi tawa."
+      ],
+      "correctOption": "mi moku."
+    },
+    {
+      "id": "ess_15",
+      "requiredVocab": [
+        "mi",
+        "olin",
+        "soweli",
+        "Sili"
+      ],
+      "englishPrompt": "Sirius gives you steady companionship — your closest connection. How do you say 'I love Sirius'?",
+      "options": [
+        "mi olin e soweli Sili.",
+        "mi lukin e soweli Sili.",
+        "mi moku e soweli Sili."
+      ],
+      "correctOption": "mi olin e soweli Sili."
+    },
+    {
+      "id": "ess_16",
+      "requiredVocab": [
+        "mi",
+        "lape",
+        "lon",
+        "tenpo",
+        "pimeja"
+      ],
+      "englishPrompt": "Target bedtime is midnight. How do you say 'I sleep at night'?",
+      "options": [
+        "mi lape lon tenpo pimeja.",
+        "mi moku lon tenpo pimeja.",
+        "mi pali lon tenpo pimeja."
+      ],
+      "correctOption": "mi lape lon tenpo pimeja."
+    },
+    {
+      "id": "ess_17",
+      "requiredVocab": [
+        "mi",
+        "lukin",
+        "sitelen",
+        "tawa"
+      ],
+      "englishPrompt": "Evening wind-down: a YouTube history documentary. How do you say 'I watch a moving picture (video)'?",
+      "options": [
+        "mi lukin e sitelen tawa.",
+        "mi pali e sitelen tawa.",
+        "mi kalama e sitelen tawa."
+      ],
+      "correctOption": "mi lukin e sitelen tawa."
+    },
+    {
+      "id": "ess_18",
+      "requiredVocab": [
+        "mi",
+        "pali",
+        "lon",
+        "tomo",
+        "esun"
+      ],
+      "englishPrompt": "Food Service Team Lead at Target. How do you say 'I work at the store (commerce-house)'?",
+      "options": [
+        "mi pali lon tomo esun.",
+        "mi lape lon tomo esun.",
+        "mi moku lon tomo esun."
+      ],
+      "correctOption": "mi pali lon tomo esun."
+    },
+    {
+      "id": "ess_19",
+      "requiredVocab": [
+        "mi",
+        "moku",
+        "telo",
+        "pimeja",
+        "lon",
+        "tenpo",
+        "suno"
+      ],
+      "englishPrompt": "Black coffee before any media or task — every morning. How do you say 'I drink black liquid (coffee) in the morning (sun-time)'?",
+      "options": [
+        "mi moku e telo pimeja lon tenpo suno.",
+        "mi moku e telo pimeja lon tenpo pimeja.",
+        "mi pali e telo pimeja lon tenpo suno."
+      ],
+      "correctOption": "mi moku e telo pimeja lon tenpo suno."
+    },
+    {
+      "id": "ess_20",
+      "requiredVocab": [
+        "mi",
+        "lukin",
+        "lipu",
+        "kepeken",
+        "ilo",
+        "lipu"
+      ],
+      "englishPrompt": "Kindle Paperwhite (11th gen) for nightly reading. How do you say 'I read books using a book-tool (e-reader)'?",
+      "options": [
+        "mi lukin e lipu kepeken ilo lipu.",
+        "mi pali e lipu kepeken ilo lipu.",
+        "mi pana e lipu kepeken ilo lipu."
+      ],
+      "correctOption": "mi lukin e lipu kepeken ilo lipu."
+    },
+    {
+      "id": "ess_21",
+      "requiredVocab": [
+        "soweli",
+        "Sili",
+        "lape",
+        "lon",
+        "supa"
+      ],
+      "englishPrompt": "Sirius is asleep on the bed. How do you say 'Sirius sleeps on the furniture (bed)'?",
+      "options": [
+        "soweli Sili li lape lon supa.",
+        "soweli Sili li moku lon supa.",
+        "soweli Sili li tawa lon supa."
+      ],
+      "correctOption": "soweli Sili li lape lon supa."
+    },
+    {
+      "id": "ess_22",
+      "requiredVocab": [
+        "mi",
+        "tawa",
+        "ma",
+        "Tene"
+      ],
+      "englishPrompt": "The Great Migration of 2016: California to Tennessee. How do you say 'I went to Tennessee (land of Ten[nessee])'?",
+      "options": [
+        "mi tawa ma Tene.",
+        "mi awen ma Tene.",
+        "mi tan ma Tene."
+      ],
+      "correctOption": "mi tawa ma Tene."
+    },
+    {
+      "id": "ess_23",
+      "requiredVocab": [
+        "mi",
+        "kama",
+        "tan",
+        "ma",
+        "Kalipona"
+      ],
+      "englishPrompt": "You came from Tulare, CA. How do you say 'I come from California'?",
+      "options": [
+        "mi kama tan ma Kalipona.",
+        "mi tawa ma Kalipona.",
+        "mi awen lon ma Kalipona."
+      ],
+      "correctOption": "mi kama tan ma Kalipona."
+    },
+    {
+      "id": "ess_24",
+      "requiredVocab": [
+        "mi",
+        "kepeken",
+        "ilo",
+        "sona",
+        "lili"
+      ],
+      "englishPrompt": "Pixel 9 Pro is your daily phone. How do you say 'I use a small knowledge-tool (phone)'?",
+      "options": [
+        "mi kepeken ilo sona lili.",
+        "mi lukin e ilo sona lili.",
+        "mi pali e ilo sona lili."
+      ],
+      "correctOption": "mi kepeken ilo sona lili."
+    },
+    {
+      "id": "ess_25",
+      "requiredVocab": [
+        "mi",
+        "wile",
+        "ala",
+        "toki",
+        "kepeken",
+        "jan"
+      ],
+      "englishPrompt": "Strongly introverted ISTJ; social interaction drains. How do you say 'I do not want to talk with people'?",
+      "options": [
+        "mi wile ala toki kepeken jan.",
+        "mi wile toki kepeken jan.",
+        "mi ken ala toki kepeken jan."
+      ],
+      "correctOption": "mi wile ala toki kepeken jan."
+    },
+    {
+      "id": "ess_26",
+      "requiredVocab": [
+        "mi",
+        "moku",
+        "lon",
+        "tomo",
+        "mi"
+      ],
+      "englishPrompt": "Weekend meal prep at the apartment. How do you say 'I eat in my home'?",
+      "options": [
+        "mi moku lon tomo mi.",
+        "mi moku lon tomo esun.",
+        "mi moku lon ma."
+      ],
+      "correctOption": "mi moku lon tomo mi."
+    },
+    {
+      "id": "ess_27",
+      "requiredVocab": [
+        "mi",
+        "wawa",
+        "kepeken",
+        "ilo",
+        "wawa"
+      ],
+      "englishPrompt": "Pull-up bar, dip station, heavy bag — full-body training without leaving home. How do you say 'I am strong using strong tools (gym equipment)'?",
+      "options": [
+        "mi wawa kepeken ilo wawa.",
+        "mi suli kepeken ilo wawa.",
+        "mi wawa kepeken ilo musi."
+      ],
+      "correctOption": "mi wawa kepeken ilo wawa."
+    },
+    {
+      "id": "ess_28",
+      "requiredVocab": [
+        "soweli",
+        "Sili",
+        "moku",
+        "lon",
+        "tenpo",
+        "suno"
+      ],
+      "englishPrompt": "Sirius's morning feeding. How do you say 'Sirius eats in the morning'?",
+      "options": [
+        "soweli Sili li moku lon tenpo suno.",
+        "soweli Sili li lape lon tenpo suno.",
+        "soweli Sili li pali lon tenpo suno."
+      ],
+      "correctOption": "soweli Sili li moku lon tenpo suno."
+    },
+    {
+      "id": "ess_29",
+      "requiredVocab": [
+        "mi",
+        "lukin",
+        "lipu",
+        "lon",
+        "tenpo",
+        "weka"
+      ],
+      "englishPrompt": "Weekends: reading, creative writing, media. How do you say 'I read books in my free time (separated time)'?",
+      "options": [
+        "mi lukin e lipu lon tenpo weka.",
+        "mi pali e lipu lon tenpo weka.",
+        "mi pana e lipu lon tenpo weka."
+      ],
+      "correctOption": "mi lukin e lipu lon tenpo weka."
+    },
+    {
+      "id": "ess_30",
+      "requiredVocab": [
+        "mi",
+        "awen",
+        "taso"
+      ],
+      "englishPrompt": "Voluntary isolation; little distress from minimal contact. How do you say 'I stay alone'?",
+      "options": [
+        "mi awen taso.",
+        "mi tawa taso.",
+        "mi pali taso."
+      ],
+      "correctOption": "mi awen taso."
+    },
+    {
+      "id": "ess_31",
+      "requiredVocab": [
+        "mi",
+        "pali",
+        "kalama",
+        "musi",
+        "lon",
+        "tomo",
+        "mi"
+      ],
+      "englishPrompt": "You produce, record, and edit your own albums in the apartment. How do you say 'I make music in my home'?",
+      "options": [
+        "mi pali e kalama musi lon tomo mi.",
+        "mi lukin e kalama musi lon tomo mi.",
+        "mi moku e kalama musi lon tomo mi."
+      ],
+      "correctOption": "mi pali e kalama musi lon tomo mi."
+    },
+    {
+      "id": "ess_32",
+      "requiredVocab": [
+        "mi",
+        "kepeken",
+        "ilo",
+        "kalama",
+        "musi",
+        "pi",
+        "luka"
+      ],
+      "englishPrompt": "Acoustic guitar, played by hand. How do you say 'I use a music-instrument of the hand (guitar)'?",
+      "options": [
+        "mi kepeken ilo kalama musi pi luka.",
+        "mi kepeken ilo kalama musi pi noka.",
+        "mi kepeken ilo kalama musi pi lawa."
+      ],
+      "correctOption": "mi kepeken ilo kalama musi pi luka."
+    },
+    {
+      "id": "ess_33",
+      "requiredVocab": [
+        "jan",
+        "pali",
+        "mi",
+        "li",
+        "pona"
+      ],
+      "englishPrompt": "Your fellow Team Lead Dan, who you trained, became a friend. How do you say 'My coworker is good'?",
+      "options": [
+        "jan pali mi li pona.",
+        "jan pali mi li ike.",
+        "jan pali sina li pona."
+      ],
+      "correctOption": "jan pali mi li pona."
+    },
+    {
+      "id": "ess_34",
+      "requiredVocab": [
+        "mi",
+        "lukin",
+        "lipu",
+        "pi",
+        "ma",
+        "sewi"
+      ],
+      "englishPrompt": "Asimov's Foundation, Card's Ender, the Expanse — sci-fi about other worlds. How do you say 'I read books of the high-place (sci-fi/other-worlds)'?",
+      "options": [
+        "mi lukin e lipu pi ma sewi.",
+        "mi lukin e lipu pi ma anpa.",
+        "mi lukin e lipu pi ma esun."
+      ],
+      "correctOption": "mi lukin e lipu pi ma sewi."
+    },
+    {
+      "id": "ess_35",
+      "requiredVocab": [
+        "mi",
+        "wile",
+        "kama",
+        "wawa",
+        "kepeken",
+        "ilo",
+        "wawa"
+      ],
+      "englishPrompt": "Heavy bag, dip station, pull-up bar — your home gym. How do you say 'I want to become strong using strong tools (gym equipment)'?",
+      "options": [
+        "mi wile kama wawa kepeken ilo wawa.",
+        "mi wile kama suli kepeken ilo wawa.",
+        "mi wile kama wawa kepeken ilo musi."
+      ],
+      "correctOption": "mi wile kama wawa kepeken ilo wawa."
+    },
+    {
+      "id": "ess_36",
+      "requiredVocab": [
+        "tomo",
+        "mi",
+        "lili",
+        "taso",
+        "pona"
+      ],
+      "englishPrompt": "678 sq ft works as your command center, gym, and creative space. How do you say 'My home is small, but it is good'?",
+      "options": [
+        "tomo mi li lili, taso ona li pona.",
+        "tomo mi li suli, taso ona li pona.",
+        "tomo mi li lili, taso ona li ike."
+      ],
+      "correctOption": "tomo mi li lili, taso ona li pona."
+    },
+    {
+      "id": "ess_37",
+      "requiredVocab": [
+        "mi",
+        "kute",
+        "kalama",
+        "musi",
+        "kepeken",
+        "ilo",
+        "kute"
+      ],
+      "englishPrompt": "Pixel Buds Pro in, Death Cab for Cutie's Transatlanticism playing. How do you say 'I listen to music using ear-tools (earbuds)'?",
+      "options": [
+        "mi kute e kalama musi kepeken ilo kute.",
+        "mi kute e kalama musi kepeken ilo lukin.",
+        "mi pali e kalama musi kepeken ilo kute."
+      ],
+      "correctOption": "mi kute e kalama musi kepeken ilo kute."
+    },
+    {
+      "id": "ess_38",
+      "requiredVocab": [
+        "mi",
+        "sona",
+        "ala",
+        "e",
+        "sewi",
+        "mama"
+      ],
+      "englishPrompt": "Educated Realistic-Agnostic Atheist; <1% probability estimate. How do you say 'I do not believe in (know) the parent-god/deity'?",
+      "options": [
+        "mi sona ala e sewi mama.",
+        "mi sona e sewi mama.",
+        "mi olin ala e sewi mama."
+      ],
+      "correctOption": "mi sona ala e sewi mama."
+    },
+    {
+      "id": "ess_39",
+      "requiredVocab": [
+        "mi",
+        "tawa",
+        "esun",
+        "kepeken",
+        "tomo",
+        "tawa"
+      ],
+      "englishPrompt": "Driving to work at Target Franklin. How do you say 'I go to the store using a moving-house (car)'?",
+      "options": [
+        "mi tawa esun kepeken tomo tawa.",
+        "mi awen esun kepeken tomo tawa.",
+        "mi tawa tomo kepeken tomo tawa."
+      ],
+      "correctOption": "mi tawa esun kepeken tomo tawa."
+    },
+    {
+      "id": "ess_40",
+      "requiredVocab": [
+        "mi",
+        "pana",
+        "moku",
+        "tawa",
+        "jan",
+        "mute"
+      ],
+      "englishPrompt": "Food Service Team Lead — running food service for Target's Starbucks operation. How do you say 'I give food to many people'?",
+      "options": [
+        "mi pana e moku tawa jan mute.",
+        "mi moku tawa jan mute.",
+        "mi pana e jan tawa moku mute."
+      ],
+      "correctOption": "mi pana e moku tawa jan mute."
+    },
+    {
+      "id": "ess_41",
+      "requiredVocab": [
+        "mi",
+        "wile",
+        "ala",
+        "kama",
+        "mama"
+      ],
+      "englishPrompt": "No interest in having children — explicit on cost-benefit and population grounds. How do you say 'I do not want to become a parent'?",
+      "options": [
+        "mi wile ala kama mama.",
+        "mi wile kama mama.",
+        "mi ken ala kama mama."
+      ],
+      "correctOption": "mi wile ala kama mama."
+    },
+    {
+      "id": "ess_42",
+      "requiredVocab": [
+        "mi",
+        "lukin",
+        "sin",
+        "lon",
+        "tenpo",
+        "suno"
+      ],
+      "englishPrompt": "After coffee, before any task: Google feed, Bluesky, YouTube news. How do you say 'I look at news in the morning'?",
+      "options": [
+        "mi lukin e sin lon tenpo suno.",
+        "mi lukin e sin lon tenpo pimeja.",
+        "mi pali e sin lon tenpo suno."
+      ],
+      "correctOption": "mi lukin e sin lon tenpo suno."
+    },
+    {
+      "id": "ess_43",
+      "requiredVocab": [
+        "mi",
+        "moku",
+        "kasi",
+        "nasa"
+      ],
+      "englishPrompt": "THC vapes for relaxation, sleep, and stress management. How do you say 'I consume the strange-plant (cannabis)'?",
+      "options": [
+        "mi moku e kasi nasa.",
+        "mi moku e telo nasa.",
+        "mi moku e kasi pona."
+      ],
+      "correctOption": "mi moku e kasi nasa."
+    },
+    {
+      "id": "ess_44",
+      "requiredVocab": [
+        "mi",
+        "sitelen",
+        "toki",
+        "kepeken",
+        "ilo",
+        "sitelen"
+      ],
+      "englishPrompt": "Creative writing on the Acer Chromebook, Logitech K380 keyboard, Dvorak layout. How do you say 'I write words using a writing-tool (keyboard/computer)'?",
+      "options": [
+        "mi sitelen e toki kepeken ilo sitelen.",
+        "mi lukin e toki kepeken ilo sitelen.",
+        "mi sitelen e toki kepeken ilo kalama."
+      ],
+      "correctOption": "mi sitelen e toki kepeken ilo sitelen."
+    },
+    {
+      "id": "ess_45",
+      "requiredVocab": [
+        "soweli",
+        "Sili",
+        "kama",
+        "lon",
+        "poka",
+        "mi"
+      ],
+      "englishPrompt": "Sirius walks over and settles next to you. How do you say 'Sirius comes to my side'?",
+      "options": [
+        "soweli Sili li kama lon poka mi.",
+        "soweli Sili li tawa weka tan mi.",
+        "soweli Sili li lape lon poka mi."
+      ],
+      "correctOption": "soweli Sili li kama lon poka mi."
+    },
+    {
+      "id": "ess_46",
+      "requiredVocab": [
+        "mi",
+        "wile",
+        "awen",
+        "taso",
+        "tan",
+        "ni",
+        "kama",
+        "wawa"
+      ],
+      "englishPrompt": "Solitude is by design — it's how you stay sharp. How do you say 'I want to stay alone, because (from this) I become strong'?",
+      "options": [
+        "mi wile awen taso, tan ni: mi kama wawa.",
+        "mi wile awen taso, taso mi kama wawa.",
+        "mi wile awen kepeken jan, tan ni: mi kama wawa."
+      ],
+      "correctOption": "mi wile awen taso, tan ni: mi kama wawa."
+    },
+    {
+      "id": "ess_47",
+      "requiredVocab": [
+        "tenpo",
+        "suno",
+        "ali",
+        "la",
+        "mi",
+        "moku",
+        "telo",
+        "pimeja",
+        "wawa"
+      ],
+      "englishPrompt": "200mg+ caffeine daily; black coffee before any task. How do you say 'Every day, I drink the strong black liquid (coffee)'?",
+      "options": [
+        "tenpo suno ali la mi moku e telo pimeja wawa.",
+        "tenpo pimeja ali la mi moku e telo pimeja wawa.",
+        "tenpo suno ali la mi pali e telo pimeja wawa."
+      ],
+      "correctOption": "tenpo suno ali la mi moku e telo pimeja wawa."
+    },
+    {
+      "id": "ess_48",
+      "requiredVocab": [
+        "jan",
+        "li",
+        "mute",
+        "la",
+        "mi",
+        "wile",
+        "weka"
+      ],
+      "englishPrompt": "Group size preference: large gatherings produce discomfort and early withdrawal. How do you say 'When people are many, I want to leave'?",
+      "options": [
+        "jan li mute la mi wile weka.",
+        "jan li lili la mi wile weka.",
+        "jan li mute la mi wile awen."
+      ],
+      "correctOption": "jan li mute la mi wile weka."
+    },
+    {
+      "id": "ess_49",
+      "requiredVocab": [
+        "mi",
+        "wile",
+        "sona",
+        "mute",
+        "tan",
+        "ni",
+        "mi",
+        "lukin",
+        "lipu",
+        "mute"
+      ],
+      "englishPrompt": "Autodidact; high openness; completed Foundation, Expanse, Shannara, Dark Tower full sets. How do you say 'I want much knowledge, so I read many books'?",
+      "options": [
+        "mi wile sona mute, tan ni: mi lukin e lipu mute.",
+        "mi wile sona lili, tan ni: mi lukin e lipu mute.",
+        "mi wile sona mute, taso mi lukin e lipu lili."
+      ],
+      "correctOption": "mi wile sona mute, tan ni: mi lukin e lipu mute."
+    },
+    {
+      "id": "ess_50",
+      "requiredVocab": [
+        "sina",
+        "wile",
+        "toki",
+        "tawa",
+        "mi",
+        "la",
+        "o",
+        "kepeken",
+        "ilo",
+        "sona",
+        "lili"
+      ],
+      "englishPrompt": "Direct; minimal social contact. If someone needs to reach you, text the Pixel 9 Pro. How do you say 'If you want to talk to me, use the small knowledge-tool (phone)'?",
+      "options": [
+        "sina wile toki tawa mi la o kepeken ilo sona lili.",
+        "sina wile toki tawa mi la o kama lon tomo mi.",
+        "sina wile toki tawa mi la o kepeken ilo wawa."
+      ],
+      "correctOption": "sina wile toki tawa mi la o kepeken ilo sona lili."
+    },
+    {
+      "id": "ess_51",
+      "requiredVocab": [
+        "mi",
+        "lukin",
+        "sitelen",
+        "tawa",
+        "pi",
+        "tenpo",
+        "pini",
+        "lon",
+        "tenpo",
+        "pimeja"
+      ],
+      "englishPrompt": "Evening: YouTube — Fall of Civilizations, PBS Eons, history documentaries. How do you say 'I watch videos of the past (history docs) at night'?",
+      "options": [
+        "mi lukin e sitelen tawa pi tenpo pini lon tenpo pimeja.",
+        "mi lukin e sitelen tawa pi tenpo kama lon tenpo pimeja.",
+        "mi pali e sitelen tawa pi tenpo pini lon tenpo pimeja."
+      ],
+      "correctOption": "mi lukin e sitelen tawa pi tenpo pini lon tenpo pimeja."
+    },
+    {
+      "id": "ess_52",
+      "requiredVocab": [
+        "mi",
+        "kama",
+        "lape",
+        "lon",
+        "tenpo",
+        "open",
+        "pi",
+        "tenpo",
+        "pimeja",
+        "sin"
+      ],
+      "englishPrompt": "Bedtime is the start of the new day (around midnight). How do you say 'I fall asleep at the start of the new night (midnight)'?",
+      "options": [
+        "mi kama lape lon tenpo open pi tenpo pimeja sin.",
+        "mi kama lape lon tenpo pini pi tenpo pimeja.",
+        "mi kama suno lon tenpo open pi tenpo pimeja sin."
+      ],
+      "correctOption": "mi kama lape lon tenpo open pi tenpo pimeja sin."
+    },
+    {
+      "id": "ess_53",
+      "requiredVocab": [
+        "mama",
+        "mi",
+        "li",
+        "weka",
+        "taso",
+        "soweli",
+        "Sili",
+        "li",
+        "lon",
+        "poka",
+        "mi"
+      ],
+      "englishPrompt": "No contact with immediate family; cat is your steady companion. How do you say 'My family is far away, but Sirius is at my side'?",
+      "options": [
+        "mama mi li weka, taso soweli Sili li lon poka mi.",
+        "mama mi li poka, taso soweli Sili li weka.",
+        "mama mi li weka, taso soweli Sili li weka."
+      ],
+      "correctOption": "mama mi li weka, taso soweli Sili li lon poka mi."
+    },
+    {
+      "id": "ess_54",
+      "requiredVocab": [
+        "mi",
+        "wile",
+        "ala",
+        "e",
+        "mani",
+        "mute",
+        "taso",
+        "mi",
+        "wile",
+        "e",
+        "tenpo",
+        "mi"
+      ],
+      "englishPrompt": "Income ~$54k; modest net worth; values autonomy over wealth. How do you say 'I do not want much money, but I want my time'?",
+      "options": [
+        "mi wile ala e mani mute, taso mi wile e tenpo mi.",
+        "mi wile e mani mute, taso mi wile ala e tenpo mi.",
+        "mi wile ala e mani mute, taso mi wile ala e tenpo mi."
+      ],
+      "correctOption": "mi wile ala e mani mute, taso mi wile e tenpo mi."
+    },
+    {
+      "id": "ess_55",
+      "requiredVocab": [
+        "mi",
+        "ken",
+        "pali",
+        "e",
+        "mute",
+        "ijo",
+        "tan",
+        "ni",
+        "mi",
+        "jan",
+        "pi",
+        "sona",
+        "mute"
+      ],
+      "englishPrompt": "Jack-of-all-trades; CliftonStrengths Strategic + Analytical. How do you say 'I can do many things, because I am a person of much knowledge'?",
+      "options": [
+        "mi ken pali e mute ijo, tan ni: mi jan pi sona mute.",
+        "mi ken pali e mute ijo, taso mi jan pi sona lili.",
+        "mi ken ala pali e mute ijo, tan ni: mi jan pi sona mute."
+      ],
+      "correctOption": "mi ken pali e mute ijo, tan ni: mi jan pi sona mute."
+    },
+    {
+      "id": "ess_56",
+      "requiredVocab": [
+        "sina",
+        "wile",
+        "kama",
+        "wawa",
+        "la",
+        "o",
+        "pali",
+        "mute"
+      ],
+      "englishPrompt": "Discipline + perfectionism that optimizes; self-directed training. How do you say 'If you want to become strong, work much (a lot)'?",
+      "options": [
+        "sina wile kama wawa la o pali mute.",
+        "sina wile kama wawa la o pali ala.",
+        "sina wile kama wawa la o lape mute."
+      ],
+      "correctOption": "sina wile kama wawa la o pali mute."
+    },
+    {
+      "id": "ess_57",
+      "requiredVocab": [
+        "mi",
+        "lukin",
+        "ala",
+        "e",
+        "sitelen",
+        "tawa",
+        "pi",
+        "tenpo",
+        "kama",
+        "tan",
+        "ni",
+        "mi",
+        "wile",
+        "sona",
+        "ala"
+      ],
+      "englishPrompt": "You don't watch trailers, read spoilers, or research before watching — strictly blind viewing. How do you say 'I don't watch videos of the future (trailers) because I don't want to know'?",
+      "options": [
+        "mi lukin ala e sitelen tawa pi tenpo kama, tan ni: mi wile ala sona.",
+        "mi lukin e sitelen tawa pi tenpo kama, tan ni: mi wile sona.",
+        "mi lukin ala e sitelen tawa pi tenpo pini, tan ni: mi wile ala sona."
+      ],
+      "correctOption": "mi lukin ala e sitelen tawa pi tenpo kama, tan ni: mi wile ala sona."
+    },
+    {
+      "id": "ess_58",
+      "requiredVocab": [
+        "tenpo",
+        "weka",
+        "la",
+        "mi",
+        "lukin",
+        "lipu",
+        "anu",
+        "sitelen",
+        "toki"
+      ],
+      "englishPrompt": "Weekend pattern: reading, creative writing, media, periodic logistics. How do you say 'On the weekend, I read books or do creative writing'?",
+      "options": [
+        "tenpo weka la mi lukin e lipu anu sitelen e toki.",
+        "tenpo weka la mi lukin e lipu en sitelen e toki.",
+        "tenpo pali la mi lukin e lipu anu sitelen e toki."
+      ],
+      "correctOption": "tenpo weka la mi lukin e lipu anu sitelen e toki."
+    },
+    {
+      "id": "ess_59",
+      "requiredVocab": [
+        "jan",
+        "li",
+        "toki",
+        "ike",
+        "la",
+        "mi",
+        "wile",
+        "ala",
+        "kute"
+      ],
+      "englishPrompt": "Triggers: irrationality, intellectual dishonesty — disengage rather than argue. How do you say 'When a person speaks foolishly, I do not want to listen'?",
+      "options": [
+        "jan li toki ike la mi wile ala kute.",
+        "jan li toki pona la mi wile ala kute.",
+        "jan li toki ike la mi wile kute."
+      ],
+      "correctOption": "jan li toki ike la mi wile ala kute."
+    },
+    {
+      "id": "ess_60",
+      "requiredVocab": [
+        "mi",
+        "wile",
+        "moku",
+        "kasi",
+        "nasa",
+        "tan",
+        "ni",
+        "mi",
+        "wile",
+        "lape",
+        "pona"
+      ],
+      "englishPrompt": "THC vapes — sleep facilitation is the primary purpose. How do you say 'I want to consume the strange-plant (cannabis), so I sleep well'?",
+      "options": [
+        "mi wile moku e kasi nasa, tan ni: mi wile lape pona.",
+        "mi wile moku e kasi nasa, taso mi wile lape pona.",
+        "mi wile moku e telo nasa, tan ni: mi wile lape pona."
+      ],
+      "correctOption": "mi wile moku e kasi nasa, tan ni: mi wile lape pona."
+    },
+    {
+      "id": "ess_61",
+      "requiredVocab": [
+        "jan",
+        "li",
+        "moli",
+        "la",
+        "ona",
+        "li",
+        "pini",
+        "tan",
+        "ni",
+        "lawa",
+        "ona",
+        "li",
+        "pali",
+        "ala"
+      ],
+      "englishPrompt": "Death = end of subjective experience; consciousness ends when neural tissue ceases function. How do you say 'When a person dies, they end, because their head (brain) does not work'?",
+      "options": [
+        "jan li moli la ona li pini, tan ni: lawa ona li pali ala.",
+        "jan li moli la ona li open, tan ni: lawa ona li pali ala.",
+        "jan li moli la ona li pini, taso lawa ona li pali."
+      ],
+      "correctOption": "jan li moli la ona li pini, tan ni: lawa ona li pali ala."
+    },
+    {
+      "id": "ess_62",
+      "requiredVocab": [
+        "mi",
+        "wile",
+        "pali",
+        "e",
+        "ijo",
+        "pona",
+        "tan",
+        "ni",
+        "tenpo",
+        "mi",
+        "li",
+        "lili"
+      ],
+      "englishPrompt": "Existentialism: existence precedes essence; meaning is created through choices. Life valuable for its finitude. How do you say 'I want to make good things, because my time is little (finite)'?",
+      "options": [
+        "mi wile pali e ijo pona, tan ni: tenpo mi li lili.",
+        "mi wile pali e ijo pona, tan ni: tenpo mi li suli.",
+        "mi wile pali e ijo ike, tan ni: tenpo mi li lili."
+      ],
+      "correctOption": "mi wile pali e ijo pona, tan ni: tenpo mi li lili."
+    },
+    {
+      "id": "ess_63",
+      "requiredVocab": [
+        "sona",
+        "li",
+        "kama",
+        "tan",
+        "lukin",
+        "pi",
+        "ijo",
+        "lon",
+        "ala",
+        "tan",
+        "pilin",
+        "sewi"
+      ],
+      "englishPrompt": "Empirical evidence over faith; ancient texts written by humans with motivations. How do you say 'Knowledge comes from looking at things-that-exist, not from sky/holy feeling'?",
+      "options": [
+        "sona li kama tan lukin pi ijo lon, ala tan pilin sewi.",
+        "sona li kama tan pilin sewi, ala tan lukin pi ijo lon.",
+        "sona li kama tan lukin pi ijo lon, en tan pilin sewi."
+      ],
+      "correctOption": "sona li kama tan lukin pi ijo lon, ala tan pilin sewi."
+    },
+    {
+      "id": "ess_64",
+      "requiredVocab": [
+        "mi",
+        "lon",
+        "ma",
+        "Tene",
+        "taso",
+        "lawa",
+        "mi",
+        "li",
+        "awen",
+        "lon",
+        "ma",
+        "Kalipona"
+      ],
+      "englishPrompt": "Lives in Franklin since 2016, but Central Valley shaped him; childhood, trauma, and class identity remain anchored there. How do you say 'I am in Tennessee, but my head (mind) stays in California'?",
+      "options": [
+        "mi lon ma Tene, taso lawa mi li awen lon ma Kalipona.",
+        "mi lon ma Kalipona, taso lawa mi li awen lon ma Tene.",
+        "mi lon ma Tene, en lawa mi li awen lon ma Kalipona."
+      ],
+      "correctOption": "mi lon ma Tene, taso lawa mi li awen lon ma Kalipona."
+    },
+    {
+      "id": "ess_65",
+      "requiredVocab": [
+        "mi",
+        "wile",
+        "e",
+        "tenpo",
+        "mi",
+        "ken",
+        "lawa",
+        "e",
+        "ona",
+        "tan",
+        "ni",
+        "mi",
+        "wile",
+        "ala",
+        "pali",
+        "tawa",
+        "jan",
+        "ante"
+      ],
+      "englishPrompt": "Self-directed work; high need for environmental predictability; prefers solitary task completion. How do you say 'I want my time — I can govern (control) it — so I do not want to work for another person'?",
+      "options": [
+        "mi wile e tenpo mi (mi ken lawa e ona), tan ni: mi wile ala pali tawa jan ante.",
+        "mi wile ala e tenpo mi, tan ni: mi wile pali tawa jan ante.",
+        "mi wile e tenpo mi, taso mi wile pali tawa jan ante."
+      ],
+      "correctOption": "mi wile e tenpo mi (mi ken lawa e ona), tan ni: mi wile ala pali tawa jan ante."
+    },
+    {
+      "id": "ess_66",
+      "requiredVocab": [
+        "jan",
+        "ante",
+        "li",
+        "wile",
+        "e",
+        "olin",
+        "pi",
+        "tenpo",
+        "ali",
+        "taso",
+        "mi",
+        "li",
+        "wile",
+        "ala"
+      ],
+      "englishPrompt": "No personal interest in marriage or formal partnership; legal benefits available through other instruments. How do you say 'Other people want love of all-time (marriage), but I do not'?",
+      "options": [
+        "jan ante li wile e olin pi tenpo ali, taso mi li wile ala.",
+        "jan ante li wile e olin pi tenpo lili, taso mi li wile ala.",
+        "jan ante li wile e olin pi tenpo ali, en mi li wile."
+      ],
+      "correctOption": "jan ante li wile e olin pi tenpo ali, taso mi li wile ala."
+    },
+    {
+      "id": "ess_67",
+      "requiredVocab": [
+        "mi",
+        "kama",
+        "tan",
+        "ma",
+        "Tulali",
+        "taso",
+        "mi",
+        "li",
+        "kama",
+        "suli",
+        "lon",
+        "ma",
+        "Pansilipan"
+      ],
+      "englishPrompt": "Born in Tulare District Hospital, October 10, 1988; grew into adulthood in Franklin, TN. How do you say 'I came from Tulare, but I became big (grew up) in Franklin'?",
+      "options": [
+        "mi kama tan ma Tulali, taso mi li kama suli lon ma Pansilipan.",
+        "mi kama tan ma Pansilipan, taso mi li kama suli lon ma Tulali.",
+        "mi kama tan ma Tulali, en mi li kama suli lon ma Pansilipan."
+      ],
+      "correctOption": "mi kama tan ma Tulali, taso mi li kama suli lon ma Pansilipan."
+    },
+    {
+      "id": "ess_68",
+      "requiredVocab": [
+        "sona",
+        "pi",
+        "tenpo",
+        "pini",
+        "li",
+        "pona",
+        "tawa",
+        "mi",
+        "tan",
+        "ni",
+        "ona",
+        "li",
+        "sitelen",
+        "e",
+        "nasin",
+        "pi",
+        "tenpo",
+        "kama"
+      ],
+      "englishPrompt": "Pattern recognition is high; identifies parallels across systems; loves Fall of Civilizations and historical analysis. How do you say 'Knowledge of the past is good for me, because it draws (sketches) the path of the future'?",
+      "options": [
+        "sona pi tenpo pini li pona tawa mi, tan ni: ona li sitelen e nasin pi tenpo kama.",
+        "sona pi tenpo pini li ike tawa mi, tan ni: ona li sitelen e nasin pi tenpo kama.",
+        "sona pi tenpo kama li pona tawa mi, tan ni: ona li sitelen e nasin pi tenpo pini."
+      ],
+      "correctOption": "sona pi tenpo pini li pona tawa mi, tan ni: ona li sitelen e nasin pi tenpo kama."
+    },
+    {
+      "id": "ess_69",
+      "requiredVocab": [
+        "mi",
+        "ken",
+        "ala",
+        "sona",
+        "e",
+        "ali",
+        "taso",
+        "mi",
+        "ken",
+        "alasa",
+        "e",
+        "sona"
+      ],
+      "englishPrompt": "High tolerance for ambiguity when acknowledged; epistemic humility; cannot prove negatives. How do you say 'I cannot know everything, but I can hunt for (seek) knowledge'?",
+      "options": [
+        "mi ken ala sona e ali, taso mi ken alasa e sona.",
+        "mi ken sona e ali, taso mi ken ala alasa e sona.",
+        "mi ken ala sona e ali, en mi ken ala alasa e sona."
+      ],
+      "correctOption": "mi ken ala sona e ali, taso mi ken alasa e sona."
+    },
+    {
+      "id": "ess_70",
+      "requiredVocab": [
+        "mi",
+        "lukin",
+        "e",
+        "sitelen",
+        "tawa",
+        "pi",
+        "ma",
+        "ali",
+        "tan",
+        "ni",
+        "mi",
+        "wile",
+        "sona",
+        "e",
+        "jan",
+        "ali"
+      ],
+      "englishPrompt": "Geography Now, RealLifeLore, Wendover Productions; broad interest in global systems. How do you say 'I watch videos of all-the-world, because I want to know all people'?",
+      "options": [
+        "mi lukin e sitelen tawa pi ma ali, tan ni: mi wile sona e jan ali.",
+        "mi lukin e sitelen tawa pi ma lili, tan ni: mi wile sona e jan ali.",
+        "mi lukin e sitelen tawa pi ma ali, taso mi wile ala sona e jan ali."
+      ],
+      "correctOption": "mi lukin e sitelen tawa pi ma ali, tan ni: mi wile sona e jan ali."
+    },
+    {
+      "id": "ess_71",
+      "requiredVocab": [
+        "pilin",
+        "ike",
+        "li",
+        "sona",
+        "tan",
+        "ma",
+        "ala",
+        "ni",
+        "li",
+        "ken",
+        "pana",
+        "e",
+        "sona",
+        "tawa",
+        "mi"
+      ],
+      "englishPrompt": "Suffering is data about reality, not a cosmic test — it teaches what to avoid and what matters. How do you say 'Bad-feeling is knowledge from reality; this can give knowledge to me'?",
+      "options": [
+        "pilin ike li sona tan ma; ala ni: ona li ken pana e sona tawa mi.",
+        "pilin ike li sona tan ma; ni li ken pana e sona tawa mi.",
+        "pilin pona li sona tan ma; ni li ken pana e sona tawa mi."
+      ],
+      "correctOption": "pilin ike li sona tan ma; ni li ken pana e sona tawa mi."
+    },
+    {
+      "id": "ess_72",
+      "requiredVocab": [
+        "mi",
+        "olin",
+        "e",
+        "soweli",
+        "mi",
+        "tan",
+        "ni",
+        "ona",
+        "taso",
+        "li",
+        "awen",
+        "lon",
+        "poka",
+        "mi"
+      ],
+      "englishPrompt": "Connection needs partially met by Sirius — steady companionship; no other intimate ties. How do you say 'I love my pet, because he alone stays at my side'?",
+      "options": [
+        "mi olin e soweli mi, tan ni: ona taso li awen lon poka mi.",
+        "mi olin e soweli mi, taso ona taso li awen lon poka mi.",
+        "mi olin ala e soweli mi, tan ni: ona taso li awen lon poka mi."
+      ],
+      "correctOption": "mi olin e soweli mi, tan ni: ona taso li awen lon poka mi."
+    },
+    {
+      "id": "ess_73",
+      "requiredVocab": [
+        "sona",
+        "pi",
+        "ilo",
+        "sona",
+        "li",
+        "kama",
+        "wawa",
+        "taso",
+        "mi",
+        "kepeken",
+        "ona",
+        "kepeken",
+        "nasin",
+        "pona"
+      ],
+      "englishPrompt": "AI tools used for brainstorming and research; current LLMs assessed as pattern matching, not intelligence; AGI has existential risk potential. How do you say 'AI knowledge becomes strong, but I use it the good way (responsibly)'?",
+      "options": [
+        "sona pi ilo sona li kama wawa, taso mi kepeken ona kepeken nasin pona.",
+        "sona pi ilo sona li kama wawa, en mi kepeken ona kepeken nasin pona.",
+        "sona pi ilo sona li kama lili, taso mi kepeken ona kepeken nasin pona."
+      ],
+      "correctOption": "sona pi ilo sona li kama wawa, taso mi kepeken ona kepeken nasin pona."
+    },
+    {
+      "id": "ess_74",
+      "requiredVocab": [
+        "nasin",
+        "pi",
+        "moku",
+        "ike",
+        "tawa",
+        "soweli",
+        "li",
+        "ike",
+        "tan",
+        "ni",
+        "mi",
+        "wile",
+        "ala",
+        "moku",
+        "e",
+        "soweli"
+      ],
+      "englishPrompt": "Factory farming assessed as morally indefensible; mitigates harm by buying organic, pasture-raised; would switch to lab-grown meat at parity. How do you say 'The way of bad-eating-toward-animals (factory farming) is bad, so I do not want to eat animals'?",
+      "options": [
+        "nasin pi moku ike tawa soweli li ike, tan ni: mi wile ala moku e soweli.",
+        "nasin pi moku ike tawa soweli li pona, tan ni: mi wile moku e soweli.",
+        "nasin pi moku ike tawa soweli li ike, taso mi wile moku e soweli."
+      ],
+      "correctOption": "nasin pi moku ike tawa soweli li ike, tan ni: mi wile ala moku e soweli."
+    },
+    {
+      "id": "ess_75",
+      "requiredVocab": [
+        "mi",
+        "ken",
+        "ala",
+        "lukin",
+        "e",
+        "tenpo",
+        "kama",
+        "taso",
+        "mi",
+        "ken",
+        "pali",
+        "e",
+        "ona"
+      ],
+      "englishPrompt": "Free will probably illusory but practical implications remain; long-term plan centers on financial autonomy by 67. How do you say 'I cannot see the future, but I can build it'?",
+      "options": [
+        "mi ken ala lukin e tenpo kama, taso mi ken pali e ona.",
+        "mi ken lukin e tenpo kama, taso mi ken ala pali e ona.",
+        "mi ken ala lukin e tenpo pini, taso mi ken pali e ona."
+      ],
+      "correctOption": "mi ken ala lukin e tenpo kama, taso mi ken pali e ona."
+    }
+  ],
+  "logicGateData": [
+    {
+      "id": "log_1",
+      "requiredVocab": [
+        "soweli",
+        "Sili",
+        "moku"
+      ],
+      "statement": "soweli Sili li moku.",
+      "englishTranslation": "Sirius (the cat) eats.",
+      "isPona": true,
+      "explanation": "Cats eat — your cat Sirius eats food daily. This is normal."
+    },
+    {
+      "id": "log_2",
+      "requiredVocab": [
+        "mi",
+        "moku",
+        "tomo"
+      ],
+      "statement": "mi moku e tomo mi.",
+      "englishTranslation": "I eat my house.",
+      "isPona": false,
+      "explanation": "You cannot eat your apartment at The Madison Franklin — houses are not food."
+    },
+    {
+      "id": "log_3",
+      "requiredVocab": [
+        "mi",
+        "moku",
+        "telo",
+        "pimeja"
+      ],
+      "statement": "mi moku e telo pimeja.",
+      "englishTranslation": "I drink black liquid (coffee).",
+      "isPona": true,
+      "explanation": "Black coffee is your daily morning drink — exactly what you do every day."
+    },
+    {
+      "id": "log_4",
+      "requiredVocab": [
+        "soweli",
+        "Sili",
+        "lape"
+      ],
+      "statement": "soweli Sili li lape.",
+      "englishTranslation": "Sirius (the cat) sleeps.",
+      "isPona": true,
+      "explanation": "Cats sleep most of the day — completely normal feline behavior."
+    },
+    {
+      "id": "log_5",
+      "requiredVocab": [
+        "mi",
+        "lape",
+        "tenpo",
+        "suno"
+      ],
+      "statement": "mi lape lon tenpo suno.",
+      "englishTranslation": "I sleep during the daytime (sun-time).",
+      "isPona": false,
+      "explanation": "You're an early bird working ~9 AM–5 PM, with bedtime at midnight — you don't sleep during the day."
+    },
+    {
+      "id": "log_6",
+      "requiredVocab": [
+        "mi",
+        "wawa"
+      ],
+      "statement": "mi wawa.",
+      "englishTranslation": "I am strong.",
+      "isPona": true,
+      "explanation": "Lean, athletic, ~12% body fat with daily home gym training. Yes, you are strong."
+    },
+    {
+      "id": "log_7",
+      "requiredVocab": [
+        "mi",
+        "pali",
+        "tomo",
+        "esun"
+      ],
+      "statement": "mi pali lon tomo esun.",
+      "englishTranslation": "I work at the store (commerce-house).",
+      "isPona": true,
+      "explanation": "You're a Food Service Team Lead at Target Franklin — you work at a store."
+    },
+    {
+      "id": "log_8",
+      "requiredVocab": [
+        "soweli",
+        "Sili",
+        "moku",
+        "lipu"
+      ],
+      "statement": "soweli Sili li moku e lipu.",
+      "englishTranslation": "Sirius (the cat) eats books.",
+      "isPona": false,
+      "explanation": "Cats do not eat books — although they may sit on them. Sirius would not consume your Kindle library."
+    },
+    {
+      "id": "log_9",
+      "requiredVocab": [
+        "mi",
+        "lukin",
+        "lipu"
+      ],
+      "statement": "mi lukin e lipu.",
+      "englishTranslation": "I read a book.",
+      "isPona": true,
+      "explanation": "You completed full sets of Foundation, Expanse, Shannara, and 30+ other series — reading is constant for you."
+    },
+    {
+      "id": "log_10",
+      "requiredVocab": [
+        "tomo",
+        "mi",
+        "suli"
+      ],
+      "statement": "tomo mi li suli.",
+      "englishTranslation": "My home is big.",
+      "isPona": false,
+      "explanation": "Your apartment at The Madison Franklin is 678 sq ft — a 1-bedroom, intentionally small. It is not big."
+    },
+    {
+      "id": "log_11",
+      "requiredVocab": [
+        "mi",
+        "wile",
+        "moku"
+      ],
+      "statement": "mi wile e moku.",
+      "englishTranslation": "I want food.",
+      "isPona": true,
+      "explanation": "Wanting food is normal — you do meal prep on weekends and lunch breaks at work."
+    },
+    {
+      "id": "log_12",
+      "requiredVocab": [
+        "mi",
+        "tawa",
+        "tomo",
+        "esun"
+      ],
+      "statement": "mi tawa tomo esun.",
+      "englishTranslation": "I go to the store.",
+      "isPona": true,
+      "explanation": "You go to Target most weekdays for your shift — going to a store is part of your routine."
+    },
+    {
+      "id": "log_13",
+      "requiredVocab": [
+        "soweli",
+        "Sili",
+        "wawa"
+      ],
+      "statement": "soweli Sili li wawa.",
+      "englishTranslation": "Sirius (the cat) is strong.",
+      "isPona": true,
+      "explanation": "Cats are agile and powerful for their size — and Sirius is a healthy cat."
+    },
+    {
+      "id": "log_14",
+      "requiredVocab": [
+        "mi",
+        "moku",
+        "telo"
+      ],
+      "statement": "mi moku e telo.",
+      "englishTranslation": "I drink water.",
+      "isPona": true,
+      "explanation": "Water is necessary, especially after heavy bag sessions. Normal."
+    },
+    {
+      "id": "log_15",
+      "requiredVocab": [
+        "mi",
+        "olin",
+        "soweli",
+        "Sili"
+      ],
+      "statement": "mi olin e soweli Sili.",
+      "englishTranslation": "I love Sirius.",
+      "isPona": true,
+      "explanation": "Sirius provides steady companionship — he is the closest connection you maintain."
+    },
+    {
+      "id": "log_16",
+      "requiredVocab": [
+        "soweli",
+        "Sili",
+        "pali",
+        "tomo",
+        "esun"
+      ],
+      "statement": "soweli Sili li pali lon tomo esun.",
+      "englishTranslation": "Sirius (the cat) works at the store.",
+      "isPona": false,
+      "explanation": "Cats do not work at Target — you are the Team Lead, not Sirius."
+    },
+    {
+      "id": "log_17",
+      "requiredVocab": [
+        "mi",
+        "lape",
+        "lon",
+        "tenpo",
+        "pimeja"
+      ],
+      "statement": "mi lape lon tenpo pimeja.",
+      "englishTranslation": "I sleep at night.",
+      "isPona": true,
+      "explanation": "Bedtime around midnight, wake at 7:00–7:30 AM. Sleeping at night is your routine."
+    },
+    {
+      "id": "log_18",
+      "requiredVocab": [
+        "mi",
+        "lukin",
+        "lipu",
+        "kepeken",
+        "ilo",
+        "lipu"
+      ],
+      "statement": "mi lukin e lipu kepeken ilo lipu.",
+      "englishTranslation": "I read books using a book-tool (e-reader).",
+      "isPona": true,
+      "explanation": "You read on your Kindle Paperwhite — an electronic book-tool — regularly."
+    },
+    {
+      "id": "log_19",
+      "requiredVocab": [
+        "mi",
+        "tawa",
+        "ma",
+        "Tene",
+        "tan",
+        "ma",
+        "Kalipona"
+      ],
+      "statement": "mi tawa ma Tene tan ma Kalipona.",
+      "englishTranslation": "I went to Tennessee from California.",
+      "isPona": true,
+      "explanation": "This is your Great Migration of October–November 2016 — Tulare, CA to Franklin, TN."
+    },
+    {
+      "id": "log_20",
+      "requiredVocab": [
+        "mi",
+        "moku",
+        "telo",
+        "pimeja",
+        "tenpo",
+        "suno"
+      ],
+      "statement": "mi moku e telo pimeja lon tenpo suno.",
+      "englishTranslation": "I drink black liquid (coffee) in the morning.",
+      "isPona": true,
+      "explanation": "Black coffee every morning is your established daily ritual before any media."
+    },
+    {
+      "id": "log_21",
+      "requiredVocab": [
+        "mi",
+        "lape",
+        "lon",
+        "tomo",
+        "esun"
+      ],
+      "statement": "mi lape lon tomo esun.",
+      "englishTranslation": "I sleep at the store.",
+      "isPona": false,
+      "explanation": "You do not sleep at Target — you work there. Sleep happens at home, not on the sales floor."
+    },
+    {
+      "id": "log_22",
+      "requiredVocab": [
+        "soweli",
+        "Sili",
+        "lape",
+        "lon",
+        "supa"
+      ],
+      "statement": "soweli Sili li lape lon supa.",
+      "englishTranslation": "Sirius (the cat) sleeps on the furniture (bed).",
+      "isPona": true,
+      "explanation": "Cats sleep on furniture constantly — the bed, the couch, anything horizontal."
+    },
+    {
+      "id": "log_23",
+      "requiredVocab": [
+        "mi",
+        "moku",
+        "lon",
+        "tenpo",
+        "lape"
+      ],
+      "statement": "mi moku lon tenpo lape.",
+      "englishTranslation": "I eat while sleeping.",
+      "isPona": false,
+      "explanation": "You cannot eat while asleep — sleep and eating are mutually exclusive activities."
+    },
+    {
+      "id": "log_24",
+      "requiredVocab": [
+        "mi",
+        "kepeken",
+        "ilo",
+        "sona",
+        "lili"
+      ],
+      "statement": "mi kepeken ilo sona lili.",
+      "englishTranslation": "I use a small knowledge-tool (phone).",
+      "isPona": true,
+      "explanation": "Pixel 9 Pro since August 2024 — yes, you use a phone."
+    },
+    {
+      "id": "log_25",
+      "requiredVocab": [
+        "mi",
+        "tawa",
+        "lon",
+        "telo",
+        "suli"
+      ],
+      "statement": "mi tawa lon telo suli.",
+      "englishTranslation": "I walk on the big water (ocean).",
+      "isPona": false,
+      "explanation": "Humans cannot walk on water — even though you have stepped into the Atlantic and Pacific. You step in, not on."
+    },
+    {
+      "id": "log_26",
+      "requiredVocab": [
+        "mi",
+        "lukin",
+        "sitelen",
+        "tawa",
+        "lon",
+        "tomo",
+        "mi"
+      ],
+      "statement": "mi lukin e sitelen tawa lon tomo mi.",
+      "englishTranslation": "I watch videos in my home.",
+      "isPona": true,
+      "explanation": "Evening wind-down at the apartment includes YouTube, streaming TV, audiobooks — you watch in your home."
+    },
+    {
+      "id": "log_27",
+      "requiredVocab": [
+        "mi",
+        "wawa",
+        "tan",
+        "ni",
+        "mi",
+        "moku",
+        "ala"
+      ],
+      "statement": "mi wawa tan ni: mi moku ala.",
+      "englishTranslation": "I am strong because I do not eat.",
+      "isPona": false,
+      "explanation": "You cannot become strong by not eating — your TDEE is 2,291 cal and you train consistently. Strength requires nutrition."
+    },
+    {
+      "id": "log_28",
+      "requiredVocab": [
+        "mi",
+        "kama",
+        "tan",
+        "ma",
+        "Kalipona"
+      ],
+      "statement": "mi kama tan ma Kalipona.",
+      "englishTranslation": "I come from California.",
+      "isPona": true,
+      "explanation": "Born in Tulare District Hospital, October 10, 1988. California origin is correct."
+    },
+    {
+      "id": "log_29",
+      "requiredVocab": [
+        "soweli",
+        "Sili",
+        "moku",
+        "telo",
+        "pimeja",
+        "wawa"
+      ],
+      "statement": "soweli Sili li moku e telo pimeja wawa.",
+      "englishTranslation": "Sirius (the cat) drinks strong black liquid (coffee).",
+      "isPona": false,
+      "explanation": "Cats do not drink coffee — that 200mg+ daily caffeine habit belongs to you, not Sirius. Caffeine is also toxic to cats."
+    },
+    {
+      "id": "log_30",
+      "requiredVocab": [
+        "mi",
+        "pali",
+        "kalama",
+        "musi",
+        "lon",
+        "tomo",
+        "mi"
+      ],
+      "statement": "mi pali e kalama musi lon tomo mi.",
+      "englishTranslation": "I make music in my home.",
+      "isPona": true,
+      "explanation": "You produce, record, and edit your own albums in your 678 sq ft apartment — fully accurate."
+    },
+    {
+      "id": "log_31",
+      "requiredVocab": [
+        "jan",
+        "pali",
+        "mi",
+        "li",
+        "lawa",
+        "e",
+        "mi"
+      ],
+      "statement": "jan pali mi li lawa e mi.",
+      "englishTranslation": "My coworker controls/leads me.",
+      "isPona": false,
+      "explanation": "You are the Team Lead — you lead them, not the other way around. Direction goes from you to your team."
+    },
+    {
+      "id": "log_32",
+      "requiredVocab": [
+        "mi",
+        "kepeken",
+        "ilo",
+        "lipu",
+        "lon",
+        "tenpo",
+        "lape"
+      ],
+      "statement": "mi kepeken ilo lipu lon tenpo lape.",
+      "englishTranslation": "I use my e-reader during sleep-time.",
+      "isPona": true,
+      "explanation": "Evening wind-down before midnight bedtime often includes Kindle reading. Reading at night is your norm."
+    },
+    {
+      "id": "log_33",
+      "requiredVocab": [
+        "mi",
+        "kepeken",
+        "ilo",
+        "sona",
+        "lili",
+        "lon",
+        "tenpo",
+        "pali"
+      ],
+      "statement": "mi kepeken ilo sona lili lon tenpo pali.",
+      "englishTranslation": "I use a small knowledge-tool (phone) during work-time.",
+      "isPona": true,
+      "explanation": "Your Pixel 9 Pro is on you during shifts — using a phone at work is normal in modern food service."
+    },
+    {
+      "id": "log_34",
+      "requiredVocab": [
+        "mi",
+        "lukin",
+        "lipu",
+        "pi",
+        "ma",
+        "sewi",
+        "lon",
+        "tomo",
+        "mi"
+      ],
+      "statement": "mi lukin e lipu pi ma sewi lon tomo mi.",
+      "englishTranslation": "I read sci-fi/space books in my home.",
+      "isPona": true,
+      "explanation": "Asimov, Card, Brooks, the Expanse — sci-fi and fantasy are your dominant reading categories, done at home."
+    },
+    {
+      "id": "log_35",
+      "requiredVocab": [
+        "soweli",
+        "Sili",
+        "li",
+        "pali",
+        "kalama",
+        "musi"
+      ],
+      "statement": "soweli Sili li pali e kalama musi.",
+      "englishTranslation": "Sirius (the cat) makes music.",
+      "isPona": false,
+      "explanation": "Cats do not produce music albums — you do. Sirius might meow, but he does not edit albums on your Chromebook."
+    },
+    {
+      "id": "log_36",
+      "requiredVocab": [
+        "jan",
+        "mute",
+        "kama",
+        "tomo",
+        "mi",
+        "lon",
+        "tenpo",
+        "weka"
+      ],
+      "statement": "jan mute li kama lon tomo mi lon tenpo weka.",
+      "englishTranslation": "Many people come to my home on the weekend.",
+      "isPona": false,
+      "explanation": "You live in voluntary isolation. Social engagements are rare and not sought, especially crowds at home."
+    },
+    {
+      "id": "log_37",
+      "requiredVocab": [
+        "mi",
+        "moku",
+        "kasi",
+        "nasa",
+        "lon",
+        "tenpo",
+        "pimeja"
+      ],
+      "statement": "mi moku e kasi nasa lon tenpo pimeja.",
+      "englishTranslation": "I consume the strange-plant (cannabis) at night.",
+      "isPona": true,
+      "explanation": "THC vapes during evening wind-down — for relaxation and sleep facilitation. Standard for you."
+    },
+    {
+      "id": "log_38",
+      "requiredVocab": [
+        "mi",
+        "lukin",
+        "ala",
+        "e",
+        "sitelen",
+        "tawa",
+        "pi",
+        "tenpo",
+        "kama"
+      ],
+      "statement": "mi lukin ala e sitelen tawa pi tenpo kama.",
+      "englishTranslation": "I do not watch videos of the future (trailers).",
+      "isPona": true,
+      "explanation": "Your media philosophy: no trailers, no spoilers, no research before watching. Strict blind viewing."
+    },
+    {
+      "id": "log_39",
+      "requiredVocab": [
+        "mi",
+        "tawa",
+        "ma",
+        "Kalipona",
+        "lon",
+        "tenpo",
+        "suno",
+        "ali"
+      ],
+      "statement": "tenpo suno ali la mi tawa ma Kalipona.",
+      "englishTranslation": "Every day, I travel to California.",
+      "isPona": false,
+      "explanation": "You live in Franklin, Tennessee — California is a 2,000+ mile trip, not a daily commute."
+    },
+    {
+      "id": "log_40",
+      "requiredVocab": [
+        "mi",
+        "wile",
+        "ala",
+        "kama",
+        "mama"
+      ],
+      "statement": "mi wile ala kama mama.",
+      "englishTranslation": "I do not want to become a parent.",
+      "isPona": true,
+      "explanation": "Your profile is explicit: no interest in having children — population, cost-benefit, and skepticism toward cultural scripts."
+    },
+    {
+      "id": "log_41",
+      "requiredVocab": [
+        "mi",
+        "olin",
+        "jan",
+        "mute",
+        "lon",
+        "tenpo",
+        "ali"
+      ],
+      "statement": "mi olin e jan mute lon tenpo ali.",
+      "englishTranslation": "I love many people all the time.",
+      "isPona": false,
+      "explanation": "Dismissive-Avoidant attachment style; values selectivity over volume; prefers no relationship to a shallow one."
+    },
+    {
+      "id": "log_42",
+      "requiredVocab": [
+        "mi",
+        "pali",
+        "kalama",
+        "musi",
+        "kepeken",
+        "ilo",
+        "kalama",
+        "musi",
+        "pi",
+        "luka"
+      ],
+      "statement": "mi pali e kalama musi kepeken ilo kalama musi pi luka.",
+      "englishTranslation": "I make music using a hand-instrument (guitar).",
+      "isPona": true,
+      "explanation": "You own and play acoustic guitar, and produce music — using a guitar to make music is accurate."
+    },
+    {
+      "id": "log_43",
+      "requiredVocab": [
+        "mi",
+        "pana",
+        "moku",
+        "tawa",
+        "soweli",
+        "Sili",
+        "lon",
+        "tenpo",
+        "suno"
+      ],
+      "statement": "mi pana e moku tawa soweli Sili lon tenpo suno.",
+      "englishTranslation": "I give food to Sirius in the morning.",
+      "isPona": true,
+      "explanation": "Cat owners feed their cats in the morning. As Sirius's owner since 2020, you feed him daily."
+    },
+    {
+      "id": "log_44",
+      "requiredVocab": [
+        "mama",
+        "mi",
+        "lon",
+        "poka",
+        "mi",
+        "lon",
+        "tenpo",
+        "ali"
+      ],
+      "statement": "mama mi li lon poka mi lon tenpo ali.",
+      "englishTranslation": "My family is at my side all the time.",
+      "isPona": false,
+      "explanation": "You maintain no communication with immediate family members. Family is not at your side — Sirius is."
+    },
+    {
+      "id": "log_45",
+      "requiredVocab": [
+        "mi",
+        "lukin",
+        "sitelen",
+        "tawa",
+        "pi",
+        "tenpo",
+        "pini",
+        "lon",
+        "tenpo",
+        "pimeja"
+      ],
+      "statement": "mi lukin e sitelen tawa pi tenpo pini lon tenpo pimeja.",
+      "englishTranslation": "I watch videos of the past (history docs) at night.",
+      "isPona": true,
+      "explanation": "Evening wind-down often includes YouTube — and you watch history channels like Fall of Civilizations and PBS Eons."
+    },
+    {
+      "id": "log_46",
+      "requiredVocab": [
+        "jan",
+        "mute",
+        "li",
+        "lon",
+        "tomo",
+        "mi",
+        "la",
+        "mi",
+        "pilin",
+        "pona"
+      ],
+      "statement": "jan mute li lon tomo mi la mi pilin pona.",
+      "englishTranslation": "When many people are in my home, I feel good.",
+      "isPona": false,
+      "explanation": "Strongly introverted; large social gatherings produce discomfort and early withdrawal. Crowds drain, not energize."
+    },
+    {
+      "id": "log_47",
+      "requiredVocab": [
+        "mi",
+        "moku",
+        "e",
+        "telo",
+        "pimeja",
+        "la",
+        "mi",
+        "kama",
+        "wawa"
+      ],
+      "statement": "mi moku e telo pimeja la mi kama wawa.",
+      "englishTranslation": "When I drink black liquid (coffee), I become strong/energetic.",
+      "isPona": true,
+      "explanation": "Caffeine is a stimulant; 200mg+ daily is functional. Coffee → energy is a real causal relationship."
+    },
+    {
+      "id": "log_48",
+      "requiredVocab": [
+        "mi",
+        "tawa",
+        "esun",
+        "kepeken",
+        "noka",
+        "tan",
+        "tomo",
+        "mi"
+      ],
+      "statement": "mi tawa esun kepeken noka tan tomo mi.",
+      "englishTranslation": "I go to the store using my feet (walking) from my home.",
+      "isPona": false,
+      "explanation": "Target Franklin is roughly 4 miles from The Madison Franklin — far enough that you drive, not walk, to a shift."
+    },
+    {
+      "id": "log_49",
+      "requiredVocab": [
+        "mi",
+        "lukin",
+        "e",
+        "lipu",
+        "lon",
+        "tenpo",
+        "weka",
+        "tan",
+        "ni",
+        "mi",
+        "wile",
+        "sona"
+      ],
+      "statement": "mi lukin e lipu lon tenpo weka tan ni: mi wile sona.",
+      "englishTranslation": "I read books on the weekend because I want knowledge.",
+      "isPona": true,
+      "explanation": "Autodidact; high openness; weekend pattern includes reading and intellectual pursuit. Match."
+    },
+    {
+      "id": "log_50",
+      "requiredVocab": [
+        "soweli",
+        "Sili",
+        "li",
+        "lukin",
+        "e",
+        "sitelen",
+        "tawa",
+        "pi",
+        "ma",
+        "sewi"
+      ],
+      "statement": "soweli Sili li lukin e sitelen tawa pi ma sewi.",
+      "englishTranslation": "Sirius (the cat) watches sci-fi shows.",
+      "isPona": false,
+      "explanation": "Cats may sit near a screen, but they do not watch The Expanse for plot. The viewer of Andor and Battlestar Galactica is you."
+    },
+    {
+      "id": "log_51",
+      "requiredVocab": [
+        "mi",
+        "lon",
+        "ma",
+        "Tene",
+        "taso",
+        "mi",
+        "kama",
+        "tan",
+        "ma",
+        "Kalipona"
+      ],
+      "statement": "mi lon ma Tene, taso mi kama tan ma Kalipona.",
+      "englishTranslation": "I am in Tennessee, but I came from California.",
+      "isPona": true,
+      "explanation": "Lives in Franklin, TN since November 2016; born and raised in Tulare/Visalia, CA. Exactly accurate."
+    },
+    {
+      "id": "log_52",
+      "requiredVocab": [
+        "mi",
+        "wile",
+        "toki",
+        "tawa",
+        "jan",
+        "mute",
+        "lon",
+        "tenpo",
+        "weka"
+      ],
+      "statement": "tenpo weka la mi wile toki tawa jan mute.",
+      "englishTranslation": "On the weekend, I want to talk to many people.",
+      "isPona": false,
+      "explanation": "Weekend pattern: reading, creative writing, media, periodic logistics. Social engagements are rare and not sought."
+    },
+    {
+      "id": "log_53",
+      "requiredVocab": [
+        "mi",
+        "kama",
+        "lape",
+        "lon",
+        "tenpo",
+        "open",
+        "pi",
+        "tenpo",
+        "pimeja",
+        "sin"
+      ],
+      "statement": "mi kama lape lon tenpo open pi tenpo pimeja sin.",
+      "englishTranslation": "I fall asleep at the start of the new night (midnight).",
+      "isPona": true,
+      "explanation": "Target bedtime is midnight, with wind-down starting around 10 PM. Falling asleep at midnight is exactly your pattern."
+    },
+    {
+      "id": "log_54",
+      "requiredVocab": [
+        "mi",
+        "wile",
+        "ala",
+        "moku",
+        "e",
+        "telo",
+        "pimeja",
+        "lon",
+        "tenpo",
+        "suno"
+      ],
+      "statement": "mi wile ala moku e telo pimeja lon tenpo suno.",
+      "englishTranslation": "I do not want to drink coffee in the morning.",
+      "isPona": false,
+      "explanation": "Black coffee before any media or task is non-negotiable in your morning ritual. Of course you want coffee."
+    },
+    {
+      "id": "log_55",
+      "requiredVocab": [
+        "mi",
+        "wile",
+        "awen",
+        "taso",
+        "tan",
+        "ni",
+        "mi",
+        "kama",
+        "wawa"
+      ],
+      "statement": "mi wile awen taso, tan ni: mi kama wawa.",
+      "englishTranslation": "I want to stay alone, because I become strong.",
+      "isPona": true,
+      "explanation": "Solitude is by design — introversion is structural; social interaction produces net energy drain. Solitude restores."
+    },
+    {
+      "id": "log_56",
+      "requiredVocab": [
+        "mi",
+        "kepeken",
+        "ilo",
+        "wawa",
+        "lon",
+        "tomo",
+        "esun"
+      ],
+      "statement": "mi kepeken ilo wawa lon tomo esun.",
+      "englishTranslation": "I use gym equipment at the store.",
+      "isPona": false,
+      "explanation": "Your home gym (heavy bag, dip station, pull-up bar) is in your apartment, not Target. Workouts happen at home."
+    },
+    {
+      "id": "log_57",
+      "requiredVocab": [
+        "mi",
+        "wile",
+        "sona",
+        "mute",
+        "tan",
+        "ni",
+        "mi",
+        "lukin",
+        "lipu",
+        "mute"
+      ],
+      "statement": "mi wile sona mute, tan ni: mi lukin e lipu mute.",
+      "englishTranslation": "I want much knowledge, so I read many books.",
+      "isPona": true,
+      "explanation": "Completionism + autodidact + multiple completed multi-book universes (32 Shannara, 17 EnderVerse, 9 Expanse). Match."
+    },
+    {
+      "id": "log_58",
+      "requiredVocab": [
+        "jan",
+        "li",
+        "toki",
+        "ike",
+        "la",
+        "mi",
+        "wile",
+        "kute"
+      ],
+      "statement": "jan li toki ike la mi wile kute.",
+      "englishTranslation": "When a person speaks foolishly, I want to listen.",
+      "isPona": false,
+      "explanation": "Triggers: irrationality, intellectual dishonesty. Disengagement, not engagement, is your default response."
+    },
+    {
+      "id": "log_59",
+      "requiredVocab": [
+        "mi",
+        "tawa",
+        "ma",
+        "ante",
+        "kepeken",
+        "tomo",
+        "tawa"
+      ],
+      "statement": "mi tawa ma ante kepeken tomo tawa.",
+      "englishTranslation": "I go to other lands using a moving-house (car).",
+      "isPona": true,
+      "explanation": "You drove the entire Great Migration route, the Florida Retreats, the Atlantic Loop, the Eclipse Run, and 6-hour Illinois cannabis runs. Driving to other states is core to you."
+    },
+    {
+      "id": "log_60",
+      "requiredVocab": [
+        "mi",
+        "olin",
+        "e",
+        "soweli",
+        "mi",
+        "tan",
+        "ni",
+        "ona",
+        "li",
+        "awen",
+        "lon",
+        "poka",
+        "mi"
+      ],
+      "statement": "mi olin e soweli mi, tan ni: ona li awen lon poka mi.",
+      "englishTranslation": "I love my pet, because he stays at my side.",
+      "isPona": true,
+      "explanation": "Sirius provides steady companionship — he's at your side daily; this is described in your profile."
+    },
+    {
+      "id": "log_61",
+      "requiredVocab": [
+        "mi",
+        "wile",
+        "olin",
+        "pi",
+        "tenpo",
+        "ali",
+        "kepeken",
+        "jan",
+        "wan"
+      ],
+      "statement": "mi wile e olin pi tenpo ali kepeken jan wan.",
+      "englishTranslation": "I want all-time love (marriage) with one person.",
+      "isPona": false,
+      "explanation": "No personal interest in marriage or formal partnership. Legal benefits available through other instruments. Marriage is explicitly off the table."
+    },
+    {
+      "id": "log_62",
+      "requiredVocab": [
+        "sona",
+        "li",
+        "kama",
+        "tan",
+        "lukin",
+        "pi",
+        "ijo",
+        "lon"
+      ],
+      "statement": "sona li kama tan lukin pi ijo lon.",
+      "englishTranslation": "Knowledge comes from observing real things.",
+      "isPona": true,
+      "explanation": "Empirical worldview; consequentialism with rule-utilitarian tendencies; evidence-based reasoning is your operating mode."
+    },
+    {
+      "id": "log_63",
+      "requiredVocab": [
+        "mi",
+        "ken",
+        "sona",
+        "e",
+        "ali",
+        "lon",
+        "ma"
+      ],
+      "statement": "mi ken sona e ali lon ma.",
+      "englishTranslation": "I can know everything in the world.",
+      "isPona": false,
+      "explanation": "High tolerance for ambiguity; epistemic humility; cannot prove negatives; ultimate questions about origins assessed as unknowable. Total knowledge is impossible."
+    },
+    {
+      "id": "log_64",
+      "requiredVocab": [
+        "jan",
+        "li",
+        "moli",
+        "la",
+        "ona",
+        "li",
+        "awen",
+        "lon"
+      ],
+      "statement": "jan li moli la ona li awen lon.",
+      "englishTranslation": "When a person dies, they continue to exist.",
+      "isPona": false,
+      "explanation": "Death = end of subjective experience. No continuation, no judgment, no reunion. Consciousness is a product of functioning neural tissue."
+    },
+    {
+      "id": "log_65",
+      "requiredVocab": [
+        "mi",
+        "wile",
+        "pali",
+        "e",
+        "ijo",
+        "pona",
+        "tan",
+        "ni",
+        "tenpo",
+        "mi",
+        "li",
+        "lili"
+      ],
+      "statement": "mi wile pali e ijo pona, tan ni: tenpo mi li lili.",
+      "englishTranslation": "I want to make good things, because my time is short (finite).",
+      "isPona": true,
+      "explanation": "Existentialism: meaning is created through choices and actions; life is more valuable for its finitude. Match."
+    },
+    {
+      "id": "log_66",
+      "requiredVocab": [
+        "sewi",
+        "mama",
+        "li",
+        "lon",
+        "la",
+        "ike",
+        "li",
+        "lon",
+        "ala"
+      ],
+      "statement": "sewi mama li lon la ike li lon ala.",
+      "englishTranslation": "If a parent-god (omnibenevolent god) exists, then evil does not exist.",
+      "isPona": true,
+      "explanation": "This is the problem of evil, which you cite explicitly: omnipotent + omnibenevolent + evil exists = contradiction. The conditional captures the logic."
+    },
+    {
+      "id": "log_67",
+      "requiredVocab": [
+        "mi",
+        "kepeken",
+        "ilo",
+        "sona",
+        "kepeken",
+        "nasin",
+        "ike"
+      ],
+      "statement": "mi kepeken ilo sona kepeken nasin ike.",
+      "englishTranslation": "I use AI tools in a bad way.",
+      "isPona": false,
+      "explanation": "AI used for brainstorming and research assistance; current LLMs assessed as pattern matching, used responsibly. Not bad-faith use."
+    },
+    {
+      "id": "log_68",
+      "requiredVocab": [
+        "nasin",
+        "pi",
+        "moku",
+        "ike",
+        "tawa",
+        "soweli",
+        "li",
+        "pona"
+      ],
+      "statement": "nasin pi moku ike tawa soweli li pona.",
+      "englishTranslation": "The way of bad-eating-toward-animals (factory farming) is good.",
+      "isPona": false,
+      "explanation": "Factory farming assessed as large-scale systematized suffering, morally indefensible under consequentialist framework. Explicitly rejected."
+    },
+    {
+      "id": "log_69",
+      "requiredVocab": [
+        "mi",
+        "ken",
+        "ala",
+        "lukin",
+        "e",
+        "tenpo",
+        "kama",
+        "taso",
+        "mi",
+        "ken",
+        "pali",
+        "e",
+        "ona"
+      ],
+      "statement": "mi ken ala lukin e tenpo kama, taso mi ken pali e ona.",
+      "englishTranslation": "I cannot see the future, but I can build it.",
+      "isPona": true,
+      "explanation": "Long-term plan centers on financial autonomy by 67 through disciplined accumulation; deliberative decision-making with high process confidence."
+    },
+    {
+      "id": "log_70",
+      "requiredVocab": [
+        "mi",
+        "lon",
+        "ma",
+        "Tene",
+        "taso",
+        "lawa",
+        "mi",
+        "li",
+        "awen",
+        "lon",
+        "ma",
+        "Kalipona"
+      ],
+      "statement": "mi lon ma Tene, taso lawa mi li awen lon ma Kalipona.",
+      "englishTranslation": "I am in Tennessee, but my head (mind) stays in California.",
+      "isPona": true,
+      "explanation": "Williamson County is substantially different from Central Valley origin; class identity, formative trauma, and cultural roots remain in California."
+    },
+    {
+      "id": "log_71",
+      "requiredVocab": [
+        "mi",
+        "ken",
+        "pali",
+        "e",
+        "mute",
+        "ijo",
+        "tan",
+        "ni",
+        "mi",
+        "jan",
+        "pi",
+        "sona",
+        "mute"
+      ],
+      "statement": "mi ken pali e mute ijo, tan ni: mi jan pi sona mute.",
+      "englishTranslation": "I can do many things, because I am a person of much knowledge.",
+      "isPona": true,
+      "explanation": "Self-described jack-of-all-trades; CliftonStrengths Strategic + Analytical; high competence-based self-esteem. Accurate self-assessment."
+    },
+    {
+      "id": "log_72",
+      "requiredVocab": [
+        "pilin",
+        "ike",
+        "li",
+        "ike",
+        "taso",
+        "ona",
+        "li",
+        "ken",
+        "pana",
+        "e",
+        "sona"
+      ],
+      "statement": "pilin ike li ike, taso ona li ken pana e sona.",
+      "englishTranslation": "Suffering is bad, but it can give knowledge.",
+      "isPona": true,
+      "explanation": "Suffering is data about reality, not a cosmic test — informs current values around safety, competence, and self-sufficiency. Acknowledged role."
+    },
+    {
+      "id": "log_73",
+      "requiredVocab": [
+        "sona",
+        "pi",
+        "tenpo",
+        "pini",
+        "li",
+        "ike",
+        "tawa",
+        "mi"
+      ],
+      "statement": "sona pi tenpo pini li ike tawa mi.",
+      "englishTranslation": "Knowledge of the past is bad for me.",
+      "isPona": false,
+      "explanation": "You watch Fall of Civilizations, PBS Eons, The Ancients, Big History — history is a primary domain of pleasure and learning."
+    },
+    {
+      "id": "log_74",
+      "requiredVocab": [
+        "mi",
+        "wile",
+        "e",
+        "tenpo",
+        "mi",
+        "tan",
+        "ni",
+        "mi",
+        "ken",
+        "lawa",
+        "e",
+        "ona"
+      ],
+      "statement": "mi wile e tenpo mi, tan ni: mi ken lawa e ona.",
+      "englishTranslation": "I want my time, because I can govern it.",
+      "isPona": true,
+      "explanation": "High need for environmental predictability; prefers self-directed work over supervised structures; control orientation is central to your psychological profile."
+    },
+    {
+      "id": "log_75",
+      "requiredVocab": [
+        "mi",
+        "wile",
+        "pana",
+        "e",
+        "mani",
+        "mi",
+        "tawa",
+        "jan",
+        "ali",
+        "lon",
+        "tenpo",
+        "mi",
+        "moli"
+      ],
+      "statement": "mi wile pana e mani mi tawa jan ali lon tenpo mi moli.",
+      "englishTranslation": "I want to give my money to all people when I die.",
+      "isPona": false,
+      "explanation": "Zero designated beneficiaries on any accounts; no estate plan; legacy held lightly. You have not arranged to give wealth to anyone, let alone all people."
+    }
+  ],
+  "sorterData": [
+    {
+      "id": "sort_1",
+      "requiredVocab": [
+        "soweli",
+        "moku",
+        "telo",
+        "jan"
+      ],
+      "bucketA": "Living things in my apartment",
+      "bucketB": "Things I consume",
+      "items": [
+        {
+          "word": "soweli",
+          "bucket": "A"
+        },
+        {
+          "word": "moku",
+          "bucket": "B"
+        },
+        {
+          "word": "telo",
+          "bucket": "B"
+        },
+        {
+          "word": "jan",
+          "bucket": "A"
+        }
+      ]
+    },
+    {
+      "id": "sort_2",
+      "requiredVocab": [
+        "lipu",
+        "ilo",
+        "supa",
+        "lupa"
+      ],
+      "bucketA": "Things I read or use to read",
+      "bucketB": "Parts of my apartment",
+      "items": [
+        {
+          "word": "lipu",
+          "bucket": "A"
+        },
+        {
+          "word": "ilo lipu",
+          "bucket": "A"
+        },
+        {
+          "word": "supa",
+          "bucket": "B"
+        },
+        {
+          "word": "lupa",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_3",
+      "requiredVocab": [
+        "telo",
+        "pimeja",
+        "lape",
+        "kama",
+        "pali"
+      ],
+      "bucketA": "Morning (suno)",
+      "bucketB": "Night (pimeja)",
+      "items": [
+        {
+          "word": "telo pimeja",
+          "bucket": "A"
+        },
+        {
+          "word": "lape",
+          "bucket": "B"
+        },
+        {
+          "word": "kama pali",
+          "bucket": "A"
+        },
+        {
+          "word": "kama lape",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_4",
+      "requiredVocab": [
+        "wawa",
+        "lape",
+        "moku",
+        "lukin"
+      ],
+      "bucketA": "Things I do at home",
+      "bucketB": "Things I do at the store (work)",
+      "items": [
+        {
+          "word": "lape",
+          "bucket": "A"
+        },
+        {
+          "word": "esun",
+          "bucket": "B"
+        },
+        {
+          "word": "lukin sitelen tawa",
+          "bucket": "A"
+        },
+        {
+          "word": "pana moku",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_5",
+      "requiredVocab": [
+        "soweli",
+        "kasi",
+        "ilo",
+        "tomo"
+      ],
+      "bucketA": "Living things",
+      "bucketB": "Made things (objects)",
+      "items": [
+        {
+          "word": "soweli",
+          "bucket": "A"
+        },
+        {
+          "word": "kasi",
+          "bucket": "A"
+        },
+        {
+          "word": "ilo",
+          "bucket": "B"
+        },
+        {
+          "word": "tomo",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_6",
+      "requiredVocab": [
+        "moku",
+        "telo",
+        "lape",
+        "tawa"
+      ],
+      "bucketA": "Body needs",
+      "bucketB": "Body actions (movement)",
+      "items": [
+        {
+          "word": "moku",
+          "bucket": "A"
+        },
+        {
+          "word": "telo",
+          "bucket": "A"
+        },
+        {
+          "word": "lape",
+          "bucket": "A"
+        },
+        {
+          "word": "tawa",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_7",
+      "requiredVocab": [
+        "pona",
+        "ike",
+        "wawa",
+        "wile"
+      ],
+      "bucketA": "Good qualities",
+      "bucketB": "Bad qualities",
+      "items": [
+        {
+          "word": "pona",
+          "bucket": "A"
+        },
+        {
+          "word": "wawa",
+          "bucket": "A"
+        },
+        {
+          "word": "ike",
+          "bucket": "B"
+        },
+        {
+          "word": "nasa",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_8",
+      "requiredVocab": [
+        "mi",
+        "sina",
+        "ona",
+        "soweli"
+      ],
+      "bucketA": "People (jan)",
+      "bucketB": "Animals (soweli)",
+      "items": [
+        {
+          "word": "mi",
+          "bucket": "A"
+        },
+        {
+          "word": "sina",
+          "bucket": "A"
+        },
+        {
+          "word": "soweli Sili",
+          "bucket": "B"
+        },
+        {
+          "word": "soweli",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_9",
+      "requiredVocab": [
+        "lipu",
+        "kalama",
+        "musi",
+        "ilo"
+      ],
+      "bucketA": "Reading",
+      "bucketB": "Music (sound)",
+      "items": [
+        {
+          "word": "lipu",
+          "bucket": "A"
+        },
+        {
+          "word": "kalama musi",
+          "bucket": "B"
+        },
+        {
+          "word": "ilo lipu",
+          "bucket": "A"
+        },
+        {
+          "word": "ilo kute",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_10",
+      "requiredVocab": [
+        "lon",
+        "weka",
+        "tomo",
+        "ma"
+      ],
+      "bucketA": "Here (where I am)",
+      "bucketB": "Far away (other places)",
+      "items": [
+        {
+          "word": "tomo mi",
+          "bucket": "A"
+        },
+        {
+          "word": "ma Tene",
+          "bucket": "A"
+        },
+        {
+          "word": "ma Kalipona",
+          "bucket": "B"
+        },
+        {
+          "word": "ma Tulali",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_11",
+      "requiredVocab": [
+        "soweli",
+        "Sili",
+        "moku",
+        "lape"
+      ],
+      "bucketA": "Things Sirius does",
+      "bucketB": "Things I do (not Sirius)",
+      "items": [
+        {
+          "word": "lape lon supa",
+          "bucket": "A"
+        },
+        {
+          "word": "moku e telo pimeja",
+          "bucket": "B"
+        },
+        {
+          "word": "moku e moku soweli",
+          "bucket": "A"
+        },
+        {
+          "word": "pali lon tomo esun",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_12",
+      "requiredVocab": [
+        "pali",
+        "musi",
+        "lape",
+        "moku"
+      ],
+      "bucketA": "Workday",
+      "bucketB": "Day off (Wednesday/weekend)",
+      "items": [
+        {
+          "word": "pali lon tomo esun",
+          "bucket": "A"
+        },
+        {
+          "word": "lukin lipu",
+          "bucket": "B"
+        },
+        {
+          "word": "pana moku",
+          "bucket": "A"
+        },
+        {
+          "word": "musi",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_13",
+      "requiredVocab": [
+        "telo",
+        "moku",
+        "lipu",
+        "ilo"
+      ],
+      "bucketA": "Drinkable",
+      "bucketB": "Not drinkable",
+      "items": [
+        {
+          "word": "telo",
+          "bucket": "A"
+        },
+        {
+          "word": "telo pimeja",
+          "bucket": "A"
+        },
+        {
+          "word": "lipu",
+          "bucket": "B"
+        },
+        {
+          "word": "ilo sona",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_14",
+      "requiredVocab": [
+        "jan",
+        "wan",
+        "mute",
+        "taso"
+      ],
+      "bucketA": "Alone (taso)",
+      "bucketB": "With others",
+      "items": [
+        {
+          "word": "mi taso",
+          "bucket": "A"
+        },
+        {
+          "word": "mi en soweli mi",
+          "bucket": "A"
+        },
+        {
+          "word": "jan mute",
+          "bucket": "B"
+        },
+        {
+          "word": "mi en jan ante",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_15",
+      "requiredVocab": [
+        "pona",
+        "ike",
+        "suli",
+        "lili"
+      ],
+      "bucketA": "Big (suli)",
+      "bucketB": "Small (lili)",
+      "items": [
+        {
+          "word": "ma Tene",
+          "bucket": "A"
+        },
+        {
+          "word": "tomo mi",
+          "bucket": "B"
+        },
+        {
+          "word": "soweli Sili",
+          "bucket": "B"
+        },
+        {
+          "word": "tomo esun suli",
+          "bucket": "A"
+        }
+      ]
+    },
+    {
+      "id": "sort_16",
+      "requiredVocab": [
+        "pali",
+        "musi",
+        "esun",
+        "lipu"
+      ],
+      "bucketA": "Things I do at Target (work)",
+      "bucketB": "Things I do for fun at home",
+      "items": [
+        {
+          "word": "esun",
+          "bucket": "A"
+        },
+        {
+          "word": "lawa jan",
+          "bucket": "A"
+        },
+        {
+          "word": "lukin lipu",
+          "bucket": "B"
+        },
+        {
+          "word": "pali kalama musi",
+          "bucket": "B"
+        },
+        {
+          "word": "pana moku",
+          "bucket": "A"
+        }
+      ]
+    },
+    {
+      "id": "sort_17",
+      "requiredVocab": [
+        "soweli",
+        "ilo",
+        "kasi",
+        "lipu"
+      ],
+      "bucketA": "Living/biological",
+      "bucketB": "Made by humans",
+      "items": [
+        {
+          "word": "soweli Sili",
+          "bucket": "A"
+        },
+        {
+          "word": "ilo sona lili",
+          "bucket": "B"
+        },
+        {
+          "word": "kasi",
+          "bucket": "A"
+        },
+        {
+          "word": "ilo wawa",
+          "bucket": "B"
+        },
+        {
+          "word": "lipu",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_18",
+      "requiredVocab": [
+        "tenpo",
+        "suno",
+        "pimeja",
+        "pali",
+        "lape"
+      ],
+      "bucketA": "Workday morning routine",
+      "bucketB": "Evening wind-down",
+      "items": [
+        {
+          "word": "telo pimeja",
+          "bucket": "A"
+        },
+        {
+          "word": "lukin sin",
+          "bucket": "A"
+        },
+        {
+          "word": "lukin sitelen tawa",
+          "bucket": "B"
+        },
+        {
+          "word": "kama lape",
+          "bucket": "B"
+        },
+        {
+          "word": "kama pali",
+          "bucket": "A"
+        }
+      ]
+    },
+    {
+      "id": "sort_19",
+      "requiredVocab": [
+        "wawa",
+        "sona",
+        "lipu",
+        "kalama"
+      ],
+      "bucketA": "Body training",
+      "bucketB": "Mind training",
+      "items": [
+        {
+          "word": "ilo wawa",
+          "bucket": "A"
+        },
+        {
+          "word": "lipu sona",
+          "bucket": "B"
+        },
+        {
+          "word": "linja wawa",
+          "bucket": "A"
+        },
+        {
+          "word": "sitelen pi toki musi",
+          "bucket": "B"
+        },
+        {
+          "word": "lukin lipu mute",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_20",
+      "requiredVocab": [
+        "telo",
+        "moku",
+        "kasi",
+        "nasa"
+      ],
+      "bucketA": "Things I consume often",
+      "bucketB": "Things I consume rarely",
+      "items": [
+        {
+          "word": "telo pimeja wawa",
+          "bucket": "A"
+        },
+        {
+          "word": "kasi nasa",
+          "bucket": "A"
+        },
+        {
+          "word": "telo nasa",
+          "bucket": "B"
+        },
+        {
+          "word": "telo wawa",
+          "bucket": "A"
+        },
+        {
+          "word": "telo nasa pi sike kiwen",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_21",
+      "requiredVocab": [
+        "ma",
+        "tomo",
+        "weka",
+        "poka"
+      ],
+      "bucketA": "California (origin)",
+      "bucketB": "Tennessee (current)",
+      "items": [
+        {
+          "word": "ma Tulali",
+          "bucket": "A"
+        },
+        {
+          "word": "ma Pansilipan",
+          "bucket": "B"
+        },
+        {
+          "word": "ma Naselin",
+          "bucket": "B"
+        },
+        {
+          "word": "ma Pisalija",
+          "bucket": "A"
+        },
+        {
+          "word": "tomo Matison",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_22",
+      "requiredVocab": [
+        "jan",
+        "soweli",
+        "tomo",
+        "ilo"
+      ],
+      "bucketA": "In my apartment with me",
+      "bucketB": "Outside the apartment",
+      "items": [
+        {
+          "word": "soweli Sili",
+          "bucket": "A"
+        },
+        {
+          "word": "ilo sona suli",
+          "bucket": "A"
+        },
+        {
+          "word": "jan pali mi",
+          "bucket": "B"
+        },
+        {
+          "word": "tomo esun",
+          "bucket": "B"
+        },
+        {
+          "word": "ilo wawa",
+          "bucket": "A"
+        }
+      ]
+    },
+    {
+      "id": "sort_23",
+      "requiredVocab": [
+        "pali",
+        "musi",
+        "wawa",
+        "sona"
+      ],
+      "bucketA": "Required (work)",
+      "bucketB": "Chosen (hobby)",
+      "items": [
+        {
+          "word": "pali tomo esun",
+          "bucket": "A"
+        },
+        {
+          "word": "pali kalama musi",
+          "bucket": "B"
+        },
+        {
+          "word": "lukin lipu",
+          "bucket": "B"
+        },
+        {
+          "word": "lawa jan pali",
+          "bucket": "A"
+        },
+        {
+          "word": "kepeken ilo wawa",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_24",
+      "requiredVocab": [
+        "lipu",
+        "sitelen",
+        "tawa",
+        "kute"
+      ],
+      "bucketA": "Things I read",
+      "bucketB": "Things I watch",
+      "items": [
+        {
+          "word": "lipu pi ma sewi",
+          "bucket": "A"
+        },
+        {
+          "word": "sitelen tawa pi tenpo pini",
+          "bucket": "B"
+        },
+        {
+          "word": "lipu sin",
+          "bucket": "A"
+        },
+        {
+          "word": "sitelen tawa pi nasin nasa",
+          "bucket": "B"
+        },
+        {
+          "word": "lipu sona",
+          "bucket": "A"
+        }
+      ]
+    },
+    {
+      "id": "sort_25",
+      "requiredVocab": [
+        "ilo",
+        "tomo",
+        "supa",
+        "lupa"
+      ],
+      "bucketA": "Things I touch every day",
+      "bucketB": "Things I rarely touch",
+      "items": [
+        {
+          "word": "ilo sona lili",
+          "bucket": "A"
+        },
+        {
+          "word": "ilo lipu",
+          "bucket": "A"
+        },
+        {
+          "word": "tomo tawa pi mama mi",
+          "bucket": "B"
+        },
+        {
+          "word": "supa pi tomo mi",
+          "bucket": "A"
+        },
+        {
+          "word": "ilo kalama musi pi luka",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_26",
+      "requiredVocab": [
+        "jan",
+        "pona",
+        "weka",
+        "ala"
+      ],
+      "bucketA": "People in my life",
+      "bucketB": "People not in my life",
+      "items": [
+        {
+          "word": "jan pali pi pali sama mi",
+          "bucket": "A"
+        },
+        {
+          "word": "mama mi",
+          "bucket": "B"
+        },
+        {
+          "word": "soweli Sili",
+          "bucket": "A"
+        },
+        {
+          "word": "jan pi tenpo pini",
+          "bucket": "B"
+        },
+        {
+          "word": "jan pi sona ala",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_27",
+      "requiredVocab": [
+        "tenpo",
+        "suno",
+        "pimeja",
+        "pali"
+      ],
+      "bucketA": "Work hours (~9 AM–5 PM)",
+      "bucketB": "Off hours",
+      "items": [
+        {
+          "word": "lawa jan pali",
+          "bucket": "A"
+        },
+        {
+          "word": "moku lon tomo mi",
+          "bucket": "B"
+        },
+        {
+          "word": "pana moku tawa jan",
+          "bucket": "A"
+        },
+        {
+          "word": "lukin sitelen tawa",
+          "bucket": "B"
+        },
+        {
+          "word": "lukin tomo esun",
+          "bucket": "A"
+        }
+      ]
+    },
+    {
+      "id": "sort_28",
+      "requiredVocab": [
+        "telo",
+        "moku",
+        "kasi",
+        "ilo"
+      ],
+      "bucketA": "Coping mechanisms (relaxation)",
+      "bucketB": "Productivity tools",
+      "items": [
+        {
+          "word": "kasi nasa",
+          "bucket": "A"
+        },
+        {
+          "word": "ilo sona suli",
+          "bucket": "B"
+        },
+        {
+          "word": "ilo lipu",
+          "bucket": "A"
+        },
+        {
+          "word": "ilo wawa",
+          "bucket": "B"
+        },
+        {
+          "word": "sitelen tawa pi musi",
+          "bucket": "A"
+        }
+      ]
+    },
+    {
+      "id": "sort_29",
+      "requiredVocab": [
+        "lipu",
+        "musi",
+        "sona",
+        "kalama"
+      ],
+      "bucketA": "Fiction (stories)",
+      "bucketB": "Non-fiction (knowledge)",
+      "items": [
+        {
+          "word": "lipu pi ma sewi",
+          "bucket": "A"
+        },
+        {
+          "word": "lipu pi tenpo pini",
+          "bucket": "B"
+        },
+        {
+          "word": "sitelen tawa pi nasin nasa",
+          "bucket": "A"
+        },
+        {
+          "word": "sitelen tawa pi mun en suno",
+          "bucket": "B"
+        },
+        {
+          "word": "lipu sona",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_30",
+      "requiredVocab": [
+        "jan",
+        "soweli",
+        "ilo",
+        "telo"
+      ],
+      "bucketA": "Needs me (depends on me)",
+      "bucketB": "I need it",
+      "items": [
+        {
+          "word": "soweli Sili",
+          "bucket": "A"
+        },
+        {
+          "word": "telo pimeja wawa",
+          "bucket": "B"
+        },
+        {
+          "word": "jan pali pi pali sama mi",
+          "bucket": "A"
+        },
+        {
+          "word": "ilo sona lili",
+          "bucket": "B"
+        },
+        {
+          "word": "ilo wawa",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_31",
+      "requiredVocab": [
+        "sona",
+        "musi",
+        "kalama",
+        "sitelen"
+      ],
+      "bucketA": "Knowledge/news (informational)",
+      "bucketB": "Entertainment/fiction",
+      "items": [
+        {
+          "word": "sitelen tawa pi tenpo pini",
+          "bucket": "A"
+        },
+        {
+          "word": "lipu sin",
+          "bucket": "A"
+        },
+        {
+          "word": "lipu pi ma sewi",
+          "bucket": "B"
+        },
+        {
+          "word": "sitelen tawa pi nasin nasa",
+          "bucket": "B"
+        },
+        {
+          "word": "lipu sona pi tenpo pini",
+          "bucket": "A"
+        },
+        {
+          "word": "sitelen tawa pi musi nasa",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_32",
+      "requiredVocab": [
+        "jan",
+        "olin",
+        "weka",
+        "pona"
+      ],
+      "bucketA": "Close to me",
+      "bucketB": "Distant from me",
+      "items": [
+        {
+          "word": "soweli Sili",
+          "bucket": "A"
+        },
+        {
+          "word": "jan pona pi pali sama",
+          "bucket": "A"
+        },
+        {
+          "word": "mama mi",
+          "bucket": "B"
+        },
+        {
+          "word": "jan pi sona ala",
+          "bucket": "B"
+        },
+        {
+          "word": "jan pi tomo sona suli",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_33",
+      "requiredVocab": [
+        "pali",
+        "musi",
+        "sona",
+        "wawa"
+      ],
+      "bucketA": "Solo activities (recharge)",
+      "bucketB": "Required social activities",
+      "items": [
+        {
+          "word": "lukin lipu taso",
+          "bucket": "A"
+        },
+        {
+          "word": "pali kalama musi taso",
+          "bucket": "A"
+        },
+        {
+          "word": "toki tawa jan mute",
+          "bucket": "B"
+        },
+        {
+          "word": "pana moku tawa jan",
+          "bucket": "B"
+        },
+        {
+          "word": "sitelen toki",
+          "bucket": "A"
+        }
+      ]
+    },
+    {
+      "id": "sort_34",
+      "requiredVocab": [
+        "wawa",
+        "sona",
+        "kalama",
+        "lipu"
+      ],
+      "bucketA": "Body work",
+      "bucketB": "Mind work",
+      "items": [
+        {
+          "word": "ilo wawa pi linja palisa",
+          "bucket": "A"
+        },
+        {
+          "word": "lipu pi tenpo pini",
+          "bucket": "B"
+        },
+        {
+          "word": "linja wawa",
+          "bucket": "A"
+        },
+        {
+          "word": "kepeken ilo kalama musi",
+          "bucket": "B"
+        },
+        {
+          "word": "len wawa pi luka anpa",
+          "bucket": "A"
+        },
+        {
+          "word": "sitelen toki",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_35",
+      "requiredVocab": [
+        "tomo",
+        "ma",
+        "tenpo",
+        "pini"
+      ],
+      "bucketA": "Past chapter (California)",
+      "bucketB": "Current chapter (Tennessee)",
+      "items": [
+        {
+          "word": "tomo sona Sekoja",
+          "bucket": "A"
+        },
+        {
+          "word": "pali pi tomo esun Tasen",
+          "bucket": "B"
+        },
+        {
+          "word": "tomo Matison",
+          "bucket": "B"
+        },
+        {
+          "word": "tomo mama mama",
+          "bucket": "A"
+        },
+        {
+          "word": "soweli Sili",
+          "bucket": "B"
+        },
+        {
+          "word": "jan pona pi tomo sona suli",
+          "bucket": "A"
+        }
+      ]
+    },
+    {
+      "id": "sort_36",
+      "requiredVocab": [
+        "lipu",
+        "sitelen",
+        "kalama",
+        "ilo"
+      ],
+      "bucketA": "On my Kindle",
+      "bucketB": "On my computer (Chromebook)",
+      "items": [
+        {
+          "word": "lipu pi ma sewi",
+          "bucket": "A"
+        },
+        {
+          "word": "sitelen toki mi",
+          "bucket": "B"
+        },
+        {
+          "word": "lipu sona pi tenpo pini",
+          "bucket": "A"
+        },
+        {
+          "word": "ilo pi pali kalama musi",
+          "bucket": "B"
+        },
+        {
+          "word": "lipu pi pona musi",
+          "bucket": "A"
+        },
+        {
+          "word": "sitelen tawa",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_37",
+      "requiredVocab": [
+        "pona",
+        "ike",
+        "wawa",
+        "weka"
+      ],
+      "bucketA": "Strengths (your profile)",
+      "bucketB": "Weaknesses (your profile)",
+      "items": [
+        {
+          "word": "sona mute",
+          "bucket": "A"
+        },
+        {
+          "word": "wile pali",
+          "bucket": "A"
+        },
+        {
+          "word": "pilin lili tawa jan",
+          "bucket": "B"
+        },
+        {
+          "word": "sona mute mute",
+          "bucket": "B"
+        },
+        {
+          "word": "ken pali e mute",
+          "bucket": "A"
+        },
+        {
+          "word": "wile lawa wawa",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_38",
+      "requiredVocab": [
+        "telo",
+        "kasi",
+        "moku",
+        "nasa"
+      ],
+      "bucketA": "Stimulants (wake up)",
+      "bucketB": "Relaxants (calm down)",
+      "items": [
+        {
+          "word": "telo pimeja",
+          "bucket": "A"
+        },
+        {
+          "word": "telo wawa",
+          "bucket": "A"
+        },
+        {
+          "word": "kasi nasa",
+          "bucket": "B"
+        },
+        {
+          "word": "telo nasa pi sike kiwen",
+          "bucket": "B"
+        },
+        {
+          "word": "telo pimeja wawa",
+          "bucket": "A"
+        }
+      ]
+    },
+    {
+      "id": "sort_39",
+      "requiredVocab": [
+        "pali",
+        "musi",
+        "lape",
+        "moku"
+      ],
+      "bucketA": "Weekday (workday)",
+      "bucketB": "Day off (Wed / alt weekend)",
+      "items": [
+        {
+          "word": "kama pali tenpo suno",
+          "bucket": "A"
+        },
+        {
+          "word": "lawa jan pali",
+          "bucket": "A"
+        },
+        {
+          "word": "sitelen toki musi",
+          "bucket": "B"
+        },
+        {
+          "word": "lukin lipu mute",
+          "bucket": "B"
+        },
+        {
+          "word": "pana moku tawa jan mute",
+          "bucket": "A"
+        },
+        {
+          "word": "kepeken ilo wawa lon tenpo suli",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_40",
+      "requiredVocab": [
+        "sona",
+        "musi",
+        "lipu",
+        "sitelen"
+      ],
+      "bucketA": "Sci-fi/Fantasy (your top genre)",
+      "bucketB": "History/Documentary (your top genre)",
+      "items": [
+        {
+          "word": "lipu pi ma sewi",
+          "bucket": "A"
+        },
+        {
+          "word": "sitelen tawa pi tenpo pini",
+          "bucket": "B"
+        },
+        {
+          "word": "lipu pi mama Asimov",
+          "bucket": "A"
+        },
+        {
+          "word": "sitelen tawa pi pini ma",
+          "bucket": "B"
+        },
+        {
+          "word": "lipu pi sike sewi",
+          "bucket": "A"
+        },
+        {
+          "word": "lipu sona pi tenpo pini",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_41",
+      "requiredVocab": [
+        "wawa",
+        "sona",
+        "moku",
+        "lape"
+      ],
+      "bucketA": "Health-positive habits",
+      "bucketB": "Things in moderation",
+      "items": [
+        {
+          "word": "kepeken ilo wawa",
+          "bucket": "A"
+        },
+        {
+          "word": "moku pona",
+          "bucket": "A"
+        },
+        {
+          "word": "lape pi tenpo suli",
+          "bucket": "A"
+        },
+        {
+          "word": "kasi nasa",
+          "bucket": "B"
+        },
+        {
+          "word": "telo pimeja mute",
+          "bucket": "B"
+        },
+        {
+          "word": "telo nasa",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_42",
+      "requiredVocab": [
+        "ilo",
+        "tomo",
+        "supa",
+        "lupa"
+      ],
+      "bucketA": "Command Center (desk)",
+      "bucketB": "Home Gym",
+      "items": [
+        {
+          "word": "ilo sona suli",
+          "bucket": "A"
+        },
+        {
+          "word": "ilo wawa pi linja palisa",
+          "bucket": "B"
+        },
+        {
+          "word": "ilo lipu",
+          "bucket": "A"
+        },
+        {
+          "word": "ilo pi pana wawa",
+          "bucket": "B"
+        },
+        {
+          "word": "linja wawa",
+          "bucket": "B"
+        },
+        {
+          "word": "ilo sitelen",
+          "bucket": "A"
+        }
+      ]
+    },
+    {
+      "id": "sort_43",
+      "requiredVocab": [
+        "jan",
+        "soweli",
+        "olin",
+        "weka"
+      ],
+      "bucketA": "Sources of companionship",
+      "bucketB": "Sources of energy drain",
+      "items": [
+        {
+          "word": "soweli Sili",
+          "bucket": "A"
+        },
+        {
+          "word": "jan mute lon tomo esun",
+          "bucket": "B"
+        },
+        {
+          "word": "lipu pi jan sona",
+          "bucket": "A"
+        },
+        {
+          "word": "toki kepeken jan mute",
+          "bucket": "B"
+        },
+        {
+          "word": "kalama musi",
+          "bucket": "A"
+        },
+        {
+          "word": "musi pi jan mute",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_44",
+      "requiredVocab": [
+        "mani",
+        "esun",
+        "moku",
+        "tomo"
+      ],
+      "bucketA": "Routine spending",
+      "bucketB": "Rare spending",
+      "items": [
+        {
+          "word": "mani tawa moku",
+          "bucket": "A"
+        },
+        {
+          "word": "mani tawa tomo",
+          "bucket": "A"
+        },
+        {
+          "word": "mani tawa tawa pi ma weka",
+          "bucket": "B"
+        },
+        {
+          "word": "mani tawa kasi nasa",
+          "bucket": "A"
+        },
+        {
+          "word": "mani tawa ilo sin",
+          "bucket": "B"
+        },
+        {
+          "word": "mani tawa moku pi tomo esun moku",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_45",
+      "requiredVocab": [
+        "pali",
+        "musi",
+        "sona",
+        "lipu"
+      ],
+      "bucketA": "Creative output",
+      "bucketB": "Creative input (consumption)",
+      "items": [
+        {
+          "word": "sitelen toki musi",
+          "bucket": "A"
+        },
+        {
+          "word": "lukin lipu",
+          "bucket": "B"
+        },
+        {
+          "word": "pali kalama musi",
+          "bucket": "A"
+        },
+        {
+          "word": "lukin sitelen tawa",
+          "bucket": "B"
+        },
+        {
+          "word": "kute lipu kalama",
+          "bucket": "B"
+        },
+        {
+          "word": "sitelen e lipu sin",
+          "bucket": "A"
+        }
+      ]
+    },
+    {
+      "id": "sort_46",
+      "requiredVocab": [
+        "sona",
+        "lon",
+        "kute",
+        "pilin"
+      ],
+      "bucketA": "Empirical / evidence-based",
+      "bucketB": "Faith / supernatural",
+      "items": [
+        {
+          "word": "sona pi tenpo pini",
+          "bucket": "A"
+        },
+        {
+          "word": "sona pi mun en suno",
+          "bucket": "A"
+        },
+        {
+          "word": "sewi mama",
+          "bucket": "B"
+        },
+        {
+          "word": "tenpo pi pini ala",
+          "bucket": "B"
+        },
+        {
+          "word": "sona pi sijelo jan",
+          "bucket": "A"
+        },
+        {
+          "word": "ijo nasa pi lon ala",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_47",
+      "requiredVocab": [
+        "pali",
+        "musi",
+        "wawa",
+        "sona"
+      ],
+      "bucketA": "Productive (gets things done)",
+      "bucketB": "Restorative (recharges)",
+      "items": [
+        {
+          "word": "pali lon tomo esun",
+          "bucket": "A"
+        },
+        {
+          "word": "lukin sitelen tawa lon tenpo pimeja",
+          "bucket": "B"
+        },
+        {
+          "word": "pali kalama musi",
+          "bucket": "A"
+        },
+        {
+          "word": "lape pi tenpo suli",
+          "bucket": "B"
+        },
+        {
+          "word": "sitelen toki musi",
+          "bucket": "A"
+        },
+        {
+          "word": "moku e kasi nasa",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_48",
+      "requiredVocab": [
+        "pona",
+        "ike",
+        "weka",
+        "poka"
+      ],
+      "bucketA": "Aligned with values",
+      "bucketB": "Avoided / rejected",
+      "items": [
+        {
+          "word": "toki lon",
+          "bucket": "A"
+        },
+        {
+          "word": "pali pi nasin pona",
+          "bucket": "A"
+        },
+        {
+          "word": "toki ike pi sona ala",
+          "bucket": "B"
+        },
+        {
+          "word": "pali pi tenpo lili",
+          "bucket": "B"
+        },
+        {
+          "word": "alasa sona",
+          "bucket": "A"
+        },
+        {
+          "word": "musi pi jan mute pi sona ala",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_49",
+      "requiredVocab": [
+        "wile",
+        "ken",
+        "wawa",
+        "lawa"
+      ],
+      "bucketA": "What you control",
+      "bucketB": "What you don't control",
+      "items": [
+        {
+          "word": "tenpo pali mi",
+          "bucket": "A"
+        },
+        {
+          "word": "moku mi",
+          "bucket": "A"
+        },
+        {
+          "word": "pilin pi jan ante",
+          "bucket": "B"
+        },
+        {
+          "word": "tenpo kama",
+          "bucket": "B"
+        },
+        {
+          "word": "pali pi sijelo mi",
+          "bucket": "A"
+        },
+        {
+          "word": "ma sin",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_50",
+      "requiredVocab": [
+        "jan",
+        "olin",
+        "weka",
+        "tenpo"
+      ],
+      "bucketA": "Past relationships",
+      "bucketB": "Current relationships",
+      "items": [
+        {
+          "word": "olin pi tenpo lili",
+          "bucket": "A"
+        },
+        {
+          "word": "soweli Sili",
+          "bucket": "B"
+        },
+        {
+          "word": "jan pi tomo sona suli",
+          "bucket": "A"
+        },
+        {
+          "word": "jan pali pi pali sama mi",
+          "bucket": "B"
+        },
+        {
+          "word": "jan pi tomo sona Sekoja",
+          "bucket": "A"
+        },
+        {
+          "word": "jan pi sona pi pali mi",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_51",
+      "requiredVocab": [
+        "sona",
+        "kalama",
+        "kepeken",
+        "ilo"
+      ],
+      "bucketA": "Tools you use daily",
+      "bucketB": "Tools you use occasionally",
+      "items": [
+        {
+          "word": "ilo sona lili pi mama Pisu",
+          "bucket": "A"
+        },
+        {
+          "word": "ilo lipu",
+          "bucket": "A"
+        },
+        {
+          "word": "ilo kalama musi pi luka",
+          "bucket": "B"
+        },
+        {
+          "word": "ilo wawa",
+          "bucket": "A"
+        },
+        {
+          "word": "ilo pi tawa ma",
+          "bucket": "B"
+        },
+        {
+          "word": "ilo sitelen pi nimi mute",
+          "bucket": "A"
+        }
+      ]
+    },
+    {
+      "id": "sort_52",
+      "requiredVocab": [
+        "pali",
+        "moku",
+        "lape",
+        "musi"
+      ],
+      "bucketA": "Done in solitude",
+      "bucketB": "Done in public/with others",
+      "items": [
+        {
+          "word": "lukin lipu",
+          "bucket": "A"
+        },
+        {
+          "word": "pali kalama musi",
+          "bucket": "A"
+        },
+        {
+          "word": "pana moku tawa jan mute",
+          "bucket": "B"
+        },
+        {
+          "word": "pali tomo esun",
+          "bucket": "B"
+        },
+        {
+          "word": "moku lon tomo mi",
+          "bucket": "A"
+        },
+        {
+          "word": "lawa jan pali mute",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_53",
+      "requiredVocab": [
+        "sona",
+        "wile",
+        "alasa",
+        "pona"
+      ],
+      "bucketA": "Self-improvement priorities",
+      "bucketB": "Already strong areas",
+      "items": [
+        {
+          "word": "toki pona pi pilin",
+          "bucket": "A"
+        },
+        {
+          "word": "olin pi pilin pona",
+          "bucket": "A"
+        },
+        {
+          "word": "sona pi tenpo pini",
+          "bucket": "B"
+        },
+        {
+          "word": "wawa pi sijelo",
+          "bucket": "B"
+        },
+        {
+          "word": "pali pi lon nasin",
+          "bucket": "B"
+        },
+        {
+          "word": "toki kepeken jan mute",
+          "bucket": "A"
+        }
+      ]
+    },
+    {
+      "id": "sort_54",
+      "requiredVocab": [
+        "telo",
+        "moku",
+        "kasi",
+        "pona"
+      ],
+      "bucketA": "Daily intake",
+      "bucketB": "Holiday/special intake",
+      "items": [
+        {
+          "word": "telo pimeja wawa",
+          "bucket": "A"
+        },
+        {
+          "word": "moku pi jan Tasen",
+          "bucket": "A"
+        },
+        {
+          "word": "telo nasa pi sike kiwen",
+          "bucket": "B"
+        },
+        {
+          "word": "kasi nasa",
+          "bucket": "A"
+        },
+        {
+          "word": "telo nasa pi sike telo",
+          "bucket": "B"
+        },
+        {
+          "word": "moku pi tomo esun moku",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_55",
+      "requiredVocab": [
+        "wawa",
+        "sona",
+        "lipu",
+        "kalama"
+      ],
+      "bucketA": "Engages mind",
+      "bucketB": "Engages body",
+      "items": [
+        {
+          "word": "lukin lipu sona",
+          "bucket": "A"
+        },
+        {
+          "word": "kepeken linja palisa wawa",
+          "bucket": "B"
+        },
+        {
+          "word": "sitelen toki musi",
+          "bucket": "A"
+        },
+        {
+          "word": "kepeken ilo pi pana wawa",
+          "bucket": "B"
+        },
+        {
+          "word": "lukin sitelen tawa pi tenpo pini",
+          "bucket": "A"
+        },
+        {
+          "word": "kepeken linja wawa",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_56",
+      "requiredVocab": [
+        "jan",
+        "tomo",
+        "ma",
+        "weka"
+      ],
+      "bucketA": "Hub places (you anchor)",
+      "bucketB": "Visited / passed through",
+      "items": [
+        {
+          "word": "tomo Matison",
+          "bucket": "A"
+        },
+        {
+          "word": "tomo esun Tasen",
+          "bucket": "A"
+        },
+        {
+          "word": "ma Pisinija Pisi",
+          "bucket": "B"
+        },
+        {
+          "word": "ma Sikako",
+          "bucket": "B"
+        },
+        {
+          "word": "ma Tulali",
+          "bucket": "B"
+        },
+        {
+          "word": "ma Pansilipan",
+          "bucket": "A"
+        }
+      ]
+    },
+    {
+      "id": "sort_57",
+      "requiredVocab": [
+        "sona",
+        "pona",
+        "lon",
+        "ala"
+      ],
+      "bucketA": "Beliefs you hold",
+      "bucketB": "Beliefs you reject",
+      "items": [
+        {
+          "word": "sona pi nasin pi sijelo",
+          "bucket": "A"
+        },
+        {
+          "word": "sewi mama pi tenpo ali",
+          "bucket": "B"
+        },
+        {
+          "word": "ken pi sona ali",
+          "bucket": "B"
+        },
+        {
+          "word": "tenpo lili pi tenpo mi",
+          "bucket": "A"
+        },
+        {
+          "word": "moli li pini pi pilin",
+          "bucket": "A"
+        },
+        {
+          "word": "tenpo pi pini ala",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_58",
+      "requiredVocab": [
+        "wile",
+        "lawa",
+        "jan",
+        "tomo"
+      ],
+      "bucketA": "What you've earned",
+      "bucketB": "What you've inherited",
+      "items": [
+        {
+          "word": "tomo lili pi mi taso",
+          "bucket": "A"
+        },
+        {
+          "word": "soweli Sili",
+          "bucket": "A"
+        },
+        {
+          "word": "lawa pi pali mi",
+          "bucket": "A"
+        },
+        {
+          "word": "kulupu mama",
+          "bucket": "B"
+        },
+        {
+          "word": "ma kama mi",
+          "bucket": "B"
+        },
+        {
+          "word": "sijelo mi",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_59",
+      "requiredVocab": [
+        "tenpo",
+        "pini",
+        "kama",
+        "lon"
+      ],
+      "bucketA": "What's behind you",
+      "bucketB": "What's ahead of you",
+      "items": [
+        {
+          "word": "tenpo lili pi ma Tulali",
+          "bucket": "A"
+        },
+        {
+          "word": "tomo sona Sekoja",
+          "bucket": "A"
+        },
+        {
+          "word": "tenpo pi mani suli",
+          "bucket": "B"
+        },
+        {
+          "word": "olin pi tenpo pini",
+          "bucket": "A"
+        },
+        {
+          "word": "pali pi sijelo pona",
+          "bucket": "B"
+        },
+        {
+          "word": "lipu sin pi pali mi",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_60",
+      "requiredVocab": [
+        "wawa",
+        "sona",
+        "olin",
+        "pona"
+      ],
+      "bucketA": "Things that ground you",
+      "bucketB": "Things that drain you",
+      "items": [
+        {
+          "word": "soweli Sili",
+          "bucket": "A"
+        },
+        {
+          "word": "tenpo pi pali sijelo",
+          "bucket": "A"
+        },
+        {
+          "word": "jan mute lon tomo esun",
+          "bucket": "B"
+        },
+        {
+          "word": "telo pimeja",
+          "bucket": "A"
+        },
+        {
+          "word": "pali pi sona ala pi jan ante",
+          "bucket": "B"
+        },
+        {
+          "word": "musi pi jan mute pi pilin nasa",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_61",
+      "requiredVocab": [
+        "sona",
+        "lon",
+        "ala",
+        "pilin"
+      ],
+      "bucketA": "Knowable (with effort)",
+      "bucketB": "Unknowable (in your view)",
+      "items": [
+        {
+          "word": "nasin pi sijelo jan",
+          "bucket": "A"
+        },
+        {
+          "word": "tenpo pini pi ma ali",
+          "bucket": "A"
+        },
+        {
+          "word": "tan pi ali",
+          "bucket": "B"
+        },
+        {
+          "word": "ijo pi tenpo pi pini ala",
+          "bucket": "B"
+        },
+        {
+          "word": "nasin pi mun en suno",
+          "bucket": "A"
+        },
+        {
+          "word": "ken pi sewi mama",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_62",
+      "requiredVocab": [
+        "pona",
+        "ike",
+        "wile",
+        "ala"
+      ],
+      "bucketA": "Worth your time",
+      "bucketB": "Not worth your time",
+      "items": [
+        {
+          "word": "lukin lipu pi sona suli",
+          "bucket": "A"
+        },
+        {
+          "word": "pali pi sijelo pona",
+          "bucket": "A"
+        },
+        {
+          "word": "musi pi jan mute pi sona ala",
+          "bucket": "B"
+        },
+        {
+          "word": "toki pi pilin nasa pi jan ante",
+          "bucket": "B"
+        },
+        {
+          "word": "alasa pi sona sin",
+          "bucket": "A"
+        },
+        {
+          "word": "toki pi nasin sewi",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_63",
+      "requiredVocab": [
+        "jan",
+        "olin",
+        "weka",
+        "lili"
+      ],
+      "bucketA": "Quality (selectivity)",
+      "bucketB": "Quantity (volume)",
+      "items": [
+        {
+          "word": "jan pona pi tenpo suli",
+          "bucket": "A"
+        },
+        {
+          "word": "soweli wan",
+          "bucket": "A"
+        },
+        {
+          "word": "jan mute pi sona ala",
+          "bucket": "B"
+        },
+        {
+          "word": "kulupu pi musi nasa",
+          "bucket": "B"
+        },
+        {
+          "word": "olin wan pi pona suli",
+          "bucket": "A"
+        },
+        {
+          "word": "jan mute lon ilo sona",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_64",
+      "requiredVocab": [
+        "pali",
+        "wile",
+        "ken",
+        "lawa"
+      ],
+      "bucketA": "Ought to do (consequentialist)",
+      "bucketB": "Just custom/tradition (rejected)",
+      "items": [
+        {
+          "word": "pali pi pana pona",
+          "bucket": "A"
+        },
+        {
+          "word": "pali pi weka pi pilin ike",
+          "bucket": "A"
+        },
+        {
+          "word": "pali pi nasin sewi pi tenpo pini",
+          "bucket": "B"
+        },
+        {
+          "word": "pali pi nasin pi mama mama",
+          "bucket": "B"
+        },
+        {
+          "word": "pali pi weka pi ike pi soweli",
+          "bucket": "A"
+        },
+        {
+          "word": "pali pi tenpo suno pi nasin sewi",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_65",
+      "requiredVocab": [
+        "wawa",
+        "sona",
+        "tenpo",
+        "kama"
+      ],
+      "bucketA": "Building toward future autonomy",
+      "bucketB": "Living in present",
+      "items": [
+        {
+          "word": "mani pi tenpo majuna",
+          "bucket": "A"
+        },
+        {
+          "word": "moku e telo pimeja",
+          "bucket": "B"
+        },
+        {
+          "word": "pali pi sijelo pona",
+          "bucket": "A"
+        },
+        {
+          "word": "musi pi tenpo pimeja",
+          "bucket": "B"
+        },
+        {
+          "word": "alasa sona pi tenpo suli",
+          "bucket": "A"
+        },
+        {
+          "word": "olin pi soweli mi",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_66",
+      "requiredVocab": [
+        "jan",
+        "soweli",
+        "ilo",
+        "ma"
+      ],
+      "bucketA": "Things worthy of love (your view)",
+      "bucketB": "Things merely useful (your view)",
+      "items": [
+        {
+          "word": "soweli Sili",
+          "bucket": "A"
+        },
+        {
+          "word": "ilo sona suli",
+          "bucket": "B"
+        },
+        {
+          "word": "jan pona pi tenpo suli",
+          "bucket": "A"
+        },
+        {
+          "word": "tomo tawa",
+          "bucket": "B"
+        },
+        {
+          "word": "kalama musi pona",
+          "bucket": "A"
+        },
+        {
+          "word": "ilo wawa",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_67",
+      "requiredVocab": [
+        "sona",
+        "pi",
+        "tenpo",
+        "pini"
+      ],
+      "bucketA": "California Era Anthony",
+      "bucketB": "Tennessee Era Anthony",
+      "items": [
+        {
+          "word": "jan pi tenpo lili pi mani lili",
+          "bucket": "A"
+        },
+        {
+          "word": "jan lawa pi tomo esun",
+          "bucket": "B"
+        },
+        {
+          "word": "jan pi pali mute pi tenpo wan",
+          "bucket": "A"
+        },
+        {
+          "word": "jan pi tomo lili pi pona",
+          "bucket": "B"
+        },
+        {
+          "word": "jan pi olin pi soweli",
+          "bucket": "B"
+        },
+        {
+          "word": "jan pi tomo tawa lon nasin",
+          "bucket": "A"
+        }
+      ]
+    },
+    {
+      "id": "sort_68",
+      "requiredVocab": [
+        "pali",
+        "musi",
+        "wawa",
+        "sona"
+      ],
+      "bucketA": "Pursued for its own sake",
+      "bucketB": "Pursued for instrumental reasons",
+      "items": [
+        {
+          "word": "lukin lipu pi ma sewi",
+          "bucket": "A"
+        },
+        {
+          "word": "pali tomo esun",
+          "bucket": "B"
+        },
+        {
+          "word": "pali kalama musi",
+          "bucket": "A"
+        },
+        {
+          "word": "kepeken ilo wawa",
+          "bucket": "B"
+        },
+        {
+          "word": "sitelen toki musi",
+          "bucket": "A"
+        },
+        {
+          "word": "pana mani lon kulupu mani",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_69",
+      "requiredVocab": [
+        "wile",
+        "kama",
+        "sona",
+        "lon"
+      ],
+      "bucketA": "Identities you hold (current)",
+      "bucketB": "Identities you reject",
+      "items": [
+        {
+          "word": "jan pi sona ala pi sewi",
+          "bucket": "A"
+        },
+        {
+          "word": "jan pi nasin pona",
+          "bucket": "A"
+        },
+        {
+          "word": "jan pi olin pi tenpo ali",
+          "bucket": "B"
+        },
+        {
+          "word": "mama pi jan lili",
+          "bucket": "B"
+        },
+        {
+          "word": "jan pi alasa sona",
+          "bucket": "A"
+        },
+        {
+          "word": "jan pi nasin sewi",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_70",
+      "requiredVocab": [
+        "nasin",
+        "pona",
+        "ike",
+        "lawa"
+      ],
+      "bucketA": "Frameworks you use",
+      "bucketB": "Frameworks you find unhelpful",
+      "items": [
+        {
+          "word": "nasin pi pana pona",
+          "bucket": "A"
+        },
+        {
+          "word": "nasin pi ken pi sijelo mi",
+          "bucket": "A"
+        },
+        {
+          "word": "nasin pi pilin sewi",
+          "bucket": "B"
+        },
+        {
+          "word": "nasin pi pona pi pilin taso",
+          "bucket": "B"
+        },
+        {
+          "word": "nasin pi sona pi tenpo pini",
+          "bucket": "A"
+        },
+        {
+          "word": "nasin pi pilin pi kulupu wan",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_71",
+      "requiredVocab": [
+        "jan",
+        "kulupu",
+        "pona",
+        "ike"
+      ],
+      "bucketA": "Civilizational direction (good)",
+      "bucketB": "Civilizational direction (bad)",
+      "items": [
+        {
+          "word": "weka pi utala pi tenpo suli",
+          "bucket": "A"
+        },
+        {
+          "word": "kama pi sona pi jan ali",
+          "bucket": "A"
+        },
+        {
+          "word": "kama pi seli pi ma ali",
+          "bucket": "B"
+        },
+        {
+          "word": "ante pi mani lili pi mani suli",
+          "bucket": "B"
+        },
+        {
+          "word": "kama pi nasin sona pi sin",
+          "bucket": "A"
+        },
+        {
+          "word": "kama pi ilo sona pi ken ike",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_72",
+      "requiredVocab": [
+        "pali",
+        "moku",
+        "telo",
+        "kasi"
+      ],
+      "bucketA": "Body needs (TDEE 2,291)",
+      "bucketB": "Mind needs",
+      "items": [
+        {
+          "word": "moku pona",
+          "bucket": "A"
+        },
+        {
+          "word": "telo mute",
+          "bucket": "A"
+        },
+        {
+          "word": "lipu sona sin",
+          "bucket": "B"
+        },
+        {
+          "word": "lape pi tenpo suli",
+          "bucket": "A"
+        },
+        {
+          "word": "tenpo taso",
+          "bucket": "B"
+        },
+        {
+          "word": "alasa sona",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_73",
+      "requiredVocab": [
+        "pona",
+        "ike",
+        "ken",
+        "ala"
+      ],
+      "bucketA": "What you can change",
+      "bucketB": "What you accept",
+      "items": [
+        {
+          "word": "wawa pi sijelo mi",
+          "bucket": "A"
+        },
+        {
+          "word": "sona mi",
+          "bucket": "A"
+        },
+        {
+          "word": "tenpo open mi",
+          "bucket": "B"
+        },
+        {
+          "word": "mama mi",
+          "bucket": "B"
+        },
+        {
+          "word": "nasin pi pali mi",
+          "bucket": "A"
+        },
+        {
+          "word": "ma mi pi tenpo lili",
+          "bucket": "B"
+        }
+      ]
+    },
+    {
+      "id": "sort_74",
+      "requiredVocab": [
+        "sona",
+        "pi",
+        "tenpo",
+        "kama"
+      ],
+      "bucketA": "Optimistic long-term",
+      "bucketB": "Worried short-term (50 years)",
+      "items": [
+        {
+          "word": "weka pi utala pi tenpo suli",
+          "bucket": "A"
+        },
+        {
+          "word": "kama pi pona pi sijelo",
+          "bucket": "A"
+        },
+        {
+          "word": "kama pi seli pi ma",
+          "bucket": "B"
+        },
+        {
+          "word": "ilo sona pi ken ike",
+          "bucket": "B"
+        },
+        {
+          "word": "ante pi mani pi jan mute",
+          "bucket": "B"
+        },
+        {
+          "word": "kama pi nasin pi pona pi jan ali",
+          "bucket": "A"
+        }
+      ]
+    },
+    {
+      "id": "sort_75",
+      "requiredVocab": [
+        "mi",
+        "lon",
+        "pini",
+        "tenpo"
+      ],
+      "bucketA": "Things that survive me",
+      "bucketB": "Things that end with me",
+      "items": [
+        {
+          "word": "kalama musi pi pali mi",
+          "bucket": "A"
+        },
+        {
+          "word": "sitelen toki pi pali mi",
+          "bucket": "A"
+        },
+        {
+          "word": "pilin mi",
+          "bucket": "B"
+        },
+        {
+          "word": "sona mi pi tenpo ali",
+          "bucket": "B"
+        },
+        {
+          "word": "lipu pi pali mi",
+          "bucket": "A"
+        },
+        {
+          "word": "soweli mi",
+          "bucket": "B"
+        }
+      ]
+    }
+  ]
+}

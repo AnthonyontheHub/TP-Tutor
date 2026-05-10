@@ -2,9 +2,20 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, ArrowRight, CheckCircle2, XCircle, LogOut, Brain, Send, HelpCircle } from 'lucide-react';
 import { essentializerData } from '../../data/drills';
+import { useMasteryStore } from '../../store/masteryStore';
 
 export const Essentializer = ({ onSessionEnd, onAskLina }) => {
-  const [challenges] = useState(() => [...essentializerData].sort(() => Math.random() - 0.5));
+  const vocabulary = useMasteryStore(state => state.vocabulary);
+  const [challenges] = useState(() => {
+    const filtered = essentializerData.filter(drill => {
+      return drill.requiredVocab.every(reqWord => {
+        const v = vocabulary.find(vw => vw.word.toLowerCase() === reqWord.toLowerCase());
+        return v && v.status !== 'not_started';
+      });
+    });
+    const sourceData = filtered.length > 0 ? filtered : essentializerData;
+    return [...sourceData].sort(() => Math.random() - 0.5);
+  });
   const [currentIndex, setCurrentIndex] = useState(0);
   const [streak, setStreak] = useState(0);
   const [totalChallenges, setTotalChallenges] = useState(0);

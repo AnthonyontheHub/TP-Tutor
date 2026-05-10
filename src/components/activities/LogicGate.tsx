@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, ArrowRight, RotateCcw, CheckCircle2, XCircle, LogOut, HelpCircle } from 'lucide-react';
 import { logicGateData, LogicGateDrill } from '../../data/drills';
+import { useMasteryStore } from '../../store/masteryStore';
 
 interface LogicGateProps {
   onComplete?: (results: { score: number; total: number }) => void;
@@ -9,7 +10,17 @@ interface LogicGateProps {
 }
 
 export const LogicGate: React.FC<LogicGateProps> = ({ onComplete, onAskLina }) => {
-  const [statements] = useState(() => [...logicGateData].sort(() => Math.random() - 0.5));
+  const vocabulary = useMasteryStore(state => state.vocabulary);
+  const [statements] = useState(() => {
+    const filtered = logicGateData.filter(drill => {
+      return drill.requiredVocab.every(reqWord => {
+        const v = vocabulary.find(vw => vw.word.toLowerCase() === reqWord.toLowerCase());
+        return v && v.status !== 'not_started';
+      });
+    });
+    const sourceData = filtered.length > 0 ? filtered : logicGateData;
+    return [...sourceData].sort(() => Math.random() - 0.5);
+  });
   const [currentIndex, setCurrentIndex] = useState(0);
   const [totalAttempted, setTotalAttempted] = useState(0);
   const [score, setScore] = useState(0);
