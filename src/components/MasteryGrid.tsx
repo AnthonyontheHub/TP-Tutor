@@ -37,8 +37,13 @@ export default function MasteryGrid({
   const [gridDensity, setGridDensity] = useState<'ledger' | 'grid' | 'crystal' | 'datapad'>('grid');
   const [suggestion, setSuggestion] = useState<string | null>(null);
   const [isTranslating, setIsTranslating] = useState(false);
+  const longPressFlag = useRef(false);
 
   const handleWordTap = useCallback((word: VocabWord) => {
+    if (longPressFlag.current) {
+      longPressFlag.current = false;
+      return;
+    }
     if (selectedWords.length > 0) {
       toggleWordSelection(word.word);
     } else {
@@ -54,11 +59,26 @@ export default function MasteryGrid({
   const touchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const handleTouchStart = useCallback((word: VocabWord) => {
     touchTimer.current = setTimeout(() => {
+      longPressFlag.current = true;
       toggleWordSelection(word.word);
     }, 600);
   }, [toggleWordSelection]);
 
   const handleTouchEnd = useCallback(() => {
+    if (touchTimer.current) {
+      clearTimeout(touchTimer.current);
+      touchTimer.current = null;
+    }
+  }, []);
+
+  const handleMouseDown = useCallback((word: VocabWord) => {
+    touchTimer.current = setTimeout(() => {
+      longPressFlag.current = true;
+      toggleWordSelection(word.word);
+    }, 600);
+  }, [toggleWordSelection]);
+
+  const handleMouseUp = useCallback(() => {
     if (touchTimer.current) {
       clearTimeout(touchTimer.current);
       touchTimer.current = null;
@@ -481,6 +501,8 @@ export default function MasteryGrid({
                 onContextMenu={(e) => handleLongPressAction(e, word)}
                 onTouchStart={() => handleTouchStart(word)}
                 onTouchEnd={handleTouchEnd}
+                onMouseDown={() => handleMouseDown(word)}
+                onMouseUp={handleMouseUp}
                 style={{ opacity: isDimmed ? 0.3 : 1 }}
               >
                 <div className="vocab-ledger-word">{word.word}</div>
@@ -504,6 +526,8 @@ export default function MasteryGrid({
                 onContextMenu={(e) => handleLongPressAction(e, word)}
                 onTouchStart={() => handleTouchStart(word)}
                 onTouchEnd={handleTouchEnd}
+                onMouseDown={() => handleMouseDown(word)}
+                onMouseUp={handleMouseUp}
                 style={{ 
                   opacity: isDimmed ? 0.3 : 1,
                   animation: isRelated ? 'relatedPulse 1.2s ease-in-out infinite' : 'none',
@@ -526,6 +550,8 @@ export default function MasteryGrid({
                 onContextMenu={(e) => handleLongPressAction(e, word)}
                 onTouchStart={() => handleTouchStart(word)}
                 onTouchEnd={handleTouchEnd}
+                onMouseDown={() => handleMouseDown(word)}
+                onMouseUp={handleMouseUp}
                 style={{ opacity: isDimmed ? 0.3 : 1 }}
               >
                 <div className="sitelen-watermark">{word.word}</div>
@@ -549,6 +575,8 @@ export default function MasteryGrid({
                 onContextMenu={(e) => handleLongPressAction(e, word)}
                 onTouchStart={() => handleTouchStart(word)}
                 onTouchEnd={handleTouchEnd}
+                onMouseDown={() => handleMouseDown(word)}
+                onMouseUp={handleMouseUp}
                 style={{ opacity: isDimmed ? 0.3 : 1 }}
               >
                 <div className="sitelen-watermark">{word.word}</div>

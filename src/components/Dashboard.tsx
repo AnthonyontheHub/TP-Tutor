@@ -39,10 +39,15 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
     lastKnowledgeCheckDate, setLastKnowledgeCheckDate, 
     recordActivityCompletion, activeActivity, setActiveActivity, 
     calculateReadinessScore, getStatusSummary, songs, commonPhrases, 
-    addWordToSelection, getDueWords, syncPhrasebook, masteryHistory
+    addWordToSelection, getDueWords, syncPhrasebook, masteryHistory,
+    addLoreEntry
   } = useMasteryStore();
   
   const summary = getStatusSummary();
+
+  const [showLoreModal, setShowLoreModal] = useState(false);
+  const [loreInput, setLoreInput] = useState('');
+  const [showLoreToast, setShowLoreToast] = useState(false);
 
   useEffect(() => {
     if (commonPhrases.length < 20) {
@@ -303,7 +308,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
 
       <header className="dashboard__header">
         <div className="dashboard__header-left">
-          <h1 className="dashboard__title" style={{ margin: 0, fontSize: '1rem' }}>TOKI PONA</h1>
+          <h1 className="dashboard__title hidden md:block" style={{ margin: 0, fontSize: '1rem' }}>TOKI PONA</h1>
           
           <button 
             onClick={() => onTogglePanel('profile')} 
@@ -361,6 +366,15 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
             onAskLina={onAskLina}
             onOpenAchievements={() => onTogglePanel('achievements')}
           />
+
+          <button 
+            onClick={() => setShowLoreModal(true)} 
+            className="dashboard__icon-btn" 
+            style={{ width: '32px', height: '32px', fontSize: '0.9rem', marginRight: '4px' }} 
+            title="LOG EVENT"
+          >
+            📝
+          </button>
 
           <button 
             onClick={() => setShowTrainingHub(true)} 
@@ -891,7 +905,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
               <button 
                 className="close-glyph" 
                 onClick={() => setActiveLore(null)}
-              ></button>
+              >✕</button>
 
               <span className="dossier-label">LORE DOSSIER • {activeLore.category}</span>
 
@@ -952,6 +966,27 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
               </div>
             </motion.div>
           </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showLoreModal && (
+          <div className="modal-backdrop" style={{ zIndex: 5001 }}>
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="glass-panel" style={{ width: '90%', maxWidth: '400px', border: '1px solid var(--gold)' }} onClick={e => e.stopPropagation()}>
+              <h3 style={{ color: 'var(--gold)', marginBottom: '15px' }}>LOG LIFE EVENT</h3>
+              <div style={{ marginBottom: '10px', fontSize: '0.8rem', color: '#ccc', lineHeight: 1.4 }}>Log a quick real-world event so jan Lina can reference it in your next conversation.</div>
+              <textarea value={loreInput} onChange={e => setLoreInput(e.target.value)} placeholder="e.g. Sirius caught a fly today..." style={{ width: '100%', height: '80px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', borderRadius: '4px', color: 'white', padding: '10px', marginBottom: '15px', resize: 'none' }} autoFocus />
+              <div style={{ display: 'flex', gap: '8px' }}>
+                 <button onClick={() => { if (loreInput.trim()) { addLoreEntry(loreInput); setLoreInput(''); setShowLoreModal(false); setShowLoreToast(true); setTimeout(() => setShowLoreToast(false), 3000); } }} className="btn-review" style={{ flex: 1, margin: 0 }}>SYNC TO LINA</button>
+                 <button onClick={() => { setShowLoreModal(false); setLoreInput(''); }} className="btn-toggle" style={{ flex: 1 }}>CANCEL</button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+        {showLoreToast && (
+          <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }} style={{ position: 'fixed', bottom: '40px', left: '50%', transform: 'translateX(-50%)', background: 'var(--gold)', color: 'black', padding: '12px 24px', borderRadius: '30px', fontWeight: 900, fontSize: '0.9rem', letterSpacing: '0.05em', boxShadow: '0 4px 20px rgba(212,175,55,0.4)', zIndex: 9999 }}>
+            LINA IS REMEMBERING... 🧠
+          </motion.div>
         )}
       </AnimatePresence>
 

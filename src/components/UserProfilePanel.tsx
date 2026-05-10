@@ -99,12 +99,6 @@ export default function UserProfilePanel({ onClose, onAskLina }: Props) {
   const [showLedger, setShowLedger] = useState(false);
   const [editableProfile, setEditableProfile] = useState(profile);
 
-  const [showTrainingHub, setShowTrainingHub] = useState(false);
-  const [showAnalytics, setShowAnalytics] = useState(false);
-  const [showLoreModal, setShowLoreModal] = useState(false);
-  const [loreInput, setLoreInput] = useState('');
-  const [showLoreToast, setShowLoreToast] = useState(false);
-
   // Pet form state
   const [newPetName, setNewPetName] = useState('');
   const [newPetSpecies, setNewPetSpecies] = useState('');
@@ -802,115 +796,11 @@ export default function UserProfilePanel({ onClose, onAskLina }: Props) {
              <button onClick={() => logout()} className="logout-button" style={{ width: '100%', padding: '12px', background: 'rgba(255,0,0,0.1)', color: '#ff4d4d', border: '1px solid #ff4d4d', borderRadius: '8px', fontWeight: 700, cursor: 'pointer' }}>LOG OUT</button>
           )}
         </div>
-
-        <section style={{ padding: '20px', borderTop: '1px solid var(--border)', flexShrink: 0 }}>
-          <h2 style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--gold)', letterSpacing: '0.15em', marginBottom: '16px', opacity: 0.8 }}>SYSTEM MODULES</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '8px' }}>
-            <button 
-              onClick={() => setShowTrainingHub(true)} 
-              className="btn-review" 
-              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', color: 'white' }}
-            >
-              🎮 TRAINING HUB
-            </button>
-            <button 
-              onClick={() => setShowAnalytics(true)} 
-              className="btn-review" 
-              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', color: 'white' }}
-            >
-              📊 ANALYTICS
-            </button>
-            <button 
-              onClick={() => setShowLoreModal(true)} 
-              className="btn-review" 
-              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', color: 'white' }}
-            >
-              📝 LOG EVENT
-            </button>
-          </div>
-        </section>
       </div>
       
       {showLedger && (
         <InsightLedger onClose={() => setShowLedger(false)} />
       )}
-
-      {showTrainingHub && (
-        <TrainingHub onClose={() => setShowTrainingHub(false)} onAskLina={onAskLina} />
-      )}
-
-      <AnalyticsPanel 
-        isOpen={showAnalytics}
-        onClose={() => setShowAnalytics(false)}
-      />
-
-      <AnimatePresence>
-        {showLoreModal && (
-          <div className="modal-backdrop" style={{ zIndex: 5001 }}>
-            <motion.div 
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="glass-panel"
-              style={{ width: '90%', maxWidth: '400px', border: '1px solid var(--gold)' }}
-              onClick={e => e.stopPropagation()}
-            >
-              <h3 style={{ color: 'var(--gold)', marginBottom: '15px' }}>LOG LIFE EVENT</h3>
-              <div style={{ marginBottom: '10px', fontSize: '0.8rem', color: '#ccc', lineHeight: 1.4 }}>
-                Log a quick real-world event so jan Lina can reference it in your next conversation.
-              </div>
-              <textarea 
-                value={loreInput} 
-                onChange={e => setLoreInput(e.target.value)}
-                placeholder="e.g. Sirius caught a fly today..."
-                style={{ width: '100%', height: '80px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', borderRadius: '4px', color: 'white', padding: '10px', marginBottom: '15px', resize: 'none' }}
-                autoFocus
-              />
-              <div style={{ display: 'flex', gap: '8px' }}>
-                 <button 
-                  onClick={() => {
-                    if (loreInput.trim()) {
-                      addLoreEntry(loreInput);
-                      setLoreInput('');
-                      setShowLoreModal(false);
-                      setShowLoreToast(true);
-                      setTimeout(() => setShowLoreToast(false), 3000);
-                    }
-                  }} 
-                  className="btn-review" style={{ flex: 1, margin: 0 }}>
-                  SYNC TO LINA
-                </button>
-                 <button onClick={() => { setShowLoreModal(false); setLoreInput(''); }} className="btn-toggle" style={{ flex: 1 }}>CANCEL</button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-
-        {showLoreToast && (
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 50 }}
-            style={{
-              position: 'fixed',
-              bottom: '40px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              background: 'var(--gold)',
-              color: 'black',
-              padding: '12px 24px',
-              borderRadius: '30px',
-              fontWeight: 900,
-              fontSize: '0.9rem',
-              letterSpacing: '0.05em',
-              boxShadow: '0 4px 20px rgba(212,175,55,0.4)',
-              zIndex: 9999
-            }}
-          >
-            LINA IS REMEMBERING... 🧠
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       <style>{`
         .field-group {
