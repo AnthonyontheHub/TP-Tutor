@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { db } from '../services/firebase';
 import { doc, setDoc, getDoc, collection, query, orderBy, getDocs, limit } from 'firebase/firestore';
-import { resolveApiKey, fetchStoicAnalysis } from '../services/linaService';
+import { resolveApiKey, fetchStoicAnalysis, generateStoicQuote } from '../services/linaService';
 import { useMasteryStore } from './masteryStore';
 
 export interface StoicQuote {
@@ -60,19 +60,34 @@ export const useStoicStore = create<StoicStore>()(
           const data = docSnap.data() as StoicQuote;
           set({ todayQuote: data, lastFetchedDate: today });
         } else {
-          // Fetch from API via proxy to bypass CORS
+          // Ultimate Hybrid Stoic Engine
           try {
-            const apiUrl = 'https://dailystoic.pl/quote/text_en.json';
-            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`;
-            
-            const response = await fetch(proxyUrl);
-            const proxyData = await response.json();
-            const quoteData = JSON.parse(proxyData.contents);
-            const english = quoteData.text;
-
-            // Translate and Analyze via Lina
             const apiKey = resolveApiKey();
             if (!apiKey) return;
+
+            let english = "";
+            let useAI = false;
+
+            try {
+              const apiUrl = 'https://dailystoic.pl/api/quote';
+              const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`;
+              const response = await fetch(proxyUrl);
+              const proxyData = await response.json();
+              const quoteData = JSON.parse(proxyData.contents);
+              english = quoteData.text;
+
+              // Duplicate check against history
+              const isDuplicate = get().history.some(q => q.english.toLowerCase().trim() === english.toLowerCase().trim());
+              if (isDuplicate) useAI = true;
+            } catch (e) {
+              console.warn("Stoic API failed, falling back to jan Lina:", e);
+              useAI = true;
+            }
+
+            if (useAI) {
+              const last14 = get().history.slice(0, 14).map(q => q.english);
+              english = await generateStoicQuote(apiKey, last14);
+            }
 
             const analysis = await fetchStoicAnalysis(apiKey, english);
             if (!analysis) return;
@@ -99,7 +114,7 @@ export const useStoicStore = create<StoicStore>()(
             await setDoc(docRef, newQuote);
             set({ todayQuote: newQuote, lastFetchedDate: today, phase1DismissedAt: null, phase2CompletedAt: null, phase3CompletedAt: null });
           } catch (e) {
-            console.error("Stoic API Error:", e);
+            console.error("Hybrid Stoic Engine Error:", e);
           }
         }
       },

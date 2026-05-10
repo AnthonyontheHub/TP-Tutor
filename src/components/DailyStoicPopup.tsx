@@ -111,7 +111,7 @@ export default function DailyStoicPopup() {
               else if (phase === 2) completePhase2();
               else if (phase === 3) completePhase3();
               setDevPhaseOverride(null);
-            }} style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer' }}>
+            }} style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer', zIndex: 9999 }}>
               <X size={16} />
             </button>
           </header>
@@ -212,6 +212,11 @@ export default function DailyStoicPopup() {
               </button>
             </div>
           )}
+
+          <div style={{ marginTop: '15px', paddingTop: '10px', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', gap: '10px' }}>
+            <button onClick={() => devReset()} style={{ fontSize: '0.6rem', color: '#666', background: 'none', border: '1px solid #333', padding: '2px 6px', borderRadius: '4px' }}>RESET</button>
+            <button onClick={() => dismissPhase1()} style={{ fontSize: '0.6rem', color: 'var(--gold)', background: 'none', border: '1px solid var(--gold)', padding: '2px 6px', borderRadius: '4px' }}>SKIP TO P2</button>
+          </div>
         </motion.div>
       </div>
     </AnimatePresence>

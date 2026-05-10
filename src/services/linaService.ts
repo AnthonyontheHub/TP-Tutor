@@ -735,3 +735,17 @@ export async function fetchStoicAnalysis(apiKey: string, englishQuote: string) {
     return null;
   }
 }
+
+export async function generateStoicQuote(apiKey: string, history: string[]) {
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
+  const prompt = `Provide a famous Stoic quote in English from Marcus Aurelius, Seneca, or Epictetus. 
+  It MUST NOT be any of these: ${history.join(' | ')}. 
+  Return ONLY the quote text and the author, nothing else.`;
+  try {
+    const result = await model.generateContent(prompt);
+    return result.response.text();
+  } catch (e) {
+    return "Waste no more time arguing about what a good man should be. Be one. - Marcus Aurelius";
+  }
+}
