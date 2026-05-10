@@ -17,6 +17,7 @@ import ConfusionDrill from './ConfusionDrill';
 import CompositionMode from './CompositionMode';
 import SRSWidget from './SRSWidget';
 import InfoTooltip from './InfoTooltip';
+import AnalyticsPanel from './AnalyticsPanel';
 import { fetchQuickTranslation, resolveApiKey, buildOfflineTranslation } from '../services/linaService';
 import type { MasteryStatus, VocabWord } from '../types/mastery';
 import type { AppPanel } from '../App';
@@ -39,6 +40,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   const [showDualDrill, setShowDualDrill] = useState(false);
   const [showConfusionDrill, setShowConfusionDrill] = useState(false);
   const [showComposition, setShowComposition] = useState(false);
+  const [showAnalytics, setShowAnalytics] = useState(false);
   const [showDrillsMenu, setShowDrillsMenu] = useState(false);
   const drillsMenuRef = useRef<HTMLDivElement>(null);
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
@@ -367,6 +369,23 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
             }}
           >
             🎮 TRAINING HUB
+          </button>
+
+          <button 
+            onClick={() => setShowAnalytics(true)} 
+            className="btn-toggle" 
+            style={{ 
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              background: 'rgba(255,255,255,0.03)',
+              border: '1px solid var(--border)',
+              borderRadius: '4px',
+              flex: 1
+            }}
+          >
+            📊 ANALYTICS
           </button>
 
           <div style={{ position: 'relative', flex: 1 }} ref={drillsMenuRef}>
@@ -739,6 +758,11 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
           isSandboxMode={isSandboxMode}
         />
       )}
+
+      <AnalyticsPanel 
+        isOpen={showAnalytics}
+        onClose={() => setShowAnalytics(false)}
+      />
     </div>
   );
 }
