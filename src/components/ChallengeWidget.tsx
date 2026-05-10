@@ -42,7 +42,7 @@ const ChallengeWidget: React.FC = () => {
         </div>
         <div style={{ textAlign: 'right', marginLeft: '12px' }}>
           {completed ? (
-            <span style={{ color: '#22c55e', fontSize: '0.75rem', fontWeight: 900 }}>✅ COMPLETE</span>
+            <span style={{ color: '#22c55e', fontSize: '0.75rem', fontWeight: 900 }}>✦ COMPLETE</span>
           ) : (
             <span style={{ color: 'var(--gold)', fontSize: '0.75rem', fontWeight: 900 }}>+{xpReward} XP</span>
           )}

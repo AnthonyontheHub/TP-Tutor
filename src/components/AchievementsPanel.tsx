@@ -1,6 +1,7 @@
 /* src/components/AchievementsPanel.tsx */
 import { motion } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
+import ChallengeWidget from './ChallengeWidget';
 
 interface Props {
   onClose: () => void;
@@ -31,10 +32,12 @@ export default function AchievementsPanel({ onClose }: Props) {
     >
       <header className="side-panel-header" style={{ justifyContent: 'space-between' }}>
         <h2 style={{ fontSize: '0.9rem', fontWeight: 900, letterSpacing: '0.15em', color: 'var(--gold)' }}>ACHIEVEMENTS</h2>
-        <button onClick={onClose} className="btn-close-glowing">✕</button>
+        {/* close-glyph is injected by ModalWrapper, but side panels might not be using ModalWrapper yet if they are manually rendered side panels */}
       </header>
 
       <div className="side-panel-content">
+        <ChallengeWidget />
+
         <div className="glass-panel" style={{ textAlign: 'center', marginBottom: '24px', border: '1px solid var(--gold)', boxShadow: '0 0 20px rgba(255, 191, 0, 0.1)' }}>
           <div style={{ fontSize: '0.65rem', color: 'var(--gold)', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '8px' }}>Operational Rank</div>
           <div style={{ fontSize: '2rem', color: '#fff', fontWeight: 900, letterSpacing: '-0.02em', textTransform: 'uppercase' }}>{summary.rankTitle}</div>

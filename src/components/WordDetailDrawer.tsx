@@ -35,6 +35,7 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
   const [grammarExamples, setGrammarExamples] = useState<Record<string, string> | null>(null);
   const [neighborConnections, setNeighborConnections] = useState<Record<string, string> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [lastWordId, setLastWordId] = useState<string | null>(null);
   const [isNeighborsModalOpen, setIsNeighborsModalOpen] = useState(false);
 
   const primaryMeaning = word?.meanings?.split(',')[0].trim() || word?.meanings;
@@ -99,10 +100,13 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
 
   useEffect(() => {
     if (isOpen && word) {
-      // RESET STATE for new word
-      setDeepDive(null);
-      setGrammarExamples(null);
-      setNeighborConnections(null);
+      if (lastWordId !== word.id) {
+        // RESET STATE for new word
+        setDeepDive(null);
+        setGrammarExamples(null);
+        setNeighborConnections(null);
+        setLastWordId(word.id);
+      }
 
       const cachedData = (aiVocabCache as Record<string, any>)[word.word];
 
@@ -233,43 +237,48 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
 
             <div style={{ marginBottom: '32px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <span style={{ fontSize: '0.75rem', color: 'white', fontWeight: 900 }}>NEURAL RESONANCE: {word.baseScore}/1000</span>
+                <span style={{ fontSize: '0.75rem', color: 'white', fontWeight: 900 }}>
+                  NEURAL RESONANCE: <span style={{ color: '#a855f7' }}>{word.baseScore}/1000</span>
+                </span>
                 <span style={{ fontSize: '0.65rem', color: 'var(--gold)', fontWeight: 800 }}>{STATUS_META[word.status].label}</span>
               </div>
 
               <div style={{ display: 'grid', gap: '12px' }}>
                 {(() => {
-                  const roles = (word.partOfSpeech || '').split(',').map(p => p.trim()).filter(Boolean);
-                  const pointsPerRole = roles.length > 0 ? Math.floor(1000 / roles.length) : 0;
+                  const posList = (word.partOfSpeech || '').split(',').map(p => p.trim()).filter(Boolean);
+                  if (posList.length === 0) return null;
+
+                  // Distributive View Logic:
+                  // If role-specific scores are all zero, distribute baseScore equally.
+                  const scores = word.partOfSpeechScores || { noun: 0, verb: 0, modifier: 0, particle: 0 };
+                  const totalRoleXp = (scores.noun || 0) + (scores.verb || 0) + (scores.modifier || 0) + (scores.particle || 0);
                   
-                  const roleMatrix = (word as any).roleMatrix || {};
-                  const roleKeys = roles.map(r => {
-                    const lower = r.toLowerCase();
-                    if (lower === 'noun') return 'noun';
-                    if (lower === 'verb') return 'verb';
-                    if (lower === 'modifier' || lower === 'mod') return 'mod';
-                    return lower;
-                  });
+                  const isDistributive = totalRoleXp === 0 && word.baseScore > 0;
+                  const distributedXp = isDistributive ? Math.floor(word.baseScore / posList.length) : 0;
 
-                  const scores = roleKeys.map(key => roleMatrix[key] || 0);
-                  const lowestScore = scores.length > 0 ? Math.min(...scores) : 0;
+                  return posList.map((pos) => {
+                    const cleanPos = pos.toLowerCase();
+                    let roleKey: keyof PartOfSpeechScores = 'modifier';
+                    if (cleanPos === 'noun') roleKey = 'noun';
+                    else if (cleanPos === 'verb') roleKey = 'verb';
+                    else if (cleanPos === 'particle') roleKey = 'particle';
 
-                  return roles.map((role, idx) => {
-                    const key = roleKeys[idx];
-                    const score = scores[idx];
-                    const isLocked = score > lowestScore + 100;
-                    const progress = pointsPerRole > 0 ? (score / pointsPerRole) * 100 : 0;
-                    
+                    const roleXp = isDistributive ? distributedXp : (scores[roleKey] || 0);
+                    const maxRoleXp = Math.floor(1000 / posList.length);
+                    const progress = Math.min(100, (roleXp / maxRoleXp) * 100);
+                    const hasEnergySaturation = progress > 50;
+
                     let color = 'var(--cyan)';
-                    if (key === 'noun') color = 'var(--blue)';
-                    else if (key === 'verb') color = 'var(--pink)';
-                    else if (key === 'mod') color = 'var(--amber)';
+                    if (roleKey === 'noun') color = 'var(--blue)';
+                    else if (roleKey === 'verb') color = 'var(--pink)';
+                    else if (roleKey === 'modifier') color = 'var(--amber)';
+                    else if (roleKey === 'particle') color = 'var(--gold)';
 
                     return (
-                      <div key={role}>
+                      <div key={pos}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.55rem', textTransform: 'uppercase', marginBottom: '4px', fontWeight: 900, letterSpacing: '0.1em' }}>
-                          <span style={{ color: isLocked ? '#666' : 'white' }}>{role} {isLocked && '🔒'}</span>
-                          <span style={{ color }}>{score} / {pointsPerRole}</span>
+                          <span style={{ color: 'white' }}>{pos}</span>
+                          <span style={{ color }}>{roleXp} / {maxRoleXp}</span>
                         </div>
                         <div className="progress-bar-track" style={{ height: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '100px', overflow: 'hidden' }}>
                           <motion.div
@@ -277,8 +286,9 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
                             animate={{ width: `${progress}%` }}
                             style={{
                               height: '100%',
-                              background: isLocked ? '#666' : color,
-                              boxShadow: isLocked ? 'none' : `0 0 10px ${color}44`
+                              background: color,
+                              boxShadow: hasEnergySaturation ? `0 0 15px ${color}` : `0 0 10px ${color}44`,
+                              opacity: hasEnergySaturation ? 1 : 0.8
                             }}
                           />
                         </div>
@@ -464,9 +474,12 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
               )}
             </AnimatePresence>
 
-            <button type="button" onClick={onClose} style={{ position: 'absolute', top: '16px', right: '16px', background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: '1.5rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', padding: 0 }} aria-label="Close">
-              &times;
-            </button>
+            <button 
+              type="button" 
+              onClick={onClose} 
+              className="close-glyph" 
+              aria-label="Close"
+            ></button>
           </motion.div>
         </div>
       )}

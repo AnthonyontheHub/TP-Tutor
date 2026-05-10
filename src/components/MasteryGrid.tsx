@@ -1,9 +1,8 @@
 /* src/components/MasteryGrid.tsx */
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import VocabCard from './VocabCard';
 import WordDetailDrawer from './WordDetailDrawer';
-import ChallengeWidget from './ChallengeWidget';
 import type { MasteryStatus, VocabWord } from '../types/mastery';
 import { STATUS_META } from '../types/mastery';
 import { WORD_RELATIONSHIPS } from '../data/wordRelationships';
@@ -35,9 +34,53 @@ export default function MasteryGrid({
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [selectedPOS, setSelectedPOS] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState<'card' | 'table'>('card');
+  const [gridDensity, setGridDensity] = useState<'ledger' | 'grid' | 'crystal' | 'datapad'>('grid');
   const [suggestion, setSuggestion] = useState<string | null>(null);
   const [isTranslating, setIsTranslating] = useState(false);
+
+  const handleWordTap = useCallback((word: VocabWord) => {
+    if (selectedWords.length > 0) {
+      toggleWordSelection(word.word);
+    } else {
+      setDrawerId(word.id);
+    }
+  }, [selectedWords, toggleWordSelection]);
+
+  const handleLongPress = useCallback((e: React.MouseEvent | React.TouchEvent, word: VocabWord) => {
+    e.preventDefault();
+    toggleWordSelection(word.word);
+  }, [toggleWordSelection]);
+
+  const touchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const handleTouchStart = useCallback((word: VocabWord) => {
+    touchTimer.current = setTimeout(() => {
+      toggleWordSelection(word.word);
+    }, 600);
+  }, [toggleWordSelection]);
+
+  const handleTouchEnd = useCallback(() => {
+    if (touchTimer.current) {
+      clearTimeout(touchTimer.current);
+      touchTimer.current = null;
+    }
+  }, []);
+
+  // Cycle: ledger -> grid -> crystal -> datapad -> ledger
+  const cycleDensity = () => {
+    setGridDensity(prev => {
+      if (prev === 'ledger') return 'grid';
+      if (prev === 'grid') return 'crystal';
+      if (prev === 'crystal') return 'datapad';
+      return 'ledger';
+    });
+  };
+
+  const densityIcon = {
+    ledger: '📑',
+    grid: '🎴',
+    crystal: '💎',
+    datapad: '📟'
+  }[gridDensity];
 
   // Helper function to parse and abbreviate part of speech
   const getPartOfSpeechAbbreviation = useCallback((partOfSpeech: string): string => {
@@ -67,18 +110,6 @@ export default function MasteryGrid({
       .map(p => p.charAt(0).toUpperCase() + p.slice(1))
       .sort();
   }, [vocabulary]);
-
-  const handleCardClick = useCallback((word: VocabWord) => {
-    if (selectedWords.length > 0) {
-      toggleWordSelection(word.word);
-    } else {
-      setDrawerId(word.id);
-    }
-  }, [selectedWords, toggleWordSelection]);
-
-  const handleCardLongPress = useCallback((word: VocabWord) => {
-    toggleWordSelection(word.word);
-  }, [toggleWordSelection]);
 
   const relatedWordIds = useMemo(() => {
     const ids = new Set<string>();
@@ -321,19 +352,15 @@ export default function MasteryGrid({
               {sortDirection === 'asc' ? '↑' : '↓'}
             </button>
             <button
-              onClick={() => setViewMode(prev => prev === 'card' ? 'table' : 'card')}
+              onClick={cycleDensity}
               className="toolbar-input btn-toggle toolbar-icon-btn"
-              title={viewMode === 'card' ? 'Switch to Table View' : 'Switch to Card View'}
+              title={`Switch density (Current: ${gridDensity})`}
             >
-              {viewMode === 'card' ? '📋' : '🎴'}
+              {densityIcon}
             </button>
           </div>
 
         </div>
-      </div>
-
-      <div style={{ marginTop: '12px', marginBottom: '12px' }}>
-        <ChallengeWidget />
       </div>
 
       <div style={{ padding: '0 12px 12px 12px', fontSize: '0.75rem', color: '#888', textAlign: 'center', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
@@ -400,115 +427,163 @@ export default function MasteryGrid({
         </div>
       )}
 
-      {viewMode === 'card' ? (
-        <div className="mastery-vocab-grid">
-          {displayed.map((word) => {
-            const positions: number[] = [];
-            selectedWords.forEach((w, i) => { if (w === word.word) positions.push(i + 1); });
-            const isFilterDimmed = !!(activeFilter && word.status !== activeFilter);
-            const isRelated = relatedWordIds.has(word.word.toLowerCase());
-            const isSelected = positions.length > 0;
-            const isSelectionDimmed = selectedWords.length > 0 && !isSelected && !isRelated;
+      <div 
+        className={gridDensity === 'ledger' || gridDensity === 'datapad' ? 'flex flex-col gap-2' : 'mastery-vocab-grid'}
+        style={{ width: '100%' }}
+      >
+        {displayed.map((word) => {
+          const positions: number[] = [];
+          selectedWords.forEach((w, i) => { if (w === word.word) positions.push(i + 1); });
+          const isFilterDimmed = !!(activeFilter && word.status !== activeFilter);
+          const isRelated = relatedWordIds.has(word.word.toLowerCase());
+          const isSelected = positions.length > 0;
+          const isSelectionDimmed = selectedWords.length > 0 && !isSelected && !isRelated;
+          const isDimmed = isFilterDimmed || isSelectionDimmed;
 
+          const selectionCounter = positions.length > 0 && (
+            <div style={{
+              position: 'absolute', top: -6, right: -6,
+              display: 'flex', flexWrap: 'wrap', gap: '2px',
+              justifyContent: 'flex-end', maxWidth: '64px',
+              pointerEvents: 'none', zIndex: 10
+            }}>
+              {positions.map(pos => (
+                <span key={pos} style={{
+                  background: 'var(--gold)', color: 'black', borderRadius: '50%',
+                  width: '18px', height: '18px', fontSize: '0.65rem', fontWeight: 900,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  lineHeight: 1, boxShadow: '0 2px 4px rgba(0,0,0,0.5)', border: '1px solid black'
+                }}>{pos}</span>
+              ))}
+            </div>
+          );
+
+          const STATUS_ICONS: Record<MasteryStatus, string> = {
+            not_started: '⬜',
+            introduced: '🔵',
+            practicing: '🟡',
+            confident: '🟢',
+            mastered: '✦',
+          };
+
+          if (gridDensity === 'ledger') {
+            return (
+              <div 
+                key={word.id} 
+                className={`vocab-ledger-row vocab-ledger-row--${word.status}`}
+                onClick={() => handleWordTap(word)}
+                onContextMenu={(e) => handleLongPress(e, word)}
+                onTouchStart={() => handleTouchStart(word)}
+                onTouchEnd={handleTouchEnd}
+                style={{ opacity: isDimmed ? 0.3 : 1 }}
+              >
+                <div className="vocab-ledger-word">{word.word}</div>
+                <div className="vocab-ledger-pos">{getPartOfSpeechAbbreviation(word.partOfSpeech)}</div>
+                <div className="vocab-ledger-en">{word.meanings.split(/[;,]/)[0].trim()}</div>
+                <div className="vocab-ledger-stats">
+                  <span>{word.baseScore} XP</span>
+                  <span>{STATUS_ICONS[word.status]}</span>
+                </div>
+                {selectionCounter}
+              </div>
+            );
+          }
+
+          if (gridDensity === 'grid') {
             return (
               <div
                 key={word.id}
-                style={{
-                  position: 'relative',
-                  cursor: 'pointer',
+                className={`vocab-card vocab-card--${word.status}`}
+                onClick={() => handleWordTap(word)}
+                onContextMenu={(e) => handleLongPress(e, word)}
+                onTouchStart={() => handleTouchStart(word)}
+                onTouchEnd={handleTouchEnd}
+                style={{ 
+                  opacity: isDimmed ? 0.3 : 1,
                   animation: isRelated ? 'relatedPulse 1.2s ease-in-out infinite' : 'none',
-                  touchAction: 'pan-y',
                 }}
-                onClick={(e) => e.stopPropagation()}
               >
-                <VocabCard
-                  word={word}
-                  onClick={handleCardClick}
-                  onLongPress={handleCardLongPress}
-                  isSandboxMode={isSandboxMode}
-                  isDimmed={isFilterDimmed || isSelectionDimmed}
-                  isSelected={isSelected}
-                  isRelated={isRelated}
-                />
-                {positions.length > 0 && (
-                  <div style={{
-                    position: 'absolute', top: -6, right: -6,
-                    display: 'flex', flexWrap: 'wrap', gap: '2px',
-                    justifyContent: 'flex-end', maxWidth: '64px',
-                    pointerEvents: 'none', zIndex: 10
-                  }}>
-                    {positions.map(pos => (
-                      <span key={pos} style={{
-                        background: 'var(--gold)', color: 'black', borderRadius: '50%',
-                        width: '18px', height: '18px', fontSize: '0.65rem', fontWeight: 900,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        lineHeight: 1, boxShadow: '0 2px 4px rgba(0,0,0,0.5)', border: '1px solid black'
-                      }}>{pos}</span>
-                    ))}
-                  </div>
-                )}
+                <div className="sitelen-watermark">{word.word}</div>
+                <div className="vocab-card__word">{word.word}</div>
+                <div className="vocab-card__pos">{getPartOfSpeechAbbreviation(word.partOfSpeech)}</div>
+                {selectionCounter}
               </div>
             );
-          })}
-        </div>
-      ) : (
-        <div className="mastery-grid__table-wrapper" style={{ overflowX: 'auto', background: 'rgba(0,0,0,0.2)', borderRadius: '8px', border: '1px solid #222' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
-            <thead>
-              <tr style={{ textAlign: 'left', borderBottom: '1px solid #333', color: '#888' }}>
-                <th style={{ padding: '12px 16px' }}>STATUS</th>
-                <th style={{ padding: '12px 16px' }}>WORD</th>
-                <th style={{ padding: '12px 16px' }}>FUNCTION</th>
-                <th style={{ padding: '12px 16px' }}>MEANINGS</th>
-                <th style={{ padding: '12px 16px' }}>SESSION NOTES</th>
-              </tr>
-            </thead>
-            <tbody>
-              {displayed.map((word) => {
-                const isFilterDimmed = activeFilter && word.status !== activeFilter;
-                const isSelected = selectedWords.includes(word.word);
-                const posIndex = selectedWords.indexOf(word.word) + 1;
+          }
 
-                return (
-                  <tr 
-                    key={word.id}
-                    onClick={() => handleCardClick(word)}
-                    onContextMenu={(e) => { e.preventDefault(); handleCardLongPress(word); }}
-                    style={{ 
-                      cursor: 'pointer',
-                      borderBottom: '1px solid #222',
-                      background: isSelected ? 'rgba(255, 191, 0, 0.1)' : 'transparent',
-                      opacity: isFilterDimmed ? 0.3 : 1,
-                      transition: 'background 0.2s'
-                    }}
-                  >
-                    <td style={{ padding: '12px 16px', textAlign: 'center', fontSize: '1.2rem' }}>
-                      {STATUS_META[word.status].emoji}
-                    </td>
-                    <td style={{ padding: '12px 16px', fontWeight: 900, color: 'white' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        {word.word}
-                        {posIndex > 0 && (
-                           <span style={{ background: 'var(--gold)', color: 'black', borderRadius: '50%', width: '18px', height: '18px', fontSize: '0.65rem', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{posIndex}</span>
-                        )}
-                      </div>
-                    </td>
-                    <td style={{ padding: '12px 16px', color: 'var(--gold)', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase' }}>
-                      {word.type === 'grammar' ? 'GRAMMAR' : word.partOfSpeech}
-                    </td>
-                    <td style={{ padding: '12px 16px', color: '#ccc', fontWeight: 700 }}>
-                      {word.meanings.split(/[;,]/)[0].trim()}
-                    </td>
-                    <td style={{ padding: '12px 16px', color: 'var(--text-muted)', fontSize: '0.75rem', fontStyle: 'italic', lineHeight: '1.4' }}>
-                      {word.sessionNotes || '-'}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
+          if (gridDensity === 'crystal') {
+            return (
+              <div 
+                key={word.id} 
+                className={`vocab-crystal-card vocab-crystal-card--${word.status}`}
+                onClick={() => handleWordTap(word)}
+                onContextMenu={(e) => handleLongPress(e, word)}
+                onTouchStart={() => handleTouchStart(word)}
+                onTouchEnd={handleTouchEnd}
+                style={{ opacity: isDimmed ? 0.3 : 1 }}
+              >
+                <div className="sitelen-watermark">{word.word}</div>
+                <div className="vocab-crystal-word">{word.word}</div>
+                <div className="vocab-crystal-en">{word.meanings.split(/[;,]/)[0].trim()}</div>
+                {word.examples && word.examples.length > 0 && (
+                  <div className="vocab-crystal-example">"{word.examples[0].tp}"</div>
+                )}
+                <div className="vocab-crystal-stats">{getPartOfSpeechAbbreviation(word.partOfSpeech)} | {word.baseScore} XP</div>
+                {selectionCounter}
+              </div>
+            );
+          }
+
+          if (gridDensity === 'datapad') {
+            return (
+              <div 
+                key={word.id} 
+                className={`vocab-datapad-block vocab-datapad-block--${word.status}`}
+                onClick={() => handleWordTap(word)}
+                onContextMenu={(e) => handleLongPress(e, word)}
+                onTouchStart={() => handleTouchStart(word)}
+                onTouchEnd={handleTouchEnd}
+                style={{ opacity: isDimmed ? 0.3 : 1 }}
+              >
+                <div className="sitelen-watermark">{word.word}</div>
+                
+                <div className="datapad-column">
+                  <div className="datapad-section-title">Concept</div>
+                  <div className="datapad-word">{word.word}</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '2px' }}>
+                    {word.partOfSpeech.split(',').map((p, pIdx) => (
+                      <span key={pIdx} className={`pos-tag pos-tag--${p.toLowerCase().trim()[0]}`}>
+                        {p.trim()}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="datapad-en">{word.meanings}</div>
+                  <div style={{ marginTop: '8px', fontSize: '0.7rem', fontWeight: 900, color: 'white' }}>
+                    LEVEL {Math.floor(word.baseScore / 100)} • {word.baseScore} XP
+                  </div>
+                </div>
+
+                <div className="datapad-column">
+                  <div className="datapad-section-title">Neural Logs</div>
+                  <div className="datapad-notes">
+                    {word.sessionNotes || "No active session logs for this node."}
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
+                    <div className="datapad-meta">
+                      <span>Used {word.useCount}x</span>
+                      <span>{STATUS_META[word.status].label}</span>
+                    </div>
+                    <div style={{ fontSize: '1.2rem' }}>{STATUS_ICONS[word.status]}</div>
+                  </div>
+                </div>
+                {selectionCounter}
+              </div>
+            );
+          }
+
+          return null;
+        })}
+      </div>
 
       <WordDetailDrawer
         isOpen={!!drawerId}

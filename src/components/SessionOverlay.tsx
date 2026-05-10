@@ -2,6 +2,8 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, AlertCircle } from 'lucide-react';
 import { useMasteryStore } from '../store/masteryStore';
+import DualDrillMode from './DualDrillMode';
+import ConfusionDrill from './ConfusionDrill';
 
 // We inline a simple sentence unscramble drill here.
 const BuilderDrill = ({ 
@@ -137,6 +139,40 @@ export const SessionOverlay: React.FC<{ onAskLina?: (p: string) => void }> = ({ 
   if (!activeActivity) return null;
 
   const { type, nodeId } = activeActivity;
+
+  // Handle special nodes
+  if (nodeId === 'training-pit') {
+    return (
+      <div className="fixed inset-0 z-[10001] bg-black/95 backdrop-blur-3xl flex items-center justify-center p-6">
+         {Math.random() > 0.5 ? (
+           <DualDrillMode onClose={() => setActiveActivity(null)} isSandboxMode={false} />
+         ) : (
+           <ConfusionDrill onClose={() => setActiveActivity(null)} />
+         )}
+      </div>
+    );
+  }
+
+  if (nodeId === 'hub' && type === 'word-scramble') {
+     return (
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-3xl z-[100] flex flex-col overflow-y-auto">
+          <div className="flex justify-end p-6">
+            <button onClick={() => setActiveActivity(null)} className="p-3 bg-white/5 border border-white/10 rounded-full text-white/40 hover:text-white hover:bg-white/10 transition-all">
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+          <div className="flex-1 flex items-center justify-center p-6">
+            <BuilderDrill 
+              nodeId="hub" 
+              requiredVocabIds={[]} 
+              onComplete={() => setActiveActivity(null)}
+              onSkip={() => setActiveActivity(null)}
+            />
+          </div>
+        </div>
+     );
+  }
+
   const node = curriculums.flatMap(l => l.nodes).find(n => n.id === nodeId);
   
   if (!node) {

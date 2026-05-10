@@ -17,6 +17,7 @@ import { curriculumRoadmap } from '../data/curriculum';
 import { vocabContent } from '../data/vocabContent';
 import { TOKI_PONA_DICTIONARY, WORD_FREQUENCY } from '../data/tokiPonaDictionary';
 import aiVocabCache from '../data/aiVocabCache.json';
+import { initialPhrasebook } from '../data/phrasebook';
 
 const KU_SULI_WORDS = new Set(['kokosila', 'lanpan', 'misikeke', 'epiku', 'jasima', 'kijetesantakalu', 'leko', 'linluwi', 'nja', 'oke', 'soko', 'tonsi', 'usawi', 'yupekosi', 'meso', 'namako', 'oko', 'kipisi']);
 
@@ -54,12 +55,15 @@ function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: Maste
     return normalizePartOfSpeech(v.partOfSpeech || '');
   })();
 
-  // Build initial roleMatrix from partOfSpeech
-  const roles = derivedPartOfSpeech.split(',').map(p => p.trim().toLowerCase()).filter(Boolean);
-  const roleKeys = roles.map(r => r === 'modifier' ? 'mod' : r);
-  const scorePerRole = roleKeys.length > 0 ? Math.floor(score / roleKeys.length) : 0;
-  const roleMatrix: Record<string, number> = {};
-  roleKeys.forEach(k => { roleMatrix[k] = scorePerRole; });
+  const roles = (derivedPartOfSpeech || '').split(',').map(p => p.trim().toLowerCase()).filter(Boolean);
+  const scorePerRole = roles.length > 0 ? Math.floor(score / roles.length) : 0;
+  const initialScores: PartOfSpeechScores = { noun: 0, verb: 0, modifier: 0, particle: 0 };
+  roles.forEach(r => {
+    if (r === 'noun') initialScores.noun = scorePerRole;
+    else if (r === 'verb') initialScores.verb = scorePerRole;
+    else if (r === 'modifier' || r === 'mod') initialScores.modifier = scorePerRole;
+    else if (r === 'particle') initialScores.particle = scorePerRole;
+  });
 
   return {
     id: v.word,
@@ -75,8 +79,7 @@ function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: Maste
     frequencyRank: v.frequencyRank ?? 999,
     isMasteryCandidate: false,
     sessionNotes: v.sessionNotes,
-    partOfSpeechScores: { noun: 0, verb: 0, modifier: 0 },
-    roleMatrix: roleMatrix as any,
+    partOfSpeechScores: initialScores,
     lastReviewed: new Date().toISOString(),
     scoreHistory: [],
     hardened: false,
@@ -154,21 +157,10 @@ const defaultSongs = [
   }
 ];
 
-const defaultCommonPhrases = [
-  { category: "GREETINGS", tp: "toki!", en: "Hello / Hi" },
-  { category: "GREETINGS", tp: "sina pilin seme?", en: "How are you?" },
-  { category: "GREETINGS", tp: "mi tawa", en: "Goodbye (I am leaving)" },
-  { category: "SOCIAL", tp: "nimi mi li jan User", en: "My name is User" },
-  { category: "SOCIAL", tp: "mi kama sona e toki pona", en: "I'm learning Toki Pona" },
-  { category: "POLITE", tp: "sina pona", en: "Thank you / You are good" },
-  { category: "POLITE", tp: "mi pakala", en: "I'm sorry / I messed up" },
-  { category: "POLITE", tp: "ale li pona", en: "Everything is good" },
-  { category: "FEELINGS", tp: "mi pilin pona", en: "I feel good / happy" },
-  { category: "FEELINGS", tp: "mi pilin seli", en: "I feel hot / angry" }
-];
+const defaultCommonPhrases = initialPhrasebook;
 
 interface MasteryActions {
-  applyScoreUpdate: (nodeId: string, points: number, context: string) => void;
+  applyScoreUpdate: (nodeId: string, points: number, context: string, targetRole?: PosRole) => void;
   calculateDecay: () => void;
   applyScoreDeltas: (deltas: { wordId: string; delta: number }[]) => void;
   updateVocabStatus: (wordIdOrText: string, status: MasteryStatus) => void;
@@ -176,6 +168,7 @@ interface MasteryActions {
   setLastUpdated: (date: string) => void;
   savePhrase: (phrase: string | SavedPhrase) => void;
   recordActivity: () => void;
+  syncPhrasebook: () => void;
   setStudentName: (name: string) => void;
   updateProfile: (profile: Partial<UserProfile>) => void;
   setReviewVibe: (vibe: ReviewVibe) => void;
@@ -260,6 +253,7 @@ interface MasteryActions {
   saveComposition: (text: string, translation?: string) => void;
   hydrateStoreFromExternalData: (data: any) => void;
   completeBossFight: (wordIds: string[]) => void;
+  recalibrateXP: (wordId: string) => void;
 }
 
 interface MasteryState {
@@ -319,6 +313,11 @@ interface MasteryState {
   currentChallenge: WeeklyChallenge | null;
   completedChallenges: WeeklyChallenge[];
   pendingRankAcknowledgement: string | null;
+
+  // Feature Flag State Persistence
+  drills: any[];
+  quizzes: any[];
+  linaChat: any[];
 }
 
 type MasteryStore = MasteryState & MasteryActions;
@@ -432,6 +431,11 @@ export const useMasteryStore = create<MasteryStore>()(
       currentChallenge: null,
       completedChallenges: [],
       pendingRankAcknowledgement: null,
+
+      // Initial Feature Flags
+      drills: [],
+      quizzes: [],
+      linaChat: [],
 
       setHasCompletedSetup: (val) => { set({ hasCompletedSetup: val }); void get().syncToCloud(); },
 
@@ -608,7 +612,7 @@ export const useMasteryStore = create<MasteryStore>()(
         masteryHistory: [{ label, change, timestamp: new Date().toISOString() }, ...(state.masteryHistory || [])].slice(0, 50)
       })),
 
-      applyScoreUpdate: (nodeId, points, context) => {
+      applyScoreUpdate: (nodeId, points, context, targetRole) => {
         const now = new Date().toISOString();
         set((state) => {
           const vocab = state.vocabulary.map((w) => {
@@ -622,15 +626,30 @@ export const useMasteryStore = create<MasteryStore>()(
             const totalDrop = Math.abs(recentDrops.reduce((acc, h) => acc + h.change, 0));
             const isBleeding = totalDrop > 50;
 
-            // Distribute points equally across the word's actual roles
             const roleParts = (w.partOfSpeech || '').split(',').map((p: string) => p.trim().toLowerCase()).filter(Boolean);
-            const roleKeys = roleParts.map((r: string) => r === 'modifier' ? 'mod' : r);
-            const pointsPerRole = roleKeys.length > 0 ? Math.floor(points / roleKeys.length) : 0;
-            const maxPerRole = roleKeys.length > 0 ? Math.floor(maxScore / roleKeys.length) : maxScore;
-            const newRoleMatrix = { ...(w.roleMatrix || {}) };
-            roleKeys.forEach((key: string) => {
-              newRoleMatrix[key] = clamp((newRoleMatrix[key] || 0) + pointsPerRole, 0, maxPerRole);
-            });
+            const roleKeys = roleParts.map((r: string) => {
+              if (r === 'noun') return 'noun';
+              if (r === 'verb') return 'verb';
+              if (r === 'modifier' || r === 'mod' || r === 'adjective' || r === 'adverb') return 'modifier';
+              if (r === 'particle') return 'particle';
+              return null;
+            }).filter(Boolean) as (keyof PartOfSpeechScores)[];
+
+            const newScores = { ...(w.partOfSpeechScores || { noun: 0, verb: 0, modifier: 0, particle: 0 }) };
+            
+            if (targetRole && roleKeys.includes(targetRole.toLowerCase() as any)) {
+              // Targeted Role Update
+              const key = targetRole.toLowerCase() as keyof PartOfSpeechScores;
+              const maxPerRole = Math.floor(maxScore / roleKeys.length);
+              newScores[key] = clamp((newScores[key] || 0) + points, 0, maxPerRole);
+            } else if (roleKeys.length > 0) {
+              // Distributed Update
+              const pointsPerRole = Math.floor(points / roleKeys.length);
+              const maxPerRole = Math.floor(maxScore / roleKeys.length);
+              roleKeys.forEach(k => {
+                newScores[k] = clamp((newScores[k] || 0) + pointsPerRole, 0, maxPerRole);
+              });
+            }
 
             return {
               ...w,
@@ -641,7 +660,7 @@ export const useMasteryStore = create<MasteryStore>()(
               scoreHistory: [historyEntry, ...(w.scoreHistory || [])].slice(0, 5),
               useCount: w.useCount + 1,
               isBleeding,
-              roleMatrix: newRoleMatrix
+              partOfSpeechScores: newScores
             };
           });
 
@@ -748,11 +767,18 @@ export const useMasteryStore = create<MasteryStore>()(
 
             // Distribute XP delta equally across the word's actual roles
             const roles = (w.partOfSpeech || '').split(',').map(p => p.trim().toLowerCase()).filter(Boolean);
-            const roleKeys = roles.map(r => r === 'modifier' ? 'mod' : r);
+            const roleKeys = roles.map(r => {
+              if (r === 'noun') return 'noun';
+              if (r === 'verb') return 'verb';
+              if (r === 'modifier' || r === 'mod' || r === 'adjective' || r === 'adverb') return 'modifier';
+              if (r === 'particle') return 'particle';
+              return null;
+            }).filter(Boolean) as (keyof PartOfSpeechScores)[];
+            
             const pointsPerRole = roleKeys.length > 0 ? Math.floor(effectiveDelta / roleKeys.length) : 0;
-            const newRoleMatrix = { ...((w as any).roleMatrix || {}) };
-            roleKeys.forEach(key => {
-              newRoleMatrix[key] = clamp((newRoleMatrix[key] || 0) + pointsPerRole, 0, Math.floor(maxScore / roleKeys.length));
+            const newScores = { ...(w.partOfSpeechScores || { noun: 0, verb: 0, modifier: 0, particle: 0 }) };
+            roleKeys.forEach(k => {
+              newScores[k] = clamp((newScores[k] || 0) + pointsPerRole, 0, Math.floor(maxScore / roleKeys.length));
             });
 
             const historyReason = (pendingComebackBonus && idx === 0) ? 'manual_delta + comeback_bonus' : 'manual_delta';
@@ -771,7 +797,7 @@ export const useMasteryStore = create<MasteryStore>()(
               confidenceScore: newScore,
               status: newStatus,
               useCount: (w.useCount ?? 0) + 1,
-              roleMatrix: newRoleMatrix,
+              partOfSpeechScores: newScores,
               lastReviewed: now,
               scoreHistory: [{ date: now, change: effectiveDelta, reason: historyReason }, ...(w.scoreHistory || [])].slice(0, 5)
             };
@@ -910,6 +936,10 @@ export const useMasteryStore = create<MasteryStore>()(
             }
           }));
         }
+      },
+
+      syncPhrasebook: () => {
+        set({ commonPhrases: initialPhrasebook });
       },
 
       recordLearningDay: (date) => {
@@ -2242,6 +2272,36 @@ export const useMasteryStore = create<MasteryStore>()(
         }));
         get().refreshCurriculumStatus();
         void get().syncToCloud();
+      },
+
+      recalibrateXP: (wordId) => {
+        set((state) => ({
+          vocabulary: state.vocabulary.map(w => {
+            if (w.id === wordId || w.word === wordId) {
+              const roles = (w.partOfSpeech || '').split(',').map(p => p.trim().toLowerCase()).filter(Boolean);
+              if (roles.length === 0) return w;
+
+              const roleKeys = roles.map(r => {
+                if (r === 'noun') return 'noun';
+                if (r === 'verb') return 'verb';
+                if (r === 'modifier' || r === 'mod' || r === 'adjective' || r === 'adverb') return 'modifier';
+                if (r === 'particle') return 'particle';
+                return null;
+              }).filter(Boolean) as (keyof PartOfSpeechScores)[];
+
+              if (roleKeys.length === 0) return w;
+
+              const currentTotal = Object.values(w.partOfSpeechScores).reduce((a, b) => a + b, 0);
+              if (currentTotal !== w.baseScore) {
+                const distributed = Math.floor(w.baseScore / roleKeys.length);
+                const newScores = { noun: 0, verb: 0, modifier: 0, particle: 0 };
+                roleKeys.forEach(k => { newScores[k] = distributed; });
+                return { ...w, partOfSpeechScores: newScores };
+              }
+            }
+            return w;
+          })
+        }));
       },
     }),
 // ─── MIGRATION SYSTEM ────────────────────────────────────────────────────────

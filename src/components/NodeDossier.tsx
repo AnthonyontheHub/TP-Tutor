@@ -329,6 +329,52 @@ export default function NodeDossier({ node, onBack, onAskLina, isSandboxMode, on
           )}
 
           <section style={{ marginTop: '20px', paddingBottom: '60px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
+              <button 
+                onClick={handlePracticeLina}
+                style={{ 
+                  background: 'rgba(255,255,255,0.03)', 
+                  border: '1px solid var(--gold)', 
+                  color: 'var(--gold)',
+                  padding: '16px',
+                  borderRadius: '12px',
+                  fontWeight: 900,
+                  fontSize: '0.8rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px'
+                }}
+              >
+                💬 CONSULT ADVISOR
+              </button>
+              
+              <button 
+                onClick={() => {
+                  if (onLaunchActivity) onLaunchActivity(node.id, 'prove-it');
+                }}
+                disabled={!isReady}
+                style={{ 
+                  background: isReady ? 'var(--gold-liquid)' : 'rgba(255,255,255,0.02)', 
+                  border: isReady ? 'none' : '1px solid #333', 
+                  color: isReady ? 'black' : '#555',
+                  padding: '16px',
+                  borderRadius: '12px',
+                  fontWeight: 900,
+                  fontSize: '0.8rem',
+                  cursor: isReady ? 'pointer' : 'not-allowed',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  boxShadow: isReady ? '0 0 20px var(--gold-glow)' : 'none'
+                }}
+              >
+                🎯 PROVE IT
+              </button>
+            </div>
+
             <button 
               onClick={() => {
                 if (onLaunchActivity) {

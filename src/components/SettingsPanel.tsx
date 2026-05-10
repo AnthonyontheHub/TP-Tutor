@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import { useAuthStore } from '../store/authStore';
+import { exportToMarkdown, importFromMarkdown } from '../utils/markdownSync';
 
 export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSandboxMode, onOpenLogbook, onOpenSessionHistory, onOpenMasteryCourt, onOpenStoicArchive }: {
   isOpen: boolean;
@@ -16,9 +17,11 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
     resetAsNewUser, masterAllVocab, randomizeVocab, isMainProfile,
     knowledgeCheckFrequency, setKnowledgeCheckFrequency, clearAllSavedPhrases,
     resetLearningProgress,
-    vocabulary, profile, studentName, currentStreak, getStatusSummary
+    vocabulary, profile, studentName, currentStreak, getStatusSummary,
+    hydrateStoreFromExternalData
   } = useMasteryStore();
   const { logout } = useAuthStore();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [localSandbox, setLocalSandbox] = useState(isSandboxMode);
   const [localApiKey, setLocalApiKey] = useState(localStorage.getItem('TP_GEMINI_KEY') || '');
@@ -69,6 +72,24 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
     }
     setPendingAction(null);
     setConfirmInput('');
+  };
+
+  const handleImportData = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const content = event.target?.result as string;
+        const data = importFromMarkdown(content);
+        hydrateStoreFromExternalData(data);
+        alert('Data imported successfully.');
+        onClose();
+      } catch (err: any) {
+        alert('Import failed: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
   };
 
   const handleExportDataSummary = () => {
@@ -161,12 +182,39 @@ ${confidentWords}
               📖 STOIC ARCHIVE
             </button>
           )}
+        </div>
+      </section>
+
+      <section style={{ marginBottom: '40px' }}>
+        <h2 style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--gold)', letterSpacing: '0.15em', marginBottom: '20px', opacity: 0.8 }}>DATA BACKUP & RESTORE</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px' }}>
           <button
-            onClick={handleExportDataSummary}
+            onClick={() => exportToMarkdown(useMasteryStore.getState())}
             className="btn-review"
             style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', color: 'white' }}
           >
-            🗄️ EXPORT DATA SUMMARY (.md)
+            🗄️ EXPORT FULL BACKUP (.md)
+          </button>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="btn-review"
+            style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', color: 'white' }}
+          >
+            📥 IMPORT BACKUP (.md)
+          </button>
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            style={{ display: 'none' }} 
+            accept=".md" 
+            onChange={handleImportData} 
+          />
+          <button
+            onClick={handleExportDataSummary}
+            className="btn-review"
+            style={{ width: '100%', background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border)', color: '#888', fontSize: '0.65rem' }}
+          >
+            📄 EXPORT SUMMARY ONLY (.md)
           </button>
         </div>
       </section>
@@ -270,10 +318,6 @@ ${confidentWords}
           ))}
         </div>
       </section>
-
-      <button onClick={onClose} className="btn-review" style={{ width: '100%', marginTop: '20px' }}>
-        CLOSE SETTINGS
-      </button>
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { type MasteryStatus } from '../types/mastery';
 
 interface Props {
   onAskLina: (prompt: string) => void;
+  onSnooze: () => void;
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -22,7 +23,7 @@ const INTERVALS: Record<MasteryStatus, number> = {
   mastered: 21,
 };
 
-export default function SRSWidget({ onAskLina }: Props) {
+export default function SRSWidget({ onAskLina, onSnooze }: Props) {
   const { vocabulary, getDueWords } = useMasteryStore();
   
   const dueWords = useMemo(() => getDueWords(), [vocabulary, getDueWords]);
@@ -38,9 +39,26 @@ export default function SRSWidget({ onAskLina }: Props) {
   return (
     <div className="glass-panel" style={{ padding: '16px', marginBottom: '16px' }}>
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-        <h3 className="section-title" style={{ margin: 0, fontSize: '0.75rem', letterSpacing: '0.1em' }}>
-          REVIEW QUEUE
-        </h3>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <h3 className="section-title" style={{ margin: 0, fontSize: '0.75rem', letterSpacing: '0.1em' }}>
+            REVIEW QUEUE
+          </h3>
+          <button 
+            onClick={onSnooze}
+            style={{ 
+              background: 'rgba(255,255,255,0.05)', 
+              border: '1px solid var(--border)', 
+              color: '#888', 
+              fontSize: '0.55rem', 
+              padding: '2px 6px', 
+              borderRadius: '4px', 
+              cursor: 'pointer',
+              fontWeight: 800
+            }}
+          >
+            SNOOZE 4H
+          </button>
+        </div>
         <div style={{ 
           background: totalDueCount > 0 ? 'var(--gold)' : 'transparent',
           color: totalDueCount > 0 ? 'black' : 'var(--text-muted)',

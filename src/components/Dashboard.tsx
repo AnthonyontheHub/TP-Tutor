@@ -1,15 +1,14 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { BookOpen, Map as MapIcon, Library, Sword, LineChart, Activity } from 'lucide-react';
 import { useMasteryStore } from '../store/masteryStore';
-import { fetchCompositionGrade, resolveApiKey, stringifyUserContext, detectSessionTitle, fetchQuickTranslation, buildOfflineTranslation } from '../services/linaService';
-import { exportToMarkdown, importFromMarkdown } from '../utils/markdownSync';
+import { resolveApiKey, fetchQuickTranslation, buildOfflineTranslation } from '../services/linaService';
 import ProgressSummary from './ProgressSummary';
 import MasteryGrid from './MasteryGrid';
 import PhraseGrid from './PhraseGrid';
 import CurriculumRoadmap from './CurriculumRoadmap';
 import SentenceBuilder from './SentenceBuilder';
 import ProveIt from './ProveIt';
-import ChallengeWidget from './ChallengeWidget';
 import TrainingHub from './TrainingHub';
 import FlashcardMode from './FlashcardMode';
 import DualDrillMode from './DualDrillMode';
@@ -20,8 +19,10 @@ import BossFightMode from './BossFightMode';
 import OperationalIntelligenceWidget from './OperationalIntelligenceWidget';
 import InfoTooltip from './InfoTooltip';
 import SRSWidget from './SRSWidget';
+import InsightLedger from './InsightLedger';
 import { SessionOverlay } from './SessionOverlay';
-import type { VocabWord, MasteryStatus, SavedPhrase, DashboardView } from '../types/mastery';
+import { getPhrasesByCategory } from '../utils/phraseEngine';
+import type { VocabWord, MasteryStatus, DashboardView, PhrasebookEntry } from '../types/mastery';
 import type { AppPanel } from '../App';
 
 export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSandboxMode, chatCount }: {
@@ -31,19 +32,38 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   isSandboxMode: boolean;
   chatCount: number;
 }) {
-  const { studentName, profile, profileImage, currentStreak, vocabulary, curriculums, reviewVibe, setReviewVibe, selectedWords, setSelectedWords, savePhrase, lessonFilter, setLessonFilter, calculateDecay, checkAssessments, knowledgeCheckFrequency, lastKnowledgeCheckDate, setLastKnowledgeCheckDate, currentPositionNodeId, recordActivityCompletion, activeActivity, setActiveActivity, addLoreEntry, calculateReadinessScore } = useMasteryStore();
+  const { 
+    studentName, profile, profileImage, currentStreak, vocabulary, curriculums, 
+    reviewVibe, setReviewVibe, selectedWords, setSelectedWords, lessonFilter, 
+    setLessonFilter, calculateDecay, checkAssessments, knowledgeCheckFrequency, 
+    lastKnowledgeCheckDate, setLastKnowledgeCheckDate, 
+    recordActivityCompletion, activeActivity, setActiveActivity, 
+    calculateReadinessScore, getStatusSummary, songs, commonPhrases, 
+    addWordToSelection, getDueWords, syncPhrasebook, masteryHistory
+  } = useMasteryStore();
+  
+  const summary = getStatusSummary();
+
+  useEffect(() => {
+    if (commonPhrases.length < 20) {
+      syncPhrasebook();
+    }
+  }, []);
 
   const [activeView, setActiveView] = useState<DashboardView>('vocab');
+  const [archiveSubView, setArchiveSubView] = useState<'saved' | 'book' | 'songs'>('saved');
+  const [selectedAlbumId, setSelectedAlbumId] = useState<string | null>(null);
+  const [selectedTrackIdx, setSelectedTrackIdx] = useState<number | null>(null);
+  const [activeLore, setActiveLore] = useState<PhrasebookEntry | null>(null);
+  const [queueSnoozedUntil, setQueueSnoozedUntil] = useState<number>(0);
+  
   const [showTrainingHub, setShowTrainingHub] = useState(false);
   const [showFlashcards, setShowFlashcards] = useState(false);
   const [showDualDrill, setShowDualDrill] = useState(false);
   const [showConfusionDrill, setShowConfusionDrill] = useState(false);
   const [showComposition, setShowComposition] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
-  const [showLoreModal, setShowLoreModal] = useState(false);
-  const [loreInput, setLoreInput] = useState('');
-  const [showLoreToast, setShowLoreToast] = useState(false);
-  const [showSyncRestore, setShowSyncRestore] = useState(false);
+  const [showInsightLog, setShowInsightLog] = useState(false);
   const [showBossFight, setShowBossFight] = useState(false);
   const [bossFightWords, setBossFightWords] = useState<string[]>([]);
   const [showDrillsMenu, setShowDrillsMenu] = useState(false);
@@ -65,6 +85,29 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   const [showProveIt, setShowProveIt] = useState(false);
   const [externalPhrase, setExternalPhrase] = useState<{ tp: string; en: string } | null>(null);
   const confirmTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowSaveNote(false);
+        setAssessmentWord(null);
+        setShowProveIt(false);
+        setActiveLore(null);
+        setShowTrainingHub(false);
+        setShowFlashcards(false);
+        setShowDualDrill(false);
+        setShowConfusionDrill(false);
+        setShowComposition(false);
+        setShowAnalytics(false);
+        setShowInsightLog(false);
+        setShowBossFight(false);
+        setShowDrillsMenu(false);
+        setSelectedWords([]);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [setSelectedWords]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -201,6 +244,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   };
 
   const handleSaveSentence = () => {
+    const { savePhrase } = useMasteryStore.getState();
     const tp = externalPhrase ? externalPhrase.tp : selectedWords.join(' ');
     const en = externalPhrase ? externalPhrase.en : (translation ?? '');
     savePhrase({ id: tp, tp, en, notes: saveNoteInput });
@@ -250,59 +294,10 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
           flex-shrink: 0;
         }
 
-        .dashboard__control-bar {
-          display: flex;
-          flex-direction: column;
-          background: var(--surface);
-          border: 1px solid var(--border);
-          border-top-left-radius: 4px;
-          border-top-right-radius: 4px;
-          padding: 4px;
-          gap: 4px;
-          margin-bottom: 0; /* Connected to grid toolbar */
-        }
-
-        .dashboard__quick-actions {
-          display: flex;
-          gap: 8px;
-          margin-top: 12px;
-          margin-bottom: 12px;
-        }
-
-        @media (min-width: 768px) {
-          .dashboard__header {
-            padding: 0 20px;
-          }
-          .dashboard__control-bar {
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-          }
-          .dashboard__tabs {
-            flex: 1;
-            max-width: 400px;
-          }
-          .dashboard__review-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-          }
-        }
-
         @keyframes gradient-shift {
           0% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
           100% { background-position: 0% 50%; }
-        }
-
-        .pulse {
-          animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-          0% { transform: scale(1); opacity: 1; }
-          50% { transform: scale(1.05); opacity: 0.8; }
-          100% { transform: scale(1); opacity: 1; }
         }
       `}</style>
 
@@ -366,24 +361,92 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
             onAskLina={onAskLina}
             onOpenAchievements={() => onTogglePanel('achievements')}
           />
-          
+
           <button 
-            onClick={() => {
-              exportToMarkdown(useMasteryStore.getState());
-              setShowSyncRestore(true);
-            }} 
+            onClick={() => setShowTrainingHub(true)} 
             className="dashboard__icon-btn" 
             style={{ width: '32px', height: '32px', fontSize: '0.9rem', marginRight: '4px' }}
-            title="Backup Data"
+            title="GARRISON (Training Hub)"
           >
-            💾
+            <Sword size={18} color="var(--gold)" />
+          </button>
+
+          <button 
+            onClick={() => setShowAnalytics(true)} 
+            className="dashboard__icon-btn" 
+            style={{ width: '32px', height: '32px', fontSize: '0.9rem', marginRight: '4px' }}
+            title="STRATEGIC READOUT (Analytics)"
+          >
+            <LineChart size={18} color="var(--gold)" />
+          </button>
+
+          <button 
+            onClick={() => onTogglePanel('instructions')} 
+            className="dashboard__icon-btn" 
+            style={{ ...getActiveStyle('instructions'), width: '32px', height: '32px', fontSize: '0.9rem', marginRight: '4px' }}
+          >
+            ?
           </button>
           
           <button onClick={() => onTogglePanel('settings')} className="dashboard__icon-btn" style={{ ...getActiveStyle('settings'), width: '32px', height: '32px', fontSize: '0.9rem' }}>⚙️</button>
         </div>
       </header>
 
-      <main className="dashboard__main" style={{ paddingBottom: '12rem' }}>
+      <main className="dashboard__main" style={{ paddingBottom: '80px' }}>
+        <div className="ritual-core-container">
+          <div className="hologram-wing">
+            <span className="hologram-label">RANK</span>
+            <span className="hologram-value">{summary.rankTitle}</span>
+          </div>
+
+          {(() => {
+            const score = calculateReadinessScore();
+            const pulseDuration = 4 - (score / 33);
+            return (
+              <motion.button
+                onClick={handleDailyReview}
+                animate={{ 
+                  scale: [1, 1.08, 1],
+                  opacity: [0.7, 1, 0.7]
+                }}
+                transition={{
+                  duration: pulseDuration,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                style={{
+                  width: '180px',
+                  height: '180px',
+                  borderRadius: '50%',
+                  background: 'var(--gold-liquid)',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 0 40px var(--gold-glow)',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  flexShrink: 0
+                }}
+              >
+                <span style={{ fontSize: '2.5rem', fontWeight: 900, color: 'black', lineHeight: 1 }}>{score}%</span>
+                <span style={{ fontSize: '0.7rem', fontWeight: 900, color: 'black', letterSpacing: '0.2em', marginTop: '4px' }}>ACTIVATE</span>
+              </motion.button>
+            );
+          })()}
+
+          <div 
+            className="hologram-wing" 
+            onClick={() => setShowInsightLog(true)}
+            style={{ cursor: 'pointer' }}
+          >
+            <span className="hologram-label">NEURAL XP</span>
+            <span className="hologram-value">LEVEL {summary.level} • {summary.xp} XP</span>
+          </div>
+        </div>
+
         {(() => {
           const bossCandidates = vocabulary.filter(v => v.baseScore >= 850 && v.status !== 'mastered');
           if (bossCandidates.length === 0) return null;
@@ -428,264 +491,12 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
           );
         })()}
 
-        {(() => {
-          const score = calculateReadinessScore();
-          const isLow = score < 50;
-          const isHigh = score >= 80;
-          return (
-            <div style={{
-              background: isLow ? 'rgba(212,175,55,0.1)' : 'rgba(255,255,255,0.02)',
-              border: `1px solid ${isLow ? 'var(--gold)' : 'var(--border)'}`,
-              borderRadius: '8px',
-              padding: '12px 16px',
-              marginBottom: '16px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              boxShadow: isLow ? '0 0 15px rgba(212,175,55,0.2)' : 'none',
-              opacity: isHigh ? 0.6 : 1,
-              transition: 'all 0.3s ease'
-            }}>
-              <div>
-                <div style={{ fontSize: '0.7rem', fontWeight: 900, letterSpacing: '0.1em', color: isLow ? 'var(--gold)' : 'var(--text-muted)' }}>
-                  RITUAL READINESS
-                </div>
-                <div style={{ fontSize: '0.85rem', color: isLow ? 'var(--gold)' : (isHigh ? 'var(--text-muted)' : 'white'), marginTop: '2px' }}>
-                  {isLow ? "SYSTEM READY FOR OPTIMIZATION." : isHigh ? "NEURAL PATHWAYS STABLE." : "MAINTAINING EQUILIBRIUM."}
-                </div>
-              </div>
-              <div style={{ fontSize: '1.5rem', fontWeight: 900, color: isLow ? 'var(--gold)' : 'white', textShadow: isLow ? '0 0 10px rgba(212,175,55,0.5)' : 'none' }}>
-                {score}%
-              </div>
-            </div>
-          );
-        })()}
-
-        <ProgressSummary activeFilter={activeFilter} onFilterClick={setActiveFilter} />
-
-        <div className="dashboard__quick-actions">
-          <button 
-            onClick={() => setShowTrainingHub(true)} 
-            className="btn-toggle" 
-            style={{ 
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              background: 'rgba(255,255,255,0.03)',
-              border: '1px solid var(--border)',
-              borderRadius: '4px',
-              flex: 1
-            }}
-          >
-            🎮 TRAINING HUB
-          </button>
-
-          <button 
-            onClick={() => setShowAnalytics(true)} 
-            className="btn-toggle" 
-            style={{ 
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              background: 'rgba(255,255,255,0.03)',
-              border: '1px solid var(--border)',
-              borderRadius: '4px',
-              flex: 1
-            }}
-          >
-            📊 ANALYTICS
-          </button>
-
-          <button 
-            onClick={() => setShowLoreModal(true)} 
-            className="btn-toggle" 
-            style={{ 
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              background: 'rgba(255,255,255,0.03)',
-              border: '1px solid var(--border)',
-              borderRadius: '4px',
-              flex: 1
-            }}
-          >
-            📝 LOG EVENT
-          </button>
-
-
-          <div style={{ position: 'relative', flex: 1 }} ref={drillsMenuRef}>
-            <button
-              onClick={() => setShowDrillsMenu(!showDrillsMenu)}
-              className="btn-toggle"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                background: showDrillsMenu ? 'rgba(255,191,0,0.1)' : 'rgba(255,255,255,0.03)',
-                border: `1px solid ${showDrillsMenu ? 'var(--gold)' : 'var(--border)'}`,
-                borderRadius: '4px',
-                width: '100%',
-                height: '100%',
-                color: showDrillsMenu ? 'var(--gold)' : 'white'
-              }}
-            >
-              ⚔️ DRILLS
-            </button>
-
-            <AnimatePresence>
-              {showDrillsMenu && (
-                <motion.div
-                  initial={{ opacity: 0, y: -8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  style={{
-                    position: 'absolute',
-                    top: '100%',
-                    left: 0,
-                    minWidth: '200px',
-                    background: 'var(--surface-opaque)',
-                    border: '1px solid var(--border)',
-                    borderRadius: '8px',
-                    marginTop: '8px',
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.6)',
-                    zIndex: 8000,
-                    overflow: 'hidden'
-                  }}
-                >
-                  {[
-                    { label: '🃏 FLASHCARDS', action: () => setShowFlashcards(true) },
-                    { label: '⚔️ DUAL DRILL', action: () => setShowDualDrill(true) },
-                    { label: '🧠 CONFUSION', action: () => setShowConfusionDrill(true) },
-                    { label: '✍️ COMPOSE', action: () => setShowComposition(true) },
-                  ].map((item, idx, arr) => (
-                    <button
-                      key={item.label}
-                      onClick={() => { item.action(); setShowDrillsMenu(false); }}
-                      style={{
-                        width: '100%',
-                        padding: '14px 20px',
-                        fontSize: '0.75rem',
-                        fontWeight: 900,
-                        letterSpacing: '0.1em',
-                        textAlign: 'left',
-                        background: 'transparent',
-                        color: 'white',
-                        border: 'none',
-                        borderBottom: idx === arr.length - 1 ? 'none' : '1px solid var(--border)',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s'
-                      }}
-                      onMouseOver={(e) => {
-                        e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
-                        e.currentTarget.style.color = 'var(--gold)';
-                      }}
-                      onMouseOut={(e) => {
-                        e.currentTarget.style.background = 'transparent';
-                        e.currentTarget.style.color = 'white';
-                      }}
-                    >
-                      {item.label}
-                    </button>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <button onClick={() => setShowProveIt(true)} className="dashboard__icon-btn" style={{ width: '42px', height: '42px', borderRadius: '4px' }} title="Prove It Drill">🎯</button>
-            <InfoTooltip text="Prove It: Take a word offline, write a sentence, and submit it. jan Lina will review it in your next chat." />
-          </div>
-          <button onClick={() => onTogglePanel('instructions')} className="dashboard__icon-btn" style={{ ...getActiveStyle('instructions'), width: '42px', height: '42px', borderRadius: '4px' }}>?</button>
-        </div>
-
-        {activeView === 'vocab' && <SRSWidget onAskLina={onAskLina} />}
-
-        {/* Unified Control Bar */}
-        <div className="dashboard__control-bar">
-          {/* Tab Switcher */}
-          <div className="dashboard__tabs" style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr 1fr',
-            gap: '4px',
-            width: '100%',
-            boxSizing: 'border-box'
-          }}>
-            <button
-              onClick={() => setActiveView('vocab')}
-              style={{
-                margin: 0, width: '100%', border: 'none', borderRadius: '2px',
-                background: activeView === 'vocab' ? 'var(--gold)' : 'transparent',
-                color: activeView === 'vocab' ? 'black' : '#888',
-                fontWeight: 900, fontSize: '0.7rem', padding: '8px 4px', cursor: 'pointer',
-                letterSpacing: '0.05em'
-              }}
-            >
-              VOCAB
-            </button>
-            <button
-              onClick={() => setActiveView('roadmap')}
-              style={{
-                margin: 0, width: '100%', border: 'none', borderRadius: '2px',
-                background: activeView === 'roadmap' ? 'var(--gold)' : 'transparent',
-                color: activeView === 'roadmap' ? 'black' : '#888',
-                fontWeight: 900, fontSize: '0.7rem', padding: '8px 4px', cursor: 'pointer',
-                letterSpacing: '0.05em'
-              }}
-            >
-              ROADMAP
-            </button>
-            <button
-              onClick={() => setActiveView('archive')}
-              style={{
-                margin: 0, width: '100%', border: 'none', borderRadius: '2px',
-                background: activeView === 'archive' ? 'var(--gold)' : 'transparent',
-                color: activeView === 'archive' ? 'black' : '#888',
-                fontWeight: 900, fontSize: '0.7rem', padding: '8px 4px', cursor: 'pointer',
-                letterSpacing: '0.05em'
-              }}
-            >
-              ARCHIVE
-            </button>
-          </div>
-
-          {/* Review Controls Group */}
-          <div className="dashboard__review-group" style={{ display: 'flex', alignItems: 'center', gap: '4px', width: '100%' }}>
-            <InfoTooltip text="Review Vibes (Chill/Deep/Intense) change their behavior based on whether you are in the Vocab, Roadmap, or Archive tab." />
-            <button
-              onClick={handleDailyReview}
-              className="btn-review"
-              style={{ flex: '1', minWidth: 0, marginBottom: 0, padding: '8px 10px', fontSize: '0.7rem', fontWeight: 900, whiteSpace: 'nowrap' }}
-            >
-              {activeView === 'vocab' ? '⚡ PRACTICE' :
-               activeView === 'archive' ? '⚡ ARCHIVE' : '🚀 ROADMAP'}
-            </button>
-            <div style={{ display: 'flex', flex: 1.5, background: 'rgba(255,255,255,0.03)', borderRadius: '2px', padding: '2px', border: '1px solid rgba(255,255,255,0.05)', gap: '2px', minWidth: 0 }}>
-              <button
-                onClick={() => setReviewVibe(reviewVibe === 'chill' ? null : 'chill')}
-                style={{ flex: 1, border: 'none', background: reviewVibe === 'chill' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'chill' ? 'black' : '#666', borderRadius: '2px', padding: '4px 2px', fontSize: '0.65rem', fontWeight: 900, cursor: 'pointer', minWidth: 0 }}
-              >
-                {activeView === 'vocab' ? 'CHILL' : activeView === 'archive' ? 'SAVES' : 'NEW'}
-              </button>
-              <button
-                onClick={() => setReviewVibe(reviewVibe === 'deep' ? null : 'deep')}
-                style={{ flex: 1, border: 'none', background: reviewVibe === 'deep' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'deep' ? 'black' : '#666', borderRadius: '2px', padding: '4px 2px', fontSize: '0.65rem', fontWeight: 900, cursor: 'pointer', minWidth: 0 }}
-              >
-                {activeView === 'vocab' ? 'DEEP' : activeView === 'archive' ? 'EVERYDAY' : 'REVIEW'}
-              </button>
-              <button
-                onClick={() => setReviewVibe(reviewVibe === 'intense' ? null : 'intense')}
-                style={{ flex: 1, border: 'none', background: reviewVibe === 'intense' ? 'var(--gold)' : 'transparent', color: reviewVibe === 'intense' ? 'black' : '#666', borderRadius: '2px', padding: '4px 2px', fontSize: '0.65rem', fontWeight: 900, cursor: 'pointer', minWidth: 0 }}
-              >
-                {activeView === 'vocab' ? 'INTENSE' : activeView === 'archive' ? 'DISCO' : 'QUIZ'}
-              </button>
-            </div>
-          </div>
-        </div>
+        {activeView === 'vocab' && getDueWords().length > 0 && Date.now() >= queueSnoozedUntil && (
+          <SRSWidget 
+            onAskLina={onAskLina} 
+            onSnooze={() => setQueueSnoozedUntil(Date.now() + 14400000)}
+          />
+        )}
 
         {/* Main Viewport */}
         <div className="dashboard__content-area" style={{ position: 'relative', display: 'flex', flexDirection: 'column', flex: 1, minHeight: '60vh' }}>
@@ -726,18 +537,21 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
               style={{ display: 'flex', flexDirection: 'column', flex: 1, width: '100%' }}
             >
               {activeView === 'vocab' && (
-                <MasteryGrid
-                  onAskLina={onAskLina}
-                  isSandboxMode={isSandboxMode}
-                  activeFilter={activeFilter}
-                  sortMode={sortMode}
-                  sortDirection={sortDirection}
-                  posFilter={posFilter}
-                  setSortMode={setSortMode}
-                  setSortDirection={setSortDirection}
-                  setPosFilter={setPosFilter}
-                  onSavePhrase={handleOpenExternalPhrase}
-                />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <ProgressSummary activeFilter={activeFilter} onFilterClick={setActiveFilter} />
+                  <MasteryGrid
+                    onAskLina={onAskLina}
+                    isSandboxMode={isSandboxMode}
+                    activeFilter={activeFilter}
+                    sortMode={sortMode}
+                    sortDirection={sortDirection}
+                    posFilter={posFilter}
+                    setSortMode={setSortMode}
+                    setSortDirection={setSortDirection}
+                    setPosFilter={setPosFilter}
+                    onSavePhrase={handleOpenExternalPhrase}
+                  />
+                </div>
               )}
               {activeView === 'roadmap' && (
                 <CurriculumRoadmap 
@@ -750,13 +564,150 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
               )}
               {activeView === 'archive' && (
                 <div style={{ padding: '0' }}>
-                  <PhraseGrid
-                    onAskLina={onAskLina}
-                    activeFilter={activeFilter}
-                    selectedWords={selectedWords}
-                    focusPhraseId={focusPhraseId}
-                    clearFocusPhrase={() => setFocusPhraseId(null)}
-                  />
+                  <div className="archive-sub-nav">
+                    <button 
+                      className={archiveSubView === 'saved' ? 'active' : ''} 
+                      onClick={() => setArchiveSubView('saved')}
+                    >
+                      SAVED
+                    </button>
+                    <button 
+                      className={archiveSubView === 'book' ? 'active' : ''} 
+                      onClick={() => setArchiveSubView('book')}
+                    >
+                      BOOK
+                    </button>
+                    <button 
+                      className={archiveSubView === 'songs' ? 'active' : ''} 
+                      onClick={() => setArchiveSubView('songs')}
+                    >
+                      SONGS
+                    </button>
+                  </div>
+
+                  {archiveSubView === 'saved' && (
+                    <PhraseGrid
+                      onAskLina={onAskLina}
+                      activeFilter={activeFilter}
+                      selectedWords={selectedWords}
+                      focusPhraseId={focusPhraseId}
+                      clearFocusPhrase={() => setFocusPhraseId(null)}
+                    />
+                  )}
+
+                  {archiveSubView === 'book' && (
+                    <div style={{ padding: '0 10px' }}>
+                      {(() => {
+                        const groupedPhrases = getPhrasesByCategory(commonPhrases);
+                        return Object.entries(groupedPhrases).map(([category, phrases]) => (
+                          <div key={category} className="phrase-category-container">
+                            <h3 className="phrase-category-title">{category}</h3>
+                            <div className="phrase-grid">
+                              {phrases.map((phrase: PhrasebookEntry, idx: number) => (
+                                <div 
+                                  key={idx} 
+                                  className="lore-tablet"
+                                  onClick={() => setActiveLore(phrase)}
+                                >
+                                  <div className="lore-tablet-tp">{phrase.tp}</div>
+                                  <div className="lore-tablet-en">{phrase.en}</div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ));
+                      })()}
+                    </div>
+                  )}
+
+                  {archiveSubView === 'songs' && (
+                    <div style={{ padding: '0 10px' }}>
+                      {!selectedAlbumId ? (
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                          {songs.map((album) => (
+                            <div 
+                              key={album.id} 
+                              className="album-slate"
+                              onClick={() => setSelectedAlbumId(album.id)}
+                            >
+                              <div style={{ fontSize: '1.2rem', marginBottom: '8px' }}>💿</div>
+                              <div style={{ fontSize: '0.7rem', fontWeight: 900 }}>{album.title}</div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : selectedTrackIdx === null ? (
+                        <div>
+                          <button 
+                            onClick={() => setSelectedAlbumId(null)}
+                            style={{ background: 'none', border: 'none', color: 'var(--gold)', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer', marginBottom: '16px', textTransform: 'uppercase', letterSpacing: '0.1em' }}
+                          >
+                            ← BACK TO ALBUMS
+                          </button>
+                          <h2 style={{ fontSize: '1rem', fontWeight: 900, color: 'white', marginBottom: '20px', letterSpacing: '0.1em' }}>
+                            {songs.find(s => s.id === selectedAlbumId)?.title}
+                          </h2>
+                          <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            {songs.find(s => s.id === selectedAlbumId)?.tracks.map((track, idx) => (
+                              <div 
+                                key={idx} 
+                                className="track-row"
+                                onClick={() => setSelectedTrackIdx(idx)}
+                              >
+                                <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>{idx + 1}. {track.title}</span>
+                                <span style={{ opacity: 0.4 }}>→</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ) : (
+                        <div>
+                          <button 
+                            onClick={() => setSelectedTrackIdx(null)}
+                            style={{ background: 'none', border: 'none', color: 'var(--gold)', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer', marginBottom: '16px', textTransform: 'uppercase', letterSpacing: '0.1em' }}
+                          >
+                            ← BACK TO TRACKS
+                          </button>
+                          <h2 style={{ fontSize: '1rem', fontWeight: 900, color: 'white', marginBottom: '4px' }}>
+                            {songs.find(s => s.id === selectedAlbumId)?.tracks[selectedTrackIdx].title}
+                          </h2>
+                          <div style={{ fontSize: '0.65rem', color: 'var(--gold)', fontWeight: 800, marginBottom: '24px', opacity: 0.6 }}>
+                            TAP WORDS TO ADD TO BUILDER
+                          </div>
+                          
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                            {songs.find(s => s.id === selectedAlbumId)?.tracks[selectedTrackIdx].blocks.map((block, bIdx) => (
+                              <div key={bIdx}>
+                                <div style={{ fontSize: '0.6rem', color: '#666', fontWeight: 900, marginBottom: '8px', textTransform: 'uppercase' }}>{block.title}</div>
+                                <div style={{ fontSize: '1.1rem', fontWeight: 900, color: 'white', lineHeight: 1.4, marginBottom: '4px' }}>
+                                  {block.tp.split(' ').map((word, wIdx) => (
+                                    <span 
+                                      key={wIdx} 
+                                      className="lyric-word"
+                                      onClick={() => addWordToSelection(word.replace(/[.,!?]/g, ''))}
+                                    >
+                                      {word}
+                                    </span>
+                                  ))}
+                                </div>
+                                <div style={{ fontSize: '0.8rem', color: '#888', fontStyle: 'italic' }}>{block.en}</div>
+                              </div>
+                            ))}
+                          </div>
+
+                          <button 
+                            onClick={() => {
+                              const track = songs.find(s => s.id === selectedAlbumId)?.tracks[selectedTrackIdx];
+                              onAskLina(`[SYSTEM: Let's analyze the lyrics for "${track?.title}" from the album "${songs.find(s => s.id === selectedAlbumId)?.title}".]`);
+                            }}
+                            className="btn-review"
+                            style={{ width: '100%', marginTop: '40px' }}
+                          >
+                            ASK LINA TO ANALYZE
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
             </motion.div>
@@ -778,7 +729,11 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
 
         <AnimatePresence>
           {showSaveNote && (
-            <div className="modal-backdrop" style={{ zIndex: 5001 }}>
+            <div 
+              className="modal-backdrop" 
+              style={{ zIndex: 5001, backdropFilter: 'blur(12px)' }}
+              onClick={() => setShowSaveNote(false)}
+            >
               <motion.div 
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -813,13 +768,18 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
           )}
 
           {assessmentWord && (
-            <div className="modal-backdrop" style={{ zIndex: 3000 }}>
+            <div 
+              className="modal-backdrop" 
+              style={{ zIndex: 3000, backdropFilter: 'blur(12px)' }}
+              onClick={() => setAssessmentWord(null)}
+            >
               <motion.div 
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
                 className="glass-panel"
                 style={{ width: '90%', maxWidth: '400px', textAlign: 'center', border: '1px solid var(--gold)' }}
+                onClick={e => e.stopPropagation()}
               >
                 <h2 style={{ color: 'var(--gold)', marginBottom: '10px' }}>KNOWLEDGE CHECK</h2>
                 <p>jan Lina wants to verify your mastery of <strong>{assessmentWord.word}</strong>.</p>
@@ -839,7 +799,11 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
           )}
 
           {showProveIt && (
-            <div className="modal-backdrop" style={{ zIndex: 5001 }}>
+            <div 
+              className="modal-backdrop" 
+              style={{ zIndex: 5001, backdropFilter: 'blur(12px)' }}
+              onClick={() => setShowProveIt(false)}
+            >
               <motion.div 
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -850,132 +814,153 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
               </motion.div>
             </div>
           )}
-
-          {showLoreModal && (
-            <div className="modal-backdrop" style={{ zIndex: 5001 }}>
-              <motion.div 
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                className="glass-panel"
-                style={{ width: '90%', maxWidth: '400px', border: '1px solid var(--gold)' }}
-                onClick={e => e.stopPropagation()}
-              >
-                <h3 style={{ color: 'var(--gold)', marginBottom: '15px' }}>LOG LIFE EVENT</h3>
-                <div style={{ marginBottom: '10px', fontSize: '0.8rem', color: '#ccc', lineHeight: 1.4 }}>
-                  Log a quick real-world event so jan Lina can reference it in your next conversation.
-                </div>
-                <textarea 
-                  value={loreInput} 
-                  onChange={e => setLoreInput(e.target.value)}
-                  placeholder="e.g. Sirius caught a fly today..."
-                  style={{ width: '100%', height: '80px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', borderRadius: '4px', color: 'white', padding: '10px', marginBottom: '15px', resize: 'none' }}
-                  autoFocus
-                />
-                <div style={{ display: 'flex', gap: '8px' }}>
-                   <button 
-                    onClick={() => {
-                      if (loreInput.trim()) {
-                        addLoreEntry(loreInput);
-                        setLoreInput('');
-                        setShowLoreModal(false);
-                        setShowLoreToast(true);
-                        setTimeout(() => setShowLoreToast(false), 3000);
-                      }
-                    }} 
-                    className="btn-review" style={{ flex: 1, margin: 0 }}>
-                    SYNC TO LINA
-                  </button>
-                   <button onClick={() => { setShowLoreModal(false); setLoreInput(''); }} className="btn-toggle" style={{ flex: 1 }}>CANCEL</button>
-                </div>
-              </motion.div>
-            </div>
-          )}
-
-          <AnimatePresence>
-            {showLoreToast && (
-              <motion.div
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 50 }}
-                style={{
-                  position: 'fixed',
-                  bottom: '40px',
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  background: 'var(--gold)',
-                  color: 'black',
-                  padding: '12px 24px',
-                  borderRadius: '30px',
-                  fontWeight: 900,
-                  fontSize: '0.9rem',
-                  letterSpacing: '0.05em',
-                  boxShadow: '0 4px 20px rgba(212,175,55,0.4)',
-                  zIndex: 9999
-                }}
-              >
-                LINA IS REMEMBERING... 🧠
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {showSyncRestore && (
-            <div className="modal-backdrop" style={{ zIndex: 9000 }}>
-              <motion.div 
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                className="glass-panel"
-                style={{ width: '90%', maxWidth: '400px', border: '1px solid var(--gold)', textAlign: 'center' }}
-                onClick={e => e.stopPropagation()}
-              >
-                <div className="sync-modal__body" style={{ padding: '24px', textAlign: 'center' }}>
-                  <div style={{ fontSize: '3rem', marginBottom: '16px' }}>💾</div>
-                  <h3 style={{ margin: '0 0 8px 0', color: 'var(--gold)', letterSpacing: '0.1em' }}>BACKUP GENERATED</h3>
-                  <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: '1.5' }}>
-                    Your neural state has been serialized to a Markdown file. 
-                    Keep this file safe as your primary **Data Backup**.
-                  </p>
-                  
-                  <div style={{ marginTop: '24px', padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid var(--border)' }}>
-                    <p style={{ margin: '0 0 12px 0', fontSize: '0.8rem', color: 'white', fontWeight: 700 }}>
-                      RESTORE FROM BACKUP
-                    </p>
-                    <input 
-                      type="file" 
-                      accept=".md"
-                      onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          const reader = new FileReader();
-                          reader.onload = async (event) => {
-                            try {
-                              const content = event.target?.result as string;
-                              const data = importFromMarkdown(content);
-                              hydrateStoreFromExternalData(data);
-                              alert('Neural pathways successfully restored.');
-                              setShowSyncRestore(false);
-                            } catch (err: any) {
-                              alert(`Failed to restore: ${err.message}`);
-                            }
-                          };
-                          reader.readAsText(file);
-                        }
-                      }}
-                      style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}
-                    />
-                  </div>
-                </div>
-                <button onClick={() => setShowSyncRestore(false)} className="btn-toggle" style={{ width: '100%' }}>CLOSE</button>
-              </motion.div>
-            </div>
-          )}
-
         </AnimatePresence>
       </main>
 
+      <footer className="bottom-nav">
+        <button
+          onClick={() => setActiveView('vocab')}
+          style={{
+            background: 'transparent',
+            border: 'none',
+            color: activeView === 'vocab' ? 'var(--gold)' : '#888',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '4px',
+            fontSize: '0.65rem',
+            fontWeight: 800,
+            cursor: 'pointer'
+          }}
+        >
+          <BookOpen size={24} color={activeView === 'vocab' ? 'var(--gold)' : '#888'} />
+          VOCAB
+        </button>
+        <button
+          onClick={() => setActiveView('roadmap')}
+          style={{
+            background: 'transparent',
+            border: 'none',
+            color: activeView === 'roadmap' ? 'var(--gold)' : '#888',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '4px',
+            fontSize: '0.65rem',
+            fontWeight: 800,
+            cursor: 'pointer'
+          }}
+        >
+          <MapIcon size={24} color={activeView === 'roadmap' ? 'var(--gold)' : '#888'} />
+          ROADMAP
+        </button>
+        <button
+          onClick={() => setActiveView('archive')}
+          style={{
+            background: 'transparent',
+            border: 'none',
+            color: activeView === 'archive' ? 'var(--gold)' : '#888',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '4px',
+            fontSize: '0.65rem',
+            fontWeight: 800,
+            cursor: 'pointer'
+          }}
+        >
+          <Library size={24} color={activeView === 'archive' ? 'var(--gold)' : '#888'} />
+          ARCHIVE
+        </button>
+      </footer>
+
+      <AnimatePresence>
+        {activeLore && (
+          <div 
+            className="modal-backdrop" 
+            style={{ zIndex: 6000, backdropFilter: 'blur(12px)' }}
+            onClick={() => setActiveLore(null)}
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="lore-dossier-content"
+              onClick={e => e.stopPropagation()}
+            >
+              <button 
+                className="close-glyph" 
+                onClick={() => setActiveLore(null)}
+              ></button>
+
+              <span className="dossier-label">LORE DOSSIER • {activeLore.category}</span>
+
+              <div style={{ marginBottom: '24px' }}>
+                <div style={{ fontSize: '2rem', fontWeight: 900, color: 'white', lineHeight: 1.2, marginBottom: '8px' }}>
+                  {activeLore.tp.split(' ').map((word, wIdx) => (
+                    <span 
+                      key={wIdx} 
+                      className="interactive-word"
+                      onClick={() => addWordToSelection(word.replace(/[.,!?]/g, ''))}
+                    >
+                      {word}{' '}
+                    </span>
+                  ))}
+                </div>
+                <div style={{ fontSize: '1.1rem', color: 'var(--gold)', fontWeight: 700 }}>
+                  {activeLore.en}
+                </div>
+              </div>
+
+              {activeLore.literal && (
+                <div style={{ marginBottom: '20px' }}>
+                  <span className="dossier-label">LITERAL DECODING</span>
+                  <div className="dossier-literal">"{activeLore.literal}"</div>
+                </div>
+              )}
+
+              {activeLore.note && (
+                <div style={{ marginBottom: '24px' }}>
+                  <span className="dossier-label">CULTURAL CONTEXT</span>
+                  <div className="phrase-note">{activeLore.note}</div>
+                </div>
+              )}
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: 'auto' }}>
+                <button 
+                  onClick={() => {
+                    const words = activeLore.tp.replace(/[.,!?]/g, '').split(' ');
+                    setSelectedWords(words);
+                    setActiveLore(null);
+                  }}
+                  className="btn-gold"
+                  style={{ width: '100%', margin: 0, fontSize: '0.75rem' }}
+                >
+                  PROJECT TO BUILDER
+                </button>
+                <button 
+                  onClick={() => {
+                    const prompt = `[SYSTEM: Deep dive on Lore Entry. Phrase: "${activeLore.tp}". Meaning: "${activeLore.en}". Literal: "${activeLore.literal}". Note: "${activeLore.note}". Discuss the philosophical implications or usage nuances.]`;
+                    onAskLina(prompt);
+                    setActiveLore(null);
+                  }}
+                  className="btn-review"
+                  style={{ width: '100%', margin: 0, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--gold)', color: 'var(--gold)', fontSize: '0.75rem' }}
+                >
+                  💬 CONSULT JAN LINA
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       <SessionOverlay onAskLina={onAskLina} />
       
+      {showInsightLog && (
+        <InsightLedger onClose={() => setShowInsightLog(false)} />
+      )}
+
       {showTrainingHub && (
         <TrainingHub onClose={() => setShowTrainingHub(false)} onAskLina={onAskLina} />
       )}

@@ -204,6 +204,16 @@ export default function CurriculumRoadmap({ onAskLina, isSandboxMode, onLaunchAc
       <header style={{ textAlign: 'center', marginBottom: '60px', width: '100%', padding: '0 20px' }}>
         <h1 style={{ color: 'var(--gold)', fontWeight: 900, fontSize: '1.2rem', letterSpacing: '0.2em', margin: '0 0 20px 0' }}>NEURAL PATHWAY</h1>
         
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '32px' }}>
+          <button 
+            onClick={() => onLaunchActivity?.('training-pit', 'Drill')}
+            className="btn-review"
+            style={{ padding: '10px 24px', fontSize: '0.75rem', letterSpacing: '0.1em' }}
+          >
+            ⚔️ THE TRAINING PIT
+          </button>
+        </div>
+
         <div style={{ maxWidth: '400px', margin: '0 auto 12px auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center' }}>

@@ -393,15 +393,30 @@ function ModalWrapper({ children, onClose }: { children: React.ReactNode, onClos
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="modal-backdrop"
+      style={{ zIndex: 'var(--z-panel)' }}
       onClick={onClose}
     >
       <motion.div 
-        initial={{ scale: 0.9, y: 20 }}
-        animate={{ scale: 1, y: 0 }}
-        exit={{ scale: 0.9, y: 20 }}
+        initial={{ x: '100%' }}
+        animate={{ x: 0 }}
+        exit={{ x: '100%' }}
+        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
         className="modal-content"
+        style={{ 
+          position: 'absolute', 
+          right: 0, 
+          top: 0, 
+          bottom: 0, 
+          maxHeight: '100vh',
+          height: '100vh',
+          borderRadius: '0',
+          borderRight: 'none',
+          borderTop: 'none',
+          borderBottom: 'none'
+        }}
         onClick={e => e.stopPropagation()}
       >
+        <button className="close-glyph" onClick={onClose}></button>
         {children}
       </motion.div>
     </motion.div>

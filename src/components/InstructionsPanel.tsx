@@ -45,7 +45,6 @@ export default function InstructionsPanel({ onClose }: Props) {
           <h2 style={{ fontSize: '1rem', fontWeight: 900, letterSpacing: '0.15em', color: 'var(--gold)', margin: 0 }}>FIELD GUIDE</h2>
           <p style={{ margin: '4px 0 0 0', fontSize: '0.7rem', color: '#666', fontStyle: 'italic' }}>pona. here's everything you need to know.</p>
         </div>
-        <button onClick={onClose} className="btn-close-glowing">✕</button>
       </header>
 
       <div className="side-panel-content" style={{ padding: '0 0 100px 0' }}>

@@ -103,19 +103,27 @@ export default function FlashcardMode({ onClose, onAskLina, isSandboxMode }: Pro
   const sitelenPona = word.sitelenPona || initialData?.sitelenPona || word.word;
 
   return (
-    <div className="modal-backdrop" style={{ zIndex: 6000, background: 'rgba(0,0,0,0.9)' }}>
-      <div style={{ position: 'absolute', top: '20px', right: '20px', zIndex: 6001 }}>
-        <button type="button" onClick={onClose} style={{ background: 'none', border: '1px solid #555', color: '#ccc', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer', fontWeight: 900 }}>
-          END SESSION
-        </button>
-      </div>
+    <div 
+      className="modal-backdrop" 
+      style={{ zIndex: 6000, background: 'rgba(0,0,0,0.9)' }}
+      onClick={onClose}
+    >
+      <button 
+        type="button" 
+        onClick={onClose} 
+        className="close-glyph"
+        aria-label="Close"
+      >✕</button>
 
       <div style={{ position: 'absolute', top: '20px', left: '20px', color: 'var(--gold)', fontWeight: 900, display: 'flex', alignItems: 'center' }}>
         CARDS STUDIED: {cardsStudied}
         <InfoTooltip text="Got It adds 2 points. Wrong subtracts 5 points." />
       </div>
 
-      <div style={{ width: '100%', maxWidth: '500px', padding: '20px' }}>
+      <div 
+        style={{ width: '100%', maxWidth: '500px', padding: '20px' }}
+        onClick={e => e.stopPropagation()}
+      >
         <AnimatePresence mode="wait">
           {!isFlipped ? (
             <motion.div

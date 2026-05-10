@@ -25,36 +25,12 @@ export default function SentenceBuilder({
   const sentence = selectedWords.join(' ');
   const hasSelection = selectedWords.length > 0;
 
+  if (!hasSelection) return null;
+
   return (
     <AnimatePresence>
-      {!hasSelection ? (
-        <motion.div
-          key="empty-builder"
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 50, opacity: 0 }}
-          style={{
-            position: 'fixed',
-            bottom: '24px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            background: 'rgba(15, 23, 42, 0.6)',
-            backdropFilter: 'blur(8px)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            padding: '8px 24px',
-            borderRadius: '20px',
-            fontSize: '0.75rem',
-            color: '#888',
-            zIndex: 2000,
-            pointerEvents: 'none',
-            whiteSpace: 'nowrap'
-          }}
-        >
-          Select words from the grid to build a sentence.
-        </motion.div>
-      ) : (
-        <motion.div
-          key="active-builder"
+      <motion.div
+        key="active-builder"
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
@@ -120,7 +96,6 @@ export default function SentenceBuilder({
             <IconButton onClick={() => setSelectedWords([])} icon="✕" label="Clear" color="#ef4444" />
           </div>
         </motion.div>
-      )}
     </AnimatePresence>
   );
 }

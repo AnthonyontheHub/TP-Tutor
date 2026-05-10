@@ -24,18 +24,21 @@ const InsightLedger: React.FC<Props> = ({ onClose }) => {
   };
 
   return (
-    <div style={{
-      position: 'fixed',
-      inset: 0,
-      background: 'rgba(0,0,0,0.9)',
-      backdropFilter: 'blur(20px)',
-      zIndex: 10001,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '20px',
-      color: 'white'
-    }}>
+    <div 
+      style={{
+        position: 'fixed',
+        inset: 0,
+        background: 'rgba(0,0,0,0.9)',
+        backdropFilter: 'blur(20px)',
+        zIndex: 10001,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px',
+        color: 'white'
+      }}
+      onClick={onClose}
+    >
       <motion.div 
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -50,17 +53,18 @@ const InsightLedger: React.FC<Props> = ({ onClose }) => {
           boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
           display: 'flex',
           flexDirection: 'column',
-          gap: '20px'
+          gap: '20px',
+          position: 'relative'
         }}
+        onClick={e => e.stopPropagation()}
       >
+        <button 
+          onClick={onClose}
+          className="close-glyph"
+          aria-label="Close"
+        >✕</button>
         <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h2 style={{ fontSize: '1rem', fontWeight: 900, letterSpacing: '0.2em', margin: 0 }}>INSIGHT LOG</h2>
-          <button 
-            onClick={onClose}
-            style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer', padding: '4px' }}
-          >
-            <X size={20} />
-          </button>
         </header>
 
         <div style={{ flex: 1, overflowY: 'auto', paddingRight: '10px' }} className="hide-scrollbar">

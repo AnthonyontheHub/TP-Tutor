@@ -16,26 +16,26 @@ interface Props {
 
 const STATUS_ICONS: Record<MasteryStatus, string> = {
   not_started: '⬜',
-  introduced: '🟣',
-  practicing: '🔵',
-  confident: '🟡',
-  mastered: '✅',
+  introduced: '🔵',
+  practicing: '🟡',
+  confident: '🟢',
+  mastered: '✦',
 };
 
 const RING_COLOR: Record<MasteryStatus, string> = {
   not_started: '#ffffff',
-  introduced: '#a855f7',
-  practicing: '#3b82f6',
-  confident: '#f59e0b',
-  mastered: '#22c55e',
+  introduced: '#3b82f6',
+  practicing: '#a855f7',
+  confident: '#22c55e',
+  mastered: '#ffbf00',
 };
 
 const GLOW_COLOR: Record<MasteryStatus, string> = {
   not_started: 'rgba(255, 255, 255, 0.4)',
-  introduced: 'rgba(168, 85, 247, 0.6)',
-  practicing: 'rgba(59, 130, 246, 0.6)',
-  confident: 'rgba(245, 158, 11, 0.6)',
-  mastered: 'rgba(34, 197, 94, 0.85)',
+  introduced: 'rgba(59, 130, 246, 0.6)',
+  practicing: 'rgba(168, 85, 247, 0.6)',
+  confident: 'rgba(34, 197, 94, 0.6)',
+  mastered: 'rgba(255, 191, 0, 0.85)',
 };
 
 export default function VocabCard({ word, onLongPress, onClick, isSandboxMode, isDimmed, isSelected, isRelated }: Props) {

@@ -21,22 +21,22 @@ export const STATUS_META: Record<
     meaning: 'Concept has not yet been introduced (0-200 pts).',
   },
   introduced: {
-    emoji: '🟣',
+    emoji: '🔵',
     label: 'INTRODUCED',
     meaning: 'The word is new to you (201-500 pts).',
   },
   practicing: {
-    emoji: '🔵',
+    emoji: '🟡',
     label: 'PRACTICING',
     meaning: "You're using it, but it's not fluid yet (501-750 pts).",
   },
   confident: {
-    emoji: '🟡',
+    emoji: '🟢',
     label: 'CONFIDENT',
     meaning: 'You know it well in most contexts (751-949 pts).',
   },
   mastered: {
-    emoji: '✅',
+    emoji: '✦',
     label: 'MASTERED',
     meaning:
       'The word is now part of your "mental map" (950-1000 pts).',
@@ -50,7 +50,7 @@ export const STATUS_META: Record<
 // 201–500 = 🟣 Introduced
 // 501–750 = 🔵 Practicing
 // 751–949 = 🟡 Confident
-// 950–1000 = ✅ Mastered
+// 950–1000 = ✦ Mastered
 
 export function scoreToStatus(score: number): MasteryStatus {
   if (score >= 950) return 'mastered';
@@ -158,6 +158,7 @@ export interface PartOfSpeechScores {
   noun: number;
   verb: number;
   modifier: number;
+  particle: number;
 }
 
 // ─── Linguistic & Teaching Types ────────────────────────────────────────
@@ -365,6 +366,18 @@ export interface CommonPhrase {
   en: string;
 }
 
+export interface PhrasebookEntry {
+  id: string;
+  category: string;
+  tp: string;
+  en: string;
+  literal?: string;
+  note?: string;
+  coreWords: string[];
+  tags: string[];
+  difficulty: 1 | 2 | 3;
+}
+
 export interface MasteryMap {
   studentName: string;
   profileImage: string;
@@ -437,7 +450,7 @@ export const ALL_BADGES: Badge[] = [
   { id: 'streak_30',        label: 'The Consistent One',   icon: '💎', description: '30-day streak achieved' },
   { id: 'streak_60',        label: 'Relentless',           icon: '🌟', description: '60-day streak achieved' },
   { id: 'streak_100',       label: 'Legendary',            icon: '👑', description: '100-day streak achieved' },
-  { id: 'first_master',     label: 'First Master',         icon: '✅', description: 'First word reached Mastered' },
+  { id: 'first_master',     label: 'First Master',         icon: '✦', description: 'First word reached Mastered' },
   { id: 'ten_masters',      label: 'The Initiate',         icon: '🎯', description: '10 words at Mastered' },
   { id: 'first_hardened',   label: 'Ironclad',             icon: '🛡️', description: 'First word hardened' },
   { id: 'prove_it_5',       label: 'Prove It',             icon: '📝', description: 'Submitted 5 Prove It drills' },
