@@ -67,6 +67,9 @@ const JanLinaPanel: React.FC<Props> = ({
           >
             ✦ RECALL DAILY STOIC
           </button>
+          <p style={{ fontSize: '0.65rem', color: '#666', marginTop: '8px', textAlign: 'center', fontStyle: 'italic' }}>
+            Use this to resume your daily philosophy ritual or enter Deep Study mode.
+          </p>
         </section>
 
         <section style={{ marginBottom: '32px' }}>

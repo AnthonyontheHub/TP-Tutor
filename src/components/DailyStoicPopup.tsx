@@ -27,7 +27,16 @@ export default function DailyStoicPopup() {
     }
   }, [user, fetchTodayQuote]);
 
-  const displayQuote = todayQuote || { tokiPona: "toki pona li pona", english: "Good speech is good.", author: "Lina", breakdown: "A fallback for testing.", source: "TP-Tutor" };
+  const displayQuote = todayQuote || { 
+    tokiPona: "toki pona li pona", 
+    english: "Good speech is good.", 
+    author: "Lina", 
+    breakdown: "Simplicity leads to clarity of mind.", 
+    source: "TP-Tutor",
+    literalTranslation: "good talk is good",
+    philosopherIntent: "To encourage mindful speech.",
+    lifeApplication: "Speak only when it improves upon silence."
+  };
 
   const now = new Date();
   const currentHour = now.getHours();
@@ -56,8 +65,6 @@ export default function DailyStoicPopup() {
 
   const todayStr = new Date().toISOString().split('T')[0];
   if (manualDismissalDate === todayStr && !showDevOnly) return null;
-
-  console.log("Stoic Popup Phase:", phase);
 
   const handlePhase1Dismiss = () => {
     dismissPhase1();
