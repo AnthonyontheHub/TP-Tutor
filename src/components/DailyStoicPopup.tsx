@@ -45,7 +45,8 @@ export default function DailyStoicPopup() {
     phase = devPhaseOverride;
   }
 
-  if (phase === 0) return null;
+  // If phase is 0, we still render a minimal "Dev Access" version
+  const showDevOnly = phase === 0;
 
   const handlePhase1Dismiss = () => {
     dismissPhase1();
@@ -99,11 +100,11 @@ export default function DailyStoicPopup() {
             position: 'relative'
           }}
         >
-          <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+          <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: showDevOnly ? '0' : '15px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Book size={16} color="var(--gold)" />
               <span style={{ fontSize: '0.7rem', fontWeight: 900, color: 'var(--gold)', letterSpacing: '0.1em' }}>
-                DAILY STOIC {phase === 1 ? '• MORNING' : phase === 2 ? '• CHALLENGE' : '• EVENING'}
+                DAILY STOIC {showDevOnly ? '• DEV ACCESS' : phase === 1 ? '• MORNING' : phase === 2 ? '• CHALLENGE' : '• EVENING'}
               </span>
             </div>
             <button type="button" onClick={() => {
@@ -116,104 +117,108 @@ export default function DailyStoicPopup() {
             </button>
           </header>
 
-          <div style={{ marginBottom: '20px' }}>
-            <p style={{ color: 'white', fontSize: '1.1rem', fontWeight: 500, lineHeight: 1.4, fontStyle: 'italic' }}>
-              "
-              {todayQuote.tokiPona.split(' ').map((word, i) => (
-                <span 
-                  key={i} 
-                  className="interactive-word" 
-                  onClick={() => addWordToSelection(word.replace(/[.,!?]/g, '').toLowerCase())}
-                >
-                  {word}{' '}
-                </span>
-              ))}
-              "
-            </p>
-            {(todayQuote.author || todayQuote.source) && (
-              <div style={{ marginTop: '12px', fontSize: '0.75rem', color: '#888', textAlign: 'right', fontWeight: 700 }}>
-                — {todayQuote.author}{todayQuote.source ? `, ${todayQuote.source}` : ''}
+          {!showDevOnly && (
+            <>
+              <div style={{ marginBottom: '20px' }}>
+                <p style={{ color: 'white', fontSize: '1.1rem', fontWeight: 500, lineHeight: 1.4, fontStyle: 'italic' }}>
+                  "
+                  {todayQuote.tokiPona.split(' ').map((word, i) => (
+                    <span 
+                      key={i} 
+                      className="interactive-word" 
+                      onClick={() => addWordToSelection(word.replace(/[.,!?]/g, '').toLowerCase())}
+                    >
+                      {word}{' '}
+                    </span>
+                  ))}
+                  "
+                </p>
+                {(todayQuote.author || todayQuote.source) && (
+                  <div style={{ marginTop: '12px', fontSize: '0.75rem', color: '#888', textAlign: 'right', fontWeight: 700 }}>
+                    — {todayQuote.author}{todayQuote.source ? `, ${todayQuote.source}` : ''}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
 
-          {phase === 1 && (
-            <button
-              type="button"
-              onClick={handlePhase1Dismiss}
-              className="btn-review"
-              style={{ width: '100%', padding: '10px' }}
-            >
-              UNDERSTOOD
-            </button>
-          )}
-
-          {phase === 2 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <p style={{ fontSize: '0.75rem', color: '#aaa' }}>Translate this back to English:</p>
-              <textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Type your translation..."
-                style={{
-                  width: '100%',
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid #333',
-                  borderRadius: '8px',
-                  color: 'white',
-                  padding: '10px',
-                  fontSize: '0.9rem',
-                  minHeight: '60px',
-                  resize: 'none'
-                }}
-              />
-              <button
-                type="button"
-                onClick={handlePhase2Submit}
-                className="btn-review"
-                style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-              >
-                <Send size={16} />
-                SUBMIT
-              </button>
-              {feedback && (
-                <p style={{ fontSize: '0.75rem', color: 'var(--gold)', marginTop: '5px', whiteSpace: 'pre-wrap', lineHeight: 1.4, background: 'rgba(255,191,0,0.1)', padding: '10px', borderRadius: '4px' }}>{feedback}</p>
+              {phase === 1 && (
+                <button
+                  type="button"
+                  onClick={handlePhase1Dismiss}
+                  className="btn-review"
+                  style={{ width: '100%', padding: '10px' }}
+                >
+                  UNDERSTOOD
+                </button>
               )}
-            </div>
+
+              {phase === 2 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <p style={{ fontSize: '0.75rem', color: '#aaa' }}>Translate this back to English:</p>
+                  <textarea
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="Type your translation..."
+                    style={{
+                      width: '100%',
+                      background: 'rgba(255,255,255,0.05)',
+                      border: '1px solid #333',
+                      borderRadius: '8px',
+                      color: 'white',
+                      padding: '10px',
+                      fontSize: '0.9rem',
+                      minHeight: '60px',
+                      resize: 'none'
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={handlePhase2Submit}
+                    className="btn-review"
+                    style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                  >
+                    <Send size={16} />
+                    SUBMIT
+                  </button>
+                  {feedback && (
+                    <p style={{ fontSize: '0.75rem', color: 'var(--gold)', marginTop: '5px', whiteSpace: 'pre-wrap', lineHeight: 1.4, background: 'rgba(255,191,0,0.1)', padding: '10px', borderRadius: '4px' }}>{feedback}</p>
+                  )}
+                </div>
+              )}
+
+              {phase === 3 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <p style={{ fontSize: '0.75rem', color: '#aaa' }}>Evening Reflection (in Toki Pona):</p>
+                  <textarea
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="toki sina li seme?"
+                    style={{
+                      width: '100%',
+                      background: 'rgba(255,255,255,0.05)',
+                      border: '1px solid #333',
+                      borderRadius: '8px',
+                      color: 'white',
+                      padding: '10px',
+                      fontSize: '0.9rem',
+                      minHeight: '60px',
+                      resize: 'none'
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={handlePhase3Submit}
+                    className="btn-review"
+                    style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                  >
+                    <Sparkles size={16} />
+                    REFLECT
+                  </button>
+                </div>
+              )}
+            </>
           )}
 
-          {phase === 3 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <p style={{ fontSize: '0.75rem', color: '#aaa' }}>Evening Reflection (in Toki Pona):</p>
-              <textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="toki sina li seme?"
-                style={{
-                  width: '100%',
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid #333',
-                  borderRadius: '8px',
-                  color: 'white',
-                  padding: '10px',
-                  fontSize: '0.9rem',
-                  minHeight: '60px',
-                  resize: 'none'
-                }}
-              />
-              <button
-                type="button"
-                onClick={handlePhase3Submit}
-                className="btn-review"
-                style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-              >
-                <Sparkles size={16} />
-                REFLECT
-              </button>
-            </div>
-          )}
-
-          <div style={{ marginTop: '15px', paddingTop: '10px', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', gap: '10px' }}>
+          <div style={{ marginTop: showDevOnly ? '10px' : '15px', paddingTop: '10px', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', gap: '10px' }}>
             <button onClick={() => devReset()} style={{ fontSize: '0.6rem', color: '#666', background: 'none', border: '1px solid #333', padding: '2px 6px', borderRadius: '4px' }}>RESET</button>
             <button onClick={() => dismissPhase1()} style={{ fontSize: '0.6rem', color: 'var(--gold)', background: 'none', border: '1px solid var(--gold)', padding: '2px 6px', borderRadius: '4px' }}>SKIP TO P2</button>
           </div>
