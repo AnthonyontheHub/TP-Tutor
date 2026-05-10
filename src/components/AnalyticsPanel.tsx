@@ -10,7 +10,24 @@ interface AnalyticsPanelProps {
 }
 
 export default function AnalyticsPanel({ isOpen, onClose }: AnalyticsPanelProps) {
-  const { sessionLog, vocabulary } = useMasteryStore();
+  const { sessionLog, vocabulary, profile, updateProfile } = useMasteryStore();
+
+  const handleTogglePings = async () => {
+    if (!profile.ritualPingsEnabled) {
+      if (!('Notification' in window)) {
+        alert('This browser does not support desktop notification');
+        return;
+      }
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        updateProfile({ ritualPingsEnabled: true });
+      } else {
+        alert('Notification permission denied.');
+      }
+    } else {
+      updateProfile({ ritualPingsEnabled: false });
+    }
+  };
 
   // 1. Heatmap Data (Last 30 days)
   const heatmapData = useMemo(() => {
@@ -179,6 +196,25 @@ export default function AnalyticsPanel({ isOpen, onClose }: AnalyticsPanelProps)
                     All words mastered!
                   </div>
                 )}
+              </div>
+            </section>
+
+            {/* Settings */}
+            <section className="space-y-4 pt-4 border-t border-white/10">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-bold text-white/70 uppercase tracking-widest">Settings</h3>
+              </div>
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center justify-between">
+                <div>
+                  <div className="text-white font-bold text-sm">Enable Ritual Pings</div>
+                  <div className="text-white/40 text-xs mt-1">Get morning reminders when Readiness is low</div>
+                </div>
+                <button
+                  onClick={handleTogglePings}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${profile.ritualPingsEnabled ? 'bg-[#D4AF37]' : 'bg-white/10'}`}
+                >
+                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${profile.ritualPingsEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+                </button>
               </div>
             </section>
 

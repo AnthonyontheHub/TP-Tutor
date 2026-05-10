@@ -28,7 +28,7 @@ export type AppPanel = 'profile' | 'settings' | 'instructions' | 'achievements' 
 
 export default function App() {
   const { user, loading } = useAuthStore();
-  const { hasCompletedSetup, isMainProfile } = useMasteryStore();
+  const { hasCompletedSetup, isMainProfile, profile, calculateReadinessScore } = useMasteryStore();
   const rawSessions = useChatStore(s => s.sessions);
   const { addSession, removeSession, updateSession } = useChatStore();
 
@@ -39,6 +39,46 @@ export default function App() {
   const [isSandboxMode, setIsSandboxMode] = useState<boolean>(
     () => localStorage.getItem('tp_sandbox_mode') === 'true'
   );
+  const [showMorningToast, setShowMorningToast] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    
+    // Morning Toast Logic
+    const now = new Date();
+    const isMorning = now.getHours() >= 5 && now.getHours() < 10;
+    const lastToastDate = localStorage.getItem('tp_last_morning_toast');
+    const todayStr = now.toDateString();
+    
+    if (isMorning && lastToastDate !== todayStr) {
+      setShowMorningToast(true);
+      localStorage.setItem('tp_last_morning_toast', todayStr);
+      setTimeout(() => setShowMorningToast(false), 5000); // hide after 5s
+    }
+
+    // Schedule Notification if ritual pings are enabled
+    if (profile.ritualPingsEnabled && ('Notification' in window) && Notification.permission === 'granted') {
+      const score = calculateReadinessScore();
+      if (score < 70) {
+        const pingTime = new Date();
+        pingTime.setHours(7, 15, 0, 0); // 7:15 AM
+        
+        if (now.getTime() > pingTime.getTime()) {
+          pingTime.setDate(pingTime.getDate() + 1);
+        }
+        
+        const timeUntilPing = pingTime.getTime() - now.getTime();
+        
+        const timerId = setTimeout(() => {
+          new Notification('jan Lina', {
+            body: 'telo pimeja li pona. Readiness is low. Time to optimize your neural pathways.',
+          });
+        }, timeUntilPing);
+        
+        return () => clearTimeout(timerId);
+      }
+    }
+  }, [user, profile.ritualPingsEnabled, calculateReadinessScore]);
 
   // Fallback for crypto.randomUUID in non-secure contexts
   const generateId = () => {
@@ -192,6 +232,39 @@ export default function App() {
           SANDBOX MODE ENABLED — LOCAL CHANGES ONLY
         </div>
       )}
+      
+      <AnimatePresence>
+        {showMorningToast && (
+          <motion.div
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            style={{
+              position: 'fixed',
+              top: '40px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              background: '#111',
+              border: '1px solid var(--gold)',
+              color: 'white',
+              padding: '16px 24px',
+              borderRadius: '8px',
+              fontWeight: 800,
+              fontSize: '0.9rem',
+              letterSpacing: '0.05em',
+              boxShadow: '0 4px 20px rgba(212,175,55,0.4)',
+              zIndex: 9999,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px'
+            }}
+          >
+            <span>☕</span>
+            <span>telo pimeja li pona. o pali e sona sina.</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <Dashboard 
         activePanels={activePanels}
         onTogglePanel={togglePanel}

@@ -139,6 +139,7 @@ export interface UserProfile {
 
   // Life Events
   loreLog?: { date: string; text: string }[];
+  ritualPingsEnabled?: boolean;
 
   [key: string]: any; // Added index signature
 }

@@ -256,6 +256,7 @@ interface MasteryActions {
   getDueCount: () => number;
   processFlashcardResult: (wordId: string, isCorrect: boolean) => void;
   addLoreEntry: (text: string) => void;
+  calculateReadinessScore: () => number;
 }
 
 interface MasteryState {
@@ -1433,6 +1434,29 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       getDueCount: () => get().getDueWords().length,
+
+      calculateReadinessScore: () => {
+        const state = get();
+        const dueCount = state.getDueWords().length;
+        
+        const today = new Date().toDateString();
+        const loggedToday = state.profile.loreLog?.some(l => new Date(l.date).toDateString() === today) ? 1 : 0;
+        
+        const activeWords = state.vocabulary.filter(v => v.status === 'practicing' || v.status === 'confident');
+        const avgScore = activeWords.length > 0 
+          ? activeWords.reduce((sum, w) => sum + (w.baseScore || 0), 0) / activeWords.length 
+          : 500;
+          
+        let score = 100;
+        score -= (dueCount * 2);
+        if (!loggedToday) score -= 15;
+        score += (avgScore - 500) / 25;
+        
+        if (score > 100) score = 100;
+        if (score < 0) score = 0;
+        
+        return Math.round(score);
+      },
 
       processFlashcardResult: (wordId, isCorrect) => {
         const now = new Date();

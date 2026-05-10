@@ -32,7 +32,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   isSandboxMode: boolean;
   chatCount: number;
 }) {
-  const { studentName, profile, profileImage, currentStreak, vocabulary, curriculums, reviewVibe, setReviewVibe, selectedWords, setSelectedWords, savePhrase, lessonFilter, setLessonFilter, calculateDecay, checkAssessments, knowledgeCheckFrequency, lastKnowledgeCheckDate, setLastKnowledgeCheckDate, currentPositionNodeId, recordActivityCompletion, activeActivity, setActiveActivity, addLoreEntry } = useMasteryStore();
+  const { studentName, profile, profileImage, currentStreak, vocabulary, curriculums, reviewVibe, setReviewVibe, selectedWords, setSelectedWords, savePhrase, lessonFilter, setLessonFilter, calculateDecay, checkAssessments, knowledgeCheckFrequency, lastKnowledgeCheckDate, setLastKnowledgeCheckDate, currentPositionNodeId, recordActivityCompletion, activeActivity, setActiveActivity, addLoreEntry, calculateReadinessScore } = useMasteryStore();
 
   const [activeView, setActiveView] = useState<DashboardView>('vocab');
   const [showTrainingHub, setShowTrainingHub] = useState(false);
@@ -354,6 +354,39 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
       </header>
 
       <main className="dashboard__main" style={{ paddingBottom: '12rem' }}>
+        {(() => {
+          const score = calculateReadinessScore();
+          const isLow = score < 50;
+          const isHigh = score >= 80;
+          return (
+            <div style={{
+              background: isLow ? 'rgba(212,175,55,0.1)' : 'rgba(255,255,255,0.02)',
+              border: `1px solid ${isLow ? 'var(--gold)' : 'var(--border)'}`,
+              borderRadius: '8px',
+              padding: '12px 16px',
+              marginBottom: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              boxShadow: isLow ? '0 0 15px rgba(212,175,55,0.2)' : 'none',
+              opacity: isHigh ? 0.6 : 1,
+              transition: 'all 0.3s ease'
+            }}>
+              <div>
+                <div style={{ fontSize: '0.7rem', fontWeight: 900, letterSpacing: '0.1em', color: isLow ? 'var(--gold)' : 'var(--text-muted)' }}>
+                  RITUAL READINESS
+                </div>
+                <div style={{ fontSize: '0.85rem', color: isLow ? 'var(--gold)' : (isHigh ? 'var(--text-muted)' : 'white'), marginTop: '2px' }}>
+                  {isLow ? "SYSTEM READY FOR OPTIMIZATION." : isHigh ? "NEURAL PATHWAYS STABLE." : "MAINTAINING EQUILIBRIUM."}
+                </div>
+              </div>
+              <div style={{ fontSize: '1.5rem', fontWeight: 900, color: isLow ? 'var(--gold)' : 'white', textShadow: isLow ? '0 0 10px rgba(212,175,55,0.5)' : 'none' }}>
+                {score}%
+              </div>
+            </div>
+          );
+        })()}
+
         <ProgressSummary activeFilter={activeFilter} onFilterClick={setActiveFilter} />
 
         <div className="dashboard__quick-actions">
