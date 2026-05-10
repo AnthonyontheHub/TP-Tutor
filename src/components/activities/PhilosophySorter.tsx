@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LogOut, HelpCircle } from 'lucide-react';
-import { sorterData } from '../../data/drills';
+import { sorterData, type SorterDrill } from '../../data/drills';
 import { useMasteryStore } from '../../store/masteryStore';
 
 interface PhilosophySorterProps {
@@ -51,12 +51,12 @@ export const PhilosophySorter: React.FC<PhilosophySorterProps> = ({ onSessionEnd
   if (items.length === 0) return null;
 
   return (
-    <div className="max-w-xl mx-auto flex flex-col items-center font-sans">
-      <div className="text-[10px] uppercase tracking-[0.4em] text-cyan-500/50 mb-12">
+    <div className="max-w-lg mx-auto flex flex-col items-center font-sans">
+      <div className="text-[10px] uppercase tracking-[0.4em] text-cyan-500/50 mb-8">
         Sorted: {score} / {total}
       </div>
 
-      <div className="relative w-full h-64 flex items-center justify-center mb-12">
+      <div className="relative w-full h-56 flex items-center justify-center mb-8">
         <AnimatePresence mode="wait" custom={exitDir}>
           {items[currentIndex] && (
             <motion.div
@@ -75,35 +75,35 @@ export const PhilosophySorter: React.FC<PhilosophySorterProps> = ({ onSessionEnd
                 x: custom === 'B' ? 200 : -200,
                 transition: { duration: 0.2 }
               })}
-              className="w-64 h-40 bg-black/60 backdrop-blur-2xl border border-white/10 rounded-3xl flex items-center justify-center p-6 text-center cursor-grab active:cursor-grabbing shadow-2xl relative"
+              className="w-56 h-32 bg-black/60 backdrop-blur-2xl border border-white/10 rounded-2xl flex items-center justify-center p-4 text-center cursor-grab active:cursor-grabbing shadow-2xl relative"
             >
               {onAskLina && (
                 <button 
                   onClick={handleHelp}
-                  className="absolute -top-4 -right-4 p-2 text-white/30 hover:text-cyan-500 transition-colors"
+                  className="absolute -top-3 -right-3 p-2 text-white/30 hover:text-cyan-500 transition-colors"
                   title="Ask Lina for a hint"
                 >
-                  <HelpCircle className="w-6 h-6" />
+                  <HelpCircle className="w-5 h-5" />
                 </button>
               )}
-              <p className="text-xl font-bold text-white/90 uppercase tracking-widest">{items[currentIndex].word}</p>
+              <p className="text-lg font-bold text-white/90 uppercase tracking-widest">{items[currentIndex].word}</p>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      <div className="flex w-full gap-8">
+      <div className="flex w-full gap-4">
         {items.length > 0 && items[currentIndex] ? (
           <>
             <button 
               onClick={() => handleSort('A')} 
-              className="flex-1 py-6 rounded-2xl border border-cyan-500/20 bg-cyan-500/5 text-cyan-400 font-black uppercase tracking-[0.1em] hover:bg-cyan-500/10 hover:border-cyan-500/50 transition-all active:scale-95 text-xs md:text-sm"
+              className="flex-1 py-4 rounded-xl border border-cyan-500/20 bg-cyan-500/5 text-cyan-400 font-black uppercase tracking-[0.1em] hover:bg-cyan-500/10 hover:border-cyan-500/50 transition-all active:scale-95 text-xs md:text-sm"
             >
               {drill.bucketA}
             </button>
             <button 
               onClick={() => handleSort('B')} 
-              className="flex-1 py-6 rounded-2xl border border-rose-500/20 bg-rose-500/5 text-rose-400 font-black uppercase tracking-[0.1em] hover:bg-rose-500/10 hover:border-rose-500/50 transition-all active:scale-95 text-xs md:text-sm"
+              className="flex-1 py-4 rounded-xl border border-rose-500/20 bg-rose-500/5 text-rose-400 font-black uppercase tracking-[0.1em] hover:bg-rose-500/10 hover:border-rose-500/50 transition-all active:scale-95 text-xs md:text-sm"
             >
               {drill.bucketB}
             </button>
