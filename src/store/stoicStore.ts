@@ -14,6 +14,9 @@ export interface StoicQuote {
   author?: string;
   source?: string;
   breakdown?: string;
+  literalTranslation?: string;
+  philosopherIntent?: string;
+  lifeApplication?: string;
 }
 
 export interface StoicState {
@@ -102,6 +105,9 @@ export const useStoicStore = create<StoicStore>()(
               author: analysis.author,
               source: analysis.source,
               breakdown: analysis.breakdown,
+              literalTranslation: analysis.literalTranslation,
+              philosopherIntent: analysis.philosopherIntent,
+              lifeApplication: analysis.lifeApplication,
               date: today
             };
 

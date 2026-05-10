@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useStoicStore } from '../store/stoicStore';
 import { useAuthStore } from '../store/authStore';
 import { useMasteryStore } from '../store/masteryStore';
-import { Book, Send, Sparkles, X } from 'lucide-react';
+import { Book, Send, Sparkles, X, Maximize2, Minimize2 } from 'lucide-react';
+import { TOKI_PONA_DICTIONARY } from '../data/tokiPonaDictionary';
 
 export default function DailyStoicPopup() {
   const { user } = useAuthStore();
@@ -18,6 +19,7 @@ export default function DailyStoicPopup() {
   const [input, setInput] = useState('');
   const [feedback, setFeedback] = useState<string | null>(null);
   const [devPhaseOverride, setDevPhaseOverride] = useState<number | null>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -86,6 +88,76 @@ export default function DailyStoicPopup() {
 
   return (
     <AnimatePresence>
+      {/* Expanded Grand View */}
+      {isExpanded && (
+        <motion.div 
+          initial={{ opacity: 0 }} 
+          animate={{ opacity: 1 }} 
+          exit={{ opacity: 0 }}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.95)', zIndex: 10005, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px', backdropFilter: 'blur(10px)' }}
+        >
+          <div style={{ width: '100%', maxWidth: '1000px', height: '100%', display: 'flex', flexDirection: 'column', gap: '40px' }}>
+            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                <Book size={32} color="var(--gold)" />
+                <h2 style={{ fontSize: '1.5rem', fontWeight: 900, color: 'white', letterSpacing: '0.2em' }}>STOIC DEEP STUDY</h2>
+              </div>
+              <button onClick={() => setIsExpanded(false)} style={{ background: 'none', border: 'none', color: 'var(--gold)', cursor: 'pointer' }}>
+                <Minimize2 size={32} />
+              </button>
+            </header>
+
+            <main style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '40px', paddingRight: '20px' }} className="side-panel-content">
+              {/* Massive Quote Section */}
+              <section style={{ textAlign: 'center' }}>
+                <div className="sitelen-pona" style={{ fontSize: '4rem', color: 'var(--gold)', marginBottom: '20px', lineHeight: 1.2 }}>
+                  {displayQuote.tokiPona}
+                </div>
+                <p style={{ fontSize: '1.8rem', fontWeight: 500, color: 'white', fontStyle: 'italic', lineHeight: 1.4 }}>
+                  "{displayQuote.tokiPona}"
+                </p>
+                {(displayQuote.author || displayQuote.source) && (
+                  <div style={{ marginTop: '15px', fontSize: '1.2rem', color: '#888', fontWeight: 700 }}>
+                    — {displayQuote.author}{displayQuote.source ? `, ${displayQuote.source}` : ''}
+                  </div>
+                )}
+              </section>
+
+              {/* Analytical Columns */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
+                <div className="glass-panel" style={{ padding: '25px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <h3 style={{ fontSize: '0.7rem', color: 'var(--gold)', letterSpacing: '0.2em', marginBottom: '15px', textTransform: 'uppercase' }}>Literal Bridge</h3>
+                  <p style={{ fontSize: '1.1rem', color: '#ccc', lineHeight: 1.6 }}>{displayQuote.literalTranslation || "Parsing word-for-word patterns..."}</p>
+                </div>
+
+                <div className="glass-panel" style={{ padding: '25px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <h3 style={{ fontSize: '0.7rem', color: 'var(--gold)', letterSpacing: '0.2em', marginBottom: '15px', textTransform: 'uppercase' }}>Philosopher's Intent</h3>
+                  <p style={{ fontSize: '1.1rem', color: '#ccc', lineHeight: 1.6 }}>{displayQuote.philosopherIntent || displayQuote.breakdown || "Analyzing authorial core..."}</p>
+                </div>
+
+                <div className="glass-panel" style={{ padding: '25px', border: '1px solid var(--gold)', background: 'rgba(212,175,55,0.05)' }}>
+                  <h3 style={{ fontSize: '0.7rem', color: 'var(--gold)', letterSpacing: '0.2em', marginBottom: '15px', textTransform: 'uppercase' }}>Daily Protocol</h3>
+                  <p style={{ fontSize: '1.1rem', color: 'white', fontWeight: 700, lineHeight: 1.6 }}>{displayQuote.lifeApplication || "Calibrating life application..."}</p>
+                </div>
+              </div>
+
+              {/* Word-by-Word Glossary */}
+              <section>
+                <h3 style={{ fontSize: '0.7rem', color: 'var(--gold)', letterSpacing: '0.2em', marginBottom: '20px', textTransform: 'uppercase' }}>Word-by-Word</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '15px' }}>
+                  {displayQuote.tokiPona.replace(/[.,!?]/g, '').toLowerCase().split(' ').map((word, idx) => (
+                    <div key={idx} style={{ display: 'flex', gap: '10px', alignItems: 'baseline', background: 'rgba(255,255,255,0.02)', padding: '10px', borderRadius: '8px' }}>
+                      <span style={{ color: 'white', fontWeight: 900, fontSize: '1rem' }}>{word}</span>
+                      <span style={{ color: '#666', fontSize: '0.8rem' }}>{TOKI_PONA_DICTIONARY[word] || 'unknown'}</span>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            </main>
+          </div>
+        </motion.div>
+      )}
+
       <div style={{ position: 'fixed', bottom: '80px', right: '20px', zIndex: 9999, display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'flex-end' }}>
         {/* Dev Controls */}
         <div style={{ display: 'flex', gap: '5px', opacity: 0.5 }}>
@@ -116,15 +188,22 @@ export default function DailyStoicPopup() {
                 DAILY STOIC {showDevOnly ? '• DEV ACCESS' : phase === 1 ? '• MORNING' : phase === 2 ? '• CHALLENGE' : '• EVENING'}
               </span>
             </div>
-            <button type="button" onClick={() => {
-              if (showDevOnly) {
-                 setDevPhaseOverride(null);
-              } else {
-                 setManualDismissal(new Date().toISOString().split('T')[0]);
-              }
-            }} style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer', zIndex: 9999 }}>
-              <X size={16} />
-            </button>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              {!showDevOnly && (
+                <button onClick={() => setIsExpanded(true)} style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer' }}>
+                  <Maximize2 size={16} />
+                </button>
+              )}
+              <button type="button" onClick={() => {
+                if (showDevOnly) {
+                   setDevPhaseOverride(null);
+                } else {
+                   setManualDismissal(new Date().toISOString().split('T')[0]);
+                }
+              }} style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer', zIndex: 9999 }}>
+                <X size={16} />
+              </button>
+            </div>
           </header>
 
           {!showDevOnly && (
@@ -146,6 +225,12 @@ export default function DailyStoicPopup() {
                 {(displayQuote.author || displayQuote.source) && (
                   <div style={{ marginTop: '12px', fontSize: '0.75rem', color: '#888', textAlign: 'right', fontWeight: 700 }}>
                     — {displayQuote.author}{displayQuote.source ? `, ${displayQuote.source}` : ''}
+                  </div>
+                )}
+                {phase === 3 && (
+                  <div style={{ marginTop: '15px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '10px' }}>
+                    <p style={{ fontSize: '0.8rem', color: '#aaa', fontStyle: 'italic', marginBottom: '8px' }}>{displayQuote.english}</p>
+                    <p style={{ fontSize: '0.7rem', color: '#666' }}>{displayQuote.literalTranslation}</p>
                   </div>
                 )}
               </div>

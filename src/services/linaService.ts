@@ -726,7 +726,23 @@ export async function fetchStoicAnalysis(apiKey: string, englishQuote: string) {
     model: GEMINI_MODEL,
     generationConfig: { responseMimeType: "application/json" },
   });
-  const prompt = `Translate this quote to Toki Pona: "${englishQuote}". Also identify the likely author and source book. Finally, provide a 1-2 sentence philosophical breakdown connecting the quote to Toki Pona's "nasin pona" (the simple way). Return ONLY valid JSON matching this exact structure: {"tokiPona": "...", "author": "...", "source": "...", "breakdown": "..."}`;
+  const prompt = `Act as jan Lina, a Stoic Toki Pona teacher. 
+  1. Translate this quote to natural Toki Pona: "${englishQuote}".
+  2. Identify the likely author and source book.
+  3. Provide a literal, word-for-word English translation of your Toki Pona version.
+  4. Explain the author's core intent in this quote in 1-2 sentences.
+  5. Provide a practical 1-sentence tip for applying this to modern daily life (Daily Protocol).
+
+  Return ONLY valid JSON matching this structure: 
+  {
+    "tokiPona": "...", 
+    "english": "${englishQuote}",
+    "author": "...", 
+    "source": "...", 
+    "literalTranslation": "...",
+    "philosopherIntent": "...",
+    "lifeApplication": "..."
+  }`;
   try {
     const result = await model.generateContent(prompt);
     return JSON.parse(sanitizeJson(result.response.text()));
