@@ -719,3 +719,19 @@ Instructions:
     };
   }
 }
+
+export async function fetchStoicAnalysis(apiKey: string, englishQuote: string) {
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({
+    model: GEMINI_MODEL,
+    generationConfig: { responseMimeType: "application/json" },
+  });
+  const prompt = `Translate this quote to Toki Pona: "${englishQuote}". Also identify the likely author and source book. Finally, provide a 1-2 sentence philosophical breakdown connecting the quote to Toki Pona's "nasin pona" (the simple way). Return ONLY valid JSON matching this exact structure: {"tokiPona": "...", "author": "...", "source": "...", "breakdown": "..."}`;
+  try {
+    const result = await model.generateContent(prompt);
+    return JSON.parse(sanitizeJson(result.response.text()));
+  } catch (e) {
+    console.error('Stoic analysis error:', e);
+    return null;
+  }
+}

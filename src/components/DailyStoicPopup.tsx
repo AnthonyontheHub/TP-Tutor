@@ -9,7 +9,7 @@ import { Book, Send, Sparkles, X } from 'lucide-react';
 export default function DailyStoicPopup() {
   const { user } = useAuthStore();
   const { todayQuote, fetchTodayQuote, phase1DismissedAt, phase2CompletedAt, phase3CompletedAt, dismissPhase1, completePhase2, completePhase3, devReset } = useStoicStore();
-  const { recordInsight } = useMasteryStore();
+  const { recordInsight, addWordToSelection } = useMasteryStore();
 
   const [input, setInput] = useState('');
   const [feedback, setFeedback] = useState<string | null>(null);
@@ -59,7 +59,7 @@ export default function DailyStoicPopup() {
     
     completePhase2();
     recordInsight('Daily Stoic Challenge', xp);
-    setFeedback(`Great attempt! The original English was: "${todayQuote.english}"`);
+    setFeedback(`Original: "${todayQuote.english}"\n\nNasin Pona: ${todayQuote.breakdown || 'A good lesson in simplicity.'}`);
     setTimeout(() => {
       setFeedback(null);
       setInput('');
@@ -118,8 +118,23 @@ export default function DailyStoicPopup() {
 
           <div style={{ marginBottom: '20px' }}>
             <p style={{ color: 'white', fontSize: '1.1rem', fontWeight: 500, lineHeight: 1.4, fontStyle: 'italic' }}>
-              "{todayQuote.tokiPona}"
+              "
+              {todayQuote.tokiPona.split(' ').map((word, i) => (
+                <span 
+                  key={i} 
+                  className="interactive-word" 
+                  onClick={() => addWordToSelection(word.replace(/[.,!?]/g, '').toLowerCase())}
+                >
+                  {word}{' '}
+                </span>
+              ))}
+              "
             </p>
+            {(todayQuote.author || todayQuote.source) && (
+              <div style={{ marginTop: '12px', fontSize: '0.75rem', color: '#888', textAlign: 'right', fontWeight: 700 }}>
+                — {todayQuote.author}{todayQuote.source ? `, ${todayQuote.source}` : ''}
+              </div>
+            )}
           </div>
 
           {phase === 1 && (
@@ -162,7 +177,7 @@ export default function DailyStoicPopup() {
                 SUBMIT
               </button>
               {feedback && (
-                <p style={{ fontSize: '0.8rem', color: 'var(--gold)', marginTop: '5px' }}>{feedback}</p>
+                <p style={{ fontSize: '0.75rem', color: 'var(--gold)', marginTop: '5px', whiteSpace: 'pre-wrap', lineHeight: 1.4, background: 'rgba(255,191,0,0.1)', padding: '10px', borderRadius: '4px' }}>{feedback}</p>
               )}
             </div>
           )}

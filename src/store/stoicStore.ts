@@ -3,13 +3,17 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { db } from '../services/firebase';
 import { doc, setDoc, getDoc, collection, query, orderBy, getDocs, limit } from 'firebase/firestore';
-import { resolveApiKey, fetchEnglishToTokiPona } from '../services/linaService';
+import { resolveApiKey, fetchStoicAnalysis } from '../services/linaService';
+import { useMasteryStore } from './masteryStore';
 
 export interface StoicQuote {
   id: string; // YYYY-MM-DD
   english: string;
   tokiPona: string;
   date: string;
+  author?: string;
+  source?: string;
+  breakdown?: string;
 }
 
 export interface StoicState {
@@ -66,19 +70,30 @@ export const useStoicStore = create<StoicStore>()(
             const quoteData = JSON.parse(proxyData.contents);
             const english = quoteData.text;
 
-            // Translate via Lina
+            // Translate and Analyze via Lina
             const apiKey = resolveApiKey();
             if (!apiKey) return;
 
-            const tokiPona = await fetchEnglishToTokiPona(apiKey, english);
-            if (!tokiPona) return;
+            const analysis = await fetchStoicAnalysis(apiKey, english);
+            if (!analysis) return;
 
             const newQuote: StoicQuote = {
               id: today,
               english,
-              tokiPona,
+              tokiPona: analysis.tokiPona,
+              author: analysis.author,
+              source: analysis.source,
+              breakdown: analysis.breakdown,
               date: today
             };
+
+            // Auto-save to phrasebook for cross-pollination
+            useMasteryStore.getState().savePhrase({
+              id: analysis.tokiPona,
+              tp: analysis.tokiPona,
+              en: english,
+              notes: `Stoic Archive: ${analysis.author || 'Unknown'} - ${analysis.source || 'Unknown'}`
+            });
 
             // Save to Firestore
             await setDoc(docRef, newQuote);
