@@ -432,6 +432,15 @@ select {
   box-shadow: 0 0 15px var(--gold-glow); 
 }
 
+.vocab-card.is-selected,
+.vocab-ledger-row.is-selected,
+.vocab-crystal-card.is-selected,
+.vocab-datapad-block.is-selected {
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 20px var(--gold) !important;
+  background: rgba(255, 191, 0, 0.15) !important;
+}
+
 .sitelen-watermark {
   position: absolute;
   right: -5%;

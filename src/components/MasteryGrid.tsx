@@ -65,6 +65,12 @@ export default function MasteryGrid({
     }
   }, []);
 
+  const handleLongPressAction = useCallback((e: React.MouseEvent | React.TouchEvent, word: VocabWord) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleWordSelection(word.word);
+  }, [toggleWordSelection]);
+
   // Cycle: ledger -> grid -> crystal -> datapad -> ledger
   const cycleDensity = () => {
     setGridDensity(prev => {
@@ -364,7 +370,7 @@ export default function MasteryGrid({
       </div>
 
       <div style={{ padding: '0 12px 12px 12px', fontSize: '0.75rem', color: '#888', textAlign: 'center', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
-         <span>Tap words to add them to the Sentence Builder. Long-press to multi-select.</span>
+         <span>Tap words to inspect data. Long-press to initiate Sentence Builder.</span>
          <InfoTooltip text="Tap an isolated word, or the DETAILS button inside Flashcards, to view its full dossier and history." />
       </div>
 
@@ -470,9 +476,9 @@ export default function MasteryGrid({
             return (
               <div 
                 key={word.id} 
-                className={`vocab-ledger-row vocab-ledger-row--${word.status}`}
+                className={`vocab-ledger-row vocab-ledger-row--${word.status} ${isSelected ? 'is-selected' : ''}`}
                 onClick={() => handleWordTap(word)}
-                onContextMenu={(e) => handleLongPress(e, word)}
+                onContextMenu={(e) => handleLongPressAction(e, word)}
                 onTouchStart={() => handleTouchStart(word)}
                 onTouchEnd={handleTouchEnd}
                 style={{ opacity: isDimmed ? 0.3 : 1 }}
@@ -493,9 +499,9 @@ export default function MasteryGrid({
             return (
               <div
                 key={word.id}
-                className={`vocab-card vocab-card--${word.status}`}
+                className={`vocab-card vocab-card--${word.status} ${isSelected ? 'is-selected' : ''}`}
                 onClick={() => handleWordTap(word)}
-                onContextMenu={(e) => handleLongPress(e, word)}
+                onContextMenu={(e) => handleLongPressAction(e, word)}
                 onTouchStart={() => handleTouchStart(word)}
                 onTouchEnd={handleTouchEnd}
                 style={{ 
@@ -515,9 +521,9 @@ export default function MasteryGrid({
             return (
               <div 
                 key={word.id} 
-                className={`vocab-crystal-card vocab-crystal-card--${word.status}`}
+                className={`vocab-crystal-card vocab-crystal-card--${word.status} ${isSelected ? 'is-selected' : ''}`}
                 onClick={() => handleWordTap(word)}
-                onContextMenu={(e) => handleLongPress(e, word)}
+                onContextMenu={(e) => handleLongPressAction(e, word)}
                 onTouchStart={() => handleTouchStart(word)}
                 onTouchEnd={handleTouchEnd}
                 style={{ opacity: isDimmed ? 0.3 : 1 }}
@@ -538,9 +544,9 @@ export default function MasteryGrid({
             return (
               <div 
                 key={word.id} 
-                className={`vocab-datapad-block vocab-datapad-block--${word.status}`}
+                className={`vocab-datapad-block vocab-datapad-block--${word.status} ${isSelected ? 'is-selected' : ''}`}
                 onClick={() => handleWordTap(word)}
-                onContextMenu={(e) => handleLongPress(e, word)}
+                onContextMenu={(e) => handleLongPressAction(e, word)}
                 onTouchStart={() => handleTouchStart(word)}
                 onTouchEnd={handleTouchEnd}
                 style={{ opacity: isDimmed ? 0.3 : 1 }}
