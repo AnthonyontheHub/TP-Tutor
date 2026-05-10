@@ -689,11 +689,16 @@ ${contextInstruction}
 
 Instructions:
 1. Grade the composition on: grammar correctness, appropriate word choice, clarity of meaning, and creative use of language.
-2. If the composition is empty or not in Toki Pona, return grade "F" with feedback explaining why.
-3. Return ONLY valid JSON matching this structure:
+2. Provide a "Literal Translation" to show what the Toki Pona actually says.
+3. Identify "Grammar Flags" (issues with 'li', 'e', 'pi', word order).
+4. Perform a "Mastery Check": flag any Toki Pona words used that are NOT in the student's active vocabulary list (they are 'unknown' or 'not_started').
+5. Return ONLY valid JSON matching this structure:
 {
   "overallGrade": "S" | "A" | "B" | "C" | "F",
   "gradeReason": "1-2 sentences explaining the grade",
+  "literalTranslation": "literal English translation of the composition",
+  "grammarFlags": [{"issue": "grammar rule broken", "explanation": "why", "severity": "minor" | "major"}],
+  "masteryCheck": [{"word": "word used", "status": "unknown"}],
   "corrections": [{"original": "incorrect phrase", "corrected": "correct Toki Pona", "explanation": "why"}],
   "highlights": [{"phrase": "good phrase", "reason": "why"}],
   "overallFeedback": "2-3 sentences of encouragement + advice",

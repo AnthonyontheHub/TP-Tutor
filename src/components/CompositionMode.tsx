@@ -1,23 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
 import { fetchCompositionGrade, resolveApiKey, stringifyUserContext } from '../services/linaService';
 import type { CompositionResult } from '../types/mastery';
+import { X, CheckCircle, AlertTriangle, Info, BookOpen } from 'lucide-react';
 
 interface Props {
   onClose: () => void;
   isSandboxMode: boolean;
 }
 
-type Screen = 'write' | 'loading' | 'results';
-
-const PROMPTS = [
-  { label: 'Describe your day', starter: 'tenpo suno ni la mi ' },
-  { label: 'Write about something you love', starter: 'mi olin e ' },
-  { label: 'Tell a short story', starter: 'tenpo pini la jan mije lili li ' },
-];
-
-const GRADE_COLORS = {
+const GRADE_COLORS: Record<string, { color: string, glow: string }> = {
   S: { color: 'var(--gold)', glow: '0 0 20px rgba(255, 191, 0, 0.5)' },
   A: { color: '#22c55e', glow: 'none' },
   B: { color: '#3b82f6', glow: 'none' },
@@ -26,34 +19,51 @@ const GRADE_COLORS = {
 };
 
 export default function CompositionMode({ onClose, isSandboxMode }: Props) {
-  const { vocabulary, profile, lore, updateSessionNotes } = useMasteryStore();
-  const [screen, setScreen] = useState<Screen>('write');
+  const { vocabulary, profile, updateSessionNotes } = useMasteryStore();
   const [text, setText] = useState('');
   const [result, setResult] = useState<CompositionResult | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [isRewriting, setIsRewriting] = useState(false);
 
-  const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
-  const canSubmit = !isSandboxMode && wordCount >= 3;
+  // Split text into words, stripping punctuation
+  const words = text.trim().split(/\s+/).filter(Boolean);
+  const wordCount = words.length;
+  
+  const vocabSafety = useMemo(() => {
+    if (wordCount === 0) return 100;
+    const activeWords = new Set(vocabulary.filter(v => v.status !== 'not_started').map(v => v.word.toLowerCase()));
+    let safeCount = 0;
+    words.forEach(w => {
+      const cleanWord = w.toLowerCase().replace(/[^a-z]/g, '');
+      if (activeWords.has(cleanWord) || ['li', 'e', 'la', 'pi', 'o', 'en', 'kin', 'a', 'mu'].includes(cleanWord) || !cleanWord) {
+        safeCount++;
+      }
+    });
+    return Math.round((safeCount / wordCount) * 100);
+  }, [text, vocabulary, wordCount, words]);
+
+  const canSubmit = !isSandboxMode && wordCount >= 3 && !isLoading;
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
-    setScreen('loading');
+    setIsLoading(true);
+    setResult(null);
+    setIsRewriting(false);
     
     const apiKey = resolveApiKey();
-    const context = stringifyUserContext(profile, lore.map(l => l.detail).join('\n'));
+    const context = stringifyUserContext(profile);
     
     const res = await fetchCompositionGrade(apiKey, text, vocabulary, context);
     setResult(res);
-    setScreen('results');
+    setIsLoading(false);
   };
 
   const handleSaveToLogbook = () => {
-    if (!result) return;
+    if (!result || !result.corrections) return;
     result.corrections.forEach(c => {
-      // Find words in the original incorrect phrase
-      const words = c.original.toLowerCase().match(/[a-z]+/g) || [];
-      words.forEach(word => {
-        const entry = vocabulary.find(v => v.word === word);
+      const errorWords = c.original.toLowerCase().match(/[a-z]+/g) || [];
+      errorWords.forEach(w => {
+        const entry = vocabulary.find(v => v.word === w);
         if (entry) {
           updateSessionNotes(entry.id, `Composition error: "${c.original}" -> "${c.corrected}". Reason: ${c.explanation}`);
         }
@@ -63,190 +73,232 @@ export default function CompositionMode({ onClose, isSandboxMode }: Props) {
   };
 
   return (
-    <div className="modal-backdrop" style={{ zIndex: 6000, background: 'rgba(0,0,0,0.9)' }}>
-      <div style={{ position: 'absolute', top: '20px', right: '20px', zIndex: 6001 }}>
-        <button onClick={onClose} style={{ background: 'none', border: '1px solid #555', color: '#ccc', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer', fontWeight: 900 }}>
-          CLOSE
+    <div className="fixed inset-0 z-[6000] bg-[#050505] flex flex-col font-sans">
+      {/* Header */}
+      <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-black">
+        <div className="flex items-center gap-3">
+          <span className="text-xl">✍️</span>
+          <h2 className="text-white font-black tracking-widest text-lg m-0 uppercase">Creative Writing Studio</h2>
+        </div>
+        <button
+          onClick={onClose}
+          className="text-white/50 hover:text-white transition-colors p-2"
+        >
+          <X className="w-6 h-6" />
         </button>
       </div>
 
-      <div style={{ width: '100%', maxWidth: '700px', height: '100%', maxHeight: '90vh', padding: '20px', display: 'flex', flexDirection: 'column' }}>
-        <AnimatePresence mode="wait">
-          {screen === 'write' && (
-            <motion.div
-              key="write"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="glass-panel"
-              style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '20px', overflowY: 'auto' }}
+      {/* Main Split Screen */}
+      <div className="flex flex-1 overflow-hidden flex-col md:flex-row">
+        
+        {/* Left Pane: Editor */}
+        <div className="w-full md:w-1/2 flex flex-col border-r border-white/10 bg-[#0a0a0a]">
+          <div className="flex-1 p-6 flex flex-col">
+            <textarea
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder="Start writing in Toki Pona... (minimum 3 words)"
+              className="w-full flex-1 bg-transparent border-none text-white/90 focus:outline-none resize-none custom-scrollbar"
+              style={{
+                fontFamily: '"Fira Code", "JetBrains Mono", monospace',
+                fontSize: '1.25rem',
+                lineHeight: '1.8',
+              }}
+            />
+          </div>
+          
+          {/* Footer Stats */}
+          <div className="px-6 py-4 bg-black/50 border-t border-white/10 flex items-center justify-between text-xs font-mono text-white/50 uppercase tracking-widest">
+            <div className="flex items-center gap-6">
+              <span>{wordCount} WORDS</span>
+              <span className={vocabSafety < 80 ? 'text-rose-500' : vocabSafety < 100 ? 'text-amber-500' : 'text-emerald-500'}>
+                {vocabSafety}% VOCAB SAFETY
+              </span>
+            </div>
+            
+            {isSandboxMode && (
+               <span className="text-rose-500 text-xs uppercase font-bold tracking-widest">Sandbox Mode</span>
+            )}
+            
+            <button
+              onClick={handleSubmit}
+              disabled={!canSubmit}
+              className={`px-6 py-2 rounded font-black tracking-widest transition-all ${canSubmit ? 'bg-[#D4AF37] text-black hover:bg-[#FBE106] shadow-[0_0_15px_rgba(212,175,55,0.4)]' : 'bg-white/5 text-white/30 cursor-not-allowed'}`}
             >
-              <div>
-                <h2 style={{ color: 'var(--gold)', letterSpacing: '0.1em', marginBottom: '8px' }}>COMPOSITION MODE</h2>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Write anything in Toki Pona. jan Lina will grade it.</p>
-              </div>
+              LINA'S REVIEW
+            </button>
+          </div>
+        </div>
 
-              <div style={{ position: 'relative' }}>
-                <textarea
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
-                  placeholder="o toki! sina ken toki e ijo ale..."
-                  style={{
-                    width: '100%',
-                    minHeight: '180px',
-                    background: 'rgba(0,0,0,0.3)',
-                    border: '1px solid var(--border)',
-                    borderRadius: '8px',
-                    padding: '16px',
-                    color: 'white',
-                    fontSize: '1.1rem',
-                    lineHeight: '1.6',
-                    resize: 'vertical',
-                    outline: 'none',
-                    fontFamily: 'inherit'
+        {/* Right Pane: Review & Feedback */}
+        <div className="w-full md:w-1/2 bg-[#111] flex flex-col overflow-y-auto custom-scrollbar relative">
+          {!isLoading && !result && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-white/20 p-12 text-center">
+              <BookOpen className="w-16 h-16 mb-4 opacity-50" />
+              <p className="font-bold tracking-widest uppercase mb-2">Awaiting Composition</p>
+              <p className="text-sm">Write your Toki Pona text on the left and submit it for a detailed grammar and vocabulary breakdown.</p>
+            </div>
+          )}
+
+          {isLoading && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-[#D4AF37]">
+              <div className="pulse text-4xl mb-4">✍️</div>
+              <div className="pulse font-black tracking-widest uppercase">jan Lina is analyzing...</div>
+            </div>
+          )}
+
+          {result && (
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="p-8 space-y-8"
+            >
+              {/* Header Grade */}
+              <div className="flex items-start gap-6 border-b border-white/10 pb-8">
+                <div 
+                  className="text-6xl font-black"
+                  style={{ 
+                    color: GRADE_COLORS[result.overallGrade]?.color || 'white', 
+                    textShadow: GRADE_COLORS[result.overallGrade]?.glow 
                   }}
-                />
-                <div style={{ textAlign: 'right', marginTop: '8px', fontSize: '0.8rem', color: wordCount < 3 ? '#ef4444' : 'var(--text-muted)' }}>
-                  {wordCount} words
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                {PROMPTS.map(p => (
-                  <button
-                    key={p.label}
-                    onClick={() => setText(p.starter)}
-                    className="chip-btn"
-                    style={{
-                      background: 'rgba(255,255,255,0.05)',
-                      border: '1px solid var(--border)',
-                      color: '#ccc',
-                      borderRadius: '16px',
-                      padding: '6px 16px',
-                      fontSize: '0.75rem',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    {p.label}
-                  </button>
-                ))}
-              </div>
-
-              {isSandboxMode && (
-                <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', color: '#ef4444', padding: '12px', borderRadius: '8px', fontSize: '0.85rem', textAlign: 'center' }}>
-                  Sandbox mode — grading unavailable
-                </div>
-              )}
-
-              <button
-                className="btn-review"
-                disabled={!canSubmit}
-                onClick={handleSubmit}
-                style={{ marginTop: 'auto', padding: '16px' }}
-              >
-                SUBMIT FOR GRADING
-              </button>
-            </motion.div>
-          )}
-
-          {screen === 'loading' && (
-            <motion.div
-              key="loading"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '20px' }}
-            >
-              <div className="pulse" style={{ fontSize: '3rem' }}>✍️</div>
-              <div className="pulse" style={{ color: 'var(--gold)', fontWeight: 900, letterSpacing: '0.1em' }}>jan Lina is reading your work...</div>
-            </motion.div>
-          )}
-
-          {screen === 'results' && result && (
-            <motion.div
-              key="results"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="glass-panel"
-              style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '24px', overflowY: 'auto' }}
-            >
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ 
-                  fontSize: '4rem', 
-                  fontWeight: 900, 
-                  color: GRADE_COLORS[result.overallGrade].color, 
-                  textShadow: GRADE_COLORS[result.overallGrade].glow,
-                  lineHeight: 1
-                }}>
+                >
                   {result.overallGrade}
                 </div>
-                <p style={{ marginTop: '12px', fontSize: '1rem', fontWeight: 600, color: 'white' }}>{result.gradeReason}</p>
+                <div>
+                  <h3 className="text-white font-bold text-lg mb-1">{result.gradeReason}</h3>
+                  <p className="text-white/60 text-sm leading-relaxed">{result.overallFeedback}</p>
+                </div>
               </div>
 
-              {result.highlights.length > 0 && (
+              {/* Literal Translation */}
+              {result.literalTranslation && (
                 <section>
-                  <h3 className="section-title" style={{ fontSize: '0.75rem', marginBottom: '12px' }}>WHAT YOU DID WELL</h3>
-                  <div style={{ display: 'grid', gap: '12px' }}>
-                    {result.highlights.map((h, i) => (
-                      <div key={i} style={{ background: 'rgba(255,191,0,0.05)', borderLeft: '3px solid var(--gold)', padding: '12px', borderRadius: '4px' }}>
-                        <div style={{ color: 'var(--gold)', fontWeight: 800, fontSize: '0.9rem' }}>{h.phrase}</div>
-                        <div style={{ color: '#ccc', fontSize: '0.8rem', marginTop: '4px' }}>{h.reason}</div>
-                      </div>
-                    ))}
+                  <h4 className="text-xs font-black text-white/40 tracking-widest uppercase mb-3 flex items-center gap-2">
+                    <Info className="w-4 h-4" /> Literal Translation
+                  </h4>
+                  <div className="bg-white/5 border border-white/10 rounded-lg p-4 text-white/80 italic font-serif">
+                    "{result.literalTranslation}"
                   </div>
                 </section>
               )}
 
-              {result.corrections.length > 0 && (
+              {/* Grammar Flags */}
+              {result.grammarFlags && result.grammarFlags.length > 0 && (
                 <section>
-                  <h3 className="section-title" style={{ fontSize: '0.75rem', marginBottom: '12px' }}>CORRECTIONS</h3>
-                  <div style={{ display: 'grid', gap: '12px' }}>
-                    {result.corrections.map((c, i) => (
-                      <div key={i} style={{ background: 'rgba(255,255,255,0.03)', padding: '12px', borderRadius: '4px', border: '1px solid var(--border)' }}>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', marginBottom: '6px' }}>
-                          <span style={{ color: '#ef4444', textDecoration: 'line-through', fontSize: '0.9rem' }}>{c.original}</span>
-                          <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>→</span>
-                          <span style={{ color: 'var(--cyan)', fontWeight: 800, fontSize: '0.9rem' }}>{c.corrected}</span>
+                  <h4 className="text-xs font-black text-amber-500 tracking-widest uppercase mb-3 flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4" /> Grammar Flags
+                  </h4>
+                  <div className="space-y-3">
+                    {result.grammarFlags.map((flag, i) => (
+                      <div key={i} className={`p-4 rounded-lg border ${flag.severity === 'major' ? 'bg-rose-500/10 border-rose-500/30' : 'bg-amber-500/10 border-amber-500/30'}`}>
+                        <div className={`font-bold mb-1 ${flag.severity === 'major' ? 'text-rose-400' : 'text-amber-400'}`}>
+                          {flag.issue}
                         </div>
-                        <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontStyle: 'italic' }}>{c.explanation}</div>
+                        <div className="text-white/70 text-sm">{flag.explanation}</div>
                       </div>
                     ))}
                   </div>
                 </section>
               )}
 
-              <section>
-                <h3 className="section-title" style={{ fontSize: '0.75rem', marginBottom: '8px' }}>OVERALL FEEDBACK</h3>
-                <p style={{ color: '#ccc', fontSize: '0.9rem', lineHeight: '1.6' }}>{result.overallFeedback}</p>
-              </section>
+              {/* Mastery Check */}
+              {result.masteryCheck && result.masteryCheck.length > 0 && (
+                <section>
+                  <h4 className="text-xs font-black text-cyan-500 tracking-widest uppercase mb-3 flex items-center gap-2">
+                    <BookOpen className="w-4 h-4" /> Mastery Check
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {result.masteryCheck.map((check, i) => (
+                      <div key={i} className="bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 px-3 py-1.5 rounded text-sm font-mono flex items-center gap-2">
+                        <span>{check.word}</span>
+                        <span className="text-xs opacity-60 uppercase">({check.status})</span>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
 
+              {/* Corrections */}
+              {result.corrections && result.corrections.length > 0 && (
+                <section>
+                  <h4 className="text-xs font-black text-white/40 tracking-widest uppercase mb-3 flex items-center gap-2">
+                    <X className="w-4 h-4 text-rose-500" /> Specific Corrections
+                  </h4>
+                  <div className="space-y-3">
+                    {result.corrections.map((c, i) => (
+                      <div key={i} className="bg-white/5 border border-white/10 rounded-lg p-4">
+                        <div className="flex items-center flex-wrap gap-3 mb-2">
+                          <span className="text-rose-400 line-through font-mono text-sm">{c.original}</span>
+                          <span className="text-white/40">→</span>
+                          <span className="text-emerald-400 font-bold font-mono text-sm">{c.corrected}</span>
+                        </div>
+                        <p className="text-white/60 text-sm italic">{c.explanation}</p>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {/* Highlights */}
+              {result.highlights && result.highlights.length > 0 && (
+                <section>
+                  <h4 className="text-xs font-black text-[#D4AF37] tracking-widest uppercase mb-3 flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4" /> Highlights
+                  </h4>
+                  <div className="space-y-3">
+                    {result.highlights.map((h, i) => (
+                      <div key={i} className="bg-[#D4AF37]/10 border border-[#D4AF37]/30 rounded-lg p-4">
+                        <div className="text-[#D4AF37] font-bold font-mono text-sm mb-1">{h.phrase}</div>
+                        <p className="text-[#D4AF37]/70 text-sm">{h.reason}</p>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {/* Suggested Rewrite */}
               {result.suggestedRewrite && (
                 <section>
+                  <h4 className="text-xs font-black text-white/40 tracking-widest uppercase mb-3 flex items-center gap-2">
+                    ✨ Suggested Rewrite
+                  </h4>
+                  
                   <button 
                     onClick={() => setIsRewriting(!isRewriting)}
-                    style={{ background: 'none', border: 'none', color: 'var(--gold)', fontSize: '0.7rem', fontWeight: 900, cursor: 'pointer', padding: 0, letterSpacing: '0.1em' }}
+                    className="text-[#D4AF37] text-xs font-black tracking-widest uppercase hover:underline mb-3 block"
                   >
                     {isRewriting ? 'HIDE SUGGESTED REWRITE ▲' : 'SEE SUGGESTED REWRITE ▼'}
                   </button>
-                  {isRewriting && (
-                    <motion.div 
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      style={{ marginTop: '12px', padding: '16px', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--gold)', borderRadius: '8px', color: 'white', fontSize: '1rem', fontStyle: 'italic', lineHeight: '1.6' }}
-                    >
-                      {result.suggestedRewrite}
-                    </motion.div>
-                  )}
+                  
+                  <AnimatePresence>
+                    {isRewriting && (
+                      <motion.div 
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="bg-white/5 border border-[#D4AF37]/50 rounded-lg p-4 text-white/90 italic overflow-hidden"
+                      >
+                        {result.suggestedRewrite}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </section>
               )}
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: 'auto' }}>
-                <button className="btn-toggle" onClick={() => { setScreen('write'); setResult(null); }}>WRITE AGAIN</button>
-                <button className="btn-review" onClick={handleSaveToLogbook} disabled={result.corrections.length === 0}>SAVE TO LOGBOOK</button>
+              <div className="pt-4 flex justify-end">
+                <button
+                  onClick={handleSaveToLogbook}
+                  disabled={!result.corrections || result.corrections.length === 0}
+                  className={`px-6 py-3 rounded text-sm font-bold tracking-widest transition-colors ${result.corrections && result.corrections.length > 0 ? 'bg-white/10 text-white hover:bg-white/20' : 'bg-white/5 text-white/30 cursor-not-allowed'}`}
+                >
+                  SAVE CORRECTIONS TO LOGBOOK
+                </button>
               </div>
+
             </motion.div>
           )}
-        </AnimatePresence>
+        </div>
+
       </div>
     </div>
   );

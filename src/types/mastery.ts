@@ -490,6 +490,16 @@ export interface MasteryEvent {
 export interface CompositionResult {
   overallGrade: 'S' | 'A' | 'B' | 'C' | 'F';
   gradeReason: string;
+  literalTranslation?: string;
+  grammarFlags?: {
+    issue: string;
+    explanation: string;
+    severity: 'minor' | 'major';
+  }[];
+  masteryCheck?: {
+    word: string;
+    status: MasteryStatus | 'unknown';
+  }[];
   corrections: {
     original: string;
     corrected: string;
