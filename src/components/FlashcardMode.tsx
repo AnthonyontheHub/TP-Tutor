@@ -4,6 +4,7 @@ import { useMasteryStore } from '../store/masteryStore';
 import WordDetailDrawer from './WordDetailDrawer';
 import { soundService } from '../services/soundService';
 import { initialMasteryMap } from '../data/initialMasteryMap';
+import InfoTooltip from './InfoTooltip';
 
 interface Props {
   onClose: () => void;
@@ -94,8 +95,9 @@ export default function FlashcardMode({ onClose, onAskLina, isSandboxMode }: Pro
         </button>
       </div>
 
-      <div style={{ position: 'absolute', top: '20px', left: '20px', color: 'var(--gold)', fontWeight: 900 }}>
+      <div style={{ position: 'absolute', top: '20px', left: '20px', color: 'var(--gold)', fontWeight: 900, display: 'flex', alignItems: 'center' }}>
         CARDS STUDIED: {cardsStudied}
+        <InfoTooltip text="Got It adds 2 points. Wrong subtracts 5 points." />
       </div>
 
       <div style={{ width: '100%', maxWidth: '500px', padding: '20px' }}>

@@ -11,6 +11,7 @@ import SettingsPanel from './components/SettingsPanel';
 import InstructionsPanel from './components/InstructionsPanel';
 import AchievementsPanel from './components/AchievementsPanel';
 import LogbookPanel from './components/LogbookPanel';
+import SessionHistoryPanel from './components/SessionHistoryPanel';
 import ChatSession from './components/ChatSession';
 import DailyStoicHistory from './components/DailyStoicHistory';
 
@@ -23,7 +24,7 @@ import { detectSessionTitle } from './services/linaService';
 // In Vite, it's typically injected globally.
 declare const __BUILD_TIME__: string;
 
-export type AppPanel = 'profile' | 'settings' | 'instructions' | 'achievements' | 'logbook';
+export type AppPanel = 'profile' | 'settings' | 'instructions' | 'achievements' | 'logbook' | 'sessionHistory';
 
 export default function App() {
   const { user, loading } = useAuthStore();
@@ -203,10 +204,11 @@ export default function App() {
         {activePanels.map(panel => (
           <ModalWrapper key={panel} onClose={() => togglePanel(panel)}>
              {panel === 'profile' && <UserProfilePanel onClose={() => togglePanel('profile')} />}
-             {panel === 'settings' && <SettingsPanel isOpen={true} onClose={() => togglePanel('settings')} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} onOpenLogbook={() => togglePanel('logbook')} onOpenMasteryCourt={() => { togglePanel('settings'); handleAskLina(`[SYSTEM: The student has opened Mastery Court. You know why they're here. Greet them briefly, acknowledge your role, and ask what they'd like to petition.]`); }} onOpenStoicArchive={() => { togglePanel('settings'); setShowStoicHistory(true); }} />}
+             {panel === 'settings' && <SettingsPanel isOpen={true} onClose={() => togglePanel('settings')} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} onOpenLogbook={() => togglePanel('logbook')} onOpenSessionHistory={() => { togglePanel('settings'); togglePanel('sessionHistory'); }} onOpenMasteryCourt={() => { togglePanel('settings'); handleAskLina(`[SYSTEM: The student has opened Mastery Court. You know why they're here. Greet them briefly, acknowledge your role, and ask what they'd like to petition.]`); }} onOpenStoicArchive={() => { togglePanel('settings'); setShowStoicHistory(true); }} />}
              {panel === 'achievements' && <AchievementsPanel onClose={() => togglePanel('achievements')} />}
              {panel === 'instructions' && <InstructionsPanel isOpen={true} onClose={() => togglePanel('instructions')} />}
              {panel === 'logbook' && <LogbookPanel onClose={() => togglePanel('logbook')} />}
+             {panel === 'sessionHistory' && <SessionHistoryPanel onClose={() => togglePanel('sessionHistory')} />}
           </ModalWrapper>
         ))}
       </AnimatePresence>

@@ -162,15 +162,15 @@ export default function VocabCard({ word, onLongPress, onClick, isSandboxMode, i
           left: '50%',
           transform: 'translate(-50%, -50%) scale(1.5)',
           zIndex: 0,
-          opacity: 0.15,
-          fontSize: '2rem',
+          opacity: 0.25,
+          fontSize: '2.5rem',
           lineHeight: 1,
           pointerEvents: 'none',
-          textShadow: `0 0 8px ${GLOW_COLOR[status]}, 0 0 12px ${GLOW_COLOR[status]}`,
-          color: GLOW_COLOR[status],
+          textShadow: `0 0 10px ${GLOW_COLOR[status]}`,
+          color: RING_COLOR[status],
         }}
       >
-        {word.word}
+        {word.word.toLowerCase()}
       </div>
 
       {/* 'ku' Marker */}

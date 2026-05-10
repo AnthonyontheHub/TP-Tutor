@@ -252,6 +252,8 @@ interface MasteryActions {
   generateWeeklyChallenge: () => void;
   progressChallenge: (amount?: number, type?: WeeklyChallenge['type'], wordId?: string) => void;
   clearRankAcknowledgement: () => void;
+  getDueWords: () => VocabWord[];
+  getDueCount: () => number;
 }
 
 interface MasteryState {
@@ -1211,38 +1213,55 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       resetLearningProgress: async () => {
-        set({
-          profile: defaultProfile,
-          vocabulary: mappedVocabulary.map(v => ({ ...v, baseScore: 0, confidenceScore: 0, status: 'not_started' as MasteryStatus })),
+        const now = new Date().toISOString();
+        set((state) => ({
+          vocabulary: state.vocabulary.map(v => ({ 
+            ...v, 
+            baseScore: 0, 
+            status: 'not_started' as MasteryStatus, 
+            confidenceScore: 0, 
+            sessionNotes: '', 
+            scoreHistory: [], 
+            useCount: 0, 
+            hardened: false, 
+            isBleeding: false, 
+            productionStatus: 'not_started' as MasteryStatus, 
+            recognitionStatus: 'not_started' as MasteryStatus,
+            lastReviewed: now
+          })),
+          masteryHistory: [],
+          currentStreak: 0,
+          lastActiveDate: '',
+          savedPhrases: [],
+          earnedBadges: [],
+          earnedCeremonialRanks: [],
+          completedNodeIds: [],
+          confusionPairs: [],
+          pendingProveItResponses: [],
+          sessionXPRecord: 0,
+          streakShields: 0,
+          xpMultiplier: 1.0,
+          currentChallenge: null,
+          completedChallenges: [],
+          completedActivities: {},
+          learningDays: [],
+          seenIntroductions: [],
+          newRankUnlocked: null,
+          pendingRankAcknowledgement: null,
+          lastSmallRankTitle: 'jan lili',
+          totalProveItSubmitted: 0,
+          lessonFilter: null,
+          selectedWords: [],
+          currentPositionNodeId: 'phi_sim',
           curriculums: curriculumRoadmap,
           activeCurriculumId: null,
           activeModuleId: null,
-          savedPhrases: [],
-          currentStreak: 0,
-          lastActiveDate: '',
-          currentPositionNodeId: 'phi_sim',
-          earnedBadges: [],
-          earnedCeremonialRanks: [],
-          newRankUnlocked: null,
-          lastSmallRankTitle: 'jan lili',
-          sessionXPRecord: 0,
-          xpMultiplier: 1.0,
-          streakShields: 0,
+          sessionLog: [],
+          lastStreakCheck: '',
           lastStreakMilestone: 0,
           pendingComebackBonus: false,
-          learningDays: [],
-          completedNodeIds: [],
-          seenIntroductions: [],
-          confusionPairs: [],
-          sessionLog: [],
-          currentChallenge: null,
-          completedChallenges: [],
-          pendingRankAcknowledgement: null,
-          lastStreakCheck: '',
-          pendingProveItResponses: [],
-          totalProveItSubmitted: 0,
-          completedActivities: {}
-        });
+          reviewVibe: null
+        }));
         localStorage.setItem('tp_sandbox_mode', 'false');
         get().refreshCurriculumStatus();
         await get().syncToCloud(undefined, false, true);
@@ -1386,6 +1405,33 @@ export const useMasteryStore = create<MasteryStore>()(
 
       clearRankAcknowledgement: () => set({ pendingRankAcknowledgement: null }),
 
+      getDueWords: () => {
+        const { vocabulary } = get();
+        const now = new Date();
+        const intervals: Record<MasteryStatus, number> = {
+          not_started: Infinity,
+          introduced: 1,
+          practicing: 3,
+          confident: 7,
+          mastered: 21,
+        };
+
+        return vocabulary
+          .filter(v => v.status !== 'not_started')
+          .map(v => {
+            const last = new Date(v.lastReviewed || 0);
+            const interval = intervals[v.status] || 1;
+            const dueDate = new Date(last.getTime() + interval * 24 * 60 * 60 * 1000);
+            return { word: v, overdueMs: now.getTime() - dueDate.getTime() };
+          })
+          .filter(v => v.overdueMs >= 0)
+          .sort((a, b) => b.overdueMs - a.overdueMs)
+          .slice(0, 10)
+          .map(v => v.word);
+      },
+
+      getDueCount: () => get().getDueWords().length,
+
       setStudentName: (name) => { set({ studentName: name }); get().updateProfile({ firstName: name }); },
       updateProfile: (profileUpdate) => { 
         set((state) => ({ 
@@ -1417,44 +1463,57 @@ export const useMasteryStore = create<MasteryStore>()(
 
       resetAsNewUser: async () => {
         const { userId } = get();
-        set({
-          studentName: '',
-          profile: defaultProfile,
-          reviewVibe: null,
-          profileImage: '',
-          savedPhrases: [],
+        const now = new Date().toISOString();
+        set((state) => ({
+          vocabulary: state.vocabulary.map(v => ({ 
+            ...v, 
+            baseScore: 0, 
+            status: 'not_started' as MasteryStatus, 
+            confidenceScore: 0, 
+            sessionNotes: '', 
+            scoreHistory: [], 
+            useCount: 0, 
+            hardened: false, 
+            isBleeding: false, 
+            productionStatus: 'not_started' as MasteryStatus, 
+            recognitionStatus: 'not_started' as MasteryStatus,
+            lastReviewed: now
+          })),
+          masteryHistory: [],
           currentStreak: 0,
           lastActiveDate: '',
-          vocabulary: mappedVocabulary.map(v => ({ ...v, baseScore: 0, confidenceScore: 0, status: 'not_started' as MasteryStatus })),
-          curriculums: curriculumRoadmap,
-          currentPositionNodeId: 'phi_sim',
-          activeCurriculumId: null,
-          activeModuleId: null,
-          hasCompletedSetup: false,
-          songs: defaultSongs,
-          commonPhrases: defaultCommonPhrases,
+          savedPhrases: [],
           earnedBadges: [],
           earnedCeremonialRanks: [],
-          newRankUnlocked: null,
-          lastSmallRankTitle: 'jan lili',
-          sessionXPRecord: 0,
-          xpMultiplier: 1.0,
-          streakShields: 0,
-          lastStreakMilestone: 0,
-          pendingComebackBonus: false,
-          learningDays: [],
           completedNodeIds: [],
-          seenIntroductions: [],
           confusionPairs: [],
-          sessionLog: [],
+          pendingProveItResponses: [],
+          sessionXPRecord: 0,
+          streakShields: 0,
+          xpMultiplier: 1.0,
           currentChallenge: null,
           completedChallenges: [],
+          completedActivities: {},
+          learningDays: [],
+          seenIntroductions: [],
+          newRankUnlocked: null,
           pendingRankAcknowledgement: null,
-          lastStreakCheck: '',
-          pendingProveItResponses: [],
+          lastSmallRankTitle: 'jan lili',
           totalProveItSubmitted: 0,
-          completedActivities: {}
-        });
+          lessonFilter: null,
+          selectedWords: [],
+          currentPositionNodeId: 'phi_sim',
+          curriculums: curriculumRoadmap,
+          activeCurriculumId: null,
+          activeModuleId: null,
+          sessionLog: [],
+          lastStreakCheck: '',
+          lastStreakMilestone: 0,
+          pendingComebackBonus: false,
+          reviewVibe: null,
+          songs: defaultSongs,
+          commonPhrases: defaultCommonPhrases,
+        }));
         localStorage.setItem('tp_sandbox_mode', 'false');
         get().refreshCurriculumStatus();
         if (userId) {
@@ -1463,41 +1522,57 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       resetProfileAndRunSetup: async () => {
-        set({
-          studentName: '',
-          profile: defaultProfile,
-          reviewVibe: null,
-          profileImage: '',
-          curriculums: curriculumRoadmap,
-          vocabulary: mappedVocabulary.map(v => ({ ...v, baseScore: 0, confidenceScore: 0, status: 'not_started' as MasteryStatus })),
-          currentPositionNodeId: 'phi_sim',
-          activeCurriculumId: null,
-          activeModuleId: null,
-          hasCompletedSetup: false,
-          songs: defaultSongs,
-          commonPhrases: defaultCommonPhrases,
+        const now = new Date().toISOString();
+        set((state) => ({
+          vocabulary: state.vocabulary.map(v => ({ 
+            ...v, 
+            baseScore: 0, 
+            status: 'not_started' as MasteryStatus, 
+            confidenceScore: 0, 
+            sessionNotes: '', 
+            scoreHistory: [], 
+            useCount: 0, 
+            hardened: false, 
+            isBleeding: false, 
+            productionStatus: 'not_started' as MasteryStatus, 
+            recognitionStatus: 'not_started' as MasteryStatus,
+            lastReviewed: now
+          })),
+          masteryHistory: [],
+          currentStreak: 0,
+          lastActiveDate: '',
+          savedPhrases: [],
           earnedBadges: [],
           earnedCeremonialRanks: [],
-          newRankUnlocked: null,
-          lastSmallRankTitle: 'jan lili',
-          sessionXPRecord: 0,
-          xpMultiplier: 1.0,
-          streakShields: 0,
-          lastStreakMilestone: 0,
-          pendingComebackBonus: false,
-          learningDays: [],
           completedNodeIds: [],
-          seenIntroductions: [],
           confusionPairs: [],
-          sessionLog: [],
+          pendingProveItResponses: [],
+          sessionXPRecord: 0,
+          streakShields: 0,
+          xpMultiplier: 1.0,
           currentChallenge: null,
           completedChallenges: [],
+          completedActivities: {},
+          learningDays: [],
+          seenIntroductions: [],
+          newRankUnlocked: null,
           pendingRankAcknowledgement: null,
-          lastStreakCheck: '',
-          pendingProveItResponses: [],
+          lastSmallRankTitle: 'jan lili',
           totalProveItSubmitted: 0,
-          completedActivities: {}
-        });
+          lessonFilter: null,
+          selectedWords: [],
+          currentPositionNodeId: 'phi_sim',
+          curriculums: curriculumRoadmap,
+          activeCurriculumId: null,
+          activeModuleId: null,
+          sessionLog: [],
+          lastStreakCheck: '',
+          lastStreakMilestone: 0,
+          pendingComebackBonus: false,
+          reviewVibe: null,
+          songs: defaultSongs,
+          commonPhrases: defaultCommonPhrases,
+        }));
         localStorage.setItem('tp_sandbox_mode', 'false');
         get().refreshCurriculumStatus();
         await get().syncToCloud(undefined, false, true);
@@ -1527,21 +1602,57 @@ export const useMasteryStore = create<MasteryStore>()(
       },
 
       clearLocalData: () => {
-        set({
+        set((state) => ({
           userId: null,
-          studentName: '',
-          profile: defaultProfile,
-          reviewVibe: null,
-          profileImage: '',
           savedPhrases: [],
           currentStreak: 0,
           lastActiveDate: '',
-          vocabulary: mappedVocabulary,
+          vocabulary: state.vocabulary.map(v => ({ 
+            ...v, 
+            baseScore: 0, 
+            status: 'not_started' as MasteryStatus, 
+            confidenceScore: 0, 
+            sessionNotes: '', 
+            scoreHistory: [], 
+            useCount: 0, 
+            hardened: false, 
+            isBleeding: false, 
+            productionStatus: 'not_started' as MasteryStatus, 
+            recognitionStatus: 'not_started' as MasteryStatus,
+            lastReviewed: new Date().toISOString()
+          })),
+          masteryHistory: [],
           curriculums: curriculumRoadmap,
-          hasCompletedSetup: false,
+          earnedBadges: [],
+          earnedCeremonialRanks: [],
+          completedNodeIds: [],
+          confusionPairs: [],
+          pendingProveItResponses: [],
+          sessionXPRecord: 0,
+          streakShields: 0,
+          xpMultiplier: 1.0,
+          currentChallenge: null,
+          completedChallenges: [],
+          completedActivities: {},
+          learningDays: [],
+          seenIntroductions: [],
+          newRankUnlocked: null,
+          pendingRankAcknowledgement: null,
+          lastSmallRankTitle: 'jan lili',
+          totalProveItSubmitted: 0,
+          lessonFilter: null,
+          selectedWords: [],
+          currentPositionNodeId: 'phi_sim',
+          activeCurriculumId: null,
+          activeModuleId: null,
+          sessionLog: [],
+          lastStreakCheck: '',
+          lastStreakMilestone: 0,
+          pendingComebackBonus: false,
+          reviewVibe: null,
           songs: defaultSongs,
           commonPhrases: defaultCommonPhrases,
-        });
+        }));
       },
 
       setLastUpdated: (date) => set({ lastUpdated: date }),

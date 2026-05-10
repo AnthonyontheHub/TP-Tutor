@@ -204,6 +204,25 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
                   <div style={{ fontSize: '1.5rem' }}>{STATUS_META[word.status].emoji}</div>
                 </div>
               </div>
+
+              {/* Dedicated Glyph Display */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '20px 0 30px' }}>
+                <div 
+                  className="sitelen-pona" 
+                  style={{ 
+                    fontSize: '4rem', 
+                    color: 'var(--gold)', 
+                    textShadow: '0 0 15px var(--gold-glow), 0 0 30px var(--gold-glow)',
+                    lineHeight: 1
+                  }}
+                >
+                  {word.word}
+                </div>
+                <div style={{ fontSize: '0.6rem', color: 'var(--text-muted)', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', marginTop: '8px' }}>
+                  sitelen pona
+                </div>
+              </div>
+
               <div style={{ fontSize: '1.4rem', color: 'var(--gold)', fontWeight: 700, marginTop: '-5px', textTransform: 'uppercase' }}>{primaryMeaning}</div>
               {sitelenEtymology && (
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontStyle: 'italic', marginTop: '6px' }}>

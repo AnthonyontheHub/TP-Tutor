@@ -480,3 +480,19 @@ export interface MasteryEvent {
   timestamp: string; // ISO timestamp
 }
 
+export interface CompositionResult {
+  overallGrade: 'S' | 'A' | 'B' | 'C' | 'F';
+  gradeReason: string;
+  corrections: {
+    original: string;
+    corrected: string;
+    explanation: string;
+  }[];
+  highlights: {
+    phrase: string;
+    reason: string;
+  }[];
+  overallFeedback: string;
+  suggestedRewrite?: string;
+}
+

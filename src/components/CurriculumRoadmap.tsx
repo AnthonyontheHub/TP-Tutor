@@ -5,13 +5,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import NodeDossier from './NodeDossier';
 import type { CurriculumNode, SessionLogEntry } from '../types/mastery';
 import { STATUS_META } from '../types/mastery';
+import InfoTooltip from './InfoTooltip';
 
 interface Props {
   onAskLina: (p: string) => void;
   isSandboxMode: boolean;
+  onLaunchActivity?: (nodeId: string, type: string) => void;
 }
 
-export default function CurriculumRoadmap({ onAskLina, isSandboxMode }: Props) {
+export default function CurriculumRoadmap({ onAskLina, isSandboxMode, onLaunchActivity }: Props) {
   const { curriculums, currentPositionNodeId, sessionLog, vocabulary } = useMasteryStore();
   const [selectedNode, setSelectedNode] = useState<CurriculumNode | null>(null);
   const [hoveredSession, setHoveredSession] = useState<SessionLogEntry | null>(null);
@@ -194,6 +196,7 @@ export default function CurriculumRoadmap({ onAskLina, isSandboxMode }: Props) {
             onBack={() => setSelectedNode(null)} 
             onAskLina={onAskLina}
             isSandboxMode={isSandboxMode}
+            onLaunchActivity={onLaunchActivity}
           />
         )}
       </AnimatePresence>
@@ -202,8 +205,11 @@ export default function CurriculumRoadmap({ onAskLina, isSandboxMode }: Props) {
         <h1 style={{ color: 'var(--gold)', fontWeight: 900, fontSize: '1.2rem', letterSpacing: '0.2em', margin: '0 0 20px 0' }}>NEURAL PATHWAY</h1>
         
         <div style={{ maxWidth: '400px', margin: '0 auto 12px auto' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <span style={{ fontSize: '0.6rem', color: '#666', fontWeight: 900, letterSpacing: '0.1em' }}>TOTAL CURRICULUM MASTERY</span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.6rem', color: '#666', fontWeight: 900, letterSpacing: '0.1em' }}>TOTAL CURRICULUM MASTERY</span>
+              <InfoTooltip text="Based on the combined scores of all required vocabulary across the entire map." />
+            </div>
             <span style={{ fontSize: '0.6rem', color: 'var(--gold)', fontWeight: 900 }}>{globalMastery}%</span>
           </div>
           <div style={{ height: '6px', background: '#111', borderRadius: '3px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)' }}>
@@ -216,7 +222,10 @@ export default function CurriculumRoadmap({ onAskLina, isSandboxMode }: Props) {
           </div>
         </div>
 
-        <p style={{ color: '#666', fontSize: '0.7rem', fontWeight: 800, marginTop: '8px' }}>SEQUENTIAL MASTERY MAP</p>
+        <p style={{ color: '#666', fontSize: '0.7rem', fontWeight: 800, marginTop: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          SEQUENTIAL MASTERY MAP
+          <InfoTooltip text="Tap a past session circle to view XP earned and specific words that changed status." />
+        </p>
       </header>
       
       <div style={{ position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '48px' }}>
@@ -470,15 +479,28 @@ export default function CurriculumRoadmap({ onAskLina, isSandboxMode }: Props) {
                         {node.title}
                       </div>
                       {!isLocked && (
-                        <div style={{
-                          fontSize: '0.55rem',
-                          fontWeight: 900,
-                          color: masteryColor,
-                          letterSpacing: '0.08em',
-                          marginTop: '2px'
-                        }}>
-                          {mastery}%
-                        </div>
+                        <>
+                          <div style={{
+                            fontSize: '0.55rem',
+                            fontWeight: 900,
+                            color: masteryColor,
+                            letterSpacing: '0.08em',
+                            marginTop: '2px'
+                          }}>
+                            {mastery}%
+                          </div>
+                          <div style={{
+                            display: 'flex',
+                            gap: '4px',
+                            justifyContent: 'center',
+                            marginTop: '4px',
+                            fontSize: '0.8rem'
+                          }}>
+                            {node.suggestedMethod === 'Jan Lina Chat' && <span title="Chat">💬</span>}
+                            {node.suggestedMethod === 'Builder Drill' && <span title="Drill">🔀</span>}
+                            {(node.suggestedMethod === 'Quiz' || node.type === 'Checkpoint') && <span title="Quiz">📋</span>}
+                          </div>
+                        </>
                       )}
                     </div>
                   </div>

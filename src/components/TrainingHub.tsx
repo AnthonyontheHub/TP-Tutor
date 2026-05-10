@@ -71,9 +71,14 @@ const TrainingHub: React.FC<Props> = ({ onClose }) => {
           ))}
         </div>
 
-        <footer className="mt-12 pt-8 border-t border-white/5 flex justify-between items-center text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-600">
-           <div className="flex items-center gap-2"><Shield size={12} /> Sandbox Protocol Active</div>
-           <div>Global Context Sync: 100%</div>
+        <footer className="mt-12 pt-8 border-t border-white/5 flex flex-col gap-3">
+           <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-[0.3em] text-zinc-600">
+             <div className="flex items-center gap-2"><Shield size={12} /> Sandbox Protocol Active</div>
+             <div>Global Context Sync: 100%</div>
+           </div>
+           <div className="text-xs text-zinc-500 font-medium text-center">
+             Modules are sandboxed. Performance here trains your brain but does not directly alter your core mastery scores.
+           </div>
         </footer>
       </motion.div>
     </div>

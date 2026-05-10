@@ -8,6 +8,7 @@ import type { MasteryStatus, VocabWord } from '../types/mastery';
 import { STATUS_META } from '../types/mastery';
 import { WORD_RELATIONSHIPS } from '../data/wordRelationships';
 import { fetchEnglishToTokiPona, resolveApiKey } from '../services/linaService';
+import InfoTooltip from './InfoTooltip';
 
 interface Props {
   onAskLina: (p: string) => void;
@@ -334,6 +335,17 @@ export default function MasteryGrid({
       <div style={{ marginTop: '12px', marginBottom: '12px' }}>
         <ChallengeWidget />
       </div>
+
+      <div style={{ padding: '0 12px 12px 12px', fontSize: '0.75rem', color: '#888', textAlign: 'center', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+         <span>Tap words to add them to the Sentence Builder. Long-press to multi-select.</span>
+         <InfoTooltip text="Tap an isolated word, or the DETAILS button inside Flashcards, to view its full dossier and history." />
+      </div>
+
+      {displayed.length === 0 && searchQuery.trim() === '' && (
+        <div style={{ padding: '40px 20px', textAlign: 'center', color: '#666', fontSize: '0.85rem', fontStyle: 'italic', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px dashed #333' }}>
+           {lessonFilter ? "No words found for this filter. Change your roadmap position or clear the filter." : "No vocabulary words found."}
+        </div>
+      )}
 
       {displayed.length === 0 && searchQuery.trim() !== '' && (suggestion || isTranslating) && (
         <div className="suggestion-panel" style={{

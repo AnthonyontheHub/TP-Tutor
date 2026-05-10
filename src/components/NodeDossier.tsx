@@ -11,9 +11,10 @@ interface Props {
   onBack: () => void;
   onAskLina: (p: string) => void;
   isSandboxMode: boolean;
+  onLaunchActivity?: (nodeId: string, type: string) => void;
 }
 
-export default function NodeDossier({ node, onBack, onAskLina, isSandboxMode }: Props) {
+export default function NodeDossier({ node, onBack, onAskLina, isSandboxMode, onLaunchActivity }: Props) {
   const { vocabulary, currentPositionNodeId, checkNodeReadiness, getNodeReadinessPercentage, completedActivities, setActiveActivity } = useMasteryStore();
   const [drawerId, setDrawerId] = useState<string | null>(null);
 
@@ -329,7 +330,13 @@ export default function NodeDossier({ node, onBack, onAskLina, isSandboxMode }: 
 
           <section style={{ marginTop: '20px', paddingBottom: '60px' }}>
             <button 
-              onClick={handlePracticeLina}
+              onClick={() => {
+                if (onLaunchActivity) {
+                  onLaunchActivity(node.id, node.suggestedMethod || 'Jan Lina Chat');
+                } else {
+                  handlePracticeLina();
+                }
+              }}
               style={{ 
                 width: '100%', 
                 background: 'var(--gold)',
@@ -351,10 +358,10 @@ export default function NodeDossier({ node, onBack, onAskLina, isSandboxMode }: 
               onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}
             >
               <span style={{ fontSize: '1.4rem' }}>✦</span>
-              PRACTICE WITH JAN LINA
+              LAUNCH ACTIVITY
             </button>
             <p style={{ color: '#555', fontSize: '0.65rem', textAlign: 'center', marginTop: '12px', fontWeight: 700, letterSpacing: '0.05em' }}>
-              START LESSON WITH jan LINA FOR INTERACTIVE ASSESSMENT
+              RECOMMENDED METHOD: {(node.suggestedMethod || 'Jan Lina Chat').toUpperCase()}
             </p>
           </section>
         </main>

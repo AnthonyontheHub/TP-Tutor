@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
 import type { MasteryStatus } from '../types/mastery';
+import InfoTooltip from './InfoTooltip';
 
 interface Props {
   onAskLina: (prompt: string) => void;
@@ -124,7 +125,10 @@ export default function OperationalIntelligenceWidget({ onAskLina, onOpenAchieve
           >
             {/* Section 1: Bleeding */}
             <section>
-              <h3 style={{ fontSize: '0.6rem', color: '#666', fontWeight: 900, letterSpacing: '0.1em', marginBottom: '10px' }}>🩸 NEEDS ATTENTION</h3>
+              <h3 style={{ fontSize: '0.6rem', color: '#666', fontWeight: 900, letterSpacing: '0.1em', marginBottom: '10px', display: 'flex', alignItems: 'center' }}>
+                🩸 NEEDS ATTENTION
+                <InfoTooltip text="Bleeding: Dropped 50+ points in 48 hours. Needs review before it drops a tier." />
+              </h3>
               <div style={{ display: 'grid', gap: '8px' }}>
                 {bleedingWords.length > 0 ? bleedingWords.map(w => (
                   <div key={w.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -140,7 +144,7 @@ export default function OperationalIntelligenceWidget({ onAskLina, onOpenAchieve
                     </button>
                   </div>
                 )) : (
-                  <div style={{ fontSize: '0.75rem', color: '#444', fontStyle: 'italic' }}>No words in distress.</div>
+                  <div style={{ fontSize: '0.75rem', color: '#444', fontStyle: 'italic' }}>All words are stable. No words have decayed 50+ points in the last 48 hours.</div>
                 )}
               </div>
             </section>

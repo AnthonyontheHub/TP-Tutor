@@ -12,6 +12,11 @@ import OperationalIntelligenceWidget from './OperationalIntelligenceWidget';
 import { SessionOverlay } from './SessionOverlay';
 import TrainingHub from './TrainingHub';
 import FlashcardMode from './FlashcardMode';
+import DualDrillMode from './DualDrillMode';
+import ConfusionDrill from './ConfusionDrill';
+import CompositionMode from './CompositionMode';
+import SRSWidget from './SRSWidget';
+import InfoTooltip from './InfoTooltip';
 import { fetchQuickTranslation, resolveApiKey, buildOfflineTranslation } from '../services/linaService';
 import type { MasteryStatus, VocabWord } from '../types/mastery';
 import type { AppPanel } from '../App';
@@ -31,6 +36,11 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   const [activeView, setActiveView] = useState<DashboardView>('vocab');
   const [showTrainingHub, setShowTrainingHub] = useState(false);
   const [showFlashcards, setShowFlashcards] = useState(false);
+  const [showDualDrill, setShowDualDrill] = useState(false);
+  const [showConfusionDrill, setShowConfusionDrill] = useState(false);
+  const [showComposition, setShowComposition] = useState(false);
+  const [showDrillsMenu, setShowDrillsMenu] = useState(false);
+  const drillsMenuRef = useRef<HTMLDivElement>(null);
   const [activeFilter, setActiveFilter] = useState<MasteryStatus | null>(null);
   const [posFilter, setPosFilter] = useState('All');
   const [sortMode, setSortMode] = useState<string>('alphabetical');
@@ -48,6 +58,18 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   const [showProveIt, setShowProveIt] = useState(false);
   const [externalPhrase, setExternalPhrase] = useState<{ tp: string; en: string } | null>(null);
   const confirmTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (drillsMenuRef.current && !drillsMenuRef.current.contains(event.target as Node)) {
+        setShowDrillsMenu(false);
+      }
+    };
+    if (showDrillsMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showDrillsMenu]);
 
   const handleOpenExternalPhrase = (tp: string, en: string) => {
     setExternalPhrase({ tp, en });
@@ -305,12 +327,15 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
 
         <div className="dashboard__header-right">
           {currentStreak > 0 && (
-            <div 
-              className="dashboard__streak" 
-              onClick={() => onTogglePanel('achievements')}
-              style={{ ...getActiveStyle('achievements'), margin: 0, padding: '4px 8px', fontSize: '0.75rem', height: '32px', display: 'flex', alignItems: 'center' }}
-            >
-              🔥 {currentStreak}
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <div 
+                className="dashboard__streak" 
+                onClick={() => onTogglePanel('achievements')}
+                style={{ ...getActiveStyle('achievements'), margin: 0, padding: '4px 8px', fontSize: '0.75rem', height: '32px', display: 'flex', alignItems: 'center' }}
+              >
+                🔥 {currentStreak}
+              </div>
+              <InfoTooltip text="Earn a streak by studying daily. Streaks apply a multiplier to your XP gains (up to 1.75x)." />
             </div>
           )}
           
@@ -344,26 +369,94 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
             🎮 TRAINING HUB
           </button>
 
-          <button
-            onClick={() => setShowFlashcards(true)}
-            className="btn-toggle"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              background: 'rgba(255,255,255,0.03)',
-              border: '1px solid var(--border)',
-              borderRadius: '4px',
-              flex: 1
-            }}
-          >
-            🃏 FLASHCARDS
-          </button>
+          <div style={{ position: 'relative', flex: 1 }} ref={drillsMenuRef}>
+            <button
+              onClick={() => setShowDrillsMenu(!showDrillsMenu)}
+              className="btn-toggle"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                background: showDrillsMenu ? 'rgba(255,191,0,0.1)' : 'rgba(255,255,255,0.03)',
+                border: `1px solid ${showDrillsMenu ? 'var(--gold)' : 'var(--border)'}`,
+                borderRadius: '4px',
+                width: '100%',
+                height: '100%',
+                color: showDrillsMenu ? 'var(--gold)' : 'white'
+              }}
+            >
+              ⚔️ DRILLS
+            </button>
 
-          <button onClick={() => setShowProveIt(true)} className="dashboard__icon-btn" style={{ width: '42px', height: '42px', borderRadius: '4px' }} title="Prove It Drill">🎯</button>
+            <AnimatePresence>
+              {showDrillsMenu && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  style={{
+                    position: 'absolute',
+                    top: '100%',
+                    left: 0,
+                    minWidth: '200px',
+                    background: 'var(--surface-opaque)',
+                    border: '1px solid var(--border)',
+                    borderRadius: '8px',
+                    marginTop: '8px',
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.6)',
+                    zIndex: 8000,
+                    overflow: 'hidden'
+                  }}
+                >
+                  {[
+                    { label: '🃏 FLASHCARDS', action: () => setShowFlashcards(true) },
+                    { label: '⚔️ DUAL DRILL', action: () => setShowDualDrill(true) },
+                    { label: '🧠 CONFUSION', action: () => setShowConfusionDrill(true) },
+                    { label: '✍️ COMPOSE', action: () => setShowComposition(true) },
+                  ].map((item, idx, arr) => (
+                    <button
+                      key={item.label}
+                      onClick={() => { item.action(); setShowDrillsMenu(false); }}
+                      style={{
+                        width: '100%',
+                        padding: '14px 20px',
+                        fontSize: '0.75rem',
+                        fontWeight: 900,
+                        letterSpacing: '0.1em',
+                        textAlign: 'left',
+                        background: 'transparent',
+                        color: 'white',
+                        border: 'none',
+                        borderBottom: idx === arr.length - 1 ? 'none' : '1px solid var(--border)',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                        e.currentTarget.style.color = 'var(--gold)';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.background = 'transparent';
+                        e.currentTarget.style.color = 'white';
+                      }}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <button onClick={() => setShowProveIt(true)} className="dashboard__icon-btn" style={{ width: '42px', height: '42px', borderRadius: '4px' }} title="Prove It Drill">🎯</button>
+            <InfoTooltip text="Prove It: Take a word offline, write a sentence, and submit it. jan Lina will review it in your next chat." />
+          </div>
           <button onClick={() => onTogglePanel('instructions')} className="dashboard__icon-btn" style={{ ...getActiveStyle('instructions'), width: '42px', height: '42px', borderRadius: '4px' }}>?</button>
         </div>
+
+        {activeView === 'vocab' && <SRSWidget onAskLina={onAskLina} />}
 
         {/* Unified Control Bar */}
         <div className="dashboard__control-bar">
@@ -414,7 +507,8 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
           </div>
 
           {/* Review Controls Group */}
-          <div className="dashboard__review-group" style={{ display: 'flex', gap: '4px', width: '100%' }}>
+          <div className="dashboard__review-group" style={{ display: 'flex', alignItems: 'center', gap: '4px', width: '100%' }}>
+            <InfoTooltip text="Review Vibes (Chill/Deep/Intense) change their behavior based on whether you are in the Vocab, Roadmap, or Archive tab." />
             <button
               onClick={handleDailyReview}
               className="btn-review"
@@ -612,7 +706,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
         </AnimatePresence>
       </main>
 
-      <SessionOverlay />
+      <SessionOverlay onAskLina={onAskLina} />
       
       {showTrainingHub && (
         <TrainingHub onClose={() => setShowTrainingHub(false)} />
@@ -622,6 +716,26 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
         <FlashcardMode
           onClose={() => setShowFlashcards(false)}
           onAskLina={onAskLina}
+          isSandboxMode={isSandboxMode}
+        />
+      )}
+
+      {showDualDrill && (
+        <DualDrillMode
+          onClose={() => setShowDualDrill(false)}
+          isSandboxMode={isSandboxMode}
+        />
+      )}
+
+      {showConfusionDrill && (
+        <ConfusionDrill
+          onClose={() => setShowConfusionDrill(false)}
+        />
+      )}
+
+      {showComposition && (
+        <CompositionMode
+          onClose={() => setShowComposition(false)}
           isSandboxMode={isSandboxMode}
         />
       )}

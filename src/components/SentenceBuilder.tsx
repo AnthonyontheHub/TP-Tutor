@@ -2,6 +2,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
+import InfoTooltip from './InfoTooltip';
 
 interface SentenceBuilderProps {
   onSave: () => void;
@@ -26,8 +27,34 @@ export default function SentenceBuilder({
 
   return (
     <AnimatePresence>
-      {hasSelection && (
+      {!hasSelection ? (
         <motion.div
+          key="empty-builder"
+          initial={{ y: 50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 50, opacity: 0 }}
+          style={{
+            position: 'fixed',
+            bottom: '24px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: 'rgba(15, 23, 42, 0.6)',
+            backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            padding: '8px 24px',
+            borderRadius: '20px',
+            fontSize: '0.75rem',
+            color: '#888',
+            zIndex: 2000,
+            pointerEvents: 'none',
+            whiteSpace: 'nowrap'
+          }}
+        >
+          Select words from the grid to build a sentence.
+        </motion.div>
+      ) : (
+        <motion.div
+          key="active-builder"
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
@@ -51,22 +78,9 @@ export default function SentenceBuilder({
           }}
         >
           {/* Top Layer: Literal Definitions (Hints) */}
-          <div style={{
-            display: 'flex',
-            gap: '4px',
-            justifyContent: 'center',
-            height: '18px',
-            overflow: 'hidden',
-            fontSize: '0.55rem',
-            color: 'rgba(255,255,255,0.35)',
-            fontWeight: 800,
-            textTransform: 'uppercase',
-            letterSpacing: '0.08em',
-            marginTop: '2px'
-          }}>
+          <div style={{ display: 'flex', gap: '4px', justifyContent: 'center', height: '18px', overflow: 'hidden', fontSize: '0.55rem', color: 'rgba(255,255,255,0.35)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: '2px' }}>
             {selectedWords.map((word, idx) => {
               const vocab = vocabulary.find(v => v.word.toLowerCase() === word.toLowerCase());
-              // Take the first meaning (before any comma or semicolon)
               const hint = vocab?.meanings?.split(/[;,]/)[0].trim() || '?';
               return (
                 <span key={idx}>
@@ -77,47 +91,11 @@ export default function SentenceBuilder({
           </div>
 
           {/* Middle Layer: The Sentence */}
-          <div style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            textAlign: 'center'
-          }}>
-            <div style={{
-              fontSize: '1.2rem',
-              fontWeight: 900,
-              color: 'white',
-              letterSpacing: '0.02em',
-              lineHeight: 1.1,
-              display: 'flex',
-              gap: '6px',
-              flexWrap: 'wrap',
-              justifyContent: 'center'
-            }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+            <div style={{ fontSize: '1.2rem', fontWeight: 900, color: 'white', letterSpacing: '0.02em', lineHeight: 1.1, display: 'flex', gap: '6px', flexWrap: 'wrap', justifyContent: 'center' }}>
               {selectedWords.map((word, idx) => (
-                <span 
-                  key={idx}
-                  onClick={() => {
-                    const newWords = [...selectedWords];
-                    newWords.splice(idx, 1);
-                    setSelectedWords(newWords);
-                  }}
-                  style={{ 
-                    cursor: 'pointer',
-                    transition: 'all 0.2s'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--gold)'}
-                  onMouseLeave={(e) => e.currentTarget.style.color = 'white'}
-                >
-                  {isAutoTranslating ? (
-                    <motion.span animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.5 }}>
-                      {word}
-                    </motion.span>
-                  ) : (
-                    word
-                  )}
+                <span key={idx} onClick={() => { const newWords = [...selectedWords]; newWords.splice(idx, 1); setSelectedWords(newWords); }} style={{ cursor: 'pointer', transition: 'all 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--gold)'} onMouseLeave={(e) => e.currentTarget.style.color = 'white'}>
+                  {isAutoTranslating ? <motion.span animate={{ opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1.5 }}>{word}</motion.span> : word}
                 </span>
               ))}
             </div>
@@ -129,15 +107,14 @@ export default function SentenceBuilder({
           </div>
 
           {/* Bottom Layer: Iconic Toolbelt */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-around',
-            alignItems: 'center',
-            padding: '4px 0',
-            borderTop: '1px solid rgba(255,255,255,0.05)'
-          }}>
+          <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', padding: '4px 0', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
             <IconButton onClick={onSave} icon="🔖" label="Save" />
-            <IconButton onClick={() => onExplain(sentence)} icon="✨" label="Explain" color="var(--gold)" />
+            <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
+              <IconButton onClick={() => onExplain(sentence)} icon="✨" label="Explain" color="var(--gold)" />
+              <div style={{ position: 'absolute', top: 0, right: -16 }}>
+                <InfoTooltip text="Sends this exact sentence to jan Lina for grammatical analysis." />
+              </div>
+            </div>
             <IconButton onClick={() => onPractice(sentence)} icon="💬" label="Practice" color="var(--gold)" />
             <IconButton onClick={onRemoveLast} icon="⌫" label="Undo" color="#aaa" />
             <IconButton onClick={() => setSelectedWords([])} icon="✕" label="Clear" color="#ef4444" />

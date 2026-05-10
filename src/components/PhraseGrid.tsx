@@ -5,6 +5,7 @@ import type { MasteryStatus, CommonPhrase } from '../types/mastery';
 import { phraseData } from '../data/phraseData';
 import type { Phrase, PhraseCategory } from '../data/phraseData';
 import PhraseCard from './PhraseCard';
+import InfoTooltip from './InfoTooltip';
 
 interface Props {
   onAskLina: (prompt: string) => void;
@@ -90,11 +91,14 @@ export default function PhraseGrid({ onAskLina, selectedWords, focusPhraseId, cl
     <section className="phrase-grid">
       {isChill && (
         <div style={{ padding: '0 4px' }}>
-          <h2 className="section-title" style={{ color: 'var(--gold)', marginBottom: '20px', borderLeft: '4px solid var(--gold)', paddingLeft: '12px' }}>MY SAVES</h2>
+          <h2 className="section-title" style={{ color: 'var(--gold)', marginBottom: '20px', borderLeft: '4px solid var(--gold)', paddingLeft: '12px', display: 'flex', alignItems: 'center' }}>
+            MY SAVES
+            <InfoTooltip text="Phrases saved from the builder/chat. These are practiced during 'Chill' reviews." />
+          </h2>
           <div style={{ display: 'grid', gap: '12px', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}>
             {filteredSaves.length === 0 ? (
               <p style={{ color: '#555', gridColumn: '1/-1', textAlign: 'center', padding: '40px 20px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px dashed #333' }}>
-                {selectedWords && selectedWords.length > 0 ? 'No saved phrases match your selection.' : 'No phrases saved yet.'}
+                {selectedWords && selectedWords.length > 0 ? 'No saved phrases match your selection.' : "Your archive is empty. Select words in the Vocab tab to build a sentence, then click 'Save' to store it here."}
               </p>
             ) : filteredSaves.map((p) => (
               <div key={p.id} style={{ background: '#0a0a0a', padding: '18px', borderRadius: '12px', border: '1px solid #1e293b', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>

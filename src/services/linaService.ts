@@ -652,3 +652,60 @@ export async function fetchSessionRecap(
       : 'Session complete! Keep practising.';
   }
 }
+
+export async function fetchCompositionGrade(
+  apiKey: string,
+  composition: string,
+  vocabulary: VocabWord[],
+  userContext?: string
+): Promise<import('../types/mastery').CompositionResult> {
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({
+    model: GEMINI_MODEL,
+    generationConfig: { responseMimeType: "application/json" },
+  });
+
+  const vocabList = vocabulary
+    .filter(v => v.status !== 'not_started')
+    .map(v => `${v.word} (${v.status})`)
+    .join(', ');
+
+  const contextInstruction = userContext ? ` Student Context: ${userContext}.` : '';
+  
+  const prompt = `Act as jan Lina, a Toki Pona teacher grading a student's composition.
+  
+COMPOSITION:
+"${composition}"
+
+STUDENT VOCABULARY:
+${vocabList}
+
+${contextInstruction}
+
+Instructions:
+1. Grade the composition on: grammar correctness, appropriate word choice, clarity of meaning, and creative use of language.
+2. If the composition is empty or not in Toki Pona, return grade "F" with feedback explaining why.
+3. Return ONLY valid JSON matching this structure:
+{
+  "overallGrade": "S" | "A" | "B" | "C" | "F",
+  "gradeReason": "1-2 sentences explaining the grade",
+  "corrections": [{"original": "incorrect phrase", "corrected": "correct Toki Pona", "explanation": "why"}],
+  "highlights": [{"phrase": "good phrase", "reason": "why"}],
+  "overallFeedback": "2-3 sentences of encouragement + advice",
+  "suggestedRewrite": "optional cleaner version"
+}`;
+
+  try {
+    const result = await model.generateContent(prompt);
+    return JSON.parse(sanitizeJson(result.response.text())) as import('../types/mastery').CompositionResult;
+  } catch (e) {
+    console.error('Composition grading error:', e);
+    return {
+      overallGrade: 'F',
+      gradeReason: 'I encountered an error while reading your work. Please try again.',
+      corrections: [],
+      highlights: [],
+      overallFeedback: 'I am sorry, but I cannot grade this right now.'
+    };
+  }
+}

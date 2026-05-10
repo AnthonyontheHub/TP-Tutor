@@ -29,6 +29,9 @@ interface Props {
 const HISTORY_WINDOW = 10;
 const SANDBOX_RESPONSE = '[OFFLINE PROTOCOL]: o toki! I am in sandbox mode. Interaction simulated.';
 
+const isSpeechSupported = typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
+const isTTSSupported = typeof window !== 'undefined' && 'speechSynthesis' in window;
+
 export default function ChatSession({ sessionId, onEndSession, onMinimize, isActive, isMinimized, pendingPrompt, clearPrompt, isSandboxMode, style }: Props) {
   const session = useChatStore(state => state.sessions.find(s => s.id === sessionId));
   const updateSession = useChatStore(state => state.updateSession);
@@ -48,6 +51,8 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
   const [startingTotalXP, setStartingTotalXP] = useState(0);
   const [userMsgCount, setUserMsgCount] = useState(0);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const [speakingId, setSpeakingId] = useState<string | null>(null);
   const yesterdayWasActive = useRef(false);
 
   const [translateBubble, setTranslateBubble] = useState<{
@@ -109,6 +114,53 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
   };
+
+  const handleSpeak = (text: string, id: string) => {
+    if (!isTTSSupported) return;
+    window.speechSynthesis.cancel();
+    if (speakingId === id) {
+      setSpeakingId(null);
+      return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.onend = () => setSpeakingId(null);
+    utterance.onerror = () => setSpeakingId(null);
+    setSpeakingId(id);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const startListening = () => {
+    if (!isSpeechSupported) return;
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    
+    // Try Toki Pona ISO code, fallback to US English
+    recognition.lang = 'tok';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.onstart = () => setIsListening(true);
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      setInput(transcript);
+    };
+    recognition.onerror = () => setIsListening(false);
+    recognition.onend = () => setIsListening(false);
+
+    try {
+      recognition.start();
+    } catch (e) {
+      recognition.lang = 'en-US';
+      recognition.start();
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (isTTSSupported) window.speechSynthesis.cancel();
+    };
+  }, []);
 
   useEffect(() => {
     let currentXP = 0;
@@ -634,22 +686,42 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
                 <div style={{ color: 'var(--gold)', fontSize: '0.6rem', fontWeight: 900, letterSpacing: '0.1em' }}>
                   {msg.role === 'assistant' ? 'jan LINA' : (displayName.toUpperCase())}
                 </div>
-                <button 
-                  onClick={() => handleCopy(msg.displayContent || '', msg.id)}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: copiedId === msg.id ? '#22c55e' : 'var(--text-muted)',
-                    fontSize: '0.55rem',
-                    fontWeight: 900,
-                    cursor: 'pointer',
-                    padding: '2px 4px',
-                    borderRadius: '2px',
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  {copiedId === msg.id ? 'COPIED' : 'COPY'}
-                </button>
+                <div style={{ display: 'flex', gap: '4px' }}>
+                  {msg.role === 'assistant' && isTTSSupported && (
+                    <button 
+                      onClick={() => handleSpeak(msg.displayContent || '', msg.id)}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: speakingId === msg.id ? 'var(--gold)' : 'var(--text-muted)',
+                        fontSize: '0.7rem',
+                        cursor: 'pointer',
+                        padding: '2px 4px',
+                        borderRadius: '2px',
+                        transition: 'all 0.2s'
+                      }}
+                      title="Listen"
+                    >
+                      {speakingId === msg.id ? '🔊' : '🔈'}
+                    </button>
+                  )}
+                  <button 
+                    onClick={() => handleCopy(msg.displayContent || '', msg.id)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: copiedId === msg.id ? '#22c55e' : 'var(--text-muted)',
+                      fontSize: '0.55rem',
+                      fontWeight: 900,
+                      cursor: 'pointer',
+                      padding: '2px 4px',
+                      borderRadius: '2px',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    {copiedId === msg.id ? 'COPIED' : 'COPY'}
+                  </button>
+                </div>
               </div>
               <div style={{ background: msg.role === 'assistant' ? 'rgba(255,255,255,0.03)' : 'rgba(255, 191, 0, 0.1)', padding: '12px', borderRadius: '2px', border: '1px solid var(--border)', color: 'white', display: 'inline-block', textAlign: 'left', maxWidth: '90%', fontSize: '0.9rem', lineHeight: '1.5' }}>{msg.displayContent || (isLoading && msg.role === 'assistant' ? '· · ·' : '')}</div>
               {msg.proposedChanges && msg.proposedChanges.map((c) => <div key={`${c.type}_${c.id}`} style={{ marginTop: '4px', fontSize: '0.65rem', color: 'var(--gold)', fontWeight: 700 }}>+ CALIBRATING: {c.id} → {c.newStatus}</div>)}
@@ -667,6 +739,26 @@ export default function ChatSession({ sessionId, onEndSession, onMinimize, isAct
               placeholder={chatContext === 'GENERAL' ? "Ask jan Lina something..." : "Type your response..."} 
               style={{ flex: 1, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: '2px', padding: '12px', color: 'white', outline: 'none', fontSize: '0.9rem' }} 
             />
+            {isSpeechSupported && (
+              <button 
+                onClick={startListening} 
+                className={isListening ? 'pulse' : ''}
+                style={{ 
+                  background: isListening ? 'rgba(255, 191, 0, 0.2)' : 'rgba(255,255,255,0.05)', 
+                  border: `1px solid ${isListening ? 'var(--gold)' : 'var(--border)'}`, 
+                  borderRadius: '2px', 
+                  width: '46px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  cursor: 'pointer',
+                  color: isListening ? 'var(--gold)' : 'white',
+                  fontSize: '1.2rem'
+                }}
+              >
+                {isListening ? '🎙️' : '🎤'}
+              </button>
+            )}
             <button onClick={() => sendToLina(input)} disabled={isLoading} style={{ background: 'var(--gold)', border: 'none', borderRadius: '2px', padding: '0 20px', color: 'black', fontWeight: 900, cursor: 'pointer', opacity: isLoading ? 0.6 : 1 }}>{isLoading ? '...' : 'SEND'}</button>
           </div>
           <button 

@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react';
 import { useMasteryStore } from '../store/masteryStore';
 import { useAuthStore } from '../store/authStore';
 
-export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSandboxMode, onOpenLogbook, onOpenMasteryCourt, onOpenStoicArchive }: {
+export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSandboxMode, onOpenLogbook, onOpenSessionHistory, onOpenMasteryCourt, onOpenStoicArchive }: {
   isOpen: boolean;
   onClose: () => void;
   isSandboxMode: boolean;
   setIsSandboxMode: (val: boolean) => void;
   onOpenLogbook: () => void;
+  onOpenSessionHistory?: () => void;
   onOpenMasteryCourt?: () => void;
   onOpenStoicArchive?: () => void;
 }) {
@@ -83,6 +84,15 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
           >
             VIEW TEACHER'S LOGBOOK
           </button>
+          {onOpenSessionHistory && (
+            <button
+              onClick={onOpenSessionHistory}
+              className="btn-review"
+              style={{ width: '100%', background: '#111', border: '1px solid #222', color: 'var(--gold)' }}
+            >
+              VIEW SESSION HISTORY
+            </button>
+          )}
           {onOpenMasteryCourt && (
             <button
               onClick={onOpenMasteryCourt}
