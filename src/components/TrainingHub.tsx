@@ -51,9 +51,9 @@ const TrainingHub: React.FC<Props> = ({ onClose, onAskLina }) => {
       <motion.div 
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className="max-w-4xl w-full bg-zinc-900/50 border border-white/10 rounded-[3rem] p-10 relative overflow-hidden"
+        className="max-w-4xl w-full bg-zinc-900/50 border border-white/10 rounded-3xl md:rounded-[3rem] p-6 md:p-10 relative overflow-hidden flex flex-col max-h-[95vh]"
       >
-        <button onClick={onClose} className="close-glyph" aria-label="Close Garrison">✕</button>
+        <button onClick={onClose} className="close-glyph" style={{ zIndex: 9999 }} aria-label="Close Garrison">✕</button>
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-gold to-transparent opacity-50" />
         
         <header className="flex justify-between items-start mb-12">

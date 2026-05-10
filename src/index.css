@@ -1129,7 +1129,7 @@ button:active { transform: scale(0.96); }
   color: var(--gold);
   font-size: 2rem;
   cursor: pointer;
-  z-index: 1001;
+  z-index: 9999 !important;
   transition: all 0.2s;
   opacity: 0.6;
 }

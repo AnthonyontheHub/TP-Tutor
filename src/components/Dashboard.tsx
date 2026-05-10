@@ -905,6 +905,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
               <button 
                 className="close-glyph" 
                 onClick={() => setActiveLore(null)}
+                style={{ zIndex: 9999 }}
               >✕</button>
 
               <span className="dossier-label">LORE DOSSIER • {activeLore.category}</span>

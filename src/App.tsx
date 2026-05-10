@@ -416,7 +416,7 @@ function ModalWrapper({ children, onClose }: { children: React.ReactNode, onClos
         }}
         onClick={e => e.stopPropagation()}
       >
-        <button className="close-glyph" onClick={onClose}>✕</button>
+        <button className="close-glyph" onClick={onClose} style={{ zIndex: 9999 }}>✕</button>
         {children}
       </motion.div>
     </motion.div>
