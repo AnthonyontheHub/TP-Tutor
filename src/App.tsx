@@ -15,6 +15,7 @@ import LogbookPanel from './components/LogbookPanel';
 import SessionHistoryPanel from './components/SessionHistoryPanel';
 import ChatSession from './components/ChatSession';
 import DailyStoicHistory from './components/DailyStoicHistory';
+import DailyStoicPopup from './components/DailyStoicPopup';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -293,6 +294,8 @@ export default function App() {
         onClose={() => setShowStoicHistory(false)}
         onAskLina={(prompt) => { setShowStoicHistory(false); handleAskLina(prompt); }}
       />
+
+      <DailyStoicPopup />
 
       <div className="chat-dock" style={{
         position: 'fixed',

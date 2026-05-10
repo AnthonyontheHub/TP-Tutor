@@ -21,32 +21,7 @@ export default function DailyStoicPopup() {
     }
   }, [user, fetchTodayQuote]);
 
-  if (!todayQuote) return null;
-
-  const now = new Date();
-  const currentHour = now.getHours();
-
-  // Phase Logic
-  let phase = 0;
-  if (currentHour >= 8 && !phase1DismissedAt) {
-    phase = 1;
-  } else if (phase1DismissedAt && !phase2CompletedAt) {
-    const dismissedTime = new Date(phase1DismissedAt).getTime();
-    const twoHoursInMs = 2 * 60 * 60 * 1000;
-    if (Date.now() - dismissedTime >= twoHoursInMs) {
-      phase = 2;
-    }
-  } else if (phase2CompletedAt && !phase3CompletedAt && currentHour >= 21) {
-    phase = 3;
-  }
-
-  // Dev Override
-  if (devPhaseOverride !== null) {
-    phase = devPhaseOverride;
-  }
-
-  // If phase is 0, we still render a minimal "Dev Access" version
-  const showDevOnly = phase === 0;
+  const displayQuote = todayQuote || { tokiPona: "toki pona li pona", english: "Good speech is good.", author: "Lina", breakdown: "A fallback for testing.", source: "TP-Tutor" };
 
   const handlePhase1Dismiss = () => {
     dismissPhase1();
@@ -60,7 +35,7 @@ export default function DailyStoicPopup() {
     
     completePhase2();
     recordInsight('Daily Stoic Challenge', xp);
-    setFeedback(`Original: "${todayQuote.english}"\n\nNasin Pona: ${todayQuote.breakdown || 'A good lesson in simplicity.'}`);
+    setFeedback(`Original: "${displayQuote.english}"\n\nNasin Pona: ${displayQuote.breakdown || 'A good lesson in simplicity.'}`);
     setTimeout(() => {
       setFeedback(null);
       setInput('');
@@ -77,7 +52,7 @@ export default function DailyStoicPopup() {
 
   return (
     <AnimatePresence>
-      <div style={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 9999, display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'flex-end' }}>
+      <div style={{ position: 'fixed', top: '100px', left: '20px', zIndex: 9999, display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'flex-end' }}>
         {/* Dev Controls */}
         <div style={{ display: 'flex', gap: '5px', opacity: 0.5 }}>
           <button type="button" onClick={() => setDevPhaseOverride(1)} style={{ fontSize: '0.6rem', padding: '2px 5px', background: '#333', color: 'white', border: 'none', borderRadius: '4px' }}>P1</button>
@@ -122,7 +97,7 @@ export default function DailyStoicPopup() {
               <div style={{ marginBottom: '20px' }}>
                 <p style={{ color: 'white', fontSize: '1.1rem', fontWeight: 500, lineHeight: 1.4, fontStyle: 'italic' }}>
                   "
-                  {todayQuote.tokiPona.split(' ').map((word, i) => (
+                  {displayQuote.tokiPona.split(' ').map((word, i) => (
                     <span 
                       key={i} 
                       className="interactive-word" 
@@ -133,9 +108,9 @@ export default function DailyStoicPopup() {
                   ))}
                   "
                 </p>
-                {(todayQuote.author || todayQuote.source) && (
+                {(displayQuote.author || displayQuote.source) && (
                   <div style={{ marginTop: '12px', fontSize: '0.75rem', color: '#888', textAlign: 'right', fontWeight: 700 }}>
-                    — {todayQuote.author}{todayQuote.source ? `, ${todayQuote.source}` : ''}
+                    — {displayQuote.author}{displayQuote.source ? `, ${displayQuote.source}` : ''}
                   </div>
                 )}
               </div>

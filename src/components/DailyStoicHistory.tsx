@@ -68,9 +68,22 @@ export default function DailyStoicHistory({ isOpen, onClose, onAskLina }: Props)
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             {history.length === 0 ? (
-              <p style={{ color: '#666', fontStyle: 'italic', textAlign: 'center', marginTop: '40px' }}>
-                No entries in the archive yet...
-              </p>
+              <>
+                <p style={{ color: '#666', fontStyle: 'italic', textAlign: 'center', marginTop: '40px' }}>
+                  No entries in the archive yet...
+                </p>
+                <div style={{ marginTop: '20px', padding: '15px', border: '1px dashed var(--gold)', borderRadius: '8px', background: 'rgba(212,175,55,0.05)' }}>
+                  <h4 style={{ color: 'var(--gold)', fontSize: '0.7rem', fontWeight: 900, marginBottom: '10px', textTransform: 'uppercase' }}>System Debug</h4>
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <button onClick={() => useStoicStore.getState().devReset()} style={{ flex: 1, padding: '8px', background: '#333', color: 'white', border: 'none', borderRadius: '4px', fontSize: '0.7rem' }}>FORCE RESET</button>
+                    <button onClick={() => {
+                      const { user } = useAuthStore.getState();
+                      if (user) useStoicStore.getState().fetchTodayQuote(user.uid);
+                      else alert("No user session found");
+                    }} style={{ flex: 1, padding: '8px', background: 'var(--gold)', color: 'black', border: 'none', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 900 }}>RE-FETCH TODAY</button>
+                  </div>
+                </div>
+              </>
             ) : (
               history.map((quote) => (
                 <div 
