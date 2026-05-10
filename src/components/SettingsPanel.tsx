@@ -15,7 +15,8 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
   const {
     resetAsNewUser, masterAllVocab, randomizeVocab, isMainProfile,
     knowledgeCheckFrequency, setKnowledgeCheckFrequency, clearAllSavedPhrases,
-    resetLearningProgress
+    resetLearningProgress,
+    vocabulary, profile, studentName, currentStreak, getStatusSummary
   } = useMasteryStore();
   const { logout } = useAuthStore();
 
@@ -70,6 +71,55 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
     setConfirmInput('');
   };
 
+  const handleExportToObsidian = () => {
+    const summary = getStatusSummary();
+    const dateStr = new Date().toISOString().split('T')[0];
+    const name = profile?.tpName || profile?.firstName || studentName || 'Student';
+
+    const masteredWords = vocabulary.filter(w => w.status === 'mastered').map(w => w.word).join(', ') || 'None yet';
+    const confidentWords = vocabulary.filter(w => w.status === 'confident').map(w => w.word).join(', ') || 'None yet';
+    const bleedingWords = vocabulary.filter(w => w.isBleeding).map(w => w.word).join(', ') || 'None right now';
+
+    const markdown = `# TP-Tutor Export - ${dateStr}
+
+**Student:** ${name}
+**Rank:** ${summary.rankTitle}
+**XP:** ${summary.xp.toLocaleString()}
+**Current Streak:** ${currentStreak} days
+
+## Vocabulary Mastery Overview
+- **Mastered:** ${summary.mastered || 0}
+- **Confident:** ${summary.confident || 0}
+- **Practicing:** ${summary.practicing || 0}
+- **Introduced:** ${summary.introduced || 0}
+- **Not Started:** ${summary.not_started || 0}
+
+## Needs Attention (Bleeding)
+> Words that have dropped 50+ points in the last 48 hours.
+
+${bleedingWords}
+
+## Mastered Words
+${masteredWords}
+
+## Confident Words
+${confidentWords}
+
+---
+*Exported from TP-Tutor on ${new Date().toLocaleString()}*
+`;
+
+    const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `TP-Tutor-Export-${dateStr}.md`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div style={{ padding: '40px', background: 'var(--surface-opaque)', height: '100%', overflowY: 'auto' }}>
       <h1 style={{ color: 'var(--gold)', fontWeight: 900, marginBottom: '32px', letterSpacing: '0.1em' }}>SETTINGS</h1>
@@ -111,6 +161,13 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
               📖 STOIC ARCHIVE
             </button>
           )}
+          <button
+            onClick={handleExportToObsidian}
+            className="btn-review"
+            style={{ width: '100%', background: 'rgba(168,85,247,0.1)', border: '1px solid #a855f7', color: '#a855f7' }}
+          >
+            🗄️ EXPORT TO OBSIDIAN (.md)
+          </button>
         </div>
       </section>
 

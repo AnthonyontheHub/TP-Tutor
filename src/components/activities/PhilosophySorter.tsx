@@ -1,53 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LogOut, Loader2 } from 'lucide-react';
-import { generateSortItems } from '../../services/geminiService';
-
-interface SortItem {
-  label: string;
-  category: 'pona' | 'ike';
-}
+import { LogOut, HelpCircle } from 'lucide-react';
+import { sorterData } from '../../data/drills';
 
 interface PhilosophySorterProps {
-  userProfile: any;
-  curriculumContext?: string;
-  vocabList?: string[];
   onSessionEnd: (results: { score: number; total: number }) => void;
+  onAskLina?: (prompt: string) => void;
 }
 
-export const PhilosophySorter: React.FC<PhilosophySorterProps> = ({ userProfile, curriculumContext, vocabList, onSessionEnd }) => {
-  const [items, setItems] = useState<SortItem[]>([]);
+export const PhilosophySorter: React.FC<PhilosophySorterProps> = ({ onSessionEnd, onAskLina }) => {
+  const [drill] = useState(() => sorterData[Math.floor(Math.random() * sorterData.length)]);
+  const [items] = useState(() => [...drill.items].sort(() => Math.random() - 0.5));
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [exitDir, setExitDir] = useState<'pona' | 'ike'>('pona');
+  const [exitDir, setExitDir] = useState<'A' | 'B'>('A');
   const [score, setScore] = useState(0);
   const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
 
-  const loadItems = async () => {
-    setLoading(true);
-    try {
-      const context = vocabList && vocabList.length > 0 
-        ? `${curriculumContext}. Focus vocabulary: ${vocabList.join(', ')}`
-        : curriculumContext;
-
-      const newItems = await generateSortItems(userProfile, context);
-      setItems(newItems);
-      setCurrentIndex(0);
-    } catch (error) {
-      console.error("Failed to load items:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => { 
-    loadItems(); 
-  }, [userProfile]);
-
-  const handleSort = (category: 'pona' | 'ike') => {
+  const handleSort = (bucket: 'A' | 'B') => {
     if (!items[currentIndex]) return;
-    setExitDir(category);
-    if (items[currentIndex].category === category) {
+    setExitDir(bucket);
+    if (items[currentIndex].bucket === bucket) {
       setScore(s => s + 1);
     }
     setTotal(t => t + 1);
@@ -55,16 +27,17 @@ export const PhilosophySorter: React.FC<PhilosophySorterProps> = ({ userProfile,
     if (currentIndex < items.length - 1) {
       setCurrentIndex(c => c + 1);
     } else {
-      loadItems();
+      setCurrentIndex(0);
     }
   };
 
-  if (loading && items.length === 0) return (
-    <div className="h-96 flex flex-col items-center justify-center space-y-4">
-      <Loader2 className="w-10 h-10 text-cyan-500 animate-spin" />
-      <p className="text-[10px] uppercase tracking-[0.5em] text-cyan-500">Scanning Concepts...</p>
-    </div>
-  );
+  const handleHelp = () => {
+    if (onAskLina && items[currentIndex]) {
+      onAskLina(`[SYSTEM: The user is stuck sorting the word: "${items[currentIndex].word}" into either "${drill.bucketA}" or "${drill.bucketB}". Provide a brief, casual hint about the word without directly giving away the answer.]`);
+    }
+  };
+
+  if (items.length === 0) return null;
 
   return (
     <div className="max-w-xl mx-auto flex flex-col items-center font-sans">
@@ -76,24 +49,33 @@ export const PhilosophySorter: React.FC<PhilosophySorterProps> = ({ userProfile,
         <AnimatePresence mode="wait" custom={exitDir}>
           {items[currentIndex] && (
             <motion.div
-              key={items[currentIndex].label}
+              key={items[currentIndex].word}
               drag="x"
               dragConstraints={{ left: -100, right: 100 }}
               onDragEnd={(_, info) => {
-                if (info.offset.x > 80) handleSort('ike');
-                else if (info.offset.x < -80) handleSort('pona');
+                if (info.offset.x > 80) handleSort('B');
+                else if (info.offset.x < -80) handleSort('A');
               }}
               initial={{ opacity: 0, scale: 0.8, x: 0 }}
               animate={{ opacity: 1, scale: 1, x: 0 }}
               exit={(custom) => ({
                 opacity: 0,
                 scale: 0.5,
-                x: custom === 'ike' ? 200 : -200,
+                x: custom === 'B' ? 200 : -200,
                 transition: { duration: 0.2 }
               })}
-              className="w-64 h-40 bg-black/60 backdrop-blur-2xl border border-white/10 rounded-3xl flex items-center justify-center p-6 text-center cursor-grab active:cursor-grabbing shadow-2xl"
+              className="w-64 h-40 bg-black/60 backdrop-blur-2xl border border-white/10 rounded-3xl flex items-center justify-center p-6 text-center cursor-grab active:cursor-grabbing shadow-2xl relative"
             >
-              <p className="text-lg font-light italic text-white/90">"{items[currentIndex].label}"</p>
+              {onAskLina && (
+                <button 
+                  onClick={handleHelp}
+                  className="absolute -top-4 -right-4 p-2 text-white/30 hover:text-cyan-500 transition-colors"
+                  title="Ask Lina for a hint"
+                >
+                  <HelpCircle className="w-6 h-6" />
+                </button>
+              )}
+              <p className="text-xl font-bold text-white/90 uppercase tracking-widest">{items[currentIndex].word}</p>
             </motion.div>
           )}
         </AnimatePresence>
@@ -103,16 +85,16 @@ export const PhilosophySorter: React.FC<PhilosophySorterProps> = ({ userProfile,
         {items.length > 0 && items[currentIndex] ? (
           <>
             <button 
-              onClick={() => handleSort('pona')} 
-              className="flex-1 py-6 rounded-2xl border border-cyan-500/20 bg-cyan-500/5 text-cyan-400 font-black uppercase tracking-[0.3em] hover:bg-cyan-500/10 hover:border-cyan-500/50 transition-all active:scale-95"
+              onClick={() => handleSort('A')} 
+              className="flex-1 py-6 rounded-2xl border border-cyan-500/20 bg-cyan-500/5 text-cyan-400 font-black uppercase tracking-[0.1em] hover:bg-cyan-500/10 hover:border-cyan-500/50 transition-all active:scale-95 text-xs md:text-sm"
             >
-              PONA
+              {drill.bucketA}
             </button>
             <button 
-              onClick={() => handleSort('ike')} 
-              className="flex-1 py-6 rounded-2xl border border-rose-500/20 bg-rose-500/5 text-rose-400 font-black uppercase tracking-[0.3em] hover:bg-rose-500/10 hover:border-rose-500/50 transition-all active:scale-95"
+              onClick={() => handleSort('B')} 
+              className="flex-1 py-6 rounded-2xl border border-rose-500/20 bg-rose-500/5 text-rose-400 font-black uppercase tracking-[0.1em] hover:bg-rose-500/10 hover:border-rose-500/50 transition-all active:scale-95 text-xs md:text-sm"
             >
-              IKE
+              {drill.bucketB}
             </button>
           </>
         ) : null}

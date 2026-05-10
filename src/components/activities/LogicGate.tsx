@@ -1,46 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, ArrowRight, RotateCcw, CheckCircle2, XCircle, LogOut } from 'lucide-react';
-import { generateLogicStatements } from '../../services/geminiService';
-
-interface Statement {
+import { Sparkles, ArrowRight, RotateCcw, CheckCircle2, XCircle, LogOut, HelpCircle } from 'lucide-react';
+import { logicGateData } from '../../data/drills';
   statement: string;
   isPona: boolean;
   explanation: string;
 }
 
 interface LogicGateProps {
-  userProfile: any;
-  curriculumContext?: string;
   onComplete?: (results: { score: number; total: number }) => void;
+  onAskLina?: (prompt: string) => void;
 }
 
-export const LogicGate: React.FC<LogicGateProps> = ({ userProfile, curriculumContext, onComplete }) => {
-  const [statements, setStatements] = useState<Statement[]>([]);
+export const LogicGate: React.FC<LogicGateProps> = ({ onComplete, onAskLina }) => {
+  const [statements] = useState(() => [...logicGateData].sort(() => Math.random() - 0.5));
   const [currentIndex, setCurrentIndex] = useState(0);
   const [totalAttempted, setTotalAttempted] = useState(0);
-  const [loading, setLoading] = useState(true);
   const [score, setScore] = useState(0);
   const [showFeedback, setShowFeedback] = useState(false);
   const [lastAnswerCorrect, setLastAnswerCorrect] = useState(false);
-
-  const loadStatements = async () => {
-    setLoading(true);
-    try {
-      const newStatements = await generateLogicStatements(userProfile, curriculumContext);
-      setStatements(newStatements);
-      setCurrentIndex(0);
-      setLoading(false);
-      setShowFeedback(false);
-    } catch (e) {
-      console.error("LogicGate Loading Error:", e);
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadStatements();
-  }, [userProfile]);
 
   const currentStatement = statements[currentIndex];
 
@@ -58,16 +36,19 @@ export const LogicGate: React.FC<LogicGateProps> = ({ userProfile, curriculumCon
       setCurrentIndex(prev => prev + 1);
       setShowFeedback(false);
     } else {
-      loadStatements();
+      // Loop back to start or finish
+      setCurrentIndex(0);
+      setShowFeedback(false);
     }
   };
 
-  if (loading && !currentStatement) return (
-    <div className="h-96 flex flex-col items-center justify-center space-y-4">
-      <div className="w-12 h-12 border-2 border-[#FFD700]/20 border-t-[#FFD700] rounded-full animate-spin" />
-      <p className="text-[10px] uppercase tracking-[0.4em] text-[#FFD700]">Generating Personal Insights...</p>
-    </div>
-  );
+  const handleHelp = () => {
+    if (onAskLina && currentStatement) {
+      onAskLina(`[SYSTEM: The user is stuck on this Logic Gate puzzle: "${currentStatement.statement}". Provide a brief, casual hint about the grammar or vocabulary without directly giving away if it is true or false.]`);
+    }
+  };
+
+  if (!currentStatement) return null;
 
   return (
     <div className="max-w-2xl mx-auto flex flex-col gap-6">
@@ -86,22 +67,23 @@ export const LogicGate: React.FC<LogicGateProps> = ({ userProfile, curriculumCon
           </div>
 
           <AnimatePresence mode="wait">
-            {loading ? (
-              <motion.div 
-                key="loading" 
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                className="h-[120px] flex items-center justify-center"
-              >
-                 <div className="w-6 h-6 border-2 border-[#FFD700]/20 border-t-[#FFD700] rounded-full animate-spin" />
-              </motion.div>
-            ) : currentStatement && (
+            {currentStatement && (
               <motion.div
                 key={currentStatement.statement}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="min-h-[120px] flex items-center justify-center text-center"
+                className="min-h-[120px] flex items-center justify-center text-center relative"
               >
+                {onAskLina && (
+                  <button 
+                    onClick={handleHelp}
+                    className="absolute -top-4 -right-4 p-2 text-white/30 hover:text-[#FFD700] transition-colors"
+                    title="Ask Lina for a hint"
+                  >
+                    <HelpCircle className="w-6 h-6" />
+                  </button>
+                )}
                 <p className="text-xl md:text-2xl font-light leading-relaxed tracking-wide italic text-white/90">
                   "{currentStatement.statement}"
                 </p>

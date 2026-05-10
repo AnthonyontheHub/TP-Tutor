@@ -709,7 +709,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
       <SessionOverlay onAskLina={onAskLina} />
       
       {showTrainingHub && (
-        <TrainingHub onClose={() => setShowTrainingHub(false)} />
+        <TrainingHub onClose={() => setShowTrainingHub(false)} onAskLina={onAskLina} />
       )}
 
       {showFlashcards && (
