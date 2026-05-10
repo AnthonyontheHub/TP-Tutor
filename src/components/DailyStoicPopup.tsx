@@ -23,6 +23,33 @@ export default function DailyStoicPopup() {
 
   const displayQuote = todayQuote || { tokiPona: "toki pona li pona", english: "Good speech is good.", author: "Lina", breakdown: "A fallback for testing.", source: "TP-Tutor" };
 
+  const now = new Date();
+  const currentHour = now.getHours();
+
+  // Phase Logic
+  let phase = 0;
+  if (currentHour >= 8 && !phase1DismissedAt) {
+    phase = 1;
+  } else if (phase1DismissedAt && !phase2CompletedAt) {
+    const dismissedTime = new Date(phase1DismissedAt).getTime();
+    const twoHoursInMs = 2 * 60 * 60 * 1000;
+    if (Date.now() - dismissedTime >= twoHoursInMs) {
+      phase = 2;
+    }
+  } else if (phase2CompletedAt && !phase3CompletedAt && currentHour >= 21) {
+    phase = 3;
+  }
+
+  // Dev Override
+  if (devPhaseOverride !== null) {
+    phase = devPhaseOverride;
+  }
+
+  // If phase is 0, we still render a minimal "Dev Access" version
+  const showDevOnly = phase === 0;
+
+  console.log("Stoic Popup Phase:", phase);
+
   const handlePhase1Dismiss = () => {
     dismissPhase1();
     setDevPhaseOverride(null);
