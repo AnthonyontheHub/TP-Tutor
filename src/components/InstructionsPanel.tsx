@@ -67,11 +67,11 @@ export default function InstructionsPanel({ onClose }: Props) {
         </Section>
 
         <Section title="JAN LINA" emoji="🤖">
-          <p style={{ color: '#eee' }}>jan Lina is your AI tutor. Cool older sister energy.</p>
+          <p style={{ color: '#eee' }}>jan Lina is your AI tutor. Cool older sister energy. Her dedicated tools have moved to the 🤖 icon in the header.</p>
           <ul style={{ paddingLeft: '16px', fontSize: '0.8rem', color: '#888', display: 'grid', gap: '10px', marginTop: '12px' }}>
-            <li><strong style={{ color: 'white' }}>Knowledge Checks:</strong> Based on your settings, jan Lina may pop up on your dashboard randomly to test your mastery of a specific word.</li>
+            <li><strong style={{ color: 'white' }}>Jan Lina Hub:</strong> Use the 🤖 icon to access her Logbook, Session History, Mastery Court, and Knowledge Check settings.</li>
             <li><strong style={{ color: 'var(--gold)' }}>CALIBRATING:</strong> When you see this, she is silently proposing a mastery update. It applies when you end the session.</li>
-            <li><strong style={{ color: 'white' }}>MASTERY COURT:</strong> Settings → Mastery Court. Go here to petition her to change a word's status manually. She decides.</li>
+            <li><strong style={{ color: 'white' }}>MASTERY COURT:</strong> Accessible via the Hub. Go here to petition her to change a word's status manually. She decides.</li>
           </ul>
         </Section>
 

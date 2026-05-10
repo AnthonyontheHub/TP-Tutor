@@ -402,6 +402,8 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
             ?
           </button>
           
+          <button onClick={() => onTogglePanel('linaHub')} className="dashboard__icon-btn" title="JAN LINA HUB">🤖</button>
+          
           <button onClick={() => onTogglePanel('settings')} className="dashboard__icon-btn" style={{ ...getActiveStyle('settings'), width: '32px', height: '32px', fontSize: '0.9rem' }}>⚙️</button>
         </div>
       </header>

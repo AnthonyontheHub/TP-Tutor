@@ -52,7 +52,6 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
   const handleSave = () => {
     setIsSandboxMode(localSandbox);
     localStorage.setItem('TP_GEMINI_KEY', localApiKey);
-    setKnowledgeCheckFrequency(localFreq);
     onClose();
   };
 
@@ -146,81 +145,7 @@ ${confidentWords}
       <h1 style={{ color: 'var(--gold)', fontWeight: 900, marginBottom: '32px', letterSpacing: '0.1em' }}>SETTINGS</h1>
 
       <section style={{ marginBottom: '40px' }}>
-        <h2 style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--gold)', letterSpacing: '0.15em', marginBottom: '20px', opacity: 0.8 }}>TEACHER'S LOGBOOK & MASTERY</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px' }}>
-          <button 
-            onClick={onOpenLogbook}
-            className="btn-review"
-            style={{ width: '100%', background: '#111', border: '1px solid #222', color: 'var(--gold)' }}
-          >
-            VIEW TEACHER'S LOGBOOK
-          </button>
-          {onOpenSessionHistory && (
-            <button
-              onClick={onOpenSessionHistory}
-              className="btn-review"
-              style={{ width: '100%', background: '#111', border: '1px solid #222', color: 'var(--gold)' }}
-            >
-              VIEW SESSION HISTORY
-            </button>
-          )}
-          {onOpenMasteryCourt && (
-            <button
-              onClick={onOpenMasteryCourt}
-              className="btn-review"
-              style={{ width: '100%', background: '#111', border: '1px solid #222', color: 'var(--gold)' }}
-            >
-              MASTERY COURT
-            </button>
-          )}
-          {onOpenStoicArchive && (
-            <button
-              onClick={onOpenStoicArchive}
-              className="btn-review"
-              style={{ width: '100%', background: '#111', border: '1px solid #222', color: 'var(--gold)' }}
-            >
-              📖 STOIC ARCHIVE
-            </button>
-          )}
-        </div>
-      </section>
-
-      <section style={{ marginBottom: '40px' }}>
-        <h2 style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--gold)', letterSpacing: '0.15em', marginBottom: '20px', opacity: 0.8 }}>DATA BACKUP & RESTORE</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px' }}>
-          <button
-            onClick={() => exportToMarkdown(useMasteryStore.getState())}
-            className="btn-review"
-            style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', color: 'white' }}
-          >
-            🗄️ EXPORT FULL BACKUP (.md)
-          </button>
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="btn-review"
-            style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', color: 'white' }}
-          >
-            📥 IMPORT BACKUP (.md)
-          </button>
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            style={{ display: 'none' }} 
-            accept=".md" 
-            onChange={handleImportData} 
-          />
-          <button
-            onClick={handleExportDataSummary}
-            className="btn-review"
-            style={{ width: '100%', background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border)', color: '#888', fontSize: '0.65rem' }}
-          >
-            📄 EXPORT SUMMARY ONLY (.md)
-          </button>
-        </div>
-      </section>
-
-      <section style={{ marginBottom: '40px' }}>
-        <h2 style={{ fontSize: '0.8rem', fontWeight: 900, opacity: 0.5, marginBottom: '20px' }}>CORE CONFIGURATION</h2>
+        <h2 style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--gold)', letterSpacing: '0.15em', marginBottom: '20px', opacity: 0.8 }}>SYSTEM DATA</h2>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px' }}>
           
           <div className="settings-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -256,23 +181,49 @@ ${confidentWords}
             />
           </div>
 
-          <div className="settings-row" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <span style={{ fontSize: '0.8rem', fontWeight: 900, opacity: 0.5 }}>KNOWLEDGE CHECK FREQUENCY</span>
-            <select 
-              value={localFreq}
-              onChange={(e) => setLocalFreq(e.target.value as any)}
-              className="settings-input"
-              style={{ width: '100%', cursor: 'pointer', background: 'rgba(255,255,255,0.05)' }}
-            >
-              <option value="daily">Daily</option>
-              <option value="session">Every Session</option>
-              <option value="never">Never</option>
-            </select>
-          </div>
-
           <button onClick={handleSave} className="btn-review" style={{ width: '100%', marginTop: '10px' }}>
             SAVE SETTINGS
           </button>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px', marginTop: '32px' }}>
+          <button
+            onClick={() => exportToMarkdown(useMasteryStore.getState())}
+            className="btn-review"
+            style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', color: 'white' }}
+          >
+            🗄️ EXPORT FULL BACKUP (.md)
+          </button>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="btn-review"
+            style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', color: 'white' }}
+          >
+            📥 IMPORT BACKUP (.md)
+          </button>
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            style={{ display: 'none' }} 
+            accept=".md" 
+            onChange={handleImportData} 
+          />
+          <button
+            onClick={handleExportDataSummary}
+            className="btn-review"
+            style={{ width: '100%', background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border)', color: '#888', fontSize: '0.65rem' }}
+          >
+            📄 EXPORT SUMMARY ONLY (.md)
+          </button>
+          {onOpenStoicArchive && (
+            <button
+              onClick={onOpenStoicArchive}
+              className="btn-review"
+              style={{ width: '100%', background: '#111', border: '1px solid #222', color: 'var(--gold)', marginTop: '8px' }}
+            >
+              📖 STOIC ARCHIVE
+            </button>
+          )}
         </div>
       </section>
 

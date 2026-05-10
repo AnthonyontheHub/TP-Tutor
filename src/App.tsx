@@ -7,6 +7,7 @@ import { useMasteryStore } from './store/masteryStore';
 import { useAuthStore } from './store/authStore';
 
 import UserProfilePanel from './components/UserProfilePanel';
+import JanLinaPanel from './components/JanLinaPanel';
 import SettingsPanel from './components/SettingsPanel';
 import InstructionsPanel from './components/InstructionsPanel';
 import AchievementsPanel from './components/AchievementsPanel';
@@ -24,7 +25,7 @@ import { detectSessionTitle } from './services/linaService';
 // In Vite, it's typically injected globally.
 declare const __BUILD_TIME__: string;
 
-export type AppPanel = 'profile' | 'settings' | 'instructions' | 'achievements' | 'logbook' | 'sessionHistory';
+export type AppPanel = 'profile' | 'settings' | 'instructions' | 'achievements' | 'logbook' | 'sessionHistory' | 'linaHub';
 
 export default function App() {
   const { user, loading } = useAuthStore();
@@ -277,6 +278,7 @@ export default function App() {
         {activePanels.map(panel => (
           <ModalWrapper key={panel} onClose={() => togglePanel(panel)}>
              {panel === 'profile' && <UserProfilePanel onClose={() => togglePanel('profile')} />}
+             {panel === 'linaHub' && <JanLinaPanel onClose={() => togglePanel('linaHub')} onAskLina={handleAskLina} onOpenLogbook={() => togglePanel('logbook')} onOpenSessionHistory={() => togglePanel('sessionHistory')} onOpenMasteryCourt={() => handleAskLina(`[SYSTEM: The student has opened Mastery Court via Jan Lina Hub. You know why they're here. Greet them briefly, acknowledge your role, and ask what they'd like to petition.]`)} />}
              {panel === 'settings' && <SettingsPanel isOpen={true} onClose={() => togglePanel('settings')} isSandboxMode={isSandboxMode} setIsSandboxMode={setIsSandboxMode} onOpenLogbook={() => togglePanel('logbook')} onOpenSessionHistory={() => { togglePanel('settings'); togglePanel('sessionHistory'); }} onOpenMasteryCourt={() => { togglePanel('settings'); handleAskLina(`[SYSTEM: The student has opened Mastery Court. You know why they're here. Greet them briefly, acknowledge your role, and ask what they'd like to petition.]`); }} onOpenStoicArchive={() => { togglePanel('settings'); setShowStoicHistory(true); }} />}
              {panel === 'achievements' && <AchievementsPanel onClose={() => togglePanel('achievements')} />}
              {panel === 'instructions' && <InstructionsPanel isOpen={true} onClose={() => togglePanel('instructions')} />}
