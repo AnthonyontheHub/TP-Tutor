@@ -21,15 +21,36 @@ const JanLinaPanel: React.FC<Props> = ({
   onOpenMasteryCourt 
 }) => {
   const { knowledgeCheckFrequency, setKnowledgeCheckFrequency } = useMasteryStore();
-  const { history } = useActivityStore();
+  const { history, lastExportDate, setLastExportDate } = useActivityStore();
   const [activeTab, setActiveTab] = React.useState<'COMMAND' | 'NEURAL_LOGS'>('COMMAND');
 
   const handleExportLedger = () => {
-    const md = useActivityStore.getState().generateMarkdownExport();
+    const summary = useMasteryStore.getState().getStatusSummary();
+    const { vocabulary, savedPhrases } = useMasteryStore.getState();
+
+    const snapshot = {
+      rank: summary.rankTitle,
+      level: summary.level,
+      xp: summary.xp,
+      distribution: {
+        mastered: vocabulary.filter(w => w.status === 'mastered').length,
+        confident: vocabulary.filter(w => w.status === 'confident').length,
+        practicing: vocabulary.filter(w => w.status === 'practicing').length,
+        learning: vocabulary.filter(w => w.status === 'learning').length,
+        familiar: vocabulary.filter(w => w.status === 'familiar').length,
+        struggling: vocabulary.filter(w => w.status === 'struggling').length,
+      },
+      phraseCount: savedPhrases.length
+    };
+
+    const md = useActivityStore.getState().generateMarkdownExport(snapshot);
     if (!md) {
       alert("Ledger is empty. Engage in more activities first.");
       return;
     }
+
+    const nowStr = new Date().toISOString();
+    setLastExportDate(nowStr);
 
     const blob = new Blob([md], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
@@ -246,6 +267,11 @@ const JanLinaPanel: React.FC<Props> = ({
               >
                 📜 EXPORT MASTER LEDGER (.md)
               </button>
+              {lastExportDate && (
+                <p style={{ fontSize: '0.6rem', color: '#444', textAlign: 'center', marginTop: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  Last Exported: {new Date(lastExportDate).toLocaleString()}
+                </p>
+              )}
             </section>
           </>
         )}

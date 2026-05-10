@@ -1176,9 +1176,11 @@ export const useMasteryStore = create<MasteryStore>()(
             updates.earnedCeremonialRanks = [...state.earnedCeremonialRanks, ...newlyEarned];
             updates.newRankUnlocked = newlyEarned[0];
             updates.pendingRankAcknowledgement = newlyEarned[0].title;
+            useActivityStore.getState().logEvent('RANK_AWARDED', `Ceremonial Rank Achieved: ${newlyEarned[0].title}`, { xp: summary.xp });
           } else if (currentSmallRank.title !== lastSmallRankTitle) {
             updates.newRankUnlocked = currentSmallRank;
             updates.lastSmallRankTitle = currentSmallRank.title;
+            useActivityStore.getState().logEvent('RANK_AWARDED', `New Rank Achieved: ${currentSmallRank.title}`, { xp: summary.xp });
           }
           return updates;
         });

@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 import { db } from '../services/firebase';
 import { collection, addDoc, serverTimestamp, query, getDocs, orderBy, limit } from 'firebase/firestore';
 
-export type ActivityType = 'XP_SHIFT' | 'STOIC_RITUAL' | 'PHRASE_SAVED' | 'BOSS_FIGHT';
+export type ActivityType = 'XP_SHIFT' | 'STOIC_RITUAL' | 'PHRASE_SAVED' | 'BOSS_FIGHT' | 'RANK_AWARDED';
 
 export interface ActivityEntry {
   timestamp: number;
@@ -15,13 +15,15 @@ export interface ActivityEntry {
 interface ActivityState {
   history: ActivityEntry[];
   isSyncing: boolean;
+  lastExportDate: string | null;
 }
 
 interface ActivityActions {
   logEvent: (type: ActivityType, content: string, metadata?: any) => Promise<void>;
   syncFromCloud: (userId: string) => Promise<void>;
   clearHistory: () => void;
-  generateMarkdownExport: () => string;
+  generateMarkdownExport: (snapshot: { rank: string, level: number, xp: number, distribution: Record<string, number>, phraseCount: number }) => string;
+  setLastExportDate: (date: string) => void;
 }
 
 type ActivityStore = ActivityState & ActivityActions;
@@ -31,6 +33,7 @@ export const useActivityStore = create<ActivityStore>()(
     (set, get) => ({
       history: [],
       isSyncing: false,
+      lastExportDate: null,
 
       logEvent: async (type: ActivityType, content: string, metadata?: any) => {
         const entry: ActivityEntry = {
@@ -63,11 +66,24 @@ export const useActivityStore = create<ActivityStore>()(
         }
       },
 
-      generateMarkdownExport: () => {
+      setLastExportDate: (date: string) => set({ lastExportDate: date }),
+
+      generateMarkdownExport: (snapshot) => {
         const { history } = get();
         if (history.length === 0) return "";
 
         let md = "# TP-Tutor Master Ledger\n\n";
+
+        md += "## 📊 CURRENT SNAPSHOT\n";
+        md += `- **Current Rank:** ${snapshot.rank}\n`;
+        md += `- **Neural Level:** ${snapshot.level}\n`;
+        md += `- **Total Resonance (XP):** ${snapshot.xp}\n`;
+        md += `- **Mastery Distribution:**\n`;
+        Object.entries(snapshot.distribution).forEach(([status, count]) => {
+          if (count > 0) md += `    - ${status.replace('_', ' ').toUpperCase()}: ${count}\n`;
+        });
+        md += `- **Phrases Transcribed:** ${snapshot.phraseCount}\n\n`;
+        md += "---\n\n";
         
         // Sort history by timestamp ascending for chronological reading
         const sorted = [...history].sort((a, b) => a.timestamp - b.timestamp);
@@ -108,6 +124,8 @@ export const useActivityStore = create<ActivityStore>()(
               
               if (entry.type === 'STOIC_RITUAL') {
                 md += `> **[${time}] STOIC RITUAL**\n> ${cleanContent}\n\n`;
+              } else if (entry.type === 'RANK_AWARDED') {
+                md += `- 🏆 **[${time}] ${cleanContent}**\n`;
               } else {
                 md += `- **[${time}]** ${cleanContent}\n`;
               }
@@ -117,7 +135,7 @@ export const useActivityStore = create<ActivityStore>()(
         });
 
         md += "---\n\n";
-        md += "## 📊 SESSION TOTALS\n";
+        md += "## 📈 SESSION TOTALS\n";
         md += `- **Total XP Resonance:** +${totalXP}\n`;
         md += `- **Phrases Transcribed:** ${phrasesSaved}\n`;
         md += `- **Philosophical Inquiries:** ${stoicRituals}\n`;
