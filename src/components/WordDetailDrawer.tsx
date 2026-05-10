@@ -478,8 +478,9 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
               type="button" 
               onClick={onClose} 
               className="close-glyph" 
+              style={{ zIndex: 9999 }}
               aria-label="Close"
-            ></button>
+            >✕</button>
           </motion.div>
         </div>
       )}

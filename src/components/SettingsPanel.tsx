@@ -16,12 +16,29 @@ export default function SettingsPanel({ isOpen, onClose, isSandboxMode, setIsSan
   const {
     resetAsNewUser, masterAllVocab, randomizeVocab, isMainProfile,
     knowledgeCheckFrequency, setKnowledgeCheckFrequency, clearAllSavedPhrases,
-    resetLearningProgress,
+    resetLearningProgress, updateProfile,
     vocabulary, profile, studentName, currentStreak, getStatusSummary,
     hydrateStoreFromExternalData
   } = useMasteryStore();
   const { logout } = useAuthStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleTogglePings = async () => {
+    if (!profile.ritualPingsEnabled) {
+      if (!('Notification' in window)) {
+        alert('This browser does not support desktop notification');
+        return;
+      }
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        updateProfile({ ritualPingsEnabled: true });
+      } else {
+        alert('Notification permission denied.');
+      }
+    } else {
+      updateProfile({ ritualPingsEnabled: false });
+    }
+  };
 
   const [localSandbox, setLocalSandbox] = useState(isSandboxMode);
   const [localApiKey, setLocalApiKey] = useState(localStorage.getItem('TP_GEMINI_KEY') || '');
@@ -179,6 +196,19 @@ ${confidentWords}
               className="settings-input"
               style={{ width: '100%' }}
             />
+          </div>
+
+          <div className="settings-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '12px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>ENABLE RITUAL PINGS</span>
+              <span style={{ fontSize: '0.65rem', color: '#888' }}>Get morning reminders when Readiness is low</span>
+            </div>
+            <button
+              onClick={handleTogglePings}
+              style={{ width: '44px', height: '24px', borderRadius: '12px', background: profile.ritualPingsEnabled ? 'var(--gold)' : 'rgba(255,255,255,0.1)', position: 'relative', border: 'none', cursor: 'pointer', transition: 'background 0.3s' }}
+            >
+              <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: 'white', position: 'absolute', top: '4px', left: profile.ritualPingsEnabled ? '24px' : '4px', transition: 'left 0.3s' }} />
+            </button>
           </div>
 
           <button onClick={handleSave} className="btn-review" style={{ width: '100%', marginTop: '10px' }}>

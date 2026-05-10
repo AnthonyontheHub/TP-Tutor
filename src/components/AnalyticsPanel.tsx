@@ -11,24 +11,7 @@ interface AnalyticsPanelProps {
 }
 
 export default function AnalyticsPanel({ isOpen, onClose }: AnalyticsPanelProps) {
-  const { sessionLog, vocabulary, profile, updateProfile, hydrateStoreFromExternalData } = useMasteryStore();
-
-  const handleTogglePings = async () => {
-    if (!profile.ritualPingsEnabled) {
-      if (!('Notification' in window)) {
-        alert('This browser does not support desktop notification');
-        return;
-      }
-      const permission = await Notification.requestPermission();
-      if (permission === 'granted') {
-        updateProfile({ ritualPingsEnabled: true });
-      } else {
-        alert('Notification permission denied.');
-      }
-    } else {
-      updateProfile({ ritualPingsEnabled: false });
-    }
-  };
+  const { sessionLog, vocabulary } = useMasteryStore();
 
   // 1. Heatmap Data (Last 30 days)
   const heatmapData = useMemo(() => {
@@ -197,81 +180,6 @@ export default function AnalyticsPanel({ isOpen, onClose }: AnalyticsPanelProps)
                     All words mastered!
                   </div>
                 )}
-              </div>
-            </section>
-
-            {/* Settings */}
-            <section className="space-y-4 pt-4 border-t border-white/10">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-white/70 uppercase tracking-widest">Settings</h3>
-              </div>
-              <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col gap-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-white font-bold text-sm">Enable Ritual Pings</div>
-                    <div className="text-white/40 text-xs mt-1">Get morning reminders when Readiness is low</div>
-                  </div>
-                  <button
-                    onClick={handleTogglePings}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${profile.ritualPingsEnabled ? 'bg-[#D4AF37]' : 'bg-white/10'}`}
-                  >
-                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${profile.ritualPingsEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
-                  </button>
-                </div>
-              </div>
-            </section>
-
-            {/* System Data & Backup */}
-            <section className="space-y-4 pt-4 border-t border-white/10">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-white/70 uppercase tracking-widest">System Data</h3>
-                <span className="text-xs text-white/40 uppercase tracking-widest">Backup & Restore</span>
-              </div>
-              <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-white font-bold text-sm">Markdown Sync</div>
-                    <div className="text-white/40 text-xs mt-1">Export your neural state to a portable file</div>
-                  </div>
-                  <button 
-                    onClick={() => exportToMarkdown(useMasteryStore.getState())}
-                    className="bg-white/10 hover:bg-white/20 text-white text-[10px] font-black tracking-widest uppercase px-4 py-2 rounded transition-colors"
-                  >
-                    EXPORT
-                  </button>
-                </div>
-
-                <div className="flex items-center justify-between pt-6 border-t border-white/5">
-                  <div>
-                    <div className="text-white font-bold text-sm">Restore Progress</div>
-                    <div className="text-white/40 text-xs mt-1">Hydrate state from a backup file</div>
-                  </div>
-                  <label className="cursor-pointer bg-white/10 hover:bg-white/20 text-white text-[10px] font-black tracking-widest uppercase px-4 py-2 rounded transition-colors">
-                    IMPORT
-                    <input 
-                      type="file" 
-                      accept=".md" 
-                      className="hidden" 
-                      onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          const reader = new FileReader();
-                          reader.onload = async (event) => {
-                            try {
-                              const content = event.target?.result as string;
-                              const data = importFromMarkdown(content);
-                              hydrateStoreFromExternalData(data);
-                              alert('Success: Neural pathways restored.');
-                            } catch (err: any) {
-                              alert(`Failed: ${err.message}`);
-                            }
-                          };
-                          reader.readAsText(file);
-                        }
-                      }}
-                    />
-                  </label>
-                </div>
               </div>
             </section>
 
