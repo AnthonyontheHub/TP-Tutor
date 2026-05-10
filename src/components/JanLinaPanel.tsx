@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
+import { useStoicStore } from '../store/stoicStore';
 
 interface Props {
   onClose: () => void;
@@ -55,6 +56,16 @@ const JanLinaPanel: React.FC<Props> = ({
             style={{ width: '100%', padding: '16px', fontSize: '0.9rem' }}
           >
             START CASUAL CHAT
+          </button>
+          <button 
+            onClick={() => {
+              useStoicStore.getState().setManualDismissal(null);
+              onClose(); 
+            }} 
+            className="btn-review" 
+            style={{ width: '100%', marginTop: '10px', background: 'rgba(212,175,55,0.1)', color: 'var(--gold)' }}
+          >
+            ✦ RECALL DAILY STOIC
           </button>
         </section>
 

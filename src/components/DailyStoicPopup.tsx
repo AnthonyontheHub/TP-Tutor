@@ -8,7 +8,11 @@ import { Book, Send, Sparkles, X } from 'lucide-react';
 
 export default function DailyStoicPopup() {
   const { user } = useAuthStore();
-  const { todayQuote, fetchTodayQuote, phase1DismissedAt, phase2CompletedAt, phase3CompletedAt, dismissPhase1, completePhase2, completePhase3, devReset } = useStoicStore();
+  const { 
+    todayQuote, fetchTodayQuote, phase1DismissedAt, phase2CompletedAt, phase3CompletedAt, 
+    dismissPhase1, completePhase2, completePhase3, devReset,
+    manualDismissalDate, setManualDismissal
+  } = useStoicStore();
   const { recordInsight, addWordToSelection } = useMasteryStore();
 
   const [input, setInput] = useState('');
@@ -48,6 +52,9 @@ export default function DailyStoicPopup() {
   // If phase is 0, we still render a minimal "Dev Access" version
   const showDevOnly = phase === 0;
 
+  const todayStr = new Date().toISOString().split('T')[0];
+  if (manualDismissalDate === todayStr && !showDevOnly) return null;
+
   console.log("Stoic Popup Phase:", phase);
 
   const handlePhase1Dismiss = () => {
@@ -79,7 +86,7 @@ export default function DailyStoicPopup() {
 
   return (
     <AnimatePresence>
-      <div style={{ position: 'fixed', top: '100px', left: '20px', zIndex: 9999, display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'flex-end' }}>
+      <div style={{ position: 'fixed', bottom: '80px', right: '20px', zIndex: 9999, display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'flex-end' }}>
         {/* Dev Controls */}
         <div style={{ display: 'flex', gap: '5px', opacity: 0.5 }}>
           <button type="button" onClick={() => setDevPhaseOverride(1)} style={{ fontSize: '0.6rem', padding: '2px 5px', background: '#333', color: 'white', border: 'none', borderRadius: '4px' }}>P1</button>
@@ -110,10 +117,11 @@ export default function DailyStoicPopup() {
               </span>
             </div>
             <button type="button" onClick={() => {
-              if (phase === 1) dismissPhase1();
-              else if (phase === 2) completePhase2();
-              else if (phase === 3) completePhase3();
-              setDevPhaseOverride(null);
+              if (showDevOnly) {
+                 setDevPhaseOverride(null);
+              } else {
+                 setManualDismissal(new Date().toISOString().split('T')[0]);
+              }
             }} style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer', zIndex: 9999 }}>
               <X size={16} />
             </button>

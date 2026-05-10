@@ -23,6 +23,7 @@ export interface StoicState {
   phase2CompletedAt: string | null; // ISO Date
   phase3CompletedAt: string | null; // ISO Date
   lastFetchedDate: string | null; // YYYY-MM-DD
+  manualDismissalDate: string | null; // YYYY-MM-DD
 }
 
 export interface StoicActions {
@@ -31,6 +32,7 @@ export interface StoicActions {
   completePhase2: () => void;
   completePhase3: () => void;
   fetchHistory: (userId: string) => Promise<void>;
+  setManualDismissal: (date: string | null) => void;
   // Dev Testing
   devReset: () => void;
 }
@@ -46,6 +48,7 @@ export const useStoicStore = create<StoicStore>()(
       phase2CompletedAt: null,
       phase3CompletedAt: null,
       lastFetchedDate: null,
+      manualDismissalDate: null,
 
       fetchTodayQuote: async (userId: string) => {
         const today = new Date().toISOString().split('T')[0];
@@ -130,6 +133,8 @@ export const useStoicStore = create<StoicStore>()(
 
       completePhase3: () => set({ phase3CompletedAt: new Date().toISOString() }),
 
+      setManualDismissal: (date: string | null) => set({ manualDismissalDate: date }),
+
       fetchHistory: async (userId: string) => {
         const q = query(collection(db, `users/${userId}/stoicQuotes`), orderBy('date', 'desc'), limit(30));
         const querySnapshot = await getDocs(q);
@@ -145,6 +150,7 @@ export const useStoicStore = create<StoicStore>()(
         phase2CompletedAt: null, 
         phase3CompletedAt: null,
         lastFetchedDate: null,
+        manualDismissalDate: null,
         todayQuote: null 
       }),
     }),
