@@ -137,6 +137,9 @@ export interface UserProfile {
   livingSituation?: string | null;
   socialPreference?: string | null;
 
+  // Life Events
+  loreLog?: { date: string; text: string }[];
+
   [key: string]: any; // Added index signature
 }
 

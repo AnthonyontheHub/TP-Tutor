@@ -255,6 +255,7 @@ interface MasteryActions {
   getDueWords: () => VocabWord[];
   getDueCount: () => number;
   processFlashcardResult: (wordId: string, isCorrect: boolean) => void;
+  addLoreEntry: (text: string) => void;
 }
 
 interface MasteryState {
@@ -1502,6 +1503,19 @@ export const useMasteryStore = create<MasteryStore>()(
       },
       setReviewVibe: (vibe) => { set({ reviewVibe: vibe }); void get().syncToCloud(); },
       setProfileImage: (url) => { set({ profileImage: url }); void get().syncToCloud(); },
+
+      addLoreEntry: (text) => {
+        set((state) => ({
+          profile: {
+            ...state.profile,
+            loreLog: [
+              ...(state.profile.loreLog || []),
+              { date: new Date().toISOString(), text }
+            ]
+          }
+        }));
+        void get().syncToCloud();
+      },
 
       updatePhraseNote: (id, notes) => {
         set((state) => ({

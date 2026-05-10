@@ -78,9 +78,14 @@ export function stringifyUserContext(profile: UserProfile, lore?: string): strin
     ? `Pets: ${profile.pets.map(p => `${p.name} the ${p.breed ? `${p.breed} ` : ''}${p.species}`).join(', ')}`
     : '';
 
-  const loreStr = lore ? `\n\nBACKGROUND LORE:\n${lore}` : '';
+  const loreLogStr = profile.loreLog?.length 
+    ? profile.loreLog.slice(-3).map(l => `- ${new Date(l.date).toLocaleDateString()}: ${l.text}`).join('\n')
+    : '';
 
-  return `${profileStr}. Personality: ${personality}. Beliefs: ${beliefs}. Health: ${health}. Media: ${media}. Daily Life: ${dailyLife}.${pets ? ` ${pets}.` : ''}${loreStr}`;
+  const loreStr = lore ? `\n\nBACKGROUND LORE:\n${lore}` : '';
+  const finalLoreStr = [loreStr, loreLogStr ? `RECENT LIFE EVENTS:\n${loreLogStr}` : ''].filter(Boolean).join('\n\n');
+
+  return `${profileStr}. Personality: ${personality}. Beliefs: ${beliefs}. Health: ${health}. Media: ${media}. Daily Life: ${dailyLife}.${pets ? ` ${pets}.` : ''}${finalLoreStr ? `\n\n${finalLoreStr}` : ''}`;
 }
 
 export interface ProposedChange {
