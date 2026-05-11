@@ -1,5 +1,24 @@
 import type { PhrasebookEntry } from '../types/mastery';
 
+import { useMasteryStore } from '../store/masteryStore';
+import { extractLyricsToPhrases } from './lyricExtractor';
+
+// Memoize the lyrics so we don't recalculate them on every keystroke
+let cachedLyrics: PhrasebookEntry[] | null = null;
+
+export const getPhrasebook = (): PhrasebookEntry[] => {
+  if (!cachedLyrics) {
+    try {
+      // Pull directly from your live discography
+      const songs = useMasteryStore.getState().songs || [];
+      cachedLyrics = extractLyricsToPhrases(songs);
+    } catch (e) {
+      cachedLyrics = [];
+    }
+  }
+  return [...standardPhrasebook, ...cachedLyrics!];
+};
+
 export const getPhrasesByCategory = (phrases: PhrasebookEntry[]) => {
   const groups: Record<string, PhrasebookEntry[]> = {};
   phrases.forEach(phrase => {
