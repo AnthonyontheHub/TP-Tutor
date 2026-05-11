@@ -300,6 +300,13 @@ const stage6Nodes: CurriculumNode[] = [
       { type: 'callout', content: "Includes Phrasebook integration: Travel and Needs." }
     ]
   },
+  {
+    id: "midterm_exam", title: "Midterm Exam", requiredVocabIds: [], requiredGrammarIds: [], status: 'locked', activities: ['exam-mode'], suggestedMethod: 'Quiz', type: 'Checkpoint',
+    richContent: [
+      { type: 'text', content: "Comprehensive assessment covering Stages 1 through 6." },
+      { type: 'callout', content: "Format: Translation, Multiple Choice, and True/False." }
+    ]
+  },
 ];
 
 const stage7Nodes: CurriculumNode[] = [
@@ -390,6 +397,13 @@ const stage8Nodes: CurriculumNode[] = [
     richContent: [
       { type: 'text', content: "Translate a vocative address; form a command using 'o'; express a wish; use 'taso' correctly as both 'but' and 'only'." },
       { type: 'callout', content: "Includes Phrasebook integration: Advanced Expressions and Philosophy." }
+    ]
+  },
+  {
+    id: "final_exam", title: "Final Exam", requiredVocabIds: [], requiredGrammarIds: [], status: 'locked', activities: ['exam-mode'], suggestedMethod: 'Quiz', type: 'Checkpoint',
+    richContent: [
+      { type: 'text', content: "Comprehensive assessment covering all foundational Toki Pona concepts." },
+      { type: 'callout', content: "Format: Translation, Multiple Choice, and True/False." }
     ]
   },
 ];

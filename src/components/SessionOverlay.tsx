@@ -4,6 +4,7 @@ import { X, AlertCircle } from 'lucide-react';
 import { useMasteryStore } from '../store/masteryStore';
 import DualDrillMode from './DualDrillMode';
 import ConfusionDrill from './ConfusionDrill';
+import { ExamActivity } from './ExamActivity';
 
 // We inline a simple sentence unscramble drill here.
 const BuilderDrill = ({ 
@@ -151,6 +152,22 @@ export const SessionOverlay: React.FC<{ onAskLina?: (p: string) => void }> = ({ 
          )}
       </div>
     );
+  }
+
+  if (type === 'exam-mode') {
+     return (
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-3xl z-[100] flex flex-col p-6">
+          <div className="flex-1 max-w-4xl w-full mx-auto flex flex-col bg-white dark:bg-slate-900 rounded-xl overflow-hidden shadow-2xl">
+            <ExamActivity 
+              nodeId={nodeId} 
+              onComplete={() => {
+                recordActivityCompletion(nodeId, 'exam-mode');
+                setActiveActivity(null);
+              }}
+            />
+          </div>
+        </div>
+     );
   }
 
   if (nodeId === 'hub' && type === 'word-scramble') {
