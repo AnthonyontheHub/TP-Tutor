@@ -16,6 +16,7 @@ import SessionHistoryPanel from './components/SessionHistoryPanel';
 import ChatSession from './components/ChatSession';
 import DailyStoicHistory from './components/DailyStoicHistory';
 import DailyStoicPopup from './components/DailyStoicPopup';
+import { LibraryOverlay } from './components/LibraryOverlay';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -38,6 +39,8 @@ export default function App() {
 
   const [activePanels, setActivePanels] = useState<AppPanel[]>([]);
   const [showStoicHistory, setShowStoicHistory] = useState(false);
+  const [showLibrary, setShowLibrary] = useState(false);
+  const [libraryChapterId, setLibraryChapterId] = useState<string | undefined>();
   const [isSandboxMode, setIsSandboxMode] = useState<boolean>(
     () => localStorage.getItem('tp_sandbox_mode') === 'true'
   );
@@ -296,6 +299,16 @@ export default function App() {
       />
 
       <DailyStoicPopup />
+
+      {showLibrary && (
+        <LibraryOverlay 
+          initialChapterId={libraryChapterId} 
+          onClose={() => setShowLibrary(false)} 
+          onJumpToRoadmap={(nodeId) => {
+            setShowLibrary(false);
+          }}
+        />
+      )}
 
       <div className="chat-dock" style={{
         position: 'fixed',

@@ -316,11 +316,12 @@ export interface CurriculumNode {
   title: string;
   requiredVocabIds: string[];
   requiredGrammarIds: string[];
+  requiredActivityIds?: string[];
   status: NodeStatus;
   richContent?: ContentBlock[];
   visualFramework?: string;
   requiredWordIds?: string[];
-  suggestedMethod?: 'Jan Lina Chat' | 'Builder Drill' | 'Quiz';
+  suggestedMethod?: 'Jan Lina Chat' | 'Builder Drill' | 'Quiz' | 'exam-mode';
   type?: 'Topic' | 'Drill' | 'Checkpoint';
   activities?: string[];
 }
@@ -525,5 +526,6 @@ export interface CompositionResult {
   }[];
   overallFeedback: string;
   suggestedRewrite?: string;
+  xpAdjustments?: { wordId: string, xp: number }[];
 }
 

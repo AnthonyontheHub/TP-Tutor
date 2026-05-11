@@ -5,16 +5,20 @@ export interface SongBlock {
 }
 
 export interface Song {
-  id: string;
   title: string;
+  titleEn?: string;
+  breakdown?: string;
+  explanation?: string;
+  deepDive?: string;
   blocks: SongBlock[];
 }
 
 export interface Album {
   id: string;
   title: string;
+  titleEn?: string;
+  breakdown?: string;
+  explanation?: string;
   year?: number;
-  artist?: string;
-  description?: string;
-  songs: Song[];
+  tracks: Song[];
 }

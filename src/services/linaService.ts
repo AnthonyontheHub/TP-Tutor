@@ -678,22 +678,28 @@ export async function fetchCompositionGrade(
   const contextInstruction = userContext ? ` Student Context: ${userContext}.` : '';
   
   const prompt = `Act as jan Lina, a Toki Pona teacher grading a student's composition.
-  
-COMPOSITION:
-"${composition}"
 
-STUDENT VOCABULARY:
-${vocabList}
+  ### GRADING PRINCIPLES:
+  1. STRICTNESS: Do not award points for "close enough" answers. If a grammar particle is missing or incorrect, it is an error.
+  2. PROGRESSION: For every correct usage of a Toki Pona word in context, output: "+ [WordID] → [Quantity] XP". A single usage is 5 XP. A perfect usage is 10 XP. Maximum 50 XP per word per conversation.
+  3. CONFIDENCE: The user must reach 500 XP manually through usage before a word is considered 'Confident'. Do not set a word to 'confident' or 'mastered' based on a single conversation.
 
-${contextInstruction}
+  COMPOSITION:
+  "${composition}"
 
-Instructions:
-1. Grade the composition on: grammar correctness, appropriate word choice, clarity of meaning, and creative use of language.
-2. Provide a "Literal Translation" to show what the Toki Pona actually says.
-3. Identify "Grammar Flags" (issues with 'li', 'e', 'pi', word order).
-4. Perform a "Mastery Check": flag any Toki Pona words used that are NOT in the student's active vocabulary list (they are 'unknown' or 'not_started').
-5. Return ONLY valid JSON matching this structure:
-{
+  STUDENT VOCABULARY:
+  ${vocabList}
+
+  ${contextInstruction}
+
+  Instructions:
+  1. Grade the composition on: grammar correctness, appropriate word choice, clarity of meaning, and creative use of language.
+  2. Provide a "Literal Translation" to show what the Toki Pona actually says.
+  3. Identify "Grammar Flags" (issues with 'li', 'e', 'pi', word order).
+  4. Perform a "Mastery Check": flag any Toki Pona words used that are NOT in the student's active vocabulary list (they are 'unknown' or 'not_started').
+  5. Perform "XP Scoring": calculate and format the XP adjustments as instructed in the Grading Principles.
+  6. Return ONLY valid JSON matching this structure:
+  {
   "overallGrade": "S" | "A" | "B" | "C" | "F",
   "gradeReason": "1-2 sentences explaining the grade",
   "literalTranslation": "literal English translation of the composition",
@@ -702,9 +708,9 @@ Instructions:
   "corrections": [{"original": "incorrect phrase", "corrected": "correct Toki Pona", "explanation": "why"}],
   "highlights": [{"phrase": "good phrase", "reason": "why"}],
   "overallFeedback": "2-3 sentences of encouragement + advice",
-  "suggestedRewrite": "optional cleaner version"
-}`;
-
+  "suggestedRewrite": "optional cleaner version",
+  "xpAdjustments": [{"wordId": "word", "xp": 5 | 10}]
+  }`;
   try {
     const result = await model.generateContent(prompt);
     return JSON.parse(sanitizeJson(result.response.text())) as import('../types/mastery').CompositionResult;

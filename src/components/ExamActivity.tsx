@@ -15,8 +15,19 @@ export const ExamActivity: React.FC<ExamActivityProps> = ({ nodeId, onComplete }
   const [status, setStatus] = useState<'writing' | 'grading' | 'finished'>('writing');
   const [markdownResult, setMarkdownResult] = useState<string>('');
 
-  const examType: ExamType = nodeId === 'midterm_exam' ? 'midterm' : 'final';
+  const examType = nodeId.includes('midterm') ? 'midterm' : 'final';
   const questions = examData[examType] || [];
+
+  if (!examData[examType]) {
+    return (
+      <div className="flex items-center justify-center h-full p-20">
+        <div className="bg-rose-500/10 border border-rose-500/20 p-8 rounded-2xl text-center">
+          <p className="text-white text-xl font-bold">Error: Exam data for {nodeId} not found.</p>
+          <button onClick={onComplete} className="mt-6 px-6 py-2 bg-rose-600 text-white rounded-lg">Close</button>
+        </div>
+      </div>
+    );
+  }
 
   // Group questions by section
   const sections = questions.reduce((acc, q) => {

@@ -19,6 +19,7 @@ import { TOKI_PONA_DICTIONARY, WORD_FREQUENCY } from '../data/tokiPonaDictionary
 import aiVocabCache from '../data/aiVocabCache.json';
 import { initialPhrasebook } from '../data/phrasebook';
 import { useActivityStore } from './activityStore';
+import type { Album } from '../types/discography';
 
 const KU_SULI_WORDS = new Set(['kokosila', 'lanpan', 'misikeke', 'epiku', 'jasima', 'kijetesantakalu', 'leko', 'linluwi', 'nja', 'oke', 'soko', 'tonsi', 'usawi', 'yupekosi', 'meso', 'namako', 'oko', 'kipisi']);
 
@@ -113,47 +114,211 @@ function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: Maste
 
 const mappedVocabulary: VocabWord[] = initialMasteryMap.initialVocabulary.map(toFullVocabWord);
 
-const defaultSongs = [
+const defaultSongs: Album[] = [
+  {
+    id: "telo-lon-kiwen",
+    title: "telo lon kiwen",
+    titleEn: "Water on Stone",
+    breakdown: "telo = water, lon = on/in, kiwen = stone/hard",
+    explanation: "This album explores the theme of persistence. Just as water slowly shapes stone over time, 'telo lon kiwen' teaches us about the power of small, consistent actions against immovable objects.",
+    tracks: [
+      {
+        title: "telo li kama",
+        titleEn: "The water comes",
+        breakdown: "telo = water, li = [verb marker], kama = come/arrive",
+        explanation: "The beginning of a gentle but persistent force. 'kama' implies something arriving or becoming.",
+        blocks: []
+      },
+      {
+        title: "kiwen li suli",
+        titleEn: "The stone is big",
+        breakdown: "kiwen = stone/hard thing, suli = big/important",
+        explanation: "Acknowledging a massive obstacle or solid foundation.",
+        blocks: []
+      },
+      {
+        title: "telo lon kiwen",
+        titleEn: "Water on stone",
+        breakdown: "Title track",
+        explanation: "The core concept of soft persistence overcoming hard resistance.",
+        blocks: []
+      }
+    ]
+  },
+  {
+    id: "kalama-pi-kon-mi",
+    title: "kalama pi kon mi",
+    titleEn: "The Sound of My Spirit",
+    breakdown: "kalama = sound, pi = of, kon = spirit/air, mi = my",
+    explanation: "A deeply personal album. The particle 'pi' regroups the words to show that the sound belongs to the speaker's internal soul or essence ('kon mi').",
+    tracks: [
+      {
+        title: "kon mi",
+        titleEn: "My spirit",
+        breakdown: "kon = spirit/air, mi = my",
+        explanation: "An introduction to the artist's inner self.",
+        blocks: []
+      },
+      {
+        title: "kalama wawa",
+        titleEn: "Powerful sound",
+        breakdown: "kalama = sound, wawa = powerful/intense",
+        explanation: "A strong expression of feeling or presence.",
+        blocks: []
+      },
+      {
+        title: "mi wile toki",
+        titleEn: "I want to speak",
+        breakdown: "mi = I, wile = want/need, toki = speak/communicate",
+        explanation: "The fundamental urge to be heard.",
+        blocks: []
+      }
+    ]
+  },
   {
     id: "utala-kon",
     title: "utala kon",
+    titleEn: "Spirit War",
+    breakdown: "utala = fight/war, kon = air/spirit",
+    explanation: "This EP deals with internal conflict. 'kon' describes things that are unseen, making 'utala kon' a battle of the mind or emotions rather than a physical fight.",
     tracks: [
-      { title: "01 wawa kama", blocks: [
-        { title: "Verse 1", tp: "mi tawa / mi tawa / mi tawa lon nasin / nasin li pini", en: "I go / I go / I go on the path / The path ends" },
-        { title: "Chorus", tp: "ona li lon / pini li kama / mi ken ala pini e tawa", en: "It is here / The end is coming / I cannot stop the movement" }
-      ]},
-      { title: "02 nasin li ken ala", blocks: [
-        { title: "Chorus", tp: "nasin li ken ala", en: "The path is not possible" }
-      ]},
-      { title: "03 pini li kama", blocks: [] },
-      { title: "04 toki ike", blocks: [] },
-      { title: "05 lukin moli", blocks: [] },
-      { title: "06 mi olin e ike", blocks: [] },
-      { title: "07 mi awen lon ni", blocks: [] },
-      { title: "08 pini ala", blocks: [] }
+      {
+        title: "01 wawa kama",
+        titleEn: "Arriving power",
+        breakdown: "wawa = power/energy, kama = coming/arriving",
+        explanation: "The build-up of energy or tension before a struggle.",
+        blocks: []
+      },
+      {
+        title: "02 nasin li ken ala",
+        titleEn: "The path is impossible",
+        breakdown: "nasin = path, li = [verb marker], ken ala = cannot/impossible",
+        explanation: "Facing an impassable obstacle or feeling stuck.",
+        blocks: []
+      },
+      {
+        title: "03 pini li kama",
+        titleEn: "The end is coming",
+        breakdown: "pini = end, kama = come",
+        explanation: "Anticipating the conclusion of the struggle.",
+        blocks: []
+      },
+      {
+        title: "04 toki ike",
+        titleEn: "Bad talk",
+        breakdown: "toki = talk, ike = bad/negative",
+        explanation: "Dealing with negativity or harsh internal dialogue.",
+        blocks: []
+      },
+      {
+        title: "05 lukin moli",
+        titleEn: "Deadly look",
+        breakdown: "lukin = look/see, moli = death",
+        explanation: "A severe or final perspective.",
+        blocks: []
+      },
+      {
+        title: "06 mi olin e ike",
+        titleEn: "I love the bad",
+        breakdown: "mi = I, olin = love, e = [object marker], ike = bad",
+        explanation: "Embracing flaws or finding comfort in difficult things.",
+        blocks: []
+      },
+      {
+        title: "07 mi awen lon ni",
+        titleEn: "I stay right here",
+        breakdown: "mi = I, awen = stay/wait, lon ni = at this",
+        explanation: "Holding one's ground.",
+        blocks: []
+      },
+      {
+        title: "08 pini ala",
+        titleEn: "No end",
+        breakdown: "pini = end, ala = no/not",
+        explanation: "A continuous cycle without a clear resolution.",
+        blocks: []
+      }
     ]
   },
   {
-    id: 'jan-olami',
-    title: "jan olin mi",
-    tracks: [
-      { title: "jan olin mi", blocks: [] },
-      { title: "tomo pona", blocks: [] },
-      { title: "suno li suli", blocks: [] },
-      { title: "tenpo pi olin ni", blocks: [] },
-      { title: "mi mute", blocks: [] }
-    ]
-  },
-  {
-    id: 'toki-nasa',
+    id: "toki-nasa",
     title: "toki nasa, kalama pona",
+    titleEn: "Weird Speech, Good Sounds",
+    breakdown: "toki nasa = weird talking, kalama pona = good music",
+    explanation: "An upbeat, experimental EP. It contrasts 'nasa' (strange, unconventional) with 'pona' (good, simple) to show that weird things can still be beautiful.",
     tracks: [
-      { title: "o tawa wawa", blocks: [] },
-      { title: "lukin sama", blocks: [] },
-      { title: "o kule e kon", blocks: [] },
-      { title: "KULUPU PONA", blocks: [] },
-      { title: "alasa tawa sin", blocks: [] },
-      { title: "kili wawa (Bonus Track)", blocks: [] }
+      {
+        title: "01 o tawa wawa",
+        titleEn: "Go fast!",
+        breakdown: "o = [command], tawa = move, wawa = power/fast",
+        explanation: "An energetic push forward.",
+        blocks: []
+      },
+      {
+        title: "02 lukin sama",
+        titleEn: "Looking the same",
+        breakdown: "lukin = look, sama = same",
+        explanation: "Observing similarities or feeling stuck in a loop.",
+        blocks: []
+      },
+      {
+        title: "03 o kule e kon",
+        titleEn: "Color the air",
+        breakdown: "o = [command], kule = color, e = [object marker], kon = air",
+        explanation: "A creative directive to liven up the atmosphere.",
+        blocks: []
+      },
+      {
+        title: "04 KULUPU PONA",
+        titleEn: "GOOD GROUP",
+        breakdown: "kulupu = group/community, pona = good",
+        explanation: "Celebrating a positive community.",
+        blocks: []
+      },
+      {
+        title: "05 alasa tawa sin",
+        titleEn: "Hunting for a new movement",
+        breakdown: "alasa = hunt/seek, tawa = move, sin = new",
+        explanation: "Seeking fresh directions or experiences.",
+        blocks: []
+      },
+      {
+        title: "06 kili wawa (Bonus Track)",
+        titleEn: "Power Fruit",
+        breakdown: "kili = fruit, wawa = power",
+        explanation: "A playful bonus track about an energizing item.",
+        blocks: []
+      }
+    ]
+  },
+  {
+    id: "pini-o-awen",
+    title: "pini o awen",
+    titleEn: "End, Please Wait",
+    breakdown: "pini = end, o = [command/wish], awen = wait/stay",
+    explanation: "A melancholic album about holding onto the present. The particle 'o' turns the end ('pini') into something you can speak to and ask to wait ('awen').",
+    tracks: [
+      {
+        title: "tenpo pini li kama",
+        titleEn: "The end time is coming",
+        breakdown: "tenpo pini = end time, li = [verb marker], kama = come",
+        explanation: "Acknowledging that the conclusion is approaching.",
+        blocks: []
+      },
+      {
+        title: "mi wile awen",
+        titleEn: "I want to stay",
+        breakdown: "mi = I, wile = want, awen = stay",
+        explanation: "The desire to hold onto the present moment.",
+        blocks: []
+      },
+      {
+        title: "pini o awen",
+        titleEn: "End, please wait",
+        breakdown: "Title track",
+        explanation: "A plea for the end to delay its arrival.",
+        blocks: []
+      }
     ]
   }
 ];
@@ -224,6 +389,7 @@ interface MasteryActions {
   // Feature 8
   updateProductionStatus: (wordId: string, status: MasteryStatus) => void;
   updateRecognitionStatus: (wordId: string, status: MasteryStatus) => void;
+  addXPToWord: (wordId: string, xp: number) => void;
 
   // Feature 10
   addProveItResponse: (entry: { word: string, sentence: string, date: string }) => void;
@@ -278,7 +444,7 @@ interface MasteryState {
   activeActivity: { type: string, nodeId: string } | null;
   isMainProfile: boolean;
   cloudSynced: boolean;
-  songs: { id: string; title: string; tracks: { title: string; blocks: { title: string; tp: string; en: string }[] }[] }[];
+  songs: Album[];
   commonPhrases: CommonPhrase[];
   compositionLog: { date: string, text: string, translation?: string }[];
   // Dashboard settings
@@ -447,7 +613,7 @@ export const useMasteryStore = create<MasteryStore>()(
           const newCurriculums = state.curriculums.map((level, lIdx) => ({
             ...level,
             nodes: level.nodes.map((node, nIdx) => {
-              const allReqs = [...node.requiredVocabIds, ...node.requiredGrammarIds];
+              const allReqs = [...(node.requiredVocabIds || []), ...(node.requiredGrammarIds || [])];
               const vocabReqs = state.vocabulary.filter(v => allReqs.includes(v.id) || allReqs.includes(v.word));
               
               const avgScore = vocabReqs.length > 0 
@@ -507,7 +673,7 @@ export const useMasteryStore = create<MasteryStore>()(
         const node = curriculums.flatMap(l => l.nodes).find(n => n.id === nodeId);
         if (!node) return 0;
 
-        const allReqs = [...node.requiredVocabIds, ...node.requiredGrammarIds];
+        const allReqs = [...(node.requiredVocabIds || []), ...(node.requiredGrammarIds || [])];
         const words = vocabulary.filter(v => allReqs.includes(v.id) || allReqs.includes(v.word));
 
         const pillars = words.filter(v => v.weight === 'pillar');
@@ -587,7 +753,7 @@ export const useMasteryStore = create<MasteryStore>()(
 
           const newState = {
             completedActivities: {
-              ...state.completedActivities,
+              ...(state.completedActivities || {}),
               [nodeId]: updated
             }
           };
@@ -1098,6 +1264,20 @@ export const useMasteryStore = create<MasteryStore>()(
           vocabulary: state.vocabulary.map((w) => {
             if (w.id !== wordId && w.word.toLowerCase() !== wordId.toLowerCase()) return w;
             return { ...w, recognitionStatus: status };
+          })
+        }));
+        void get().syncToCloud();
+      },
+      addXPToWord: (wordId, xp) => {
+        set((state) => ({
+          vocabulary: state.vocabulary.map((w) => {
+            if (w.id !== wordId && w.word.toLowerCase() !== wordId.toLowerCase()) return w;
+            const currentXP = w.baseScore || 0;
+            const newXP = Math.min(1000, currentXP + xp); // Cap at 1000 (Mastered)
+            let newStatus: MasteryStatus = w.status;
+            if (newXP >= 500) newStatus = 'confident';
+            if (newXP >= 950) newStatus = 'mastered';
+            return { ...w, baseScore: newXP, status: newStatus };
           })
         }));
         void get().syncToCloud();

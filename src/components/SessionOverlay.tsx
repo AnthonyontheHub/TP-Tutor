@@ -141,70 +141,54 @@ export const SessionOverlay: React.FC<{ onAskLina?: (p: string) => void }> = ({ 
 
   const { type, nodeId } = activeActivity;
 
-  // Handle special nodes
-  if (nodeId === 'training-pit') {
+  // Handle exam-mode specially
+  if (type === 'exam-mode') {
     return (
-      <div className="fixed inset-0 z-[10001] bg-black/95 backdrop-blur-3xl flex items-center justify-center p-6">
-         {Math.random() > 0.5 ? (
-           <DualDrillMode onClose={() => setActiveActivity(null)} isSandboxMode={false} />
-         ) : (
-           <ConfusionDrill onClose={() => setActiveActivity(null)} />
-         )}
+      <div className="fixed inset-0 bg-black/95 backdrop-blur-3xl z-[1000] flex flex-col overflow-hidden">
+        <div className="flex justify-end p-6">
+          <button onClick={() => setActiveActivity(null)} className="p-3 bg-white/5 border border-white/10 rounded-full text-white/40 hover:text-white">
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto px-6 pb-20">
+          <div className="max-w-4xl mx-auto">
+            <ExamActivity nodeId={nodeId} onComplete={() => setActiveActivity(null)} />
+          </div>
+        </div>
       </div>
     );
   }
 
-  if (type === 'exam-mode') {
-     return (
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-3xl z-[100] flex flex-col p-6">
-          <div className="flex-1 max-w-4xl w-full mx-auto flex flex-col bg-white dark:bg-slate-900 rounded-xl overflow-hidden shadow-2xl">
-            <ExamActivity 
-              nodeId={nodeId} 
-              onComplete={() => {
-                recordActivityCompletion(nodeId, 'exam-mode');
-                setActiveActivity(null);
-              }}
-            />
-          </div>
-        </div>
-     );
-  }
-
-  if (nodeId === 'hub' && type === 'word-scramble') {
-     return (
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-3xl z-[100] flex flex-col overflow-y-auto">
-          <div className="flex justify-end p-6">
-            <button onClick={() => setActiveActivity(null)} className="p-3 bg-white/5 border border-white/10 rounded-full text-white/40 hover:text-white hover:bg-white/10 transition-all">
-              <X className="w-6 h-6" />
-            </button>
-          </div>
-          <div className="flex-1 flex items-center justify-center p-6">
-            <BuilderDrill 
-              nodeId="hub" 
-              requiredVocabIds={[]} 
-              onComplete={() => setActiveActivity(null)}
-              onSkip={() => setActiveActivity(null)}
-            />
-          </div>
-        </div>
-     );
-  }
-
   const node = curriculums.flatMap(l => l.nodes).find(n => n.id === nodeId);
-  
-  if (!node) {
-    return null;
-  }
+  if (!node) return null;
 
   const handleClose = () => setShowConfirm(true);
 
-  const isChat = type === 'Jan Lina Chat' || node.suggestedMethod === 'Jan Lina Chat';
-  const isQuiz = type === 'Quiz' || node.type === 'Checkpoint' || node.suggestedMethod === 'Quiz';
-  const isBuilder = type === 'word-scramble' || node.suggestedMethod === 'Builder Drill';
+  const renderActivity = () => {
+    switch (type) {
+      case 'word-scramble': return <BuilderDrill nodeId={node.id} requiredVocabIds={node.requiredVocabIds || []} onComplete={() => {recordActivityCompletion(node.id, type); setActiveActivity(null);}} onSkip={() => setActiveActivity(null)} />;
+      case 'logic-gate': return <div className="text-white text-center p-12"><h2 className="text-2xl font-bold">LogicGateDrill (Under Development)</h2></div>;
+      case 'composition': return <div className="text-white text-center p-12"><h2 className="text-2xl font-bold">CompositionDrill (Under Development)</h2></div>;
+      case 'confusion-drill': return <ConfusionDrill onClose={() => setActiveActivity(null)} />;
+      case 'dual-drill': return <DualDrillMode onClose={() => setActiveActivity(null)} isSandboxMode={false} />;
+      case 'philosophy-sorter': return <div className="text-white text-center p-12"><h2 className="text-2xl font-bold">PhilosophySorter (Under Development)</h2></div>;
+      default: return (
+        <div className="text-center text-white p-12">
+            <h2 className="text-3xl font-bold mb-4 uppercase">Module Under Calibration</h2>
+            <p className="text-gray-400 mb-8">This learning module is currently being calibrated.</p>
+            <button onClick={() => setActiveActivity(null)} className="px-8 py-3 bg-white text-black font-black rounded-full">BACK TO ROADMAP</button>
+        </div>
+      );
+    }
+  };
+
+  const isChat = type === 'Jan Lina Chat';
+  const isQuiz = type === 'Quiz';
+
 
   if ((isChat || isQuiz) && onAskLina && !initiatedRef.current) {
     initiatedRef.current = true;
-    const vocabStr = node.requiredVocabIds.join(', ');
+    const vocabStr = (node.requiredVocabIds || []).join(', ');
     const contentStr = node.richContent?.map(c => c.content).join(' ') || '';
 
     if (isQuiz) {
@@ -220,93 +204,14 @@ export const SessionOverlay: React.FC<{ onAskLina?: (p: string) => void }> = ({ 
     return null;
   }
 
-  if (isBuilder) {
-    return (
-      <div className="fixed inset-0 bg-black/90 backdrop-blur-3xl z-[100] flex flex-col overflow-y-auto">
-        <div className="flex justify-end p-6">
-          <button 
-            onClick={handleClose}
-            className="p-3 bg-white/5 border border-white/10 rounded-full text-white/40 hover:text-white hover:bg-white/10 transition-all active:scale-95"
-          >
-            <X className="w-6 h-6" />
-          </button>
-        </div>
-
-        <div className="flex-1 flex items-center justify-center p-6">
-          <div className="w-full max-w-4xl">
-            <BuilderDrill 
-              nodeId={node.id} 
-              requiredVocabIds={node.requiredVocabIds || []} 
-              onComplete={() => {
-                recordActivityCompletion(node.id, 'word-scramble');
-                setActiveActivity(null);
-              }}
-              onSkip={() => setActiveActivity(null)}
-            />
-          </div>
-        </div>
-
-        <AnimatePresence>
-          {showConfirm && (
-            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] flex items-center justify-center p-6">
-              <motion.div 
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                className="bg-zinc-900 border border-white/10 p-8 rounded-3xl max-w-sm w-full text-center space-y-6 shadow-2xl"
-              >
-                <div className="w-16 h-16 bg-rose-500/10 border border-rose-500/20 rounded-full flex items-center justify-center mx-auto">
-                  <AlertCircle className="w-8 h-8 text-rose-500" />
-                </div>
-                <div className="space-y-2">
-                  <h3 className="text-xl font-bold text-white uppercase tracking-tight">Abandon Session?</h3>
-                  <p className="text-gray-400 text-sm leading-relaxed">Your progress will not be saved for this activity.</p>
-                </div>
-                <div className="flex flex-col gap-3">
-                  <button 
-                    onClick={() => setActiveActivity(null)}
-                    className="w-full py-4 bg-rose-600 text-white font-black uppercase tracking-[0.2em] rounded-xl hover:bg-rose-500 transition-all"
-                  >
-                    Confirm Exit
-                  </button>
-                  <button 
-                    onClick={() => setShowConfirm(false)}
-                    className="w-full py-4 bg-white/5 text-white/60 font-bold uppercase tracking-[0.2em] rounded-xl hover:bg-white/10 transition-all"
-                  >
-                    Stay in Session
-                  </button>
-                </div>
-              </motion.div>
-            </div>
-          )}
-        </AnimatePresence>
-      </div>
-    );
-  }
-
-  // Fallback for unknown type
   return (
     <div className="fixed inset-0 bg-black/90 backdrop-blur-3xl z-[100] flex flex-col overflow-y-auto">
-      <div className="flex justify-end p-6">
-        <button 
-          onClick={handleClose}
-          className="p-3 bg-white/5 border border-white/10 rounded-full text-white/40 hover:text-white hover:bg-white/10 transition-all active:scale-95"
-        >
-          <X className="w-6 h-6" />
-        </button>
-      </div>
-      <div className="flex-1 flex items-center justify-center p-6">
-        <div className="text-white text-center">
-          <h2 className="text-2xl font-bold mb-4 uppercase">Activity Under Construction</h2>
-          <p className="text-gray-400 mb-8 font-mono text-xs uppercase tracking-widest">Type: {type}</p>
-          <button 
-            onClick={() => setActiveActivity(null)}
-            className="px-8 py-3 bg-white text-black font-black rounded-full"
-          >
-            COMPLETE PREVIEW MISSION
-          </button>
-        </div>
-      </div>
+       <div className="flex justify-end p-6">
+         <button onClick={handleClose} className="p-3 bg-white/5 border border-white/10 rounded-full text-white/40 hover:text-white transition-all active:scale-95"><X className="w-6 h-6"/></button>
+       </div>
+       <div className="flex-1 flex items-center justify-center">
+         {renderActivity()}
+       </div>
     </div>
   );
 };

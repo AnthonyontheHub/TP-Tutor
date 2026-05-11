@@ -6,6 +6,7 @@ import NodeDossier from './NodeDossier';
 import type { CurriculumNode, SessionLogEntry } from '../types/mastery';
 import { STATUS_META } from '../types/mastery';
 import InfoTooltip from './InfoTooltip';
+import { HelpCircle } from 'lucide-react';
 
 interface Props {
   onAskLina: (p: string) => void;
@@ -202,7 +203,11 @@ export default function CurriculumRoadmap({ onAskLina, isSandboxMode, onLaunchAc
       </AnimatePresence>
 
       <header style={{ textAlign: 'center', marginBottom: '60px', width: '100%', padding: '0 20px' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
+            <div title="Legend: Blue=Available, Gray=Locked, Gold=Mastered" style={{ cursor: 'help', color: '#666' }}><HelpCircle size={20} /></div>
+        </div>
         <h1 style={{ color: 'var(--gold)', fontWeight: 900, fontSize: '1.2rem', letterSpacing: '0.2em', margin: '0 0 20px 0' }}>NEURAL PATHWAY</h1>
+
         
         <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '32px' }}>
           <button 
@@ -232,10 +237,10 @@ export default function CurriculumRoadmap({ onAskLina, isSandboxMode, onLaunchAc
           </div>
         </div>
 
-        <p style={{ color: '#666', fontSize: '0.7rem', fontWeight: 800, marginTop: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ color: '#666', fontSize: '0.7rem', fontWeight: 800, marginTop: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           SEQUENTIAL MASTERY MAP
           <InfoTooltip text="Tap a past session circle to view XP earned and specific words that changed status." />
-        </p>
+        </div>
       </header>
       
       <div style={{ position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '48px' }}>

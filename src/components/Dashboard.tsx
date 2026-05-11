@@ -15,12 +15,14 @@ import DualDrillMode from './DualDrillMode';
 import ConfusionDrill from './ConfusionDrill';
 import CompositionMode from './CompositionMode';
 import AnalyticsPanel from './AnalyticsPanel';
+import Discography from './Discography';
 import BossFightMode from './BossFightMode';
 import OperationalIntelligenceWidget from './OperationalIntelligenceWidget';
 import InfoTooltip from './InfoTooltip';
 import SRSWidget from './SRSWidget';
 import InsightLedger from './InsightLedger';
 import { SessionOverlay } from './SessionOverlay';
+import { LibraryOverlay } from './LibraryOverlay';
 import { getPhrasesByCategory } from '../utils/phraseEngine';
 import type { VocabWord, MasteryStatus, DashboardView, PhrasebookEntry } from '../types/mastery';
 import type { AppPanel } from '../App';
@@ -48,6 +50,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
   const [showLoreModal, setShowLoreModal] = useState(false);
   const [loreInput, setLoreInput] = useState('');
   const [showLoreToast, setShowLoreToast] = useState(false);
+  const [showLibrary, setShowLibrary] = useState(false);
 
   useEffect(() => {
     if (commonPhrases.length < 20) {
@@ -402,6 +405,10 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
             ?
           </button>
           
+          <button onClick={() => setShowLibrary(true)} className="dashboard__icon-btn" title="OPEN TEXTBOOK LIBRARY">
+            <Library size={18} color="var(--gold)" />
+          </button>
+
           <button onClick={() => onTogglePanel('linaHub')} className="dashboard__icon-btn" title="JAN LINA HUB">🤖</button>
           
           <button onClick={() => onTogglePanel('settings')} className="dashboard__icon-btn" style={{ ...getActiveStyle('settings'), width: '32px', height: '32px', fontSize: '0.9rem' }}>⚙️</button>
@@ -409,6 +416,19 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
       </header>
 
       <main className="dashboard__main" style={{ paddingBottom: '80px' }}>
+        {/* Inject the Library Overlay here or at App level. 
+            Since we're modifying Dashboard, I'll pass the control up or assume App handles it. 
+            Actually, the library overlay should be triggered here. 
+            I'll add the modal/overlay here. 
+        */}
+        {showLibrary && (
+           <div className="fixed inset-0 z-[10000]">
+             <LibraryOverlay onClose={() => setShowLibrary(false)} onJumpToRoadmap={(nodeId) => {
+               setShowLibrary(false);
+               setActiveView('roadmap');
+             }} />
+           </div>
+        )}
         <div className="ritual-core-container">
           <div className="hologram-wing">
             <span className="hologram-label">RANK</span>
@@ -638,90 +658,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
 
                   {archiveSubView === 'songs' && (
                     <div style={{ padding: '0 10px' }}>
-                      {!selectedAlbumId ? (
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                          {songs.map((album) => (
-                            <div 
-                              key={album.id} 
-                              className="album-slate"
-                              onClick={() => setSelectedAlbumId(album.id)}
-                            >
-                              <div style={{ fontSize: '1.2rem', marginBottom: '8px' }}>💿</div>
-                              <div style={{ fontSize: '0.7rem', fontWeight: 900 }}>{album.title}</div>
-                            </div>
-                          ))}
-                        </div>
-                      ) : selectedTrackIdx === null ? (
-                        <div>
-                          <button 
-                            onClick={() => setSelectedAlbumId(null)}
-                            style={{ background: 'none', border: 'none', color: 'var(--gold)', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer', marginBottom: '16px', textTransform: 'uppercase', letterSpacing: '0.1em' }}
-                          >
-                            ← BACK TO ALBUMS
-                          </button>
-                          <h2 style={{ fontSize: '1rem', fontWeight: 900, color: 'white', marginBottom: '20px', letterSpacing: '0.1em' }}>
-                            {songs.find(s => s.id === selectedAlbumId)?.title}
-                          </h2>
-                          <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            {songs.find(s => s.id === selectedAlbumId)?.tracks.map((track, idx) => (
-                              <div 
-                                key={idx} 
-                                className="track-row"
-                                onClick={() => setSelectedTrackIdx(idx)}
-                              >
-                                <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>{idx + 1}. {track.title}</span>
-                                <span style={{ opacity: 0.4 }}>→</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ) : (
-                        <div>
-                          <button 
-                            onClick={() => setSelectedTrackIdx(null)}
-                            style={{ background: 'none', border: 'none', color: 'var(--gold)', fontSize: '0.6rem', fontWeight: 900, cursor: 'pointer', marginBottom: '16px', textTransform: 'uppercase', letterSpacing: '0.1em' }}
-                          >
-                            ← BACK TO TRACKS
-                          </button>
-                          <h2 style={{ fontSize: '1rem', fontWeight: 900, color: 'white', marginBottom: '4px' }}>
-                            {songs.find(s => s.id === selectedAlbumId)?.tracks[selectedTrackIdx].title}
-                          </h2>
-                          <div style={{ fontSize: '0.65rem', color: 'var(--gold)', fontWeight: 800, marginBottom: '24px', opacity: 0.6 }}>
-                            TAP WORDS TO ADD TO BUILDER
-                          </div>
-                          
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                            {songs.find(s => s.id === selectedAlbumId)?.tracks[selectedTrackIdx].blocks.map((block, bIdx) => (
-                              <div key={bIdx}>
-                                <div style={{ fontSize: '0.6rem', color: '#666', fontWeight: 900, marginBottom: '8px', textTransform: 'uppercase' }}>{block.title}</div>
-                                <div style={{ fontSize: '1.1rem', fontWeight: 900, color: 'white', lineHeight: 1.4, marginBottom: '4px' }}>
-                                  {block.tp.split(' ').map((word, wIdx) => (
-                                    <span 
-                                      key={wIdx} 
-                                      className="lyric-word"
-                                      onClick={() => addWordToSelection(word.replace(/[.,!?]/g, ''))}
-                                    >
-                                      {word}
-                                    </span>
-                                  ))}
-                                </div>
-                                <div style={{ fontSize: '0.8rem', color: '#888', fontStyle: 'italic' }}>{block.en}</div>
-                              </div>
-                            ))}
-                          </div>
-
-                          <button 
-                            onClick={() => {
-                              const track = songs.find(s => s.id === selectedAlbumId)?.tracks[selectedTrackIdx];
-                              onAskLina(`[SYSTEM: Let's analyze the lyrics for "${track?.title}" from the album "${songs.find(s => s.id === selectedAlbumId)?.title}".]`);
-                            }}
-                            className="btn-review"
-                            style={{ width: '100%', marginTop: '40px' }}
-                          >
-                            ASK LINA TO ANALYZE
-                          </button>
-                        </div>
-                      )}
+                      <Discography onAskLina={onAskLina} selectedWords={selectedWords} />
                     </div>
                   )}
                 </div>
