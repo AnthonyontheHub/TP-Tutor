@@ -298,7 +298,9 @@ export default function App() {
         onAskLina={(prompt) => { setShowStoicHistory(false); handleAskLina(prompt); }}
       />
 
-      <DailyStoicPopup />
+      <div className="hidden">
+        <DailyStoicPopup />
+      </div>
 
       {showLibrary && (
         <LibraryOverlay 

@@ -20,5 +20,6 @@ export interface Album {
   breakdown?: string;
   explanation?: string;
   year?: number;
+  scUrl?: string;
   tracks: Song[];
 }

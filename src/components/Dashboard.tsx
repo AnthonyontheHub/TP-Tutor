@@ -21,6 +21,7 @@ import OperationalIntelligenceWidget from './OperationalIntelligenceWidget';
 import InfoTooltip from './InfoTooltip';
 import SRSWidget from './SRSWidget';
 import InsightLedger from './InsightLedger';
+import SoundCloudPlayer from './SoundCloudPlayer';
 import { SessionOverlay } from './SessionOverlay';
 import { LibraryOverlay } from './LibraryOverlay';
 import { getPhrasesByCategory } from '../utils/phraseEngine';
@@ -42,7 +43,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
     recordActivityCompletion, activeActivity, setActiveActivity, 
     calculateReadinessScore, getStatusSummary, songs, commonPhrases, 
     addWordToSelection, getDueWords, syncPhrasebook, masteryHistory,
-    addLoreEntry
+    addLoreEntry, activeScUrl, setActiveScUrl
   } = useMasteryStore();
   
   const summary = getStatusSummary();
@@ -979,6 +980,23 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
           bossWords={bossFightWords}
           isSandboxMode={isSandboxMode}
         />
+      )}
+
+      {activeScUrl && (
+        <div className="fixed bottom-20 left-0 right-0 z-[100] bg-black/80 backdrop-blur-md border-t border-[var(--gold)]/30 p-2 animate-in slide-in-from-bottom duration-500">
+          <div className="max-w-4xl mx-auto flex items-center gap-4">
+            <div className="flex-1">
+              <SoundCloudPlayer url={activeScUrl} height={120} />
+            </div>
+            <button 
+              onClick={() => setActiveScUrl(null)}
+              className="p-2 hover:bg-white/10 rounded-full transition-colors text-[var(--gold)]"
+              title="Close Player"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

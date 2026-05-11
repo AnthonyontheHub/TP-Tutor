@@ -9,7 +9,7 @@ interface Props {
 }
 
 export default function Discography({ onAskLina, selectedWords = [] }: Props) {
-  const { songs } = useMasteryStore();
+  const { songs, setActiveScUrl } = useMasteryStore();
   const [selectedAlbumId, setSelectedAlbumId] = useState<string | null>(null);
   const [selectedTrackTitle, setSelectedTrackTitle] = useState<string | null>(null);
   const [selectedBlocks, setSelectedBlocks] = useState<SongBlock[]>([]);
@@ -74,9 +74,25 @@ export default function Discography({ onAskLina, selectedWords = [] }: Props) {
             <ChevronLeft size={14} /> BACK TO ALBUMS
           </button>
           
-          <div className="flex flex-col gap-2">
-            <span className="text-[0.6rem] font-black text-[var(--text-muted)] tracking-[0.2em]">NOW VIEWING ALBUM</span>
-            <h3 className="section-title text-[1.2rem] m-0">{safeSongs.find(a => a.id === selectedAlbumId)?.title}</h3>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <span className="text-[0.6rem] font-black text-[var(--text-muted)] tracking-[0.2em]">NOW VIEWING ALBUM</span>
+              <div className="flex justify-between items-start gap-4">
+                <h3 className="section-title text-[1.2rem] m-0">{safeSongs.find(a => a.id === selectedAlbumId)?.title}</h3>
+                {(() => {
+                  const album = safeSongs.find(a => a.id === selectedAlbumId);
+                  return album?.scUrl && (
+                    <button 
+                      onClick={() => setActiveScUrl(album.scUrl!)}
+                      className="flex items-center gap-2 px-4 py-2 bg-[var(--gold)]/20 hover:bg-[var(--gold)]/30 border border-[var(--gold)]/40 rounded-full text-sm font-bold transition-all text-[var(--gold)]"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                      PLAY ALBUM
+                    </button>
+                  );
+                })()}
+              </div>
+            </div>
           </div>
 
           <div className="grid gap-4 max-w-[800px]">

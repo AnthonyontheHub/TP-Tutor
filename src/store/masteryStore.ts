@@ -119,6 +119,7 @@ const defaultSongs: Album[] = [
     id: "telo-lon-kiwen",
     title: "telo lon kiwen",
     titleEn: "Water on Stone",
+    scUrl: "https://soundcloud.com/ansoni-482276927/sets/telo-lon-kiwen",
     breakdown: "telo = water, lon = on/in, kiwen = stone/hard",
     explanation: "I want to tell you something honest before I tell you anything else about this record... I built a cathedral. I built it alone in a 678 square foot apartment in Franklin, Tennessee using convolution reverb and a gut-strung baroque palette and a countertenor voice I had to reach up and find inside myself and hold there.\\n\\nToki pona forces reduction. It strips a concept down to its most essential components and makes you find the word inside the small set you are given. The language does not let you be indirect. It cannot support the architecture of avoidance that English can sustain for years if you are disciplined enough... I want you to sit in the cold of this record. I want you to feel the stone under you and the silence between the notes pressing against your ears. And then I want you to feel the warmth come, slowly.",
     tracks: [
@@ -334,6 +335,7 @@ const defaultSongs: Album[] = [
     id: "kalama-pi-kon-mi",
     title: "kalama pi kon mi",
     titleEn: "The Sound of My Spirit",
+    scUrl: "https://soundcloud.com/ansoni-482276927/sets/kalama-pi-kon-mi",
     breakdown: "kalama = sound, pi = of, kon = spirit/air, mi = my",
     explanation: "I made this record because I was suffocating in silence and did not fully realize it until I was already halfway through building something completely different... kalama pi kon mi is the sound of my apartment. Not idealized, not expanded into something grander than it is. Just the room. I made a decision early in this record that I was going to stop hiding the evidence of the making. Every pristine production choice is also a choice about what to conceal. This time I wanted the seams visible. I wanted you to hear that this was made by a person sitting alone in a small space trying to say something they did not have a clean way to say.",
     tracks: [
@@ -513,6 +515,7 @@ const defaultSongs: Album[] = [
     id: "utala-kon",
     title: "utala kon",
     titleEn: "Spirit War",
+    scUrl: "https://soundcloud.com/ansoni-482276927/sets/utala-kon",
     breakdown: "utala = fight/war, kon = air/spirit",
     explanation: "I titled this record war of air because that is the most accurate description I have for what the whole recording process felt like. Not a war with something you can see or touch or reason with. A war with pressure. With atmosphere... I traded everything delicate for this record. What replaced all of that is down-tuned guitars so low they buzz before you even play a note, sub-bass pulses you feel in your sternum, programmed breakbeats running at 160 BPM that sound erratic and cornered from the first second, and turntable scratches cutting through the mix like something being interrupted mid-sentence. I made those choices deliberately. This was not me losing control of the production. This was me deciding that control was the wrong tool for what I was trying to say.",
     tracks: [
@@ -639,6 +642,7 @@ const defaultSongs: Album[] = [
     id: "toki-nasa",
     title: "toki nasa, kalama pona",
     titleEn: "Weird Speech, Good Sounds",
+    scUrl: "https://soundcloud.com/ansoni-482276927/sets/toki-nasa-kalama-pona",
     breakdown: "toki nasa = weird talking, kalama pona = good music",
     explanation: "An upbeat, experimental EP. It contrasts 'nasa' (strange, unconventional) with 'pona' (good, simple) to show that weird things can still be beautiful.\\n\\nI want to be honest with you about why this record exists... I was exhausted from the weight of interiority. So I sat alone in my apartment and I built a stadium. I want you to put this on when you are exhausted from being inside your own head and let the structure of it make the decision for you.",
     tracks: [
@@ -749,6 +753,7 @@ const defaultSongs: Album[] = [
     id: "pini-o-awen",
     title: "pini o awen",
     titleEn: "End, Please Wait",
+    scUrl: "https://soundcloud.com/ansoni-482276927/sets/pini-o-awen",
     breakdown: "pini = end, o = [command/wish], awen = wait/stay",
     explanation: "I realized sometime during the making of this record that you cannot hide grief inside a production choice... So I stripped everything down. I sat with an acoustic guitar and I put the microphone close enough to hear everything, every finger slide, every fret rattle, every breath before the word arrived, every moment of hesitation that a cleaner production would have edited out. I did not edit it out. The mess is the record. The mess is the point.",
     tracks: [
@@ -1015,6 +1020,7 @@ interface MasteryActions {
   switchProfile: (name: string) => void;
   updateVocabAIContent: (wordId: string, content: { aiExplanation?: string; aiExamples?: Record<string, string>; grammarExamples?: Record<string, string> | null; neighborConnections?: Record<string, string> | null }) => void;
   updateSessionNotes: (wordId: string, notes: string) => void;
+  setActiveScUrl: (url: string | null) => void;
 
   // Feature 5
   recordLearningDay: (date: string) => void;
@@ -1123,6 +1129,7 @@ interface MasteryState {
   currentChallenge: WeeklyChallenge | null;
   completedChallenges: WeeklyChallenge[];
   pendingRankAcknowledgement: string | null;
+  activeScUrl: string | null;
 
   // Feature Flag State Persistence
   drills: any[];
@@ -1241,6 +1248,7 @@ export const useMasteryStore = create<MasteryStore>()(
       currentChallenge: null,
       completedChallenges: [],
       pendingRankAcknowledgement: null,
+      activeScUrl: null,
 
       // Initial Feature Flags
       drills: [],
@@ -1248,6 +1256,8 @@ export const useMasteryStore = create<MasteryStore>()(
       linaChat: [],
 
       setHasCompletedSetup: (val) => { set({ hasCompletedSetup: val }); void get().syncToCloud(); },
+
+      setActiveScUrl: (url) => set({ activeScUrl: url }),
 
       refreshCurriculumStatus: () => {
         set((state) => {
