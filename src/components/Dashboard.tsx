@@ -657,7 +657,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
                   )}
 
                   {archiveSubView === 'songs' && (
-                    <div style={{ padding: '0 10px' }}>
+                    <div style={{ padding: '0', width: '100%' }}>
                       <Discography onAskLina={onAskLina} selectedWords={selectedWords} />
                     </div>
                   )}

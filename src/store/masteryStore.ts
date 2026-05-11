@@ -303,21 +303,33 @@ const defaultSongs: Album[] = [
         titleEn: "The end time is coming",
         breakdown: "tenpo pini = end time, li = [verb marker], kama = come",
         explanation: "Acknowledging that the conclusion is approaching.",
-        blocks: []
+        blocks: [
+          { title: "Verse 1", tp: "tenpo pini li kama", en: "The end time is coming" },
+          { title: "Verse 2", tp: "mi lukin e ona", en: "I see it" },
+          { title: "Verse 3", tp: "ona li suli", en: "It is big" }
+        ]
       },
       {
         title: "mi wile awen",
         titleEn: "I want to stay",
         breakdown: "mi = I, wile = want, awen = stay",
         explanation: "The desire to hold onto the present moment.",
-        blocks: []
+        blocks: [
+          { title: "Verse 1", tp: "mi wile awen", en: "I want to stay" },
+          { title: "Verse 2", tp: "taso tenpo li tawa", en: "But time moves" },
+          { title: "Verse 3", tp: "mi ken ala awen e tenpo", en: "I cannot stop time" }
+        ]
       },
       {
         title: "pini o awen",
         titleEn: "End, please wait",
         breakdown: "Title track",
         explanation: "A plea for the end to delay its arrival.",
-        blocks: []
+        blocks: [
+          { title: "Verse 1", tp: "pini o awen", en: "End, please wait" },
+          { title: "Verse 2", tp: "mi wile e tenpo sin", en: "I want more time" },
+          { title: "Verse 3", tp: "o awen lili", en: "Please wait a little" }
+        ]
       }
     ]
   }
