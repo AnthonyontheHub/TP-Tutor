@@ -1,5 +1,5 @@
-import { Album } from '../types/discography';
-import { PhrasebookEntry } from '../types/mastery';
+import type { Album } from '../types/discography';
+import type { PhrasebookEntry } from '../types/mastery';
 
 export const extractLyricsToPhrases = (albums: Album[]): PhrasebookEntry[] => {
   const phrases: PhrasebookEntry[] = [];
