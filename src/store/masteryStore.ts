@@ -21,6 +21,36 @@ import { initialPhrasebook } from '../data/phrasebook';
 import { useActivityStore } from './activityStore';
 import type { Album } from '../types/discography';
 
+/* =====================================================================
+   🤖 AI AGENT & LLM MANIFEST: SYSTEM ARCHITECTURE GUIDELINES 🤖
+   ---------------------------------------------------------------------
+   Welcome to masteryStore.ts. Before modifying state logic, you MUST
+   read and adhere to these global rules. This is a single-user app
+   prioritizing local code authority over legacy cloud data.
+
+   1. THE HYBRID STATE LAW:
+      This store mixes Cloud Data (Firestore), Local Cache (Zustand Persist),
+      and Hardcoded Data. Do NOT blindly merge or sync the entire state.
+
+   2. THE "EMBARGO" RULE FOR HARDCODED DATA:
+      Data like the 'songs' array (and potentially future static lists)
+      are strictly HARDCODED. They must NEVER be added to the Zustand
+      'partialize' whitelist, NEVER sent via 'syncToCloud', and NEVER
+      ingested via 'onSnapshot' or manual rehydration. Update the code
+      arrays directly instead.
+
+   3. INBOUND DATA HAZARDS:
+      Firebase's `onSnapshot` listener and `hydrateStoreFromExternalData`
+      are historically notorious for overwriting new local hardcoded
+      changes with legacy ghost data from the cloud. Always explicitly
+      sanitize inbound payloads to block embargoed fields.
+
+   4. DO NOT "FIX" EXCLUSIONS:
+      If a state variable is missing from the cloud sync or local persist
+      functions, assume it was excluded ON PURPOSE to prevent cloud
+      overwrites. Do not "helpfully" re-integrate it.
+   ===================================================================== */
+
 const KU_SULI_WORDS = new Set(['kokosila', 'lanpan', 'misikeke', 'epiku', 'jasima', 'kijetesantakalu', 'leko', 'linluwi', 'nja', 'oke', 'soko', 'tonsi', 'usawi', 'yupekosi', 'meso', 'namako', 'oko', 'kipisi']);
 
 function normalizePartOfSpeech(pos: string): string {
@@ -114,6 +144,26 @@ function toFullVocabWord(v: { word: string; partOfSpeech?: string; status: Maste
 
 const mappedVocabulary: VocabWord[] = initialMasteryMap.initialVocabulary.map(toFullVocabWord);
 
+/* =====================================================================
+   🤖 AI AGENT WARNING: THE "SONG EMBARGO" 🤖
+   ---------------------------------------------------------------------
+   The 'songs' array is strictly HARDCODED. It must NEVER be synced to
+   or from Firebase, nor should it be persisted in local storage.
+
+   Historically, Firebase's onSnapshot listener and Zustand's persist
+   logic were overwriting this hardcoded list with legacy cloud data.
+
+   To maintain the integrity of this discography, 'songs' has been
+   intentionally EXCLUDED from:
+   1. Zustand's 'partialize' (Local Save)
+   2. 'syncToCloud' (Firestore Write)
+   3. 'onSnapshot' (Firestore Read)
+   4. 'hydrateStoreFromExternalData' (Manual Merge)
+
+   DO NOT attempt to "fix" or re-integrate 'songs' into the cloud sync
+   payloads. If you need to update the song list, modify the
+   'defaultSongs' array directly.
+   ===================================================================== */
 const defaultSongs: Album[] = [
   {
     id: "telo-lon-kiwen",
@@ -2363,7 +2413,6 @@ export const useMasteryStore = create<MasteryStore>()(
           compositionLog: data.compositionLog || state.compositionLog || [],
           commonPhrases: data.commonPhrases || state.commonPhrases,
           curriculums: data.curriculums || state.curriculums,
-          songs: data.songs || state.songs,
         }));
         
         // Push full state to cloud
@@ -2791,7 +2840,7 @@ export const useMasteryStore = create<MasteryStore>()(
             vocabulary: partialVocab,
             curriculums, lastUpdated, studentName, profile, profileImage,
             savedPhrases, currentStreak, lastActiveDate, hasCompletedSetup, currentPositionNodeId, isMainProfile,
-            widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, songs, commonPhrases,
+            widgetDensity, fogOfWar, showCircuitPaths, knowledgeCheckFrequency, lastKnowledgeCheckDate, commonPhrases,
             lastStreakCheck, learningDays, completedNodeIds, seenIntroductions, confusionPairs, pendingProveItResponses,
             earnedCeremonialRanks, lastSmallRankTitle, earnedBadges, totalProveItSubmitted,
             streakShields, xpMultiplier, lastStreakMilestone, pendingComebackBonus, sessionXPRecord,
@@ -3019,7 +3068,6 @@ export const useMasteryStore = create<MasteryStore>()(
             showCircuitPaths: data.showCircuitPaths !== undefined ? data.showCircuitPaths : true,
             knowledgeCheckFrequency: data.knowledgeCheckFrequency || 'session',
             lastKnowledgeCheckDate: data.lastKnowledgeCheckDate || '',
-            songs: (Array.isArray(data.songs) && data.songs.length > 0) ? data.songs : defaultSongs,
             commonPhrases: (Array.isArray(data.commonPhrases) && data.commonPhrases.length > 0) ? data.commonPhrases : defaultCommonPhrases,
             lastStreakCheck: data.lastStreakCheck || '',
             learningDays: data.learningDays || [],
@@ -3160,7 +3208,7 @@ export const useMasteryStore = create<MasteryStore>()(
 // ─────────────────────────────────────────────────────────────────────────────
     { 
       name: 'tp-tutor-mastery',
-      version: 4,
+      version: 5,
       migrate: (persistedState: any, version: number) => {
         if (version < 3) {
           if (persistedState && Array.isArray(persistedState.vocabulary)) {
@@ -3211,14 +3259,20 @@ export const useMasteryStore = create<MasteryStore>()(
             );
           }
         }
+
+        if (version < 5) {
+          persistedState.songs = defaultSongs;
+        }
+
         return persistedState as MasteryStore;
       },
       partialize: (state) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { userId, cloudSynced, ...rest } = state;
+        const { userId, cloudSynced, songs, ...rest } = state;
         return rest;
       },
       onRehydrateStorage: () => (state) => {
+        if (state) { state.songs = defaultSongs; }
         if (state) {
           // Normalize vocabulary partOfSpeech
           if (Array.isArray(state.vocabulary)) {
