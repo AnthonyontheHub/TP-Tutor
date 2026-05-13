@@ -16,7 +16,6 @@ import SessionHistoryPanel from './components/SessionHistoryPanel';
 import ChatSession from './components/ChatSession';
 import DailyStoicHistory from './components/DailyStoicHistory';
 import DailyStoicPopup from './components/DailyStoicPopup';
-import { LibraryOverlay } from './components/LibraryOverlay';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -26,6 +25,14 @@ import { detectSessionTitle } from './services/linaService';
 // Type for __BUILD_TIME__ to satisfy TypeScript if it's not globally declared elsewhere.
 // In Vite, it's typically injected globally.
 declare const __BUILD_TIME__: string;
+
+// Fallback for crypto.randomUUID in non-secure contexts
+const generateId = () => {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return Math.random().toString(36).substring(2, 15);
+};
 
 export type AppPanel = 'profile' | 'settings' | 'instructions' | 'achievements' | 'logbook' | 'sessionHistory' | 'linaHub';
 
@@ -39,8 +46,6 @@ export default function App() {
 
   const [activePanels, setActivePanels] = useState<AppPanel[]>([]);
   const [showStoicHistory, setShowStoicHistory] = useState(false);
-  const [showLibrary, setShowLibrary] = useState(false);
-  const [libraryChapterId, setLibraryChapterId] = useState<string | undefined>();
   const [isSandboxMode, setIsSandboxMode] = useState<boolean>(
     () => localStorage.getItem('tp_sandbox_mode') === 'true'
   );
@@ -84,14 +89,6 @@ export default function App() {
       }
     }
   }, [user, profile.ritualPingsEnabled, calculateReadinessScore]);
-
-  // Fallback for crypto.randomUUID in non-secure contexts
-  const generateId = () => {
-    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-      return crypto.randomUUID();
-    }
-    return Math.random().toString(36).substring(2, 15);
-  };
 
   // Validate localStorage data on mount to fix any corruption
   useEffect(() => {
@@ -301,16 +298,6 @@ export default function App() {
       <div className="hidden">
         <DailyStoicPopup />
       </div>
-
-      {showLibrary && (
-        <LibraryOverlay 
-          initialChapterId={libraryChapterId} 
-          onClose={() => setShowLibrary(false)} 
-          onJumpToRoadmap={(nodeId) => {
-            setShowLibrary(false);
-          }}
-        />
-      )}
 
       <div className="chat-dock" style={{
         position: 'fixed',

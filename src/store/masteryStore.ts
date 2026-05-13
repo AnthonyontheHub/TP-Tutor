@@ -3260,10 +3260,6 @@ export const useMasteryStore = create<MasteryStore>()(
           }
         }
 
-        if (version < 5) {
-          persistedState.songs = defaultSongs;
-        }
-
         return persistedState as MasteryStore;
       },
       partialize: (state) => {

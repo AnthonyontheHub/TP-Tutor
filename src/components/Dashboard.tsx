@@ -57,7 +57,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
     if (commonPhrases.length < 20) {
       syncPhrasebook();
     }
-  }, []);
+  }, [syncPhrasebook]);
 
   const [activeView, setActiveView] = useState<DashboardView>('vocab');
   const [archiveSubView, setArchiveSubView] = useState<'saved' | 'book' | 'songs'>('saved');

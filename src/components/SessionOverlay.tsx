@@ -127,7 +127,6 @@ const BuilderDrill = ({
 
 export const SessionOverlay: React.FC<{ onAskLina?: (p: string) => void }> = ({ onAskLina }) => {
   const { activeActivity, setActiveActivity, recordActivityCompletion, curriculums } = useMasteryStore();
-  const [showConfirm, setShowConfirm] = useState(false);
   const initiatedRef = useRef(false);
 
   // Sync state cleanly
@@ -161,8 +160,6 @@ export const SessionOverlay: React.FC<{ onAskLina?: (p: string) => void }> = ({ 
 
   const node = curriculums.flatMap(l => l.nodes).find(n => n.id === nodeId);
   if (!node) return null;
-
-  const handleClose = () => setShowConfirm(true);
 
   const renderActivity = () => {
     switch (type) {
@@ -207,7 +204,7 @@ export const SessionOverlay: React.FC<{ onAskLina?: (p: string) => void }> = ({ 
   return (
     <div className="fixed inset-0 bg-black/90 backdrop-blur-3xl z-[100] flex flex-col overflow-y-auto">
        <div className="flex justify-end p-6">
-         <button onClick={handleClose} className="p-3 bg-white/5 border border-white/10 rounded-full text-white/40 hover:text-white transition-all active:scale-95"><X className="w-6 h-6"/></button>
+         <button onClick={() => setActiveActivity(null)} className="p-3 bg-white/5 border border-white/10 rounded-full text-white/40 hover:text-white transition-all active:scale-95"><X className="w-6 h-6"/></button>
        </div>
        <div className="flex-1 flex items-center justify-center">
          {renderActivity()}
