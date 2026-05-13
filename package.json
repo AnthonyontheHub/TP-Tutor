@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@capacitor/android": "^8.3.4",
+    "@capacitor/app": "^8.1.0",
     "@capacitor/core": "^8.3.4",
     "@capgo/capacitor-social-login": "^8.3.22",
     "@google/generative-ai": "^0.21.0",

@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { auth } from '../services/firebase';
-import { GoogleAuthProvider, signInWithCredential, signOut, onAuthStateChanged, type User } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithCredential, signInWithPopup, signOut, onAuthStateChanged, type User } from 'firebase/auth';
 import { SocialLogin } from '@capgo/capacitor-social-login';
+import { Capacitor } from '@capacitor/core';
 import { useMasteryStore } from './masteryStore';
 
 interface AuthState {
@@ -14,6 +15,8 @@ interface AuthState {
   logout: () => Promise<void>;
   setUser: (user: User | null) => void;
 }
+
+const googleProvider = new GoogleAuthProvider();
 
 SocialLogin.initialize({
   google: {
@@ -29,16 +32,19 @@ export const useAuthStore = create<AuthState>((set) => ({
   signIn: async () => {
     set({ loading: true, error: null });
     try {
-      const result = await SocialLogin.login({
-        provider: 'google',
-        options: {
-          scopes: ['profile', 'email'],
-        }
-      });
-      const idToken = result.result.idToken;
-      if (!idToken) throw new Error('No ID token returned from Google');
-      const credential = GoogleAuthProvider.credential(idToken);
-      await signInWithCredential(auth, credential);
+      const isNative = Capacitor.isNativePlatform();
+      if (isNative) {
+        const result = await SocialLogin.login({
+          provider: 'google',
+          options: { scopes: ['profile', 'email'] }
+        });
+        const idToken = result.result.idToken;
+        if (!idToken) throw new Error('No ID token returned from Google');
+        const credential = GoogleAuthProvider.credential(idToken);
+        await signInWithCredential(auth, credential);
+      } else {
+        await signInWithPopup(auth, googleProvider);
+      }
     } catch (error) {
       const authError = error as { code?: string; message?: string };
       console.error('Sign-in failed:', authError.code, authError.message);
@@ -56,7 +62,9 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
   logout: async () => {
     try {
-      await SocialLogin.logout({ provider: 'google' });
+      if (Capacitor.isNativePlatform()) {
+        await SocialLogin.logout({ provider: 'google' });
+      }
       await signOut(auth);
       set({ user: null, isGuest: false });
       useMasteryStore.getState().clearLocalData();
