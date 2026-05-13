@@ -10,6 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@capacitor/android": "^8.3.4",
+    "@capacitor/core": "^8.3.4",
+    "@capgo/capacitor-social-login": "^8.3.22",
     "@google/generative-ai": "^0.21.0",
     "firebase": "^10.14.0",
     "framer-motion": "^11.18.2",
@@ -25,6 +28,7 @@
     "zustand": "^5.0.1"
   },
   "devDependencies": {
+    "@capacitor/cli": "^7.6.5",
     "@eslint/js": "^9.15.0",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^20.17.6",

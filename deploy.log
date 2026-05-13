@@ -1,0 +1,16 @@
+
+=== Deploying to 'tp-tutor'...
+
+i  deploying hosting
+i  hosting[tp-tutor]: beginning deploy...
+i  hosting[tp-tutor]: found 22 files in dist
+✔  hosting[tp-tutor]: file upload complete
+i  hosting[tp-tutor]: finalizing version...
+✔  hosting[tp-tutor]: version finalized
+i  hosting[tp-tutor]: releasing new version...
+✔  hosting[tp-tutor]: release complete
+
+✔  Deploy complete!
+
+Project Console: https://console.firebase.google.com/project/tp-tutor/overview
+Hosting URL: https://tp-tutor.web.app
