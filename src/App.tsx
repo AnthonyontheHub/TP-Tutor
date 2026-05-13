@@ -19,6 +19,8 @@ import DailyStoicPopup from './components/DailyStoicPopup';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
+import { App as CapApp } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
 import { useChatStore } from './store/chatStore';
 import { detectSessionTitle } from './services/linaService';
 
@@ -38,7 +40,7 @@ export type AppPanel = 'profile' | 'settings' | 'instructions' | 'achievements' 
 
 export default function App() {
   const { user, loading } = useAuthStore();
-  const { hasCompletedSetup, isMainProfile, profile, calculateReadinessScore } = useMasteryStore();
+  const { hasCompletedSetup, isMainProfile, profile, calculateReadinessScore, newRankUnlocked, clearNewRankUnlocked } = useMasteryStore();
   const rawSessions = useChatStore(s => s.sessions);
   const { addSession, removeSession, updateSession } = useChatStore();
 
@@ -50,6 +52,21 @@ export default function App() {
     () => localStorage.getItem('tp_sandbox_mode') === 'true'
   );
   const [showMorningToast, setShowMorningToast] = useState(false);
+
+  useEffect(() => {
+    if (Capacitor.isNativePlatform()) {
+      const handle = CapApp.addListener('backButton', ({ canGoBack }) => {
+        if (canGoBack) {
+          window.history.back();
+        } else {
+          CapApp.exitApp();
+        }
+      });
+      return () => {
+        handle.then(h => h.remove());
+      };
+    }
+  }, []);
 
   useEffect(() => {
     if (!user) return;
@@ -143,6 +160,15 @@ export default function App() {
   }, [isSandboxMode]);
 
   useEffect(() => {
+    if (newRankUnlocked) {
+      const timerId = setTimeout(() => {
+        clearNewRankUnlocked();
+      }, 6000);
+      return () => clearTimeout(timerId);
+    }
+  }, [newRankUnlocked, clearNewRankUnlocked]);
+
+  useEffect(() => {
     if (!user) return;
     let cancelled = false;
     let unsubscribe: (() => void) | null = null;
@@ -154,6 +180,7 @@ export default function App() {
         user.photoURL || undefined
       );
       if (typeof result !== 'function') return;
+      useMasteryStore.getState().runMorningStreakCheck();
       // If the component unmounted (or user changed) before syncFromCloud
       // resolved, tear the listener down immediately — otherwise it leaks.
       if (cancelled) result();
@@ -173,6 +200,7 @@ export default function App() {
   }, []);
 
   const handleAskLina = useCallback((prompt: string) => {
+    useMasteryStore.getState().startSessionTimer();
     addSession({
       id: generateId(),
       title: detectSessionTitle(prompt),
@@ -186,6 +214,10 @@ export default function App() {
   }, [addSession]);
 
   const closeChat = (id: string) => {
+    const session = chatSessions.find(s => s.id === id);
+    if (session) {
+      useMasteryStore.getState().commitSessionLog({ topic: session.title || 'Chat Session', xpEarned: 0, wordsReviewed: [] });
+    }
     removeSession(id);
   };
 
@@ -267,6 +299,38 @@ export default function App() {
         )}
       </AnimatePresence>
 
+      <AnimatePresence>
+        {newRankUnlocked && (
+          <motion.div
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            style={{
+              position: 'fixed',
+              top: showMorningToast ? '110px' : '40px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              background: '#111',
+              border: '1px solid var(--gold)',
+              color: 'var(--gold)',
+              padding: '16px 24px',
+              borderRadius: '8px',
+              fontWeight: 800,
+              fontSize: '0.9rem',
+              letterSpacing: '0.05em',
+              boxShadow: '0 4px 20px rgba(212,175,55,0.4)',
+              zIndex: 9999,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px'
+            }}
+          >
+            <span>🏆</span>
+            <span>RANK UNLOCKED: {typeof newRankUnlocked === 'string' ? newRankUnlocked : newRankUnlocked.title}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <Dashboard 
         activePanels={activePanels}
         onTogglePanel={togglePanel}
@@ -295,9 +359,7 @@ export default function App() {
         onAskLina={(prompt) => { setShowStoicHistory(false); handleAskLina(prompt); }}
       />
 
-      <div className="hidden">
-        <DailyStoicPopup />
-      </div>
+      <DailyStoicPopup />
 
       <div className="chat-dock" style={{
         position: 'fixed',
@@ -370,24 +432,26 @@ export default function App() {
       {!hasCompletedSetup && <SetupScreen />}
 
       {/* Build Time Badge */}
-      <div
-        style={{
-          position: 'fixed',
-          bottom: '10px',
-          right: '10px',
-          backgroundColor: 'rgba(0, 0, 0, 0.6)', // Semi-transparent black background
-          color: 'white',
-          padding: '5px 10px',
-          borderRadius: '5px',
-          fontSize: '0.7rem',
-          fontWeight: 'bold',
-          zIndex: 99999, // High z-index to ensure it's on top
-          opacity: 0.8, // Slightly transparent
-          backdropFilter: 'blur(5px)' // Optional: adds a blur effect for unobtrusiveness
-        }}
-      >
-        Compiled: {new Date(__BUILD_TIME__).toLocaleString()}
-      </div>
+      {import.meta.env.DEV && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '10px',
+            right: '10px',
+            backgroundColor: 'rgba(0, 0, 0, 0.6)', // Semi-transparent black background
+            color: 'white',
+            padding: '5px 10px',
+            borderRadius: '5px',
+            fontSize: '0.7rem',
+            fontWeight: 'bold',
+            zIndex: 99999, // High z-index to ensure it's on top
+            opacity: 0.8, // Slightly transparent
+            backdropFilter: 'blur(5px)' // Optional: adds a blur effect for unobtrusiveness
+          }}
+        >
+          Compiled: {new Date(__BUILD_TIME__).toLocaleString()}
+        </div>
+      )}
       {/* End Build Time Badge */}
     </div>
   );

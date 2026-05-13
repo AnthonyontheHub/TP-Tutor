@@ -1,32 +1,15 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
-import { type MasteryStatus, type VocabWord } from '../types/mastery';
+import { type VocabWord } from '../types/mastery';
 
 interface Props {
   onClose: () => void;
-  isSandboxMode: boolean;
 }
 
 type DrillMode = 'select' | 'recognition' | 'production' | 'summary';
 
-const STATUS_TIERS: MasteryStatus[] = ['not_started', 'introduced', 'practicing', 'confident', 'mastered'];
-
-const getNextTier = (current: MasteryStatus | undefined): MasteryStatus => {
-  if (!current) return 'introduced';
-  const idx = STATUS_TIERS.indexOf(current);
-  if (idx === -1) return 'introduced';
-  return STATUS_TIERS[Math.min(idx + 1, STATUS_TIERS.length - 1)];
-};
-
-const getPrevTier = (current: MasteryStatus | undefined): MasteryStatus => {
-  if (!current || current === 'not_started') return 'not_started';
-  const idx = STATUS_TIERS.indexOf(current);
-  if (idx === -1) return 'not_started';
-  return STATUS_TIERS[Math.max(idx - 1, 1)]; // min 'introduced'
-};
-
-export default function DualDrillMode({ onClose, isSandboxMode }: Props) {
+export default function DualDrillMode({ onClose }: Props) {
   const { vocabulary, applyScoreUpdate } = useMasteryStore();
 
   const [mode, setMode] = useState<DrillMode>('select');

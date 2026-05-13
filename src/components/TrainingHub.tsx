@@ -13,9 +13,10 @@ import CompositionMode from './CompositionMode';
 interface Props {
   onClose: () => void;
   onAskLina?: (prompt: string) => void;
+  onLaunchDrill?: (drill: 'flashcards' | 'dual' | 'confusion' | 'composition') => void;
 }
 
-const TrainingHub: React.FC<Props> = ({ onClose, onAskLina }) => {
+const TrainingHub: React.FC<Props> = ({ onClose, onAskLina, onLaunchDrill }) => {
   const { setActiveActivity, sessionLog } = useMasteryStore();
   const [localActivity, setLocalActivity] = useState<string | null>(null);
 
@@ -41,6 +42,14 @@ const TrainingHub: React.FC<Props> = ({ onClose, onAskLina }) => {
     if (id === 'word-scramble') {
       setActiveActivity({ type: id, nodeId: 'hub' });
       onClose();
+    } else if (id === 'flashcards' && onLaunchDrill) {
+      onLaunchDrill('flashcards');
+    } else if (id === 'dual-drill' && onLaunchDrill) {
+      onLaunchDrill('dual');
+    } else if (id === 'confusion' && onLaunchDrill) {
+      onLaunchDrill('confusion');
+    } else if (id === 'composition' && onLaunchDrill) {
+      onLaunchDrill('composition');
     } else {
       setLocalActivity(id);
     }

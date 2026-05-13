@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, AlertCircle } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useMasteryStore } from '../store/masteryStore';
 import DualDrillMode from './DualDrillMode';
 import ConfusionDrill from './ConfusionDrill';
 import { ExamActivity } from './ExamActivity';
+import CompositionMode from './CompositionMode';
 
 // We inline a simple sentence unscramble drill here.
 const BuilderDrill = ({ 
@@ -164,11 +165,9 @@ export const SessionOverlay: React.FC<{ onAskLina?: (p: string) => void }> = ({ 
   const renderActivity = () => {
     switch (type) {
       case 'word-scramble': return <BuilderDrill nodeId={node.id} requiredVocabIds={node.requiredVocabIds || []} onComplete={() => {recordActivityCompletion(node.id, type); setActiveActivity(null);}} onSkip={() => setActiveActivity(null)} />;
-      case 'logic-gate': return <div className="text-white text-center p-12"><h2 className="text-2xl font-bold">LogicGateDrill (Under Development)</h2></div>;
-      case 'composition': return <div className="text-white text-center p-12"><h2 className="text-2xl font-bold">CompositionDrill (Under Development)</h2></div>;
+      case 'composition': return <CompositionMode onClose={() => setActiveActivity(null)} />;
       case 'confusion-drill': return <ConfusionDrill onClose={() => setActiveActivity(null)} />;
-      case 'dual-drill': return <DualDrillMode onClose={() => setActiveActivity(null)} isSandboxMode={false} />;
-      case 'philosophy-sorter': return <div className="text-white text-center p-12"><h2 className="text-2xl font-bold">PhilosophySorter (Under Development)</h2></div>;
+      case 'dual-drill': return <DualDrillMode onClose={() => setActiveActivity(null)} />;
       default: return (
         <div className="text-center text-white p-12">
             <h2 className="text-3xl font-bold mb-4 uppercase">Module Under Calibration</h2>

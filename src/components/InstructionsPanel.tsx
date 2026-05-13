@@ -1,10 +1,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
-import { STATUS_META, SMALL_RANKS } from '../types/mastery';
 
 interface Props {
-  isOpen: boolean;
   onClose: () => void;
 }
 

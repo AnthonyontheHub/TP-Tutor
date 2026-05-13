@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMasteryStore } from '../store/masteryStore';
 import { type VocabWord } from '../types/mastery';
@@ -274,7 +274,9 @@ export default function ConfusionDrill({ onClose }: Props) {
             animate={{ opacity: 1, y: 0 }}
             style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', maxWidth: '300px', margin: '0 auto' }}
           >
-            <button onClick={handleNext} className="btn-review" style={{ width: '100%', margin: 0, opacity: feedback === 'wrong' ? 0.6 : 1 }}>✓ GOT IT</button>
+            {feedback !== 'wrong' && (
+              <button onClick={handleNext} className="btn-review" style={{ width: '100%', margin: 0 }}>✓ GOT IT</button>
+            )}
             <button 
               onClick={handleSkip} 
               style={{ width: '100%', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#aaa', padding: '12px', borderRadius: '4px', fontWeight: 900, cursor: 'pointer', letterSpacing: '0.05em', fontSize: '0.8rem' }}

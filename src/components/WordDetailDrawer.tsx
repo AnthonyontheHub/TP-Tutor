@@ -188,7 +188,11 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
             style={{ padding: '24px' }}
           >
             <div style={{ marginBottom: '24px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <div style={{ fontSize: '1.2rem' }}>{STATUS_META[word.status].emoji}</div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{STATUS_META[word.status].label}</div>
+                </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <h2 style={{ fontSize: '3rem', marginBottom: '0', fontWeight: 900, color: 'white', letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '16px' }}>
                     {word.word}
@@ -202,10 +206,6 @@ export default function WordDetailDrawer({ isOpen, word, onClose, onAskLina, isS
                   >
                     🔊
                   </button>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{STATUS_META[word.status].label}</div>
-                  <div style={{ fontSize: '1.5rem' }}>{STATUS_META[word.status].emoji}</div>
                 </div>
               </div>
 

@@ -1239,6 +1239,9 @@ const defaultProfile: UserProfile = {
   workSchedule: '',
   livingSituation: '',
   socialPreference: '',
+  loreLog: [],
+  ritualPingsEnabled: false,
+  pets: [],
 };
 
 export const useMasteryStore = create<MasteryStore>()(
@@ -1977,9 +1980,7 @@ export const useMasteryStore = create<MasteryStore>()(
             if (w.id !== wordId && w.word.toLowerCase() !== wordId.toLowerCase()) return w;
             const currentXP = w.baseScore || 0;
             const newXP = Math.min(1000, currentXP + xp); // Cap at 1000 (Mastered)
-            let newStatus: MasteryStatus = w.status;
-            if (newXP >= 500) newStatus = 'confident';
-            if (newXP >= 950) newStatus = 'mastered';
+            let newStatus: MasteryStatus = scoreToStatus(newXP);
             return { ...w, baseScore: newXP, status: newStatus };
           })
         }));
@@ -2214,6 +2215,8 @@ export const useMasteryStore = create<MasteryStore>()(
         set(state => ({
           sessionLog: [{ ...entry, id, durationMinutes }, ...state.sessionLog].slice(0, 100)
         }));
+        get().progressChallenge(1, 'session_count');
+        get().checkAndAwardRanks();
         void get().syncToCloud();
       },
 
@@ -2232,6 +2235,7 @@ export const useMasteryStore = create<MasteryStore>()(
            set(state => ({ completedChallenges: [currentChallenge, ...state.completedChallenges] }));
         }
 
+        // TODO: 'convo_length' progression needs to be wired in ChatSession when that file is next opened.
         const templates: { type: WeeklyChallenge['type'], title: string, description: string, targetCount: number, xpReward: number }[] = [
           {
             type: 'word_usage',
@@ -2802,7 +2806,7 @@ export const useMasteryStore = create<MasteryStore>()(
             earnedCeremonialRanks, lastSmallRankTitle, earnedBadges, totalProveItSubmitted,
             streakShields, xpMultiplier, lastStreakMilestone, pendingComebackBonus, sessionXPRecord,
             sessionLog, currentChallenge, completedChallenges, pendingRankAcknowledgement, newRankUnlocked,
-            activeCurriculumId, activeModuleId, selectedWords, lessonFilter, completedActivities, masteryHistory } = get();
+            activeCurriculumId, activeModuleId, selectedWords, lessonFilter, completedActivities, masteryHistory, reviewVibe } = get();
         const targetId = explicitUserId || userId;
 
         // Block premature syncs before cloud data has loaded — prevents stale
@@ -2845,7 +2849,7 @@ export const useMasteryStore = create<MasteryStore>()(
             earnedCeremonialRanks, lastSmallRankTitle, earnedBadges, totalProveItSubmitted,
             streakShields, xpMultiplier, lastStreakMilestone, pendingComebackBonus, sessionXPRecord,
             sessionLog, currentChallenge, completedChallenges, pendingRankAcknowledgement, newRankUnlocked,
-            activeCurriculumId, activeModuleId, selectedWords, lessonFilter, completedActivities, masteryHistory
+            activeCurriculumId, activeModuleId, selectedWords, lessonFilter, completedActivities, masteryHistory, reviewVibe
           }), { merge });
         } catch (err) {
           console.error('Firebase Sync Error:', err);
@@ -3095,6 +3099,7 @@ export const useMasteryStore = create<MasteryStore>()(
             lessonFilter: data.lessonFilter || null,
             completedActivities: data.completedActivities || {},
             masteryHistory: data.masteryHistory || [],
+            reviewVibe: data.reviewVibe || null,
           };
 
           if (data.studentName) update.studentName = data.studentName;
@@ -3257,6 +3262,18 @@ export const useMasteryStore = create<MasteryStore>()(
             persistedState.vocabulary = persistedState.vocabulary.filter(
               (v: any) => !REMOVED_IDS.has(v.word) && !REMOVED_IDS.has(v.id)
             );
+          }
+        }
+
+        if (version < 5) {
+          if (persistedState && Array.isArray(persistedState.vocabulary)) {
+            persistedState.vocabulary = persistedState.vocabulary.map((v: any) => {
+              const groundTruth = initialMasteryMap.initialVocabulary.find(iv => iv.id === v.id || iv.word === v.word);
+              if (groundTruth && groundTruth.weight) {
+                return { ...v, weight: groundTruth.weight };
+              }
+              return v;
+            });
           }
         }
 

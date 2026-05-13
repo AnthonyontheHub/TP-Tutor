@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { examData } from '../data/examQuestions';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { resolveApiKey } from '../services/linaService';
@@ -16,8 +16,7 @@ export const ExamActivity: React.FC<ExamActivityProps> = ({ nodeId, onComplete }
   const [markdownResult, setMarkdownResult] = useState<string>('');
 
   const examType = nodeId.includes('midterm') ? 'midterm' : 'final';
-  const questions = examData[examType] || [];
-
+  
   if (!examData[examType]) {
     return (
       <div className="flex items-center justify-center h-full p-20">
@@ -28,6 +27,8 @@ export const ExamActivity: React.FC<ExamActivityProps> = ({ nodeId, onComplete }
       </div>
     );
   }
+
+  const questions = examData[examType] || [];
 
   // Group questions by section
   const sections = questions.reduce((acc, q) => {
@@ -64,7 +65,6 @@ Your goal is to grade the following exam strictly according to the provided Blue
 3. KINDNESS: Use "Secondbrain" callouts (> [!info], > [!tip]) to provide helpful hints for missed questions. Instead of just saying "Wrong," say "Not quite! In Toki Pona, we use [concept] here because..."
 
 ### DATA PROVIDED:
-- EXAM SPECIFICATION: [Insert contents of toki_pona_intro_exams.md here]
 - EXAM TYPE: ${examType}
 - STUDENT ANSWERS: ${JSON.stringify(answers)}
 - QUESTIONS & CORRECT ANSWERS:

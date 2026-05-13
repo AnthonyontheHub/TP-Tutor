@@ -301,6 +301,8 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
           align-items: center;
           gap: 6px;
           flex-shrink: 0;
+          max-width: calc(100vw - 180px);
+          overflow-x: auto;
         }
 
         @keyframes gradient-shift {
@@ -326,8 +328,9 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
               borderRadius: '20px',
               background: 'rgba(255,255,255,0.03)',
               border: '1px solid rgba(255,255,255,0.05)',
-              flexShrink: 1,
+              flexShrink: 0,
               minWidth: 0,
+              maxWidth: '160px',
               height: '32px'
             }}
           >
@@ -340,7 +343,8 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
                   height: '26px', 
                   borderRadius: '50%', 
                   objectFit: 'cover',
-                  border: '1px solid rgba(255,255,255,0.1)'
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  flexShrink: 0
                 }} 
               />
             ) : (
@@ -416,7 +420,7 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
         </div>
       </header>
 
-      <main className="dashboard__main" style={{ paddingBottom: '80px' }}>
+      <main className="dashboard__main" style={{ paddingBottom: 'calc(80px + env(safe-area-inset-bottom, 0px))' }}>
         {/* Inject the Library Overlay here or at App level. 
             Since we're modifying Dashboard, I'll pass the control up or assume App handles it. 
             Actually, the library overlay should be triggered here. 
@@ -938,7 +942,17 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
       )}
 
       {showTrainingHub && (
-        <TrainingHub onClose={() => setShowTrainingHub(false)} onAskLina={onAskLina} />
+        <TrainingHub 
+          onClose={() => setShowTrainingHub(false)} 
+          onAskLina={onAskLina} 
+          onLaunchDrill={(drill) => {
+            setShowTrainingHub(false);
+            if (drill === 'flashcards') setShowFlashcards(true);
+            else if (drill === 'dual') setShowDualDrill(true);
+            else if (drill === 'confusion') setShowConfusionDrill(true);
+            else if (drill === 'composition') setShowComposition(true);
+          }}
+        />
       )}
 
       {showFlashcards && (
@@ -952,7 +966,6 @@ export default function Dashboard({ onTogglePanel, activePanels, onAskLina, isSa
       {showDualDrill && (
         <DualDrillMode
           onClose={() => setShowDualDrill(false)}
-          isSandboxMode={isSandboxMode}
         />
       )}
 

@@ -897,6 +897,7 @@ button:active { transform: scale(0.96); }
   display: flex;
   justify-content: space-around;
   align-items: center;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .ritual-core-container {
